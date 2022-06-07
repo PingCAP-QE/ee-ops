@@ -1,0 +1,20 @@
+name: CD config Test
+on:
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup tools
+        uses: ./.github/actions/flux2/tools
+      - name: Validate infrastructure manifests
+        working-directory: infrastructure
+        run: |
+          chmod +x ../scripts/validate_k8s_yaml.sh
+          ../scripts/validate_k8s_yaml.sh
