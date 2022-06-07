@@ -1,0 +1,100 @@
+# verify with local kind k8s cluster.
+name: CD E2E test
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+jobs:
+  kubernetes:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        cluster: [staging]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup tools
+        uses: ./.github/actions/flux2/tools
+      - name: Setup Flux
+        uses: fluxcd/flux2/action@main
+      - name: Setup Kubernetes
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          # renovate: datasource=go depName=sigs.k8s.io/kind
+          version: v0.12.0
+      - name: Install Flux in Kubernetes Kind
+        run: |
+          flux check --pre
+          flux install
+      - name: Setup secret and PVC
+        run: |
+          kubectl create namespace jenkins
+          kubectl -n jenkins create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret
+          kubectl -n jenkins apply -f - <<EOF > cat
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: jenkins
+            namespace: jenkins
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 8Gi
+            storageClassName: standard # in kind type cluster.
+            volumeMode: Filesystem
+          EOF
+      - name: Debug PR info
+        run: |
+          echo "source repo: ${{ github.event.pull_request.head.repo.html_url }}"
+          echo "source branch: ${GITHUB_HEAD_REF}"
+      - name: Setup cluster reconciliation
+        run: |
+          kubectl apply -f - <<EOF > cat
+          apiVersion: source.toolkit.fluxcd.io/v1beta2
+          kind: GitRepository
+          metadata:
+            name: flux-system
+            namespace: flux-system
+          spec:
+            interval: 15m
+            ref:
+              branch: ${GITHUB_HEAD_REF}
+            url: ${{ github.event.pull_request.head.repo.html_url }}
+            ignore: clusters/${{ matrix.cluster }}/flux-system/
+          EOF
+
+          flux create kustomization flux-system \
+            --source=flux-system \
+            --path=clusters/${{ matrix.cluster }}
+
+      - name: Verify cluster reconciliations
+        timeout-minutes: 5
+        run: |
+          while flux get all --all-namespaces --status-selector=ready=false | grep False
+          do
+            sleep 5
+          done
+
+          # wait for jenkins server
+          until kubectl get pods  -l app.kubernetes.io/name=jenkins --all-namespaces
+          do
+            sleep 5
+          done
+          kubectl wait -l app.kubernetes.io/name=jenkins pods --for=condition=ready --all-namespaces --timeout=5m
+      - name: Debug failure using kubectl
+        if: failure()
+        run: |
+          kubectl get all --all-namespaces
+          kubectl -n flux-system logs deploy/source-controller
+          kubectl -n flux-system logs deploy/kustomize-controller
+          kubectl -n flux-system logs deploy/helm-controller
+      - name: Debug failure using flux
+        if: failure()
+        run: |
+          flux get all --all-namespaces
+          flux logs --all-namespaces
