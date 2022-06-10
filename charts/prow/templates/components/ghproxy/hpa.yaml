@@ -1,0 +1,28 @@
+{{- if .Values.ghproxy.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "prow.fullname.ghproxy" . }}
+  labels:
+    {{- include "prow.labels.ghproxy" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "prow.fullname.ghproxy" . }}
+  minReplicas: {{ .Values.ghproxy.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.ghproxy.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.ghproxy.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.ghproxy.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.ghproxy.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.ghproxy.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

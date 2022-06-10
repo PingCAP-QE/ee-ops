@@ -1,0 +1,322 @@
+# Default values for prow.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+### Global Pod configurations.
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+nodeSelector: {}
+tolerations: []
+affinity: {}
+podAnnotations: {}
+podSecurityContext: {}
+securityContext: {}
+
+#### custom config, all should be replaced.
+prow:
+  podsNamespace: default
+
+  domainName: << REPLACE >>
+  githubAppId: << REPLACE >>
+  githubAppCert: << REPLACE >>
+  # Generate via `openssl rand -hex 20`.
+  # This is the secret used in the GitHub webhook configuration
+  githubHmacToken: << REPLACE >>
+
+  # github org:
+  githubOrg: << REPLACE >>
+
+### Values for minIO Sub chart.
+minio:
+  regionName: prow
+  auth:
+    rootUser: root
+    rootPassword: password
+  defaultBuckets: "prow-logs,tide,status-reconciler"
+  persistence:
+    size: 10Gi
+  extraEnvVars:
+    - name: MINIO_REGION_NAME
+      value: prow
+
+########################################
+# Configuration for prow components    #
+########################################
+crier:
+  image:
+    repository: gcr.io/k8s-prow/crier
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template.
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}
+
+deck:
+  image:
+    repository: gcr.io/k8s-prow/deck
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 2
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  service:
+    type: ClusterIP
+    port: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+
+  resources: {}
+  ingress:
+    enabled: true
+    className: ""
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+ghproxy:
+  image:
+    repository: gcr.io/k8s-prow/ghproxy
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  service:
+    type: ClusterIP
+    port: 80
+  resources: {}
+  persistence:
+    size: 10Gi
+
+hook:
+  image:
+    repository: gcr.io/k8s-prow/hook
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 2
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  service:
+    type: ClusterIP
+    port: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}
+  ingress:
+    enabled: true
+    className: ""
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-staging
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - paths:
+          - path: /hook
+            pathType: Prefix
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
+horologium:
+  image:
+    repository: gcr.io/k8s-prow/horologium
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  # Do not scale up.
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}
+
+pcm:
+  image:
+    repository: gcr.io/k8s-prow/prow-controller-manager
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}
+
+sinker:
+  image:
+    repository: gcr.io/k8s-prow/sinker
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}
+
+statusReconciler:
+  image:
+    repository: gcr.io/k8s-prow/status-reconciler
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}
+
+tide:
+  image:
+    repository: gcr.io/k8s-prow/tide
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  # Do not scale up.
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  service:
+    type: ClusterIP
+    port: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}

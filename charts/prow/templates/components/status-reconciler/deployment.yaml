@@ -1,0 +1,93 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.statusReconciler" . }}
+  labels:
+    {{- include "prow.labels.statusReconciler" . | nindent 4 }}
+spec:
+  {{- if not .Values.statusReconciler.autoscaling.enabled }}
+  replicas: {{ .Values.statusReconciler.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.statusReconciler" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.statusReconciler" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.statusReconciler" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 180
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.statusReconciler.image.repository }}:{{ .Values.statusReconciler.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.statusReconciler.image.pullPolicy }}
+          args:
+            - --dry-run=false
+            - --continue-on-error=true
+            - --plugin-config=/etc/plugins/plugins.yaml
+            - --config-path=/etc/config/config.yaml
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --status-path=s3://status-reconciler/status-reconciler-status
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
+          env:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "prow.fullname" . }}-github-token
+                  key: appid
+          volumeMounts:
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
+              readOnly: true
+            - name: s3-credentials
+              mountPath: /etc/s3-credentials
+              readOnly: true
+          resources:
+            {{- toYaml .Values.statusReconciler.resources | nindent 12 }}
+      volumes:
+      - name: github-token
+        secret:
+          secretName: {{ include "prow.fullname" . }}-github-token
+      - name: config
+        configMap:
+          name: {{ include "prow.fullname" . }}-config
+      - name: plugins
+        configMap:
+          name: {{ include "prow.fullname" . }}-plugins
+      - name: s3-credentials
+        secret:
+          secretName: {{ include "prow.fullname" . }}-s3-credentials
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

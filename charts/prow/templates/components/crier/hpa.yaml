@@ -1,0 +1,28 @@
+{{- if .Values.crier.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "prow.fullname.crier" . }}
+  labels:
+    {{- include "prow.labels.crier" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "prow.fullname.crier" . }}
+  minReplicas: {{ .Values.crier.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.crier.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.crier.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.crier.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.crier.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.crier.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

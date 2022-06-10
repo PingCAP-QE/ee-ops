@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.horologium" . }}
+  labels:
+    {{- include "prow.labels.horologium" . | nindent 4 }}
+spec:
+  {{- if not .Values.horologium.autoscaling.enabled }}
+  replicas: {{ .Values.horologium.replicaCount }}
+  {{- end }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.horologium" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.horologium" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.horologium" . }}
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.horologium.image.repository }}:{{ .Values.horologium.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.horologium.image.pullPolicy }}
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+          - name: config
+            mountPath: /etc/config
+            readOnly: true
+          resources:
+            {{- toYaml .Values.horologium.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "prow.fullname" . }}-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
