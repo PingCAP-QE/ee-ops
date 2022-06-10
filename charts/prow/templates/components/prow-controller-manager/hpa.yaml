@@ -1,0 +1,28 @@
+{{- if .Values.pcm.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "prow.fullname.pcm" . }}
+  labels:
+    {{- include "prow.labels.pcm" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "prow.fullname.pcm" . }}
+  minReplicas: {{ .Values.pcm.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.pcm.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.pcm.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.pcm.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.pcm.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.pcm.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

@@ -1,0 +1,33 @@
+{{- if .Values.deck.serviceAccount.roleBinding.create -}}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: {{ .Values.prow.podsNamespace }}
+  name: {{ include "prow.roleName.deck" . }}
+  labels:
+    {{- include "prow.labels.deck" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - pods/log
+    verbs:
+      - get
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: {{ .Values.prow.podsNamespace }}
+  name: {{ include "prow.roleBindingName.deck" . }}
+  labels:
+    {{- include "prow.labels.deck" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "prow.roleName.deck" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "prow.serviceAccountName.deck" . }}
+    namespace: {{ .Release.Namespace }}      
+{{- end }}

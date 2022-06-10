@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.crier" . }}
+  labels:
+    {{- include "prow.labels.crier" . | nindent 4 }}
+spec:
+  {{- if not .Values.crier.autoscaling.enabled }}
+  replicas: {{ .Values.crier.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.crier" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.crier" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.crier" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.crier.image.repository }}:{{ .Values.crier.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.crier.image.pullPolicy }}
+          args:
+            - --blob-storage-workers=10
+            - --config-path=/etc/config/config.yaml
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --github-workers=10
+            - --kubernetes-blob-storage-workers=10
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
+          env:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "prow.fullname" . }}-github-token
+                  key: appid
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: s3-credentials
+              mountPath: /etc/s3-credentials
+              readOnly: true
+          resources:
+            {{- toYaml .Values.crier.resources | nindent 12 }}
+
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "prow.fullname" . }}-config
+      - name: github-token
+        secret:
+          secretName: {{ include "prow.fullname" . }}-github-token
+      - name: s3-credentials
+        secret:
+          secretName: {{ include "prow.fullname" . }}-s3-credentials
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
