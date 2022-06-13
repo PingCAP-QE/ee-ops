@@ -1,0 +1,28 @@
+{{- if .Values.horologium.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "prow.fullname.horologium" . }}
+  labels:
+    {{- include "prow.labels.horologium" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "prow.fullname.horologium" . }}
+  minReplicas: {{ .Values.horologium.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.horologium.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.horologium.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.horologium.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.horologium.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.horologium.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

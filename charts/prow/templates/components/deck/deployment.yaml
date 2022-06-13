@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.deck" . }}
+  labels:
+    {{- include "prow.labels.deck" . | nindent 4 }}
+spec:
+  {{- if not .Values.deck.autoscaling.enabled }}
+  replicas: {{ .Values.deck.replicaCount }}
+  {{- end }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.deck" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.deck" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.deck" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.deck.image.repository }}:{{ .Values.deck.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.deck.image.pullPolicy }}
+          args:
+            - --config-path=/etc/config/config.yaml
+            - --plugin-config=/etc/plugins/plugins.yaml
+            - --tide-url=http://tide/
+            - --hook-url=http://hook:8888/plugin-help
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --github-graphql-endpoint=http://ghproxy/graphql
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --spyglass=true
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
+          env:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "prow.fullname" . }}-github-token
+                  key: appid
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          resources:
+            {{- toYaml .Values.deck.resources | nindent 12 }}
+          volumeMounts:
+          - name: config
+            mountPath: /etc/config
+            readOnly: true
+          - name: github-token
+            mountPath: /etc/github
+            readOnly: true
+          - name: plugins
+            mountPath: /etc/plugins
+            readOnly: true
+          - name: s3-credentials
+            mountPath: /etc/s3-credentials
+            readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 600
+      volumes:
+      - name: config
+        configMap:
+          name: {{ include "prow.fullname" . }}-config
+      - name: plugins
+        configMap:
+          name: {{ include "prow.fullname" . }}-plugins
+      - name: github-token
+        secret:
+          secretName: {{ include "prow.fullname" . }}-github-token
+      - name: s3-credentials
+        secret:
+          secretName: {{ include "prow.fullname" . }}-s3-credentials
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

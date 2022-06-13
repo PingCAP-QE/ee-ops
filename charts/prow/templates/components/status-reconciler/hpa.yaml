@@ -1,0 +1,28 @@
+{{- if .Values.statusReconciler.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "prow.fullname.statusReconciler" . }}
+  labels:
+    {{- include "prow.labels.statusReconciler" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "prow.fullname.statusReconciler" . }}
+  minReplicas: {{ .Values.statusReconciler.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.statusReconciler.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.statusReconciler.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.statusReconciler.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.statusReconciler.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.statusReconciler.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

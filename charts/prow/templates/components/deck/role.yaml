@@ -1,0 +1,37 @@
+{{- if .Values.deck.serviceAccount.roleBinding.create }}
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "prow.roleName.deck" . }}
+  labels:
+    {{- include "prow.labels.deck" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - prow.k8s.io
+    resources:
+      - prowjobs
+    verbs:
+      - get
+      - list
+      - watch
+      # Required when deck runs with `--rerun-creates-job=true`
+      # **Warning:** Only use this for non-public deck instances, this allows
+      # anyone with access to your Deck instance to create new Prowjobs
+      # - create
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "prow.roleBindingName.deck" . }}
+  labels:
+    {{- include "prow.labels.deck" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "prow.roleName.deck" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "prow.serviceAccountName.deck" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}
