@@ -1,0 +1,33 @@
+{{- if .Values.horologium.serviceAccount.roleBinding.create }}
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "prow.roleName.horologium" . }}
+  labels:
+    {{- include "prow.labels.horologium" . | nindent 4 }}
+rules:
+  - apiGroups:
+      - prow.k8s.io
+    resources:
+      - prowjobs
+    verbs:
+      - create
+      - list
+      - watch
+
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "prow.roleBindingName.horologium" . }}
+  labels:
+    {{- include "prow.labels.horologium" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "prow.roleName.horologium" . }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "prow.serviceAccountName.horologium" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "prow.fullname.hook" . }}
+  labels: {{- include "prow.labels.hook" . | nindent 4 }}
+spec:
+  type: {{ .Values.hook.service.type }}
+  ports:
+    - port: {{ .Values.hook.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector: {{- include "prow.selectorLabels.hook" . | nindent 4 }}

@@ -1,0 +1,28 @@
+{{- if .Values.sinker.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "prow.fullname.sinker" . }}
+  labels:
+    {{- include "prow.labels.sinker" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "prow.fullname.sinker" . }}
+  minReplicas: {{ .Values.sinker.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.sinker.autoscaling.maxReplicas }}
+  metrics:
+    {{- if .Values.sinker.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ .Values.sinker.autoscaling.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.sinker.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ .Values.sinker.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- end }}
+{{- end }}

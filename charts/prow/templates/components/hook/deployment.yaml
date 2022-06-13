@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.hook" . }}
+  labels:
+    {{- include "prow.labels.hook" . | nindent 4 }}
+spec:
+  {{- if not .Values.hook.autoscaling.enabled }}
+  replicas: {{ .Values.hook.replicaCount }}
+  {{- end }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.hook" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.hook" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.hook" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      terminationGracePeriodSeconds: 180
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.hook.image.repository }}:{{ .Values.hook.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.hook.image.pullPolicy }}
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
+          env:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "prow.fullname" . }}-github-token
+                  key: appid
+          ports:
+            - name: http
+              containerPort: 8888
+          volumeMounts:
+            - name: hmac
+              mountPath: /etc/webhook
+              readOnly: true
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 600
+          resources:
+            {{- toYaml .Values.hook.resources | nindent 12 }}
+      volumes:
+        - name: hmac
+          secret:
+            secretName: {{ include "prow.fullname" . }}-hmac-token
+        - name: github-token
+          secret:
+            secretName: {{ include "prow.fullname" . }}-github-token
+        - name: config
+          configMap:
+            name: {{ include "prow.fullname" . }}-config
+        - name: plugins
+          configMap:
+            name: {{ include "prow.fullname" . }}-plugins
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

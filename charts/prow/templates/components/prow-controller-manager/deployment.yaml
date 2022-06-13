@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.pcm" . }}
+  labels:
+    {{- include "prow.labels.pcm" . | nindent 4 }}
+spec:
+  {{- if not .Values.pcm.autoscaling.enabled }}
+  replicas: {{ .Values.pcm.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.pcm" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.pcm" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.pcm" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.pcm.image.repository }}:{{ .Values.pcm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.pcm.image.pullPolicy }}
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+            - --github-endpoint=http://ghproxy
+            - --github-endpoint=https://api.github.com
+            - --enable-controller=plank
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
+          env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: {{ include "prow.fullname" . }}-github-token
+                key: appid
+          volumeMounts:
+          - name: github-token
+            mountPath: /etc/github
+            readOnly: true
+          - name: config
+            mountPath: /etc/config
+            readOnly: true
+          resources:
+            {{- toYaml .Values.pcm.resources | nindent 12 }}
+      volumes:
+      - name: github-token
+        secret:
+          secretName: {{ include "prow.fullname" . }}-github-token
+      - name: config
+        configMap:
+          name: {{ include "prow.fullname" . }}-config
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
