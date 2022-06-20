@@ -20,7 +20,7 @@ Create a github private token with repo permissions, copy and write it.
 See [doc](https://fluxcd.io/docs/get-started/#before-you-begin).
 
 - secrets for jenkins component
-  > see [here](infrastructure/jenkins/README.md)
+  > see [here](apps/staging/jenkins/README.md)
 - other `WIP`
 
 ### Setup GitOps
