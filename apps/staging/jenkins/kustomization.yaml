@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: jenkins
 resources:
   - namespace.yaml
+  - helm-repo.yaml
   - release.yaml
 configMapGenerator:
   - name: jenkins-values
