@@ -8,13 +8,18 @@ on:
 jobs:
   manifests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        path: [infrastructure, clusters/staging, apps/staging]
     steps:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Setup tools
         uses: ./.github/actions/flux2/tools
-      - name: Validate infrastructure manifests
-        working-directory: infrastructure
+      - name: Validate ${{ matrix.path }} manifests
         run: |
-          chmod +x ../scripts/validate_k8s_yaml.sh
-          ../scripts/validate_k8s_yaml.sh
+          chmod +x scripts/validate_k8s_yaml.sh
+          pushd ${{ matrix.path }}
+            ${{ github.workspace }}/scripts/validate_k8s_yaml.sh
+          popd
