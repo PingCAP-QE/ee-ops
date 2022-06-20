@@ -14,14 +14,16 @@ Before all please fork it into you personal account or organization.
   > Install by bash or download release binary from [Flux site](https://fluxcd.io/docs/get-started/#install-the-flux-cli)
 #### cluster secret data
 
+- secrets for jenkins component
+  > see [here](apps/staging/jenkins/README.md)
+- other `WIP`
+
+
 #### Github private token
 
 Create a github private token with repo permissions, copy and write it.
 See [doc](https://fluxcd.io/docs/get-started/#before-you-begin).
 
-- secrets for jenkins component
-  > see [here](apps/staging/jenkins/README.md)
-- other `WIP`
 
 ### Setup GitOps
 
