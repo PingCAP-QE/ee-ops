@@ -22,3 +22,5 @@ spec:
     controller:
       service:
         type: NodePort
+      ingressClassResource:
+        default: true
