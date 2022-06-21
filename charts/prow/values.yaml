@@ -111,10 +111,11 @@ deck:
       - paths:
           - path: /
             pathType: Prefix
+        # host: << REPLACE >>
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
-    #      - chart-example.local
+    #      - << REPLACE >>
 
 ghproxy:
   image:
@@ -176,10 +177,12 @@ hook:
       - paths:
           - path: /hook
             pathType: Prefix
+        # host: << REPLACE >>
+
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
-    #      - chart-example.local
+    #      - << REPLACE >>
 
 horologium:
   image:

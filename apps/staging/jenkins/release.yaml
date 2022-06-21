@@ -2,6 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: jenkins
+  namespace: apps
 spec:
   releaseName: jenkins
   chart:
@@ -20,18 +21,8 @@ spec:
     enable: true
     ignoreFailures: false
   valuesFrom:
-    - kind: ConfigMap
-      name: jenkins-values
-      valuesKey: values1.yaml
-    - kind: ConfigMap
-      name: jenkins-values
-      valuesKey: values2.yaml
-    - kind: ConfigMap
-      name: jenkins-values
-      valuesKey: values3.yaml
-    - kind: ConfigMap
-      name: jenkins-values
-      valuesKey: values4.yaml
-    - kind: ConfigMap
-      name: jenkins-values
-      valuesKey: values5.yaml
+    - { kind: ConfigMap, name: jenkins-values, valuesKey: values1.yaml }
+    - { kind: ConfigMap, name: jenkins-values, valuesKey: values2.yaml }
+    - { kind: ConfigMap, name: jenkins-values, valuesKey: values3.yaml }
+    - { kind: ConfigMap, name: jenkins-values, valuesKey: values4.yaml }
+    - { kind: ConfigMap, name: jenkins-values, valuesKey: values5.yaml }

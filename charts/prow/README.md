@@ -15,7 +15,7 @@ Helm Chart for Prow
     podsNamespace: default
 
     # you can fill it with dumy domain, such as: `test.io`  
-    domainName: <<prow app backend domain without prefix `prow.`>>
+    domainName: <<prow app backend domain with prefix `prow.`>>
     githubAppId: <<prow github app id>
     githubAppCert: |
         -----BEGIN RSA PRIVATE KEY-----
@@ -30,7 +30,7 @@ Helm Chart for Prow
     ```
 2. install the chart
     ```bash
-    helm install prow
+    helm install prow -f values.yaml
     ```
 
 ## Debug

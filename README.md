@@ -14,14 +14,19 @@ Before all please fork it into you personal account or organization.
   > Install by bash or download release binary from [Flux site](https://fluxcd.io/docs/get-started/#install-the-flux-cli)
 #### cluster secret data
 
+- secrets for jenkins component
+  > see [here](apps/staging/jenkins/README.md)
+- secrets for prow component
+  > first copy and update with the [tpl](apps/staging/prow/values.yaml) to file `values.yaml`, then create secret `prow-secret` with kubectl:
+  > `kubectl -n apps create secret generic prow-secret --from-file=values.yaml=values.yaml`
+- other `WIP`
+
+
 #### Github private token
 
 Create a github private token with repo permissions, copy and write it.
 See [doc](https://fluxcd.io/docs/get-started/#before-you-begin).
 
-- secrets for jenkins component
-  > see [here](infrastructure/jenkins/README.md)
-- other `WIP`
 
 ### Setup GitOps
 
