@@ -31,14 +31,14 @@ jobs:
           flux install
       - name: Setup secret and PVC
         run: |
-          kubectl create namespace jenkins
-          kubectl -n jenkins create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret
-          kubectl -n jenkins apply -f - <<EOF > cat
+          kubectl create namespace apps
+          kubectl -n apps create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret
+          kubectl -n apps apply -f - <<EOF > cat
           apiVersion: v1
           kind: PersistentVolumeClaim
           metadata:
             name: jenkins
-            namespace: jenkins
+            namespace: apps
           spec:
             accessModes:
             - ReadWriteOnce
