@@ -30,7 +30,7 @@ Helm Chart for Prow
     ```
 2. install the chart
     ```bash
-    helm install prow
+    helm install prow -f values.yaml
     ```
 
 ## Debug
