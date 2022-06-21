@@ -29,9 +29,11 @@ jobs:
         run: |
           flux check --pre
           flux install
-      - name: Setup secret and PVC
+      - name: Create namespace `apps`
+        run: kubectl create namespace apps
+
+      - name: Setup secret and PVC for jenkins
         run: |
-          kubectl create namespace apps
           kubectl -n apps create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret
           kubectl -n apps apply -f - <<EOF > cat
           apiVersion: v1
@@ -45,9 +47,23 @@ jobs:
             resources:
               requests:
                 storage: 8Gi
-            storageClassName: standard # in kind type cluster.
+            storageClassName: standard # in kind type cluster, if the cluster has default storage class, it should be commented.
             volumeMode: Filesystem
           EOF
+      - name: Setup secret and PVC for prow
+        run: |
+          touch values.yaml
+
+          yq -i e '.prow.domainName = "prow.test.io"' values.yaml
+          yq -i e '.prow.githubAppId = "${{ secrets.PROW_APP_ID }}"' values.yaml
+          yq -i e '.prow.githubAppCert = "${{ secrets.PROW_APP_CERT }}" | .prow.githubAppCert style="double"' values.yaml
+          yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' values.yaml
+          orgName=$(dirname ${{ github.event.repository.full_name }})
+          yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
+
+          kubectl -n apps create secret generic prow-secret --from-file=values.yaml=values.yaml
+
+          rm values.yaml
       - name: Debug PR info
         run: |
           echo "source repo: ${{ github.event.pull_request.head.repo.html_url }}"
