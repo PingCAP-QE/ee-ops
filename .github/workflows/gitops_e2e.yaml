@@ -88,7 +88,7 @@ jobs:
             --source=flux-system \
             --path=clusters/${{ matrix.cluster }}
 
-      - name: Verify cluster reconciliations
+      - name: Verify cluster reconciliations - jenkins
         timeout-minutes: 5
         run: |
           while flux get all --all-namespaces --status-selector=ready=false | grep False
@@ -102,6 +102,21 @@ jobs:
             sleep 5
           done
           kubectl wait -l app.kubernetes.io/name=jenkins pods --for=condition=ready --all-namespaces --timeout=5m
+
+      - name: Verify cluster reconciliations - tekton
+        timeout-minutes: 5
+        run: |
+          for cm in tekton-pipelines tekton-triggers tekton-dashboard; do
+            opts="-n tekton-pipelines -l app.kubernetes.io/part-of=${cm}"
+            # wait for pod displayed
+            until kubectl get pods ${opts}
+            do
+              sleep 1
+            done
+
+            # wait for deployment be ready
+            kubectl wait deployments ${opts} --for condition=Available --timeout=5m
+          done
       - name: Debug failure using kubectl
         if: failure()
         run: |
