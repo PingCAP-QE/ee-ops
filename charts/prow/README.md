@@ -30,8 +30,14 @@ Helm Chart for Prow
     ```
 2. install the chart
     ```bash
-    helm install prow -f values.yaml
+    helm install prow <chart-dir> -f values.yaml
     ```
+
+3. add or update jobs
+   ```bash
+   helm upgrade prow <chart-dir> -f values.yaml --set-file prow.jobs.your_uniq_job_key=<your-job-yaml-path-to-add-or-update.yaml>
+   ```
+   > 这里传入的文件是子集,注意不要相互覆盖. 配置格式参考: https://github.com/kubernetes/test-infra/blob/master/prow/jobs.md
 
 ## Debug
 

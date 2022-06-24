@@ -42,15 +42,16 @@ spec:
           args:
             - --config-path=/etc/config/config.yaml
             - --plugin-config=/etc/plugins/plugins.yaml
+            - --job-config-path=/etc/job-config
             - --tide-url=http://tide/
             - --hook-url=http://hook:8888/plugin-help
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert            
             - --github-endpoint=http://ghproxy
             - --github-endpoint=https://api.github.com
             - --github-graphql-endpoint=http://ghproxy/graphql
             - --s3-credentials-file=/etc/s3-credentials/service-account.json
             - --spyglass=true
-            - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -67,11 +68,14 @@ spec:
           - name: config
             mountPath: /etc/config
             readOnly: true
-          - name: github-token
-            mountPath: /etc/github
-            readOnly: true
           - name: plugins
             mountPath: /etc/plugins
+            readOnly: true            
+          - name: job-config
+            mountPath: /etc/job-config
+            readOnly: true            
+          - name: github-token
+            mountPath: /etc/github
             readOnly: true
           - name: s3-credentials
             mountPath: /etc/s3-credentials
@@ -96,6 +100,9 @@ spec:
       - name: plugins
         configMap:
           name: {{ include "prow.fullname" . }}-plugins
+      - name: job-config
+        configMap:
+          name: {{ include "prow.fullname" . }}-job-config          
       - name: github-token
         secret:
           secretName: {{ include "prow.fullname" . }}-github-token
