@@ -37,14 +37,15 @@ spec:
           args:
             - --dry-run=false
             - --continue-on-error=true
-            - --plugin-config=/etc/plugins/plugins.yaml
             - --config-path=/etc/config/config.yaml
+            - --plugin-config=/etc/plugins/plugins.yaml
+            - --job-config-path=/etc/job-config
             - --github-endpoint=http://ghproxy
             - --github-endpoint=https://api.github.com
-            - --s3-credentials-file=/etc/s3-credentials/service-account.json
-            - --status-path=s3://status-reconciler/status-reconciler-status
             - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert
+            - --github-app-private-key-path=/etc/github/cert            
+            - --status-path=s3://status-reconciler/status-reconciler-status
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -61,6 +62,9 @@ spec:
             - name: plugins
               mountPath: /etc/plugins
               readOnly: true
+            - name: job-config
+              mountPath: /etc/job-config
+              readOnly: true              
             - name: s3-credentials
               mountPath: /etc/s3-credentials
               readOnly: true
@@ -76,6 +80,9 @@ spec:
       - name: plugins
         configMap:
           name: {{ include "prow.fullname" . }}-plugins
+      - name: job-config
+        configMap:
+          name: {{ include "prow.fullname" . }}-job-config          
       - name: s3-credentials
         secret:
           secretName: {{ include "prow.fullname" . }}-s3-credentials

@@ -38,14 +38,15 @@ spec:
           args:
             - --dry-run=false
             - --config-path=/etc/config/config.yaml
+            - --job-config-path=/etc/job-config
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
             - --github-endpoint=http://ghproxy
             - --github-endpoint=https://api.github.com
             - --github-graphql-endpoint=http://ghproxy/graphql
-            - --s3-credentials-file=/etc/s3-credentials/service-account.json
-            - --status-path=s3://tide/tide-status
             - --history-uri=s3://tide/tide-history.json
-            - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert
+            - --status-path=s3://tide/tide-status
+            - --s3-credentials-file=/etc/s3-credentials/service-account.json
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -62,6 +63,9 @@ spec:
           - name: config
             mountPath: /etc/config
             readOnly: true
+          - name: job-config
+            mountPath: /etc/job-config
+            readOnly: true            
           - name: s3-credentials
             mountPath: /etc/s3-credentials
             readOnly: true
@@ -74,6 +78,9 @@ spec:
         - name: config
           configMap:
             name: {{ include "prow.fullname" . }}-config
+        - name: job-config
+          configMap:
+            name: {{ include "prow.fullname" . }}-job-config                  
         - name: s3-credentials
           secret:
             secretName: {{ include "prow.fullname" . }}-s3-credentials
