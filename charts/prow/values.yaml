@@ -27,6 +27,9 @@ prow:
   # github org:
   githubOrg: << REPLACE >>
 
+  # global prow config. it call override the default content with merging strategy.
+  config: ""
+
   # jobs, key, value with file key and content, content example job-example.yaml
   # install with `helm install prow charts/prow --set-file job1.yaml=job-example.yaml`
   jobs:

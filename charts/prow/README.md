@@ -35,9 +35,14 @@ Helm Chart for Prow
 
 3. add or update jobs
    ```bash
-   helm upgrade prow <chart-dir> -f values.yaml --set-file prow.jobs.your_uniq_job_key=<your-job-yaml-path-to-add-or-update.yaml>
+   helm upgrade prow <chart-dir> --set-file prow.jobs.your_uniq_job_key=<your-job-yaml-path-to-add-or-update.yaml> --reuse-values
    ```
    > 这里传入的文件是子集,注意不要相互覆盖. 配置格式参考: https://github.com/kubernetes/test-infra/blob/master/prow/jobs.md
+
+4. update global prow config(store in configmap `prow-config` with key `config.yaml`)
+   ```bash
+    helm upgrade prow <chart-dir> --set-file prow.config=<your-prow-config.yaml> --reuse-values
+   ```
 
 ## Debug
 
