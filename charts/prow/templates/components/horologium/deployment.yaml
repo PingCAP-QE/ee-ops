@@ -39,6 +39,7 @@ spec:
           args:
             - --dry-run=false
             - --config-path=/etc/config/config.yaml
+            - --job-config-path=/etc/job-config
           ports:
             - name: http
               containerPort: 80
@@ -47,12 +48,18 @@ spec:
           - name: config
             mountPath: /etc/config
             readOnly: true
+          - name: job-config
+            mountPath: /etc/job-config
+            readOnly: true            
           resources:
             {{- toYaml .Values.horologium.resources | nindent 12 }}
       volumes:
         - name: config
           configMap:
             name: {{ include "prow.fullname" . }}-config
+        - name: job-config
+          configMap:
+            name: {{ include "prow.fullname" . }}-job-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

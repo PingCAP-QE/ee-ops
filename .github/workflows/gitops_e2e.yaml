@@ -88,21 +88,26 @@ jobs:
             --source=flux-system \
             --path=clusters/${{ matrix.cluster }}
 
-      - name: Verify cluster reconciliations - jenkins
+      - name: Wait all flux object be ready
         timeout-minutes: 5
         run: |
           while flux get all --all-namespaces --status-selector=ready=false | grep False
           do
             sleep 5
           done
+      - name: Verify cluster reconciliations - jenkins
+        timeout-minutes: 5
+        run: |
+          until flux get helmrelease jenkins -n apps
+          do
+            sleep 5
+          done
 
-          # wait for jenkins server
           until kubectl get pods  -l app.kubernetes.io/name=jenkins --all-namespaces
           do
             sleep 5
           done
           kubectl wait -l app.kubernetes.io/name=jenkins pods --for=condition=ready --all-namespaces --timeout=5m
-
       - name: Verify cluster reconciliations - tekton
         timeout-minutes: 5
         run: |
@@ -121,11 +126,20 @@ jobs:
         if: failure()
         run: |
           kubectl get all --all-namespaces
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
           kubectl -n flux-system logs deploy/source-controller
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
           kubectl -n flux-system logs deploy/kustomize-controller
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
           kubectl -n flux-system logs deploy/helm-controller
       - name: Debug failure using flux
         if: failure()
         run: |
+          flux tree kustomization flux-system
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
           flux get all --all-namespaces
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
           flux logs --all-namespaces
