@@ -14,8 +14,17 @@ spec:
         namespace: flux-system
   interval: 1m
   install:
+    crds: CreateReplace
     remediation:
       retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3    
   test:
     enable: true
     ignoreFailures: false
