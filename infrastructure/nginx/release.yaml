@@ -22,11 +22,10 @@ spec:
     controller:
       service:
         type: NodePort
+        nodePorts:
+          # TODO: should change to more special ports @wuhuizuo
+          http: "30704"
+          https: "32631"
       ingressClassResource:
         default: true
-      hostPort:
-        enabled: true
-        ports:
-          # TODO: should change to more special ports @wuhuizuo
-          http: 30704
-          https: 32631
+
