@@ -84,6 +84,11 @@ jobs:
             ignore: clusters/${{ matrix.cluster }}/flux-system/
           EOF
 
+          while flux get source git --status-selector=ready=false | grep False
+          do
+            sleep 5
+          done
+
           flux create kustomization flux-system \
             --source=flux-system \
             --path=clusters/${{ matrix.cluster }}
