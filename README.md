@@ -1,37 +1,44 @@
-## Welcome to GitHub Pages
+## GitOps everything for Efficiency Engineering
 
 You can use the [editor on GitHub](https://github.com/PingCAP-QE/ee-ops/edit/gh-pages/README.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## How to Setup it in you k8s cluster
 
-### Markdown
+Before all please fork it into you personal account or organization.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Pre require
 
-```markdown
-Syntax highlighted code block
+#### GitOps Tools
 
-# Header 1
-## Header 2
-### Header 3
+- Flux CLI
+  > Install by bash or download release binary from [Flux site](https://fluxcd.io/docs/get-started/#install-the-flux-cli)
+#### cluster secret data
 
-- Bulleted
-- List
+- secrets for jenkins component
+  > see [here](apps/staging/jenkins/README.md)
+- secrets for prow component
+  > first copy and update with the [tpl](apps/staging/prow/values.yaml) to file `values.yaml`, then create secret `prow-secret` with kubectl:
+  > `kubectl -n apps create secret generic prow-secret --from-file=values.yaml=values.yaml`
+- other `WIP`
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
+#### Github private token
 
-[Link](url) and ![Image](src)
+Create a github private token with repo permissions, copy and write it.
+See [doc](https://fluxcd.io/docs/get-started/#before-you-begin).
+
+
+### Setup GitOps
+
+```bash
+export GITHUB_TOKEN=<github private token>
+export GITHUB_REPOSITORY_OWNER=<github org or username>
+flux check --pre
+flux bootstrap github \
+    --owner=${GITHUB_REPOSITORY_OWNER} \
+    --repository=<your repo name> \
+    --branch=main \
+    --path=clusters/staging # or other cluster dir.
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/PingCAP-QE/ee-ops/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+if you repo in under personal account, you should add cli option `--personal`.
