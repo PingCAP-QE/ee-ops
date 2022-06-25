@@ -17,15 +17,16 @@ spec:
   install:
     crds: CreateReplace
     remediation:
-      retries: 3
+      retries: -1
   rollback:
-    cleanupOnFail: true
+    cleanupOnFail: false
     recreate: true
   upgrade:
     crds: CreateReplace
-    cleanupOnFail: true
+    cleanupOnFail: false
+    disableHooks: true
     remediation:
-      retries: 3    
+      retries: -1    
   test:
     enable: true
     ignoreFailures: false
