@@ -37,8 +37,9 @@ spec:
     {{- end }}
   {{- end }}
   rules:
+    {{- $domainName := .Values.prow.domainName -}}
     {{- range .Values.hook.ingress.hosts }}
-    - host: {{ .host | quote }}
+    - host: {{ .host | default $domainName | quote }}
       http:
         paths:
           {{- range .paths }}

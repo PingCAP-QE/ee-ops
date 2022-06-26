@@ -3,3 +3,10 @@ kind: Kustomization
 resources:
   - namespaces.yaml
   - release.yaml
+configMapGenerator:
+  - name: prow-job-config
+    namespace: apps
+    files:
+      - job1=jobs/PingCAP-QE/ee-ops/job1.yaml
+configurations:
+  - kustomize-config.yaml

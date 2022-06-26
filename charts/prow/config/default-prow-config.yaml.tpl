@@ -56,7 +56,11 @@ tide:
       - do-not-merge/hold
       - do-not-merge/work-in-progress
       - do-not-merge/invalid-owners-file
+    {{- if .Values.prow.githubOrg }}
     orgs:
       - {{ .Values.prow.githubOrg }}
+    {{- else }}
+    orgs: []
+    {{- end }}
 
 decorate_all_jobs: true

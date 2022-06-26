@@ -12,14 +12,45 @@ spec:
         kind: GitRepository
         name: flux-system
         namespace: flux-system
-  interval: 1m
+  interval: 5m
+  timeout: 5m
   install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    disableHooks: true
     remediation:
       retries: 3
   test:
     enable: true
     ignoreFailures: false
+  values:
+    prow:
+      githubOrg: PingCAP-QE
+      podNameSpace: prow-test-pods
   valuesFrom:
+    #### secret `github-app-prow` should be created manually.
     - kind: Secret
-      name: prow-secret
-      valuesKey: values.yaml
+      name: github-app-prow
+      valuesKey: domain-name
+      targetPath: prow.domainName
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: app-id
+      targetPath: prow.githubAppId      
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: app-cert
+      targetPath: prow.githubAppCert
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: webhook-secret
+      targetPath: prow.githubHmacToken
+    #### for prow jobs #####
+    - { kind: ConfigMap, name: prow-job-config, valuesKey: job1, targetPath: prow.jobs.job1 }

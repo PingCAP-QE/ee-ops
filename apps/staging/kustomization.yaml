@@ -4,4 +4,4 @@ resources:
   - namespace.yaml
   - jenkins
   - tekton
-  # - prow
+  - prow

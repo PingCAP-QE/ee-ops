@@ -1,8 +1,20 @@
 periodics:
-  - interval: 1m
+  - interval: 10m
     agent: kubernetes
     name: echo-test
     spec:
       containers:
         - image: alpine
           command: ["/bin/date"]
+
+presubmits:
+  <org>/<repo>:
+    - name: verifyCI1
+      decorate: true
+      always_run: true
+      skip_report: false
+      max_concurrency: 2
+      spec:
+        containers:
+          - image: alpine
+            command: ["/bin/date"]

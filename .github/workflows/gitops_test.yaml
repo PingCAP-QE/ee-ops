@@ -1,4 +1,4 @@
-name: CD config Test
+name: CD Test
 on:
   workflow_dispatch:
   pull_request:
@@ -6,7 +6,7 @@ on:
       - "**.md"
 
 jobs:
-  manifests:
+  Verify-manifests:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -23,3 +23,156 @@ jobs:
           pushd ${{ matrix.path }}
             ${{ github.workspace }}/scripts/validate_k8s_yaml.sh
           popd
+
+  E2E-Test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        cluster: [staging]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup tools
+        uses: ./.github/actions/flux2/tools
+      - name: Setup Flux
+        uses: fluxcd/flux2/action@main
+      - name: Setup Kubernetes
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          # renovate: datasource=go depName=sigs.k8s.io/kind
+          version: v0.12.0
+      - name: Install Flux in Kubernetes Kind
+        run: |
+          flux check --pre
+          flux install
+      - name: Create namespace `apps`
+        run: kubectl create namespace apps
+
+      - name: Setup secret and PVC for jenkins
+        run: |
+          kubectl -n apps create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret
+          kubectl -n apps apply -f - <<EOF > cat
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: jenkins
+            namespace: apps
+          spec:
+            accessModes:
+            - ReadWriteOnce
+            resources:
+              requests:
+                storage: 8Gi
+            storageClassName: standard # in kind type cluster, if the cluster has default storage class, it should be commented.
+            volumeMode: Filesystem
+          EOF
+      - name: Setup secret and PVC for prow
+        run: |
+          echo "${{ secrets.PROW_APP_CERT }}" > github-app.cert
+
+          kubectl -n apps create secret generic github-app-prow \
+            --from-literal domain-name=prow.test.io \
+            --from-literal app-id="${{ secrets.PROW_APP_ID }}" \
+            --from-file    app-cert=github-app.cert \
+            --from-literal webhook-secret="${{ secrets.PROW_HMAC_TOKEN }}"
+
+          rm github-app.cert
+      - name: Debug PR info
+        run: |
+          echo "source repo: ${{ github.event.pull_request.head.repo.html_url }}"
+          echo "source branch: ${GITHUB_HEAD_REF}"
+      - name: Setup cluster reconciliation
+        run: |
+          kubectl apply -f - <<EOF > cat
+          apiVersion: source.toolkit.fluxcd.io/v1beta2
+          kind: GitRepository
+          metadata:
+            name: flux-system
+            namespace: flux-system
+          spec:
+            interval: 15m
+            ref:
+              branch: ${GITHUB_HEAD_REF}
+            url: ${{ github.event.pull_request.head.repo.html_url }}
+            ignore: clusters/${{ matrix.cluster }}/flux-system/
+          EOF
+
+          while flux get source git --status-selector=ready=false | grep False
+          do
+            sleep 5
+          done
+          
+          flux create kustomization flux-system \
+            --source=flux-system \
+            --path=clusters/${{ matrix.cluster }}
+
+      - name: Wait all flux object be ready
+        timeout-minutes: 5
+        run: |
+          while flux get all --all-namespaces --status-selector=ready=false | grep False
+          do
+            sleep 5
+          done
+      - name: Verify cluster reconciliations - jenkins
+        timeout-minutes: 5
+        run: |
+          until flux get helmrelease jenkins -n apps
+          do
+            sleep 5
+          done
+
+          until kubectl get pods  -l app.kubernetes.io/name=jenkins --all-namespaces
+          do
+            sleep 5
+          done
+          kubectl wait -l app.kubernetes.io/name=jenkins pods --for=condition=ready --all-namespaces --timeout=5m
+      - name: Verify cluster reconciliations - tekton
+        timeout-minutes: 5
+        run: |
+          for cm in tekton-pipelines tekton-triggers tekton-dashboard; do
+            opts="-n tekton-pipelines -l app.kubernetes.io/part-of=${cm}"
+            # wait for pod displayed
+            until kubectl get pods ${opts}
+            do
+              sleep 1
+            done
+
+            # wait for deployment be ready
+            kubectl wait deployments ${opts} --for condition=Available --timeout=5m
+          done
+      - name: Verify cluster reconciliations - prow
+        timeout-minutes: 5
+        run: |
+          for cm in crier deck ghproxy hook horologium pcm sinker statusReconciler tide; do
+            opts="-n apps -l app.kubernetes.io/part-of=prow,app.kubernetes.io/app=${cm}"
+            # wait for pod displayed
+            until kubectl get pods ${opts}
+            do
+              sleep 1
+            done
+
+            # wait for deployment be ready
+            kubectl wait deployments ${opts} --for condition=Available --timeout=5m
+          done
+      - name: Debug failure using kubectl
+        if: failure()
+        run: |
+          kubectl get all --all-namespaces
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+          kubectl -n flux-system logs deploy/source-controller
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+          kubectl -n flux-system logs deploy/kustomize-controller
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+
+          kubectl -n flux-system logs deploy/helm-controller
+      - name: Debug failure using flux
+        if: failure()
+        run: |
+          flux tree kustomization flux-system
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+          flux get all --all-namespaces
+          echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+          flux logs --all-namespaces

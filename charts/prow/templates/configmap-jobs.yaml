@@ -6,6 +6,6 @@ metadata:
     {{- include "prow.labels" . | nindent 4 }}
 data:
 {{- range $jKey, $jobContent := .Values.prow.jobs }}
-  {{ $jKey }}: |
+  {{ $jKey }}.yaml: |
 {{ $jobContent | indent 4 }}
 {{- end }}
