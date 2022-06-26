@@ -43,13 +43,12 @@ spec:
             - --config-path=/etc/config/config.yaml
             - --plugin-config=/etc/plugins/plugins.yaml
             - --job-config-path=/etc/job-config
-            - --tide-url=http://tide/
-            - --hook-url=http://hook:8888/plugin-help
+            - --tide-url=http://{{ include "prow.fullname.tide" . }}/
+            - --hook-url=http://{{ include "prow.fullname.hook" . }}/plugin-help
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/cert            
-            - --github-endpoint=http://ghproxy
-            - --github-endpoint=https://api.github.com
-            - --github-graphql-endpoint=http://ghproxy/graphql
+            - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
+            - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" . }}/graphql
             - --s3-credentials-file=/etc/s3-credentials/service-account.json
             - --spyglass=true
           env:

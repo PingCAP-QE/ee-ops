@@ -43,8 +43,7 @@ spec:
             - --dry-run=false
             - --config-path=/etc/config/config.yaml
             - --job-config-path=/etc/job-config
-            - --github-endpoint=http://ghproxy
-            - --github-endpoint=https://api.github.com
+            - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/cert
           env:
