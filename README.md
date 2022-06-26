@@ -17,10 +17,8 @@ Before all please fork it into you personal account or organization.
 - secrets for jenkins component
   > see [here](apps/staging/jenkins/README.md)
 - secrets for prow component
-  > first copy and update with the [tpl](apps/staging/prow/values.yaml) to file `values.yaml`, then create secret `prow-secret` with kubectl:
-  > `kubectl -n apps create secret generic prow-secret --from-file=values.yaml=values.yaml`
+    > `kubectl -n apps create secret generic github-app-prow --from-literal domain-name=<full prow domain> --from-literal app-id=<github app id> --from-file=app-cert=<github cert file path> --from-literal webhook-secret=<github-hmac-token>`
 - other `WIP`
-
 
 #### Github private token
 

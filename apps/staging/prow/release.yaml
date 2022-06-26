@@ -32,8 +32,35 @@ spec:
     ignoreFailures: false
   values:
     prow:
+      githubOrg: PingCAP-QE
       podNameSpace: prow-test-pods
   valuesFrom:
+    #### secret `github-app-prow` should be created manually.
     - kind: Secret
-      name: prow-secret
-      valuesKey: values.yaml
+      name: github-app-prow
+      valuesKey: domain-name
+      targetPath: prow.domainName
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: app-id
+      targetPath: prow.githubAppId      
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: app-cert
+      targetPath: prow.githubAppCert
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: webhook-secret
+      targetPath: prow.githubHmacToken
+    #### for ingresses #####
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: domain-name
+      targetPath: deck.ingress.hosts[0].paths.host
+    - kind: Secret
+      name: github-app-prow
+      valuesKey: domain-name
+      targetPath: hook.ingress.hosts[0].paths.host
+    #### for prow jobs #####
+    - { kind: ConfigMap, name: prow-job-config, valuesKey: job1, targetPath: prow.jobs.job1 }
+    - { kind: ConfigMap, name: prow-job-config, valuesKey: job2, targetPath: prow.jobs.job2 }

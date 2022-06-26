@@ -52,18 +52,15 @@ jobs:
           EOF
       - name: Setup secret and PVC for prow
         run: |
-          touch values.yaml
+          echo "${{ secrets.PROW_APP_CERT }}" > github-app.cert
 
-          yq -i e '.prow.domainName = "prow.test.io"' values.yaml
-          yq -i e '.prow.githubAppId = "${{ secrets.PROW_APP_ID }}"' values.yaml
-          yq -i e '.prow.githubAppCert = "${{ secrets.PROW_APP_CERT }}" | .prow.githubAppCert style="double"' values.yaml
-          yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' values.yaml
-          orgName=$(dirname ${{ github.event.repository.full_name }})
-          yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
+          kubectl -n apps create secret generic github-app-prow \
+            --from-literal domain-name=prow.test.io \
+            --from-literal app-id="${{ secrets.PROW_APP_ID }}" \
+            --from-file    app-cert=github-app.cert \
+            --from-literal webhook-secret="${{ secrets.PROW_HMAC_TOKEN }}"
 
-          kubectl -n apps create secret generic prow-secret --from-file=values.yaml=values.yaml
-
-          rm values.yaml
+          rm github-app.cert
       - name: Debug PR info
         run: |
           echo "source repo: ${{ github.event.pull_request.head.repo.html_url }}"
@@ -118,6 +115,20 @@ jobs:
         run: |
           for cm in tekton-pipelines tekton-triggers tekton-dashboard; do
             opts="-n tekton-pipelines -l app.kubernetes.io/part-of=${cm}"
+            # wait for pod displayed
+            until kubectl get pods ${opts}
+            do
+              sleep 1
+            done
+
+            # wait for deployment be ready
+            kubectl wait deployments ${opts} --for condition=Available --timeout=5m
+          done
+      - name: Verify cluster reconciliations - prow
+        timeout-minutes: 5
+        run: |
+          for cm in crier deck ghproxy hook horologium minio pcm sinker status-reconciler tide; do
+            opts="-n apps -l app.kubernetes.io/part-of=prow,app.kubernetes.io/app=${cm}"
             # wait for pod displayed
             until kubectl get pods ${opts}
             do
