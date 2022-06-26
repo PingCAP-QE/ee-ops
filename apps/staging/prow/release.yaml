@@ -52,15 +52,5 @@ spec:
       name: github-app-prow
       valuesKey: webhook-secret
       targetPath: prow.githubHmacToken
-    #### for ingresses #####
-    - kind: Secret
-      name: github-app-prow
-      valuesKey: domain-name
-      targetPath: deck.ingress.hosts[0].paths.host
-    - kind: Secret
-      name: github-app-prow
-      valuesKey: domain-name
-      targetPath: hook.ingress.hosts[0].paths.host
     #### for prow jobs #####
     - { kind: ConfigMap, name: prow-job-config, valuesKey: job1, targetPath: prow.jobs.job1 }
-    - { kind: ConfigMap, name: prow-job-config, valuesKey: job2, targetPath: prow.jobs.job2 }
