@@ -144,7 +144,7 @@ jobs:
       - name: Verify cluster reconciliations - prow
         timeout-minutes: 5
         run: |
-          for cm in crier deck ghproxy hook horologium minio pcm sinker status-reconciler tide; do
+          for cm in crier deck ghproxy hook horologium pcm sinker statusReconciler tide; do
             opts="-n apps -l app.kubernetes.io/part-of=prow,app.kubernetes.io/app=${cm}"
             # wait for pod displayed
             until kubectl get pods ${opts}
