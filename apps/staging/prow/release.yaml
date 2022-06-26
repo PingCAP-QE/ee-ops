@@ -17,19 +17,22 @@ spec:
   install:
     crds: CreateReplace
     remediation:
-      retries: -1
+      retries: 3
   rollback:
-    cleanupOnFail: false
+    cleanupOnFail: true
     recreate: true
   upgrade:
     crds: CreateReplace
-    cleanupOnFail: false
+    cleanupOnFail: true
     disableHooks: true
     remediation:
-      retries: -1    
+      retries: 3
   test:
     enable: true
     ignoreFailures: false
+  values:
+    prow:
+      podNameSpace: prow-test-pods
   valuesFrom:
     - kind: Secret
       name: prow-secret
