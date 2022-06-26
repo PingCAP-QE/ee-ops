@@ -3,6 +3,7 @@ kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "prow.roleName.pcm" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "prow.labels.pcm" . | nindent 4 }}  
 rules:
@@ -53,6 +54,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "prow.roleBindingName.pcm" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     {{- include "prow.labels.pcm" . | nindent 4 }}  
 roleRef:
