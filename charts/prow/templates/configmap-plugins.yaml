@@ -6,20 +6,5 @@ metadata:
     {{- include "prow.labels" . | nindent 4 }}
 data:
   plugins.yaml: |
-    plugins:
-      {{ .Values.prow.githubOrg }}:
-        plugins:
-        - approve
-        - assign
-        - blunderbuss
-        - cat
-        - dog
-        - help
-        - heart
-        - hold
-        - label
-        - lgtm
-        - trigger
-        - verify-owners
-        - wip
-        - yuks
+{{- tpl (.Files.Get "config/default-prow-plugins.yaml.tpl") . | nindent 4 }}
+
