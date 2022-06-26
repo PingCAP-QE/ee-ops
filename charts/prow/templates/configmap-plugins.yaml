@@ -6,5 +6,8 @@ metadata:
     {{- include "prow.labels" . | nindent 4 }}
 data:
   plugins.yaml: |
+{{- if .Values.prow.plugins }}
+{{- (merge (.Values.prow.plugins | fromYaml) (tpl (.Files.Get "config/default-prow-plugins.yaml.tpl") . | fromYaml)) | toYaml | nindent 4 }}
+{{- else }}
 {{- tpl (.Files.Get "config/default-prow-plugins.yaml.tpl") . | nindent 4 }}
-
+{{- end }}
