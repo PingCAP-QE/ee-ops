@@ -8,10 +8,10 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: feat/jenkins-deploy-on-k8s
+    branch: main
   secretRef:
     name: flux-system
-  url: ssh://git@github.com/PingCAP-QE/ee-ops.git
+  url: ssh://git@github.com/derekstrong/ee-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
