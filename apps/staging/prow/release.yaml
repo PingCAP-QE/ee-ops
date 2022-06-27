@@ -32,7 +32,7 @@ spec:
     ignoreFailures: false
   values:
     prow:
-      githubOrg: PingCAP-QE
+      githubOrg: derekstrong
       podNameSpace: prow-test-pods
   valuesFrom:
     #### secret `github-app-prow` should be created manually.
