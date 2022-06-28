@@ -1,0 +1,20 @@
+##### file only config for special devices in nodes.
+cephClusterSpec:
+  storage:
+    nodes:
+      - name: "172.16.5.55"
+        deviceFilter: "nvme0n1"
+        config:
+          osdsPerDevice: "5"
+      - name: "172.16.5.83"
+        devices:
+          - name: "sdb"
+            config: { osdsPerDevice: "2" }
+          - name: "sdc"
+            config: { osdsPerDevice: "2" }
+      - name: "172.16.5.90"
+        devices:
+          - name: "nvme0n1"
+            config: { osdsPerDevice: "5" }
+          - name: "nvme1n1"
+            config: { osdsPerDevice: "5" }

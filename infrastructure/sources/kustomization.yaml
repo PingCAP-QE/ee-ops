@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - helm-repo-ingress-nginx.yaml
   - helm-repo-jenkins.yaml
+  - helm-repo-rook.yaml
