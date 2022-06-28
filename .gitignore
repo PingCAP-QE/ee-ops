@@ -13,3 +13,7 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# helm chart
+Chart.lock
+/charts/**/*.tgz

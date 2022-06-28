@@ -49,25 +49,12 @@ jobs:
       - name: Create namespace `apps`
         run: kubectl create namespace apps
 
-      - name: Setup secret and PVC for jenkins
+      - name: Setup secret for jenkins
         run: |
           kubectl -n apps create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret
-          kubectl -n apps apply -f - <<EOF > cat
-          apiVersion: v1
-          kind: PersistentVolumeClaim
-          metadata:
-            name: jenkins
-            namespace: apps
-          spec:
-            accessModes:
-            - ReadWriteOnce
-            resources:
-              requests:
-                storage: 8Gi
-            storageClassName: standard # in kind type cluster, if the cluster has default storage class, it should be commented.
-            volumeMode: Filesystem
-          EOF
-      - name: Setup secret and PVC for prow
+          echo "------------"
+          kubectl get storageclasses.storage.k8s.io
+      - name: Setup secret for prow
         run: |
           echo "${{ secrets.PROW_APP_CERT }}" > github-app.cert
 
@@ -102,7 +89,7 @@ jobs:
           do
             sleep 5
           done
-          
+
           flux create kustomization flux-system \
             --source=flux-system \
             --path=clusters/${{ matrix.cluster }}
@@ -117,7 +104,7 @@ jobs:
       - name: Verify cluster reconciliations - jenkins
         timeout-minutes: 5
         run: |
-          until flux get helmrelease jenkins -n apps
+          until flux get helmrelease jenkins -n apps | grep jenkins
           do
             sleep 5
           done
@@ -144,6 +131,11 @@ jobs:
       - name: Verify cluster reconciliations - prow
         timeout-minutes: 5
         run: |
+          until flux get helmrelease prow -n apps | grep prow
+          do
+            sleep 5
+          done
+
           for cm in crier deck ghproxy hook horologium pcm sinker statusReconciler tide; do
             opts="-n apps -l app.kubernetes.io/part-of=prow,app.kubernetes.io/app=${cm}"
             # wait for pod displayed
