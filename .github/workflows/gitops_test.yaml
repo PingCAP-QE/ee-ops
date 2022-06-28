@@ -104,7 +104,7 @@ jobs:
       - name: Verify cluster reconciliations - jenkins
         timeout-minutes: 5
         run: |
-          until flux get helmrelease jenkins -n apps
+          until flux get helmrelease jenkins -n apps | grep jenkins
           do
             sleep 5
           done
@@ -131,6 +131,11 @@ jobs:
       - name: Verify cluster reconciliations - prow
         timeout-minutes: 5
         run: |
+          until flux get helmrelease prow -n apps | grep prow
+          do
+            sleep 5
+          done
+
           for cm in crier deck ghproxy hook horologium pcm sinker statusReconciler tide; do
             opts="-n apps -l app.kubernetes.io/part-of=prow,app.kubernetes.io/app=${cm}"
             # wait for pod displayed
