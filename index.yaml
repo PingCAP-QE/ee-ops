@@ -3,6 +3,27 @@ entries:
   prow:
   - apiVersion: v2
     appVersion: v20220504-0b3a7e15f4
+    created: "2022-06-28T07:42:54.199175915Z"
+    dependencies:
+    - name: prow-crd
+      repository: ""
+      version: 0.1.0
+    - name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.7.6
+    description: 'A Helm chart for deploying Prow in self kubernetes cluster with
+      S3 storage served by minio. '
+    digest: 1479a1dd00789c0771573ab55941e2a0ca1b5b55afa1951a9c1f10fbf7e745b5
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: prow
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-0.1.1/prow-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: v20220504-0b3a7e15f4
     created: "2022-06-25T10:26:35.731317896Z"
     dependencies:
     - name: prow-crd
@@ -36,4 +57,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2022-06-25T10:26:35.850998981Z"
+generated: "2022-06-28T07:42:54.199191415Z"
