@@ -9,6 +9,28 @@ spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   path: ./apps/staging/tekton/setup
   prune: true
-  wait: true
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-pipelines-controller
+      namespace: tekton-pipelines
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-pipelines-webhook
+      namespace: tekton-pipelines
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-triggers-controller
+      namespace: tekton-pipelines
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-triggers-webhook
+      namespace: tekton-pipelines
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: tekton-ingress # should manual created in namespace `apps`
+        optional: true

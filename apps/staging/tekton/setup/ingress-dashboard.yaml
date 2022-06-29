@@ -17,10 +17,11 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - http:
+    - host: "${domain}"
+      http:
         paths:
           - pathType: Prefix
-            path: "/tekton(/|$)(.*)"
+            path: "${path_for_dashboard}(/|$)(.*)"
             backend:
               service:
                 name: tekton-dashboard

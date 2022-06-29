@@ -5,12 +5,13 @@ metadata:
   name: tekton-configs
   namespace: apps
 spec:
-  dependsOn:
-    - name: tekton-setup
-      namespace: apps
   interval: 1m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
+    namespace: flux-system
   path: ./apps/staging/tekton/config
+  dependsOn:
+    - name: tekton-setup
+      namespace: apps
   prune: true
