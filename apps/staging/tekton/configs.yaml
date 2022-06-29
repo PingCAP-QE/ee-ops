@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: tekton-configs
+  namespace: apps
+spec:
+  dependsOn:
+    - name: tekton-setup
+      namespace: apps
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/staging/tekton/config
+  prune: true
