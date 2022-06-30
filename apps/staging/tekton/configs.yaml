@@ -10,7 +10,7 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/staging/tekton/config
+  path: ./apps/staging/tekton/configs
   dependsOn:
     - name: tekton-setup
       namespace: apps
