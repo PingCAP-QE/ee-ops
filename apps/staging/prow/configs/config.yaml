@@ -1,0 +1,15 @@
+# TODO: (@wuhuizuo) add json schema.
+tide:
+  queries:
+    - labels:
+        - lgtm
+        - approved
+        - <other labels for auto merging gate>
+      missingLabels:
+        - needs-rebase
+        - do-not-merge/hold
+        - do-not-merge/work-in-progress
+        - do-not-merge/invalid-owners-file
+      orgs:
+        - PingCAP-QE
+        # - your-another-org-name

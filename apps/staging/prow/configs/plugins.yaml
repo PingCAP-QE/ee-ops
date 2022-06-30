@@ -1,0 +1,20 @@
+# enable plugins for any repos in the org.
+plugins:
+  PingCAP-QE:
+    plugins:
+      - approve
+      - assign
+      - blunderbuss
+      - cat
+      - dog
+      - help
+      - heart
+      - hold
+      - label
+      - lgtm
+      - trigger
+      - verify-owners
+      - wip
+      - yuks
+# plugin_a:
+#   configs_for_plugin_a: {}
