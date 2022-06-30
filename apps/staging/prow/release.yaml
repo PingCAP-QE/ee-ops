@@ -27,6 +27,7 @@ spec:
     disableHooks: true
     remediation:
       retries: 3
+    force: true
   test:
     enable: true
     ignoreFailures: false
