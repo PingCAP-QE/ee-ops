@@ -169,6 +169,13 @@ jobs:
           echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
           kubectl -n flux-system logs deploy/helm-controller
+      - name: Describe pending pods.
+        if: failure()
+        run: |
+          kubectl get pods --all-namespaces --field-selector status.phase=Pending
+
+          kubectl get pods --all-namespaces --field-selector status.phase=Running --no-headers | head -3 | awk '{print "-n",$1,$2}' | xargs kubectl describe pod
+
       - name: Debug failure using flux
         if: failure()
         run: |
