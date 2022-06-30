@@ -85,7 +85,11 @@ jobs:
             ignore: clusters/${{ matrix.cluster }}/flux-system/
           EOF
 
-          while flux get source git --status-selector=ready=false | grep False
+          until flux get source git --no-header | grep "flux-system"
+          do
+            sleep 5
+          done
+          until flux get source git flux-system --no-header --status-selector=ready=true | grep "flux-system"
           do
             sleep 5
           done
