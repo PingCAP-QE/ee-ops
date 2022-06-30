@@ -30,6 +30,14 @@ spec:
       kind: Deployment
       name: tekton-triggers-webhook
       namespace: tekton-pipelines
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-triggers-core-interceptors
+      namespace: tekton-pipelines
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-dashboard
+      namespace: tekton-pipelines
   postBuild:
     substituteFrom:
       - kind: Secret
