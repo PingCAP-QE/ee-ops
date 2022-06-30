@@ -33,7 +33,7 @@ spec:
   values:
     prow:
       githubOrg: PingCAP-QE
-      podsNameSpace: prow-test-pods
+      podsNamespace: prow-test-pods
   valuesFrom:
     #### secret `github-app-prow` should be created manually.
     - kind: Secret
