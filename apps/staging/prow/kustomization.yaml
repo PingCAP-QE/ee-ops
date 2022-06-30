@@ -4,9 +4,21 @@ resources:
   - namespaces.yaml
   - release.yaml
 configMapGenerator:
+  - name: prow-config
+    namespace: apps
+    files:
+      # DO NOT EDIT.
+      - config.yaml=configs/config.yaml
+  - name: prow-plugins
+    namespace: apps
+    files:
+      # DO NOT EDIT.
+      - plugins.yaml=configs/plugins.yaml
   - name: prow-job-config
     namespace: apps
     files:
-      - job1=jobs/PingCAP-QE/ee-ops/job1.yaml
+      # add yours another job here.
+      # - jobXxx=configs/jobs/<org>/<repo>/jobXxx.yaml
+      - job1=configs/jobs/PingCAP-QE/ee-ops/job1.yaml
 configurations:
   - kustomize-config.yaml

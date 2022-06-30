@@ -1,0 +1,83 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: getting-started-pipeline1
+spec:
+  params:
+    - name: repo-name
+    - name: git-revision
+  workspaces:
+    - name: git-source
+  tasks:
+    # TODO: using commit-status-tracker to replace explicit tasks.
+    # https://github.com/tektoncd/experimental/tree/main/commit-status-tracker
+    - name: set-github-status-start
+      taskRef:
+        name: github-set-status
+      timeout: 1m
+      params:
+        - name: REPO_FULL_NAME
+          value: $(params.repo-name)
+        - name: SHA
+          value: $(params.git-revision)
+        - name: DESCRIPTION
+          value: "Build has started"
+        - name: STATE
+          value: pending
+        - name: TARGET_URL
+          value: https://tekton/dashboard/taskrun/log
+
+    - name: fetch-from-git
+      taskRef:
+        name: git-clone
+      runAfter:
+        - set-github-status-start
+      params:
+        - name: url
+          value: "https://github.com/$(params.repo-name)"
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: git-source
+    - name: go-build
+      taskRef:
+        name: golang-build
+      runAfter:
+        - fetch-from-git
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: package
+          value: "github.com/$(params.repo-name)"
+        - name: packages
+          value: ./...
+    - name: go-test
+      taskRef:
+        name: golang-test
+      runAfter:
+        - fetch-from-git
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: package
+          value: "github.com/$(params.repo-name)"
+        - name: packages
+          value: ./...
+  finally:
+    - name: set-github-status-end
+      taskRef:
+        name: github-set-status
+      params:
+        - name: REPO_FULL_NAME
+          value: NightProgrammers/devops-research
+        - name: SHA
+          value: $(params.git-revision)
+        - name: DESCRIPTION
+          value: "Build has started"
+        - name: STATE
+          value: $(tasks.status)
+        - name: TARGET_URL
+          value: https://tekton/dashboard/taskrun/log

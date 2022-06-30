@@ -44,6 +44,11 @@ Helm Chart for Prow
     helm upgrade prow <chart-dir> --set-file prow.config=<your-prow-config.yaml> --reuse-values
    ```
 
+5. update prow plugin config(store in configmap `prow-plugins` with key `plugins.yaml`)
+   ```bash
+    helm upgrade prow <chart-dir> --set-file prow.plugins=<your-prow-plugins.yaml> --reuse-values
+   ```
+
 ## Debug
 
 After all the prow pods Are ready, you can do following steps to setup debug env:

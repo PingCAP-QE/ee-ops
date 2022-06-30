@@ -17,7 +17,9 @@ Before all please fork it into you personal account or organization.
 - secrets for jenkins component
   > see [here](apps/staging/jenkins/README.md)
 - secrets for prow component
-    > `kubectl -n apps create secret generic github-app-prow --from-literal domain-name=<full prow domain> --from-literal app-id=<github app id> --from-file=app-cert=<github cert file path> --from-literal webhook-secret=<github-hmac-token>`
+  > `kubectl -n apps create secret generic github-app-prow --from-literal domain-name=<full prow domain> --from-literal app-id=<github app id> --from-file=app-cert=<github cert file path> --from-literal webhook-secret=<github-hmac-token>`
+- secrets for tekton component
+  > `kubectl -n apps create secret generic tekton-ingress --from-literal domain=<full tekton domain> --from-literal path_for_dashboard=/your-tekton-dashboard-path`
 - other `WIP`
 
 #### Github private token
