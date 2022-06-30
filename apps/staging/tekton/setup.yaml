@@ -12,6 +12,7 @@ spec:
     namespace: flux-system
   path: ./apps/staging/tekton/setup
   prune: true
+  force: true
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
