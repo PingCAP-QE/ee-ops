@@ -11,7 +11,3 @@ presubmits:
               - apps
               - get
               - pods
-            # FIXME:
-            # unable to merge value from key ''job2'' in ConfigMap ''apps/prow-job-config-hdk74thb2b'' into target path ''prow.jobs.job2'': key " \"apps\"" has no value (cannot end with ,)
-            # can not use this inline yaml format:
-            # command: ["--namespace","apps","get","pods"]
