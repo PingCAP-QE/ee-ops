@@ -104,7 +104,7 @@ jobs:
             --path=clusters/${{ matrix.cluster }}
 
       - name: Wait all flux object be ready
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           while flux get all --all-namespaces --status-selector=ready=false | grep False
           do
