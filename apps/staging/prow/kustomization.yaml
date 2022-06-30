@@ -17,7 +17,8 @@ configMapGenerator:
   - name: prow-job-config
     namespace: apps
     files:
+      # add yours another job here.
+      # - jobXxx=configs/jobs/<org>/<repo>/jobXxx.yaml
       - job1=configs/jobs/PingCAP-QE/ee-ops/job1.yaml
-      # add yours here.
 configurations:
   - kustomize-config.yaml
