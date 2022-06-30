@@ -20,5 +20,6 @@ configMapGenerator:
       # add yours another job here.
       # - jobXxx=configs/jobs/<org>/<repo>/jobXxx.yaml
       - job1=configs/jobs/PingCAP-QE/ee-ops/job1.yaml
+      - job2=configs/jobs/PingCAP-QE/ee-ops/job2.yaml
 configurations:
   - kustomize-config.yaml
