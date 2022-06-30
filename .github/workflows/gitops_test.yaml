@@ -65,6 +65,11 @@ jobs:
             --from-literal webhook-secret="${{ secrets.PROW_HMAC_TOKEN }}"
 
           rm github-app.cert
+      - name: Setup secret for tekton
+        run: |
+          kubectl -n apps create secret generic tekton-ingress \
+            --from-literal domain=tekton.test.io \
+            --from-literal path_for_dashboard=/
       - name: Debug PR info
         run: |
           echo "source repo: ${{ github.event.pull_request.head.repo.html_url }}"
