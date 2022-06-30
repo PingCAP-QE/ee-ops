@@ -43,7 +43,7 @@ spec:
     - kind: Secret
       name: github-app-prow
       valuesKey: app-id
-      targetPath: prow.githubAppId      
+      targetPath: prow.githubAppId
     - kind: Secret
       name: github-app-prow
       valuesKey: app-cert
@@ -52,5 +52,23 @@ spec:
       name: github-app-prow
       valuesKey: webhook-secret
       targetPath: prow.githubHmacToken
+    #### for prow plugins, DO NOT EDIT ###
+    - kind: ConfigMap
+      name: prow-plugins
+      valuesKey: plugins.yaml
+      targetPath: prow.plugins
+    #### for prow global config, DO NOT EDIT ###
+    - kind: ConfigMap
+      name: prow-config
+      valuesKey: config.yaml
+      targetPath: prow.config
     #### for prow jobs #####
-    - { kind: ConfigMap, name: prow-job-config, valuesKey: job1, targetPath: prow.jobs.job1 }
+    #  add your another job:
+    # - kind: ConfigMap
+    #   name: prow-job-config
+    #   valuesKey: jobXxx
+    #   targetPath: prow.jobs.jobXxx
+    - kind: ConfigMap
+      name: prow-job-config
+      valuesKey: job1
+      targetPath: prow.jobs.job1
