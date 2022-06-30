@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespaces.yaml
   - release.yaml
+  - rbac/
 configMapGenerator:
   - name: prow-config
     namespace: apps

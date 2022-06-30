@@ -1,16 +1,15 @@
 presubmits:
   PingCAP-QE/ee-ops:
     - name: verifyCI-k8s-generic
-      always_run: true
+      always_run: false
       max_concurrency: 2
       spec:
-        automountServiceAccountToken: true
+        serviceAccountName: k8s-pod-full
         containers:
           - image: bitnami/kubectl
             command:
               - kubectl
             args:
-              - --namespace
-              - apps
               - get
               - pods
+              - --namespace prow-test-pods
