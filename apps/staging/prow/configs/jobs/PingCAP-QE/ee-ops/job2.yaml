@@ -10,6 +10,7 @@ presubmits:
             command:
               - kubectl
             args:
+              - --namespace
+              - prow-test-pods
               - get
               - pods
-              - --namespace prow-test-pods
