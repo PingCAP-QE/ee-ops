@@ -6,6 +6,7 @@ presubmits:
       spec:
         containers:
           - image: bitnami/kubectl
+            command: kubectl
             args:
               - --namespace
               - apps
