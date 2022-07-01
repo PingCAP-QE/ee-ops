@@ -14,3 +14,15 @@ presubmits:
               - "Accept: application/json"
               - -H
               - "Content-Type: application/json"
+              - -H
+              - "Sec-Fetch-Mode: cors"
+              - -H
+              - "Sec-Fetch-Dest: empty"
+              - -H
+              - "Sec-Fetch-Site: same-origin"
+              - -H
+              - "Tekton-Client: prowjobs.prow.k8s.io/ee-ops"
+              - --fail-with-body
+              - --compressed
+              - --data-raw
+              - '{"apiVersion":"tekton.dev/v1beta1","kind":"TaskRun","metadata":{"generateName":"git-clone-run-by-prow-","namespace":"ci-demo","labels":{}},"spec":{"params":[{"name":"url","value":"https://github.com/PingCAP-QE/ee-ops"},{"name":"revision","value":"main"}],"resources":{"inputs":[],"outputs":[]},"taskRef":{"name":"git-clone","kind":"Task"},"timeout":"1m"}}'

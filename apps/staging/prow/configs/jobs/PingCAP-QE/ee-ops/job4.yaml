@@ -14,4 +14,15 @@ presubmits:
               - "Accept: application/json"
               - -H
               - "Content-Type: application/json"
+              - -H
+              - "Sec-Fetch-Mode: cors"
+              - -H
+              - "Sec-Fetch-Dest: empty"
+              - -H
+              - "Sec-Fetch-Site: same-origin"
+              - -H
+              - "Tekton-Client: prowjobs.prow.k8s.io/ee-ops"
+              - --fail-with-body
               - --compressed
+              - --data-raw
+              - '{"apiVersion":"tekton.dev/v1beta1","kind":"PipelineRun","metadata":{"generateName":"getting-started-pipeline1-run-by-prow-","labels":{"prow":"true"}},"spec":{"pipelineRef":{"name":"getting-started-pipeline1"},"resources":[],"params":[{"name":"repo-name","value":"PingCAP-QE/ee-ops"},{"name":"git-revision","value":"main"}],"serviceAccountName":"default","timeout":"3m"}}'
