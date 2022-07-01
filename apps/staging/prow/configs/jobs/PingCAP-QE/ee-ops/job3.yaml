@@ -14,6 +14,3 @@ presubmits:
               - "Accept: application/json"
               - -H
               - "Content-Type: application/json"
-              - --data-raw
-              - >-
-                '{"apiVersion":"tekton.dev/v1beta1","kind":"TaskRun","metadata":{"generateName":"git-clone-run-by-prow-","namespace":"ci-demo","labels":{}},"spec":{"params":[{"name":"url","value":"https://github.com/PingCAP-QE/ee-ops"},{"name":"revision","value":"main"}],"resources":{"inputs":[],"outputs":[]},"taskRef":{"name":"git-clone","kind":"Task"},"timeout":"1m"}}'
