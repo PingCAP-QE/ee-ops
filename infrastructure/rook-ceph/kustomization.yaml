@@ -9,6 +9,5 @@ configMapGenerator:
     namespace: rook-ceph
     files:
       - values.yaml=config/values.yaml
-      - values-nodes.yaml=config/values-nodes.yaml
 configurations:
   - kustomize-config.yaml

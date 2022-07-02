@@ -48,7 +48,6 @@ jobs:
           flux install
       - name: Create namespace `apps`
         run: kubectl create namespace apps
-
       - name: Setup secret for jenkins
         run: |
           kubectl -n apps create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret

@@ -22,7 +22,7 @@ spec:
     - kind: ConfigMap
       name: cluster-release-values
       valuesKey: values.yaml
-      # TODO: (@wuhuizuo) split it from git repo.
-    - kind: ConfigMap
-      name: cluster-release-values
-      valuesKey: values-node.yaml
+    # may you should set custom values in you cluster, for example: config/values-nodes.tpl.yaml
+    - kind: Secret
+      name: cluster-release-optional-values
+      optional: true
