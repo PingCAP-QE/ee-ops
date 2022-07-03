@@ -30,4 +30,4 @@ spec:
     keep: 10
     schedule: "0 * * * *" # hourly
   dashboard:
-    readonly: true
+    readonly: false

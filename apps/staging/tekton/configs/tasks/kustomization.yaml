@@ -6,3 +6,4 @@ resources:
   - github-set-status.yaml
   - golang-build.yaml
   - golang-test.yaml
+  - echo.yaml

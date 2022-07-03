@@ -48,7 +48,6 @@ jobs:
           flux install
       - name: Create namespace `apps`
         run: kubectl create namespace apps
-
       - name: Setup secret for jenkins
         run: |
           kubectl -n apps create secret generic google-oauth2 --from-literal=client-id=client --from-literal=client-secret=secret
@@ -104,7 +103,7 @@ jobs:
             --path=clusters/${{ matrix.cluster }}
 
       - name: Wait all flux object be ready
-        timeout-minutes: 5
+        timeout-minutes: 10
         run: |
           while flux get all --all-namespaces --status-selector=ready=false | grep False
           do
@@ -169,6 +168,13 @@ jobs:
           echo "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
 
           kubectl -n flux-system logs deploy/helm-controller
+      - name: Describe pending pods.
+        if: failure()
+        run: |
+          kubectl get pods --all-namespaces --field-selector status.phase=Pending
+
+          kubectl get pods --all-namespaces --field-selector status.phase=Pending --no-headers | head -3 | awk '{print "-n",$1,$2}' | xargs kubectl describe pod
+
       - name: Debug failure using flux
         if: failure()
         run: |
