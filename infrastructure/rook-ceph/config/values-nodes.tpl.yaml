@@ -1,6 +1,7 @@
 ##### file only config for special devices in nodes.
 cephClusterSpec:
   storage:
+    useAllNodes: false
     nodes:
       - name: "172.16.5.55"
         deviceFilter: "nvme0n1"

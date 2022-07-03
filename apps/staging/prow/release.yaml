@@ -24,7 +24,6 @@ spec:
   upgrade:
     crds: CreateReplace
     cleanupOnFail: true
-    disableHooks: true
     remediation:
       retries: 3
   test:
@@ -33,7 +32,7 @@ spec:
   values:
     prow:
       githubOrg: PingCAP-QE
-      podNameSpace: prow-test-pods
+      podsNamespace: prow-test-pods # should delete old prow-pcm pods when changed.
   valuesFrom:
     #### secret `github-app-prow` should be created manually.
     - kind: Secret
@@ -72,3 +71,15 @@ spec:
       name: prow-job-config
       valuesKey: job1
       targetPath: prow.jobs.job1
+    - kind: ConfigMap
+      name: prow-job-config
+      valuesKey: job2
+      targetPath: prow.jobs.job2
+    - kind: ConfigMap
+      name: prow-job-config
+      valuesKey: job3
+      targetPath: prow.jobs.job3
+    - kind: ConfigMap
+      name: prow-job-config
+      valuesKey: job4
+      targetPath: prow.jobs.job4
