@@ -6,6 +6,9 @@ metadata:
   namespace: rook-ceph
 spec:
   releaseName: rook-ceph-cluster
+  dependsOn:
+    - name: rook-ceph
+      namespace: rook-ceph
   chart:
     spec:
       chart: rook-ceph-cluster

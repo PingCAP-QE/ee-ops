@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - release-operator.yaml
+  - release-cluster.yaml
 configMapGenerator:
   - name: cluster-release-values
     namespace: rook-ceph
