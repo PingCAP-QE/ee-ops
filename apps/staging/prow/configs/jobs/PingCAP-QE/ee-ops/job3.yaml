@@ -25,4 +25,4 @@ presubmits:
               - --fail-with-body
               - --compressed
               - --data-raw
-              - '{"apiVersion":"tekton.dev/v1beta1","kind":"TaskRun","metadata":{"generateName":"echo-by-prow-","namespace":"ci-demo","labels":{}},"spec":{"params":[{"name":"message","value":"demo message"}],"taskRef":{"name":"echo","kind":"Task"},"timeout":"1m"}}'
+              - '{"apiVersion":"tekton.dev/v1beta1"\,"kind":"TaskRun"\,"metadata":{"generateName":"echo-by-prow-"\,"namespace":"ci-demo"\,"labels":{}}\,"spec":{"params":[{"name":"message"\,"value":"demo message"}]\,"taskRef":{"name":"echo"\,"kind":"Task"}\,"timeout":"1m"}}'
