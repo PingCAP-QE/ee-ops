@@ -20,79 +20,79 @@ spec:
     The `github-set-status` task allows external services to mark GitHub commits
     with an `error`, `failure`, `pending`, or `success` state, which is then
     reflected in pull requests involving those commits. Statuses include as well a
-    `description` and a `target_url`, to give the user informations about the CI
+    `description` and a `targetUrl`, to give the user informations about the CI
     statuses or a direct link to the full log.
 
   params:
-    - name: GITHUB_HOST_URL
-      description: |
-        The GitHub host, adjust this if you run a GitHub enterprise.
-      default: "api.github.com"
-      type: string
-
-    - name: API_PATH_PREFIX
-      description: |
-        The API path prefix, GitHub Enterprise has a prefix e.g. /api/v3
-      default: ""
-      type: string
-
-    - name: REPO_FULL_NAME
+    - name: repoFullname
       description: |
         The GitHub repository full name, e.g.: tektoncd/catalog
       type: string
 
-    - name: GITHUB_TOKEN_SECRET_NAME
+    - name: githubTokenSecretName
       description: |
         The name of the kubernetes secret that contains the GitHub token, default: github
       type: string
       default: github
 
-    - name: GITHUB_TOKEN_SECRET_KEY
+    - name: githubTokenSecretKey
       description: |
         The key within the kubernetes secret that contains the GitHub token, default: token
       type: string
       default: token
 
-    - name: SHA
+    - name: sha
       description: |
         Commit SHA to set the status for.
       type: string
 
-    - name: TARGET_URL
+    - name: targetUrl
       description: |
         The target URL to associate with this status. This URL will be linked
         from the GitHub UI to allow users to easily see the source of the
         status.
       type: string
 
-    - name: DESCRIPTION
+    - name: description
       description: |
         A short description of the status.
       type: string
 
-    - name: CONTEXT
+    - name: context
       description: |
         The GitHub context, A string label to differentiate this status from
         the status of other systems. ie: "continuous-integration/tekton"
-      default: "continuous-integration/tekton"
       type: string
 
-    - name: STATE
+    - name: state
       description: |
-        The state of the status. Can be one of the following `error`,
-        `failure`, `pending`, or `success`.
+        The state of the status. Can be one of the following:
+        `error`, `failure`, `pending`, or `success`.
       type: string
 
-    - name: AUTH_TYPE
+    - name: githubHostUrl
+      description: |
+        The GitHub host, adjust this if you run a GitHub enterprise.
+      default: "api.github.com"
+      type: string
+
+    - name: apiPathPrefix
+      description: |
+        The API path prefix, GitHub Enterprise has a prefix e.g. /api/v3
+      default: ""
+      type: string
+
+    - name: authType
       description: |
         The type of authentication to use. You could use the less secure "Basic" for example
       type: string
       default: Bearer
+    
 
   volumes:
     - name: githubtoken
       secret:
-        secretName: $(params.GITHUB_TOKEN_SECRET_NAME)
+        secretName: $(params.githubTokenSecretName)
 
   steps:
     - name: set-status
@@ -110,23 +110,23 @@ spec:
         import sys
         import http.client
 
-        github_token = open("/etc/github-set-status/$(params.GITHUB_TOKEN_SECRET_KEY)", "r").read()
+        github_token = open("/etc/github-set-status/$(params.githubTokenSecretKey)", "r").read()
 
-        status_url = "$(params.API_PATH_PREFIX)" + "/repos/$(params.REPO_FULL_NAME)/" + \
-            "statuses/$(params.SHA)"
+        status_url = "$(params.apiPathPrefix)" + "/repos/$(params.repoFullname)/" + \
+            "statuses/$(params.sha)"
 
         data = {
-            "state": "$(params.STATE)",
-            "target_url": "$(params.TARGET_URL)",
-            "description": "$(params.DESCRIPTION)",
-            "context": "$(params.CONTEXT)"
+            "state": "$(params.state)",
+            "targetUrl": "$(params.targetUrl)",
+            "description": "$(params.description)",
+            "context": "$(params.context)"
         }
         print("Sending this data to GitHub: ")
         print(data)
 
-        authHeader = "$(params.AUTH_TYPE) " + github_token
+        authHeader = "$(params.authType) " + github_token
 
-        conn = http.client.HTTPSConnection("$(params.GITHUB_HOST_URL)")
+        conn = http.client.HTTPSConnection("$(params.githubHostUrl)")
         conn.request(
             "POST",
             status_url,
@@ -142,5 +142,5 @@ spec:
             print(resp.read())
             sys.exit(1)
         else:
-            print("GitHub status '$(params.STATE)' has been set on "
-                "$(params.REPO_FULL_NAME)#$(params.SHA) ")
+            print("GitHub status '$(params.state)' has been set on "
+                "$(params.repoFullname)#$(params.sha) ")
