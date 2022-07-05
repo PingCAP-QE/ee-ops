@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: ci-demo
 resources:
   - rbac.yaml
+  - trigger-template.yaml

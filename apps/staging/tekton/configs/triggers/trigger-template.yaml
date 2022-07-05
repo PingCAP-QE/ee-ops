@@ -1,0 +1,33 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: github-template
+spec:
+  params:
+    - name: repoName
+      description: The git repository name without domain
+    - name: revision
+      description: The git revision
+      default: main
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: demo-pipeline1-run-
+      spec:
+        pipelineRef:
+          name: demo-pipeline1
+          params:
+            - name: repoName
+              value: $(tt.params.repoName)
+            - name: revision
+              value: $(tt.params.revision)
+          workspaces:
+            - name: git-source
+              volumeClaimTemplate:
+                spec:
+                  accessModes: [ReadWriteOnce]
+                  resources:
+                    requests:
+                      storage: 1Gi
+
