@@ -4,8 +4,8 @@ metadata:
   name: demo-pipeline1
 spec:
   params:
-    - name: repoName
-    - name: revision
+    - name: git-url
+    - name: git-revision
       default: main
   workspaces:
     - name: git-source
@@ -17,15 +17,15 @@ spec:
         name: github-set-status
       timeout: 1m
       params:
-        - name: repoFullname
-          value: $(params.repoName)
+        - name: git-url
+          value: $(params.git-url)
         - name: sha
-          value: $(params.revision)
+          value: $(params.git-revision)
         - name: description
           value: "Build has started"
         - name: state
           value: pending
-        - name: targetUrl
+        - name: target_url
           value: https://tekton/dashboard/taskrun/log
 
     - name: fetch-from-git
@@ -35,9 +35,9 @@ spec:
         - set-github-status-start
       params:
         - name: url
-          value: "https://github.com/$(params.repoName)"
+          value: $(params.git-url)
         - name: revision
-          value: $(params.revision)
+          value: $(params.git-revision)
       workspaces:
         - name: output
           workspace: git-source
@@ -50,8 +50,6 @@ spec:
         - name: source
           workspace: git-source
       params:
-        - name: package
-          value: "github.com/$(params.repoName)"
         - name: packages
           value: ./...
     - name: go-test
@@ -63,8 +61,6 @@ spec:
         - name: source
           workspace: git-source
       params:
-        - name: package
-          value: "github.com/$(params.repoName)"
         - name: packages
           value: ./...
   finally:
@@ -72,13 +68,13 @@ spec:
       taskRef:
         name: github-set-status
       params:
-        - name: repoFullname
-          value: $(params.repoName)
+        - name: git-url
+          value: $(params.git-url)
         - name: sha
-          value: $(params.revision)
+          value: $(params.git-reversion)
         - name: description
-          value: "Build has started"
+          value: "Build has finished"
         - name: state
           value: $(tasks.status)
-        - name: targetUrl
+        - name: target_url
           value: https://tekton/dashboard/taskrun/log
