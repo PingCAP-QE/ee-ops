@@ -4,3 +4,4 @@ namespace: ci-demo
 resources:
   - rbac.yaml
   - trigger-template.yaml
+  - trigger-binding.yaml
