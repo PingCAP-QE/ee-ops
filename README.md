@@ -15,12 +15,14 @@ Before all please fork it into you personal account or organization.
 #### cluster secret data
 
 **required**:
+
 - secrets for jenkins component
   > see [here](apps/staging/jenkins/README.md)
 - secrets for prow component
   > `kubectl -n apps create secret generic github-app-prow --from-literal domain-name=<full prow domain> --from-literal app-id=<github app id> --from-file=app-cert=<github cert file path> --from-literal webhook-secret=<github-hmac-token>`
 - secrets for tekton component
   > `kubectl -n apps create secret generic tekton-ingress --from-literal domain=<full tekton domain> --from-literal path_for_dashboard=/your-tekton-dashboard-path`
+  > `kubectl -n ci-demo create secret generic github-secret --from-literal secretToken=<hmac-token>`
 
 **optional**:
 - secrets `rook-ceph/cluster-release-optional-values`

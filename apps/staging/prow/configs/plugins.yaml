@@ -18,3 +18,15 @@ plugins:
       - yuks
 # plugin_a:
 #   configs_for_plugin_a: {}
+
+external_plugins:
+  PingCAP-QE:
+    - name: tektoncd # forward to tekton trigger event listener.
+      endpoint: http://el-trigger-groups-listener.ci-demo.svc:8080
+      events:
+        - pull_request
+  PingCAP-QE/tibuild:
+    - name: tektoncd # forward to tekton trigger event listener.
+      endpoint: http://el-trigger-groups-listener.ci-demo.svc:8080
+      events:
+        - pull_request
