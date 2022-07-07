@@ -5,3 +5,4 @@ resources:
   - rbac.yaml
   - trigger-template.yaml
   - trigger-binding.yaml
+  - trigger.yaml
