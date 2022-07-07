@@ -6,6 +6,6 @@ metadata:
     type: github-pr
 spec:
   bindings:
-    - ref: pipeline-binding
+    - ref: github-binding
   template:
     ref: github-template
