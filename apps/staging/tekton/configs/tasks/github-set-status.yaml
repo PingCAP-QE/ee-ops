@@ -111,7 +111,7 @@ spec:
         import http.client
         from urllib.parse import urlparse
 
-        github_token = open("/etc/github-set-status/$(params.github-token-secret-key)", "r").read()
+        github_token = open("/etc/github-set-status/$(params.github-token-secret-key)", "r").read().rstrip()
 
         repo_full_name = urlparse("$(params.git-url)").path.lstrip("/").rstrip(".git")
         status_url = "{}/repos/{}/statuses/{}".format("$(params.api-path-prefix)", repo_full_name, "$(params.sha)")
