@@ -70,13 +70,13 @@ spec:
         `error`, `failure`, `pending`, or `success`.
       type: string
 
-    - name: github_host_url
+    - name: github-host-url
       description: |
         The GitHub host, adjust this if you run a GitHub enterprise.
       default: "api.github.com"
       type: string
 
-    - name: api_path_prefix
+    - name: api-path-prefix
       description: |
         The API path prefix, GitHub Enterprise has a prefix e.g. /api/v3
       default: ""
@@ -91,7 +91,7 @@ spec:
   volumes:
     - name: githubtoken
       secret:
-        secretName: $(params.githubTokenSecretName)
+        secretName: $(params.github-token-secret-name)
 
   steps:
     - name: set-status
@@ -110,14 +110,14 @@ spec:
         import http.client
         from urllib.parse import urlparse
 
-        github_token = open("/etc/github-set-status/$(params.github_token_secret_key)", "r").read()
+        github_token = open("/etc/github-set-status/$(params.github-token-secret-key)", "r").read()
 
         repo_full_name = urlparse("$(params.git-url)").path.lstrip("/").rstrip(".git")
-        status_url = "{}/repos/{}/statuses/{}".format("$(params.api_path_prefix)", repo_full_name, "$(params.sha)")
+        status_url = "{}/repos/{}/statuses/{}".format("$(params.api-path-prefix)", repo_full_name, "$(params.sha)")
 
         data = {
             "state": "$(params.state)",
-            "targetUrl": "$(params.target_url)",
+            "targetUrl": "$(params.target-url)",
             "description": "$(params.description)",
             "context": "$(params.context)"
         }
@@ -126,7 +126,7 @@ spec:
 
         authHeader = "$(params.auth-type) " + github_token
 
-        conn = http.client.HTTPSConnection("$(params.github_host_url)")
+        conn = http.client.HTTPSConnection("$(params.github-host-url)")
         conn.request(
             "POST",
             status_url,
