@@ -85,8 +85,9 @@ spec:
     - name: auth-type
       description: |
         The type of authentication to use. You could use the less secure "Basic" for example
+        options: Bearer, token
       type: string
-      default: Bearer
+      default: token
 
   volumes:
     - name: githubtoken
