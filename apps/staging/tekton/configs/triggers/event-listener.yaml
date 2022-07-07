@@ -6,6 +6,27 @@ metadata:
 spec:
   triggerGroups:
     - name: github-pr
+      interceptors:
+        - name: "validate GitHub payload and filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: secretRef
+              value:
+                secretName: github-secret
+                secretKey: secretToken
+            - name: eventTypes
+              value: ["pull_request"]
+        - name: "validate PR state and add field"
+          ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "body.action in ['opened', 'synchronize', 'reopened']"
+            - name: "overlays"
+              value:
+                - key: truncated_sha
+                  expression: body.pull_request.head.sha.truncate(7)
       triggerSelector:
         labelSelector:
           matchLabels:
