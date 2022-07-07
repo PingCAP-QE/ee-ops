@@ -25,9 +25,10 @@ spec:
           value: "Build has started"
         - name: state
           value: pending
-        - name: target_url
+        - name: context
+          value: demo-pipeline1
+        - name: target-url
           value: https://tekton/dashboard/taskrun/log
-
     - name: fetch-from-git
       taskRef:
         name: git-clone
@@ -76,5 +77,7 @@ spec:
           value: "Build has finished"
         - name: state
           value: $(tasks.status)
-        - name: target_url
+        - name: context
+          value: demo-pipeline1
+        - name: target-url
           value: https://tekton/dashboard/taskrun/log
