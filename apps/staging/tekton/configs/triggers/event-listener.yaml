@@ -4,6 +4,7 @@ kind: EventListener
 metadata:
   name: trigger-groups-listener
 spec:
+  serviceAccountName: tekton-triggers
   triggerGroups:
     - name: github-pr
       interceptors:
