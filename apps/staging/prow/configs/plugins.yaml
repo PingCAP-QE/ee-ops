@@ -22,6 +22,6 @@ plugins:
 external_plugins:
   PingCAP-QE:
     - name: tektoncd
-      endpoint: https://el-trigger-groups-listener.ci-demo.svc
+      endpoint: http://el-trigger-groups-listener.ci-demo.svc:8080
       events:
         - pull_request
