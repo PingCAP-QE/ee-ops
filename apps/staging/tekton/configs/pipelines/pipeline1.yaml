@@ -71,7 +71,7 @@ spec:
         - name: git-url
           value: $(params.git-url)
         - name: sha
-          value: $(params.git-reversion)
+          value: $(params.git-revision)
         - name: description
           value: "Build has finished"
         - name: state
