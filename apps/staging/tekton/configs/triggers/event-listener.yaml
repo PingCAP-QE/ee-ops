@@ -29,6 +29,9 @@ spec:
                 - key: truncated_sha
                   expression: body.pull_request.head.sha.truncate(7)
       triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ci-demo
         labelSelector:
           matchLabels:
             type: github-pr

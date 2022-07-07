@@ -18,3 +18,10 @@ plugins:
       - yuks
 # plugin_a:
 #   configs_for_plugin_a: {}
+
+external_plugins:
+  PingCAP-QE:
+    - name: tektoncd
+      endpoint: https://el-trigger-groups-listener.ci-demo.svc
+      events:
+        - pull_request
