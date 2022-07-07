@@ -6,3 +6,4 @@ resources:
   - trigger-template.yaml
   - trigger-binding.yaml
   - trigger.yaml
+  - event-listener.yaml

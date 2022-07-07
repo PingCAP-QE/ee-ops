@@ -1,0 +1,12 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: trigger-groups-listener
+spec:
+  triggerGroups:
+    - name: github-pr
+      triggerSelector:
+        labelSelector:
+          matchLabels:
+            type: github-pr
