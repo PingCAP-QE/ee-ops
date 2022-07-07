@@ -8,14 +8,14 @@ spec:
   triggerGroups:
     - name: github-pr
       interceptors:
-        - name: "validate GitHub payload and filter on eventType"
+        - name: "filter on eventType"
           ref:
             name: github
           params:
-            - name: secretRef
-              value:
-                secretName: github-secret
-                secretKey: secretToken
+            # - name: secretRef
+            #   value:
+            #     secretName: github-secret
+            #     secretKey: secretToken
             - name: eventTypes
               value: ["pull_request"]
         - name: "validate PR state and add field"
