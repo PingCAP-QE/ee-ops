@@ -1,11 +1,12 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: getting-started-pipeline1
+  name: demo-pipeline1
 spec:
   params:
-    - name: repo-name
+    - name: git-url
     - name: git-revision
+      default: main
   workspaces:
     - name: git-source
   tasks:
@@ -16,17 +17,18 @@ spec:
         name: github-set-status
       timeout: 1m
       params:
-        - name: REPO_FULL_NAME
-          value: $(params.repo-name)
-        - name: SHA
+        - name: git-url
+          value: $(params.git-url)
+        - name: sha
           value: $(params.git-revision)
-        - name: DESCRIPTION
+        - name: description
           value: "Build has started"
-        - name: STATE
+        - name: state
           value: pending
-        - name: TARGET_URL
+        - name: context
+          value: demo-pipeline1
+        - name: target-url
           value: https://tekton/dashboard/taskrun/log
-
     - name: fetch-from-git
       taskRef:
         name: git-clone
@@ -34,7 +36,7 @@ spec:
         - set-github-status-start
       params:
         - name: url
-          value: "https://github.com/$(params.repo-name)"
+          value: $(params.git-url)
         - name: revision
           value: $(params.git-revision)
       workspaces:
@@ -49,8 +51,6 @@ spec:
         - name: source
           workspace: git-source
       params:
-        - name: package
-          value: "github.com/$(params.repo-name)"
         - name: packages
           value: ./...
     - name: go-test
@@ -62,8 +62,6 @@ spec:
         - name: source
           workspace: git-source
       params:
-        - name: package
-          value: "github.com/$(params.repo-name)"
         - name: packages
           value: ./...
   finally:
@@ -71,13 +69,15 @@ spec:
       taskRef:
         name: github-set-status
       params:
-        - name: REPO_FULL_NAME
-          value: $(params.repo-name)
-        - name: SHA
+        - name: git-url
+          value: $(params.git-url)
+        - name: sha
           value: $(params.git-revision)
-        - name: DESCRIPTION
-          value: "Build has started"
-        - name: STATE
-          value: $(tasks.status)
-        - name: TARGET_URL
+        - name: description
+          value: "Build has finished"
+        - name: state
+          value: success
+        - name: context
+          value: demo-pipeline1
+        - name: target-url
           value: https://tekton/dashboard/taskrun/log
