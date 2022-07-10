@@ -1,6 +1,47 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: foo-run
+  generateName: self-pipeline1-run-
 spec:
-  pipelineSpec: {}
+  workspaces:
+    - name: git-source
+  params:
+    - name: git-url
+      value: $(tt.params.git-url)
+    - name: git-revision
+      value: $(tt.params.git-revision)
+  pipelineSpec:
+    tasks:
+    - name: fetch-from-git
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: git-source
+    - name: go-build
+      taskRef:
+        name: golang-build
+      runAfter:
+        - fetch-from-git
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: packages
+          value: ./...
+    - name: go-test
+      taskRef:
+        name: golang-test
+      runAfter:
+        - fetch-from-git
+      workspaces:
+        - name: source
+          workspace: git-source
+      params:
+        - name: packages
+          value: ./...

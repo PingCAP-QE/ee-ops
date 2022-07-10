@@ -3,7 +3,11 @@ kind: Kustomization
 namespace: ci-demo
 resources:
   - rbac.yaml
-  - trigger-template.yaml
+  - trigger-template.public.yaml
+  - trigger-template.public.self-repo.setup.yaml
+  - trigger-template.public.self-repo.setup.yaml
   - trigger-binding.yaml
-  - trigger.yaml
+  - trigger.public.yaml
+  - trigger.public.self-repo.setup.yaml
+  - trigger.public.self-repo.teardown.yaml
   - event-listener.yaml

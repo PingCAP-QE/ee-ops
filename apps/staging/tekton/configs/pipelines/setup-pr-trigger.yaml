@@ -1,0 +1,39 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: setup-pr-trigger
+spec:
+  workspaces:
+    - name: git-source
+  params:
+    - name: git-url
+      type: string
+    - name: git-revision
+      type: string
+      default: main
+  tasks:
+    - name: fetch-from-git
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: git-source
+    - name: taskName
+      taskRef:
+        name: kubernetes-actions
+      params:
+        - name: script
+          value: |
+            pwd
+            ls -lh
+            echo "-----------"
+            kubectl -n ci-demo get deploy
+      workspaces:
+        - name: manifest-dir
+          workspace: git-source
+          subPath: ".ci"

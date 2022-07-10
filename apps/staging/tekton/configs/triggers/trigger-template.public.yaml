@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: github-template
+  name: github-pr-public
 spec:
   params:
     - name: git-url
