@@ -20,7 +20,7 @@ spec:
       description: |
         The GitHub repository full url, e.g.: https://github.com/tektoncd/catalog.git
       type: string
-    - name: sha
+    - name: git-revision
       description: |
         Commit SHA to get ci pipeline manifests.
       type: string

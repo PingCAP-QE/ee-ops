@@ -17,9 +17,9 @@ spec:
         kind: ClusterTask
         name: fetch-repo-pipelines
       params:
-        - name: url
+        - name: git-url
           value: $(params.git-url)
-        - name: revision
+        - name: git-revision
           value: $(params.git-revision)
       workspaces:
         - name: output
