@@ -118,7 +118,7 @@ spec:
 
         data = {
             "state": "$(params.state)",
-            "targetUrl": "$(params.target-url)",
+            "target_url": "$(params.target-url)",
             "description": "$(params.description)",
             "context": "$(params.context)"
         }
