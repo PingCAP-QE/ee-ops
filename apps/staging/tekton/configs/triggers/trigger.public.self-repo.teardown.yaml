@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: trigger
+  name: trigger-pr-teardown
   labels:
     type: github-pr-teardown
 spec:
   bindings:
     - ref: github-binding
   template:
-    ref: github-pr-public
+    ref: github-pr-teardown

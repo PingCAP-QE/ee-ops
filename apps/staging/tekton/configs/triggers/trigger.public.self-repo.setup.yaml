@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: trigger
+  name: trigger-pr-setup
   labels:
     type: github-pr-setup
 spec:

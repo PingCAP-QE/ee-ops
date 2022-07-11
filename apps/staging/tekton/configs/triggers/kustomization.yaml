@@ -5,7 +5,7 @@ resources:
   - rbac.yaml
   - trigger-template.public.yaml
   - trigger-template.public.self-repo.setup.yaml
-  - trigger-template.public.self-repo.setup.yaml
+  - trigger-template.public.self-repo.teardown.yaml
   - trigger-binding.yaml
   - trigger.public.yaml
   - trigger.public.self-repo.setup.yaml

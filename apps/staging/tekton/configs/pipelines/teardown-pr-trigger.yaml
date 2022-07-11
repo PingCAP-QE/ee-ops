@@ -4,7 +4,7 @@ metadata:
   name: teardown-pr-trigger
 spec:
   workspaces:
-    - name: git-source
+    - name: output
   params:
     - name: git-url
       type: string
@@ -12,9 +12,10 @@ spec:
       type: string
       default: main
   tasks:
-    - name: fetch-from-git
+    - name: fetch-repo-pipelines
       taskRef:
-        name: git-clone
+        kind: ClusterTask
+        name: fetch-repo-pipelines
       params:
         - name: url
           value: $(params.git-url)
@@ -22,8 +23,18 @@ spec:
           value: $(params.git-revision)
       workspaces:
         - name: output
-          workspace: git-source
-    - name: taskName
+          workspace: output
+    - name: todo
+      runAfter:
+        - fetch-repo-pipelines
+      taskRef:
+        name: echo
+      params:
+        - name: message
+          value: "todo"
+    - name: teardown-manifest
+      runAfter:
+        - fetch-repo-pipelines
       taskRef:
         name: kubernetes-actions
       params:
@@ -35,5 +46,5 @@ spec:
             kubectl -n ci-demo get deploy
       workspaces:
         - name: manifest-dir
-          workspace: git-source
+          workspace: output
           subPath: ".ci"
