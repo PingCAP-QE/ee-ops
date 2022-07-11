@@ -13,14 +13,14 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        name: setup-pr-trigger-run-$(params.git-revision)
-        # annotations:
-        #   "tekton.dev/git-status": "true"
-        #   "tekton.dev/status-context": "demo-pipeline1"
-        #   "tekton.dev/status-description": "demo pipeline forwarded by prow"
-        #   "tekton.dev/status-target-url": "https://dashboard.tekton.pingcap.net/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
-        #   "tekton.dev/git-repo": $(tt.params.git-url)
-        #   "tekton.dev/git-revision": $(tt.params.git-revision)
+        generateName: setup-pr-trigger-run-
+        annotations:
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-context": "demo-pipeline1"
+          "tekton.dev/status-description": "demo pipeline forwarded by prow"
+          "tekton.dev/status-target-url": "https://dashboard.tekton.pingcap.net/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
           name: setup-pr-trigger
