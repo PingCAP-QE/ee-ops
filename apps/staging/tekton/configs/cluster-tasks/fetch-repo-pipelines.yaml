@@ -49,6 +49,9 @@ spec:
       script: |
         #!/usr/bin/env bash
 
+        which deno
+        deno --version
+
         cat <<EOF > get.ts
         import { parse } from "https://deno.land/std@0.147.0/flags/mod.ts";
         import { stringify as yamlStringify } from "https://deno.land/std@0.147.0/encoding/yaml.ts";
