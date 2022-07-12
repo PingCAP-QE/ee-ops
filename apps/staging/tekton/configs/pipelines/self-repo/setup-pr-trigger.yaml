@@ -11,6 +11,8 @@ spec:
     - name: git-revision
       type: string
       default: main
+    - name: pr-number
+      type: number
   tasks:
     - name: fetch-repo-pipelines
       taskRef:
@@ -21,6 +23,8 @@ spec:
           value: $(params.git-url)
         - name: git-revision
           value: $(params.git-revision)
+        - name: pr-number
+          value: $(params.pr-number)
       workspaces:
         - name: output
           workspace: output

@@ -25,6 +25,9 @@ spec:
         Commit SHA to get ci pipeline manifests.
       type: string
       default: main
+    - name: pr-number
+      type: number
+      description: Pull request number.
     - name: context
       type: string
       default: .ci
@@ -77,4 +80,6 @@ spec:
 
         deno run -q --allow-read --allow-write \
           "${remote_script_url}" \
-            --input=$(params.output)
+            --input=$(params.output) \
+            --gitUrl=$(params.git-url) \
+            --pr.number=$(params.pr-number)
