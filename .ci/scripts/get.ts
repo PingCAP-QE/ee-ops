@@ -1,7 +1,7 @@
-import { parse } from "https://deno.land/std@0.147.0/flags/mod.ts";
+import * as flags from "https://deno.land/std@0.147.0/flags/mod.ts";
 import { sprintf } from "https://deno.land/std@0.147.0/fmt/printf.ts";
-import { stringify as yamlStringify } from "https://deno.land/std@0.147.0/encoding/yaml.ts";
-import { decode as base64Decode } from "https://deno.land/std@0.147.0/encoding/base64.ts";
+import * as yaml from "https://deno.land/std@0.147.0/encoding/yaml.ts";
+import * as base64 from "https://deno.land/std@0.147.0/encoding/base64.ts";
 import { Octokit, App } from "https://cdn.skypack.dev/octokit?dts";
 
 const DEFAULT_CI_DIR = ".ci";
@@ -11,7 +11,7 @@ const DEFAULT_CI_MANIFEST_OUTPUT = "ci.yaml"
  * typescript style guide: https://google.github.io/styleguide/tsguide.html
  */
 
-interface gitParams {
+interface cliParams {
     appId: number;
     privateKeyPath: string;
     gitUrl: string;
@@ -82,17 +82,17 @@ async function getCiFiles(
     });
 
     return await Promise.all(tree.
-        filter(f => f.path.endsWith(".yaml") || f.path.endsWith(".yml")).
-        map(async (f) => {
+        filter((f: { path: string; }) => f.path.endsWith(".yaml") || f.path.endsWith(".yml")).
+        map(async (f: { sha: string; path: string; }) => {
             const { data: { content } } = await octokit.rest.git.getBlob({ owner, repo, file_sha: f.sha });
-            const file_content = new TextDecoder().decode(base64Decode(content));
+            const file_content = new TextDecoder().decode(base64.decode(content));
 
             return { path: f.path, file_sha: f.sha, content: file_content } as ciFileBlob;
         })
     );
 }
 
-async function main(params: gitParams) {
+async function main(params: cliParams) {
     const { appId, privateKeyPath, gitUrl, reversion } = params;
     const { owner, repo } = parseRepo(gitUrl);
 
@@ -119,11 +119,11 @@ async function main(params: gitParams) {
     );
     files.forEach((f) => console.log(f));
 
-    await Deno.writeFile(output, new TextEncoder().encode(yamlStringify(files)))
+    await Deno.writeFile(output, new TextEncoder().encode(yaml.stringify(files)))
 }
 
-const cliArgs = parse(Deno.args);
-await main(cliArgs as unknown as gitParams);
+const cliArgs = flags.parse(Deno.args) as cliParams;
+await main(cliArgs);
 console.log("~~~~~~~~~~~end~~~~~~~~~~~~~~");
 
 /**

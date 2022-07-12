@@ -1,5 +1,7 @@
-// init compose script
-import { parse as parseYaml, stringify as stringifyYaml } from "https://deno.land/std@0.147.0/encoding/yaml.ts";
+import * as yaml from "https://deno.land/std@0.147.0/encoding/yaml.ts";
+import * as flags from "https://deno.land/std@0.147.0/flags/mod.ts";
+
+const DEFAULT_CI_MANIFEST_INPUT = "ci.yaml"
 
 interface ciFileBlob {
     file_sha: string;
@@ -7,21 +9,16 @@ interface ciFileBlob {
     content: string;
 }
 
+interface cliParams {
+    input?: string; // default ci.yaml
+}
+
 interface pipelineRun { [key: string]: any }
 interface triggerTemplate { [key: string]: any }
 
-async function readManifest(path: string) {
-    const decoder = new TextDecoder("utf-8");
-
-    const data = await Deno.readFile(path);
-    const result = parseYaml(decoder.decode(data)) as ciFileBlob[];
-
-    result.forEach(e => {
-        const ePipelineRun = parseYaml(e.content) as pipelineRun;
-        const eTriggerTemplate = composeTriggerTemplate(ePipelineRun);
-
-        console.log(stringifyYaml(eTriggerTemplate))
-    });
+function readManifest(path: string) {
+    const content = Deno.readTextFileSync(path);
+    return yaml.parse(content) as ciFileBlob[];
 }
 
 function composeTriggerTemplate(run: pipelineRun): triggerTemplate {
@@ -56,4 +53,21 @@ function composeTriggerTemplate(run: pipelineRun): triggerTemplate {
     return ret;
 }
 
-await readManifest('ci.yaml');
+function main({ input }: cliParams) {
+    if (!input) {
+        input = DEFAULT_CI_MANIFEST_INPUT
+    }
+    const pipelines = readManifest(input);
+
+    pipelines.forEach(e => {
+        const ePipelineRun = yaml.parse(e.content) as pipelineRun;
+        const eTriggerTemplate = composeTriggerTemplate(ePipelineRun);
+
+        console.log(yaml.stringify(eTriggerTemplate))
+    });
+}
+
+const cliArgs = flags.parse(Deno.args) as cliParams;
+main(cliArgs);
+console.log("~~~~~~~~~~~end~~~~~~~~~~~~~~");
+
