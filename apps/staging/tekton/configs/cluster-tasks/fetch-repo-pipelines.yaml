@@ -188,6 +188,8 @@ spec:
       script: |
         #! /usr/bin/env bash
 
+        cat get.ts
+        echo "------------------"
         deno run --allow-read --allow-write --allow-net get.ts \
           --gitUrl="$(params.git-url)" \
           --sha=$(params.git-revision) \
