@@ -43,19 +43,16 @@ spec:
       secret:
         secretName: $(params.github-app-secret)
   steps:
-    - name: run-remote-script
+    - name: get-ci-manifests
       image: denoland/deno:1.23.3
       workingDir: $(workspaces.output.path)
       script: |
         #! /usr/bin/env bash
 
         remote_repo_url="$(params.git-url)"
-
         # only for demo simplify.
         remote_script_url="${remote_repo_url%.git}/raw/$(params.git-revision)/.ci/scripts/get.ts"
 
-        cat get.ts
-        echo "------------------"
         deno run \
           --allow-read \
           --allow-write \
@@ -71,3 +68,18 @@ spec:
       volumeMounts:
         - name: github-app-secret
           mountPath: /etc/github-app-secret
+    - name: compose-tekton-resources
+      image: denoland/deno:1.23.3
+      workingDir: $(workspaces.output.path)
+      script: |
+        #! /usr/bin/env bash
+
+        remote_repo_url="$(params.git-url)"
+        # only for demo simplify.
+        remote_script_url="${remote_repo_url%.git}/raw/$(params.git-revision)/.ci/scripts/compose.ts"
+
+        deno run \
+          --allow-read \
+          --allow-write \
+          "${remote_script_url}" \
+            --input=$(params.output)
