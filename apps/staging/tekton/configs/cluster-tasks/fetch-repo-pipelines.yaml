@@ -26,7 +26,7 @@ spec:
       type: string
       default: main
     - name: pr-number
-      type: number
+      type: string
       description: Pull request number.
     - name: context
       type: string

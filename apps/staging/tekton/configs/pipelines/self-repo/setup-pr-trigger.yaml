@@ -12,7 +12,7 @@ spec:
       type: string
       default: main
     - name: pr-number
-      type: number
+      type: string
   tasks:
     - name: fetch-repo-pipelines
       taskRef:
