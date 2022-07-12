@@ -15,7 +15,7 @@ interface cliParams {
     appId: number;
     privateKeyPath: string;
     gitUrl: string;
-    reversion: string;
+    sha: string;
     ciDir?: string;
     output?: string;
 }
@@ -93,7 +93,7 @@ async function getCiFiles(
 }
 
 async function main(params: cliParams) {
-    const { appId, privateKeyPath, gitUrl, reversion } = params;
+    const { appId, privateKeyPath, gitUrl, sha } = params;
     const { owner, repo } = parseRepo(gitUrl);
 
     let { ciDir, output } = params;
@@ -114,7 +114,7 @@ async function main(params: cliParams) {
         await getRepoOctokit(app, owner, repo),
         owner,
         repo,
-        reversion,
+        sha,
         ciDir,
     );
     files.forEach((f) => console.log(f));
