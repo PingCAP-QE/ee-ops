@@ -52,7 +52,7 @@ spec:
         remote_repo_url="$(params.git-url)"
 
         # only for demo simplify.
-        remote_script_url="${remote_repo_url%.git}}/raw/$(params.git-revision)/.ci/scripts/get.ts"
+        remote_script_url="${remote_repo_url%.git}/raw/$(params.git-revision)/.ci/scripts/get.ts"
 
         cat get.ts
         echo "------------------"
