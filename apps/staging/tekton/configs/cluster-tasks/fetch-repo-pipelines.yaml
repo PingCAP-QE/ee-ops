@@ -45,7 +45,7 @@ spec:
   steps:
     - name: prepare-script
       image: denoland/deno:1.23.3
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.output.path)
       script: |
         #!/usr/bin/env bash
 
@@ -184,7 +184,7 @@ spec:
         EOF
     - name: run-script
       image: denoland/deno:1.23.3
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.output.path)
       script: |
         #! /usr/bin/env bash
 
