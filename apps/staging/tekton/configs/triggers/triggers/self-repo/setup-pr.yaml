@@ -6,6 +6,6 @@ metadata:
     type: github-pr-setup
 spec:
   bindings:
-    - ref: github-binding
+    - ref: github-pr
   template:
     ref: github-pr-setup
