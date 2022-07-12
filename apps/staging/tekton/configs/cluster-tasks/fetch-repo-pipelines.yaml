@@ -49,7 +49,7 @@ spec:
       script: |
         #!/usr/bin/env bash
 
-        cat <<EOF > $(workspace.output.path)/get.ts
+        cat <<EOF > get.ts
         import { parse } from "https://deno.land/std@0.147.0/flags/mod.ts";
         import { stringify as yamlStringify } from "https://deno.land/std@0.147.0/encoding/yaml.ts";
         import { decode as base64Decode } from "https://deno.land/std@0.147.0/encoding/base64.ts";
