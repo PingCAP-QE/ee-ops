@@ -82,9 +82,11 @@ spec:
         }
 
         function parseRepo(gitUrl: string): { repo: string, owner: string } {
-            const url = new URL(gitUrl);
-            console.log(url.pathname)
-            const [repo, owner] = url.pathname.split("/", 2)
+            const [repo, owner] = new URL(gitUrl).
+                pathname.
+                replace(/^(\/)/, '').
+                replace(/(\.git)$/, '').
+                split('/', 2)
             return { repo, owner };
         }
 
@@ -194,9 +196,11 @@ spec:
       script: |
         #! /usr/bin/env bash
 
+
         cat get.ts
         echo "------------------"
-        deno run --allow-read --allow-write --allow-net get.ts \
+        deno run --allow-read --allow-write --allow-net \
+          https://github.com/PingCAP-QE/ee-ops/raw/feature/self-ci-pipeline/.ci/scripts/get.ts \
           --gitUrl="$(params.git-url)" \
           --sha=$(params.git-revision) \
           --ciDir=$(params.context) \
