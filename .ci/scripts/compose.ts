@@ -161,11 +161,3 @@ function main({ input, gitUrl, pr }: cliParams) {
 const cliArgs = flags.parse(Deno.args) as cliParams;
 main(cliArgs);
 console.log("~~~~~~~~~~~end~~~~~~~~~~~~~~");
-
-/**
- * FIXME: A bug in [octokit](https://github.com/octokit/octokit.j).
- * current I need call an `exit` at the end of deno script.
- * issue: https://github.com/octokit/octokit.js/issues/2079
- * working in progress: https://github.com/octokit/webhooks.js/pull/693
- */
-//  Deno.exit(0);
