@@ -27,12 +27,12 @@ interface ciFileBlob {
 }
 
 function parseRepo(gitUrl: string): { repo: string, owner: string } {
-    const [repo, owner] = new URL(gitUrl).
+    const [owner, repo] = new URL(gitUrl).
         pathname.
         replace(/^(\/)/, '').
         replace(/(\.git)$/, '').
         split('/', 2)
-    return { repo, owner };
+    return { owner, repo };
 }
 
 async function getRepoOctokit(
@@ -108,7 +108,7 @@ async function main(params: cliParams) {
     const privateKey = await Deno.readTextFile(privateKeyPath);
     const app = new App({ appId, privateKey });
     const { data: { slug } } = await app.octokit.rest.apps.getAuthenticated();
-    console.log({ slug });
+    console.debug({ slug, owner, repo });
 
     const files = await getCiFiles(
         await getRepoOctokit(app, owner, repo),
