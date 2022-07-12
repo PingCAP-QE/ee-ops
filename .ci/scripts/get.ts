@@ -1,10 +1,8 @@
-#! /usr/bin/env deno
-
 import { parse } from "https://deno.land/std@0.147.0/flags/mod.ts";
+import { sprintf } from "https://deno.land/std@0.147.0/fmt/printf.ts";
 import { stringify as yamlStringify } from "https://deno.land/std@0.147.0/encoding/yaml.ts";
 import { decode as base64Decode } from "https://deno.land/std@0.147.0/encoding/base64.ts";
 import { Octokit, App } from "https://cdn.skypack.dev/octokit?dts";
-
 
 const DEFAULT_CI_DIR = ".ci";
 const DEFAULT_CI_MANIFEST_OUTPUT = "ci.yaml"
@@ -29,9 +27,11 @@ interface ciFileBlob {
 }
 
 function parseRepo(gitUrl: string): { repo: string, owner: string } {
-    const url = new URL(gitUrl);
-    console.log(url.pathname)
-    const [repo, owner] = url.pathname.split("/", 2)
+    const [repo, owner] = new URL(gitUrl).
+        pathname.
+        replace(/^(\/)/, '').
+        replace(/(\.git)$/, '').
+        split('/', 2)
     return { repo, owner };
 }
 
@@ -41,8 +41,10 @@ async function getRepoOctokit(
     repo: string,
 ): Promise<Octokit> {
     let ret: Octokit;
+
+    const fullRepoName = sprintf('%s/%s', owner, repo);
     await app.eachRepository(({ octokit, repository }) => {
-        if (repository.full_name === `${owner}/${repo}`) {
+        if (repository.full_name === fullRepoName) {
             ret = octokit;
         }
     });
@@ -130,4 +132,4 @@ console.log("~~~~~~~~~~~end~~~~~~~~~~~~~~");
  * issue: https://github.com/octokit/octokit.js/issues/2079
  * working in progress: https://github.com/octokit/webhooks.js/pull/693
  */
-Deno.exit(0)
+Deno.exit(0);
