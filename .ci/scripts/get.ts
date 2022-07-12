@@ -1,7 +1,7 @@
 import * as flags from "https://deno.land/std@0.147.0/flags/mod.ts";
-import { sprintf } from "https://deno.land/std@0.147.0/fmt/printf.ts";
 import * as yaml from "https://deno.land/std@0.147.0/encoding/yaml.ts";
 import * as base64 from "https://deno.land/std@0.147.0/encoding/base64.ts";
+import { sprintf } from "https://deno.land/std@0.147.0/fmt/printf.ts";
 import { Octokit, App } from "https://cdn.skypack.dev/octokit?dts";
 
 const DEFAULT_CI_DIR = ".ci";
@@ -117,7 +117,6 @@ async function main(params: cliParams) {
         sha,
         ciDir,
     );
-    files.forEach((f) => console.log(f));
 
     await Deno.writeFile(output, new TextEncoder().encode(yaml.stringify(files)))
 }
