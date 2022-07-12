@@ -92,17 +92,12 @@ async function getCiFiles(
     );
 }
 
-async function main(params: cliParams) {
-    const { appId, privateKeyPath, gitUrl, sha } = params;
+async function main({
+    ciDir = DEFAULT_CI_DIR,
+    output = DEFAULT_CI_MANIFEST_OUTPUT,
+    appId, privateKeyPath, gitUrl, sha,
+}: cliParams) {
     const { owner, repo } = parseRepo(gitUrl);
-
-    let { ciDir, output } = params;
-    if (!ciDir) {
-        ciDir = DEFAULT_CI_DIR;
-    }
-    if (!output) {
-        output = DEFAULT_CI_MANIFEST_OUTPUT
-    }
 
     // decode private key from base64 encoded string
     const privateKey = await Deno.readTextFile(privateKeyPath);

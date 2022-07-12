@@ -1,8 +1,10 @@
 import * as yaml from "https://deno.land/std@0.147.0/encoding/yaml.ts";
 import * as flags from "https://deno.land/std@0.147.0/flags/mod.ts";
 import { sprintf } from "https://deno.land/std@0.147.0/fmt/printf.ts";
+import * as path from 'https://deno.land/std@0.147.0/path/mod.ts'
 
 const DEFAULT_CI_MANIFEST_INPUT = "ci.yaml";
+const DEFAULT_CI_MANIFEST_OUTPUT = "tekton";
 
 interface ciFileBlob {
     file_sha: string;
@@ -24,10 +26,15 @@ interface prInfo {
 interface cliParams {
     gitUrl: string;
     input?: string; // default ci.yaml
+    output?: string; // default tekton.yaml
     pr: prInfo;
 }
 
 interface pipelineRun {
+    metadata: {
+        generateName: string;
+        [key: string]: any;
+    };
     [key: string]: any;
 }
 interface triggerTemplate {
@@ -139,10 +146,11 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
     return ret;
 }
 
-function main({ input, gitUrl, pr }: cliParams) {
-    if (!input) {
-        input = DEFAULT_CI_MANIFEST_INPUT;
-    }
+function main({
+    input = DEFAULT_CI_MANIFEST_INPUT,
+    output = DEFAULT_CI_MANIFEST_OUTPUT,
+    gitUrl, pr
+}: cliParams) {
     const pipelines = readManifest(input);
 
     if (!pr.baseOwner || !pr.baseRepo) {
@@ -155,8 +163,14 @@ function main({ input, gitUrl, pr }: cliParams) {
         const eTriggerTemplate = composeTriggerTemplate(ePipelineRun, pr);
         const eTrigger = composeTrigger(eTriggerTemplate.metadata.name, pr);
 
-        console.log(yaml.stringify(eTriggerTemplate));
-        console.log(yaml.stringify(eTrigger));
+        const triggerTemplateYamlPath = path.join(output,
+            `${ePipelineRun.metadata.generateName}trigger-template.yaml`);
+        const triggerYamlPath = path.join(output,
+            `${ePipelineRun.metadata.generateName}trigger.yaml`);
+
+        Deno.mkdir(output, { recursive: true });
+        Deno.writeTextFileSync(triggerTemplateYamlPath, yaml.stringify(eTriggerTemplate));
+        Deno.writeTextFileSync(triggerYamlPath, yaml.stringify(eTrigger));
     });
 }
 
