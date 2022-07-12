@@ -96,12 +96,13 @@ function composeTriggerTemplate(run: pipelineRun, pr: prInfo): triggerTemplate {
 }
 
 function composeTrigger(templateName: string, pr: prInfo): trigger {
-    const filterFormat = `
-        header.match('X-GitHub-Event', 'pull_request') &&
-        body.action in ['opened', 'synchronize'] &&
-        body.pull_request.base.user.login == %s &&
-        body.pull_request.base.repo.name == %s &&
+    const filterFormat = `\
+        header.match('X-GitHub-Event', 'pull_request') && \
+        body.action in ['opened', 'synchronize'] && \
+        body.pull_request.base.user.login == %s && \
+        body.pull_request.base.repo.name == %s && \
         body.pull_request.number == %d`;
+
     const filter = sprintf(filterFormat, pr.baseOwner, pr.baseRepo, pr.number);
     const ret: trigger = {
         apiVersion: "triggers.tekton.dev/v1beta1",
@@ -109,6 +110,7 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
         metadata: {
             name: "github-template-owner-repo-pr-12345",
             labels: {
+                // TODO(wuhuizuo): label value should be 63 characters or less. 
                 type: "github-pr",
                 prNum: pr.number,
                 prOwner: pr.baseOwner,
