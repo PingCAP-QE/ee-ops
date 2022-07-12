@@ -53,17 +53,14 @@ spec:
         # only for demo simplify.
         remote_script_url="${remote_repo_url%.git}/raw/$(params.git-revision)/.ci/scripts/get.ts"
 
-        deno run \
-          --allow-read \
-          --allow-write \
-          --allow-net \
+        deno run -q --allow-read --allow-write --allow-net \
           "${remote_script_url}" \
-            --gitUrl="$(params.git-url)" \
-            --sha=$(params.git-revision) \
-            --ciDir=$(params.context) \
-            --output=$(params.output) \
-            --appId="$(cat /etc/github-app-secret/app-id)" \
-            --privateKeyPath=/etc/github-app-secret/app-cert-pkcs8
+          --gitUrl="$(params.git-url)" \
+          --sha=$(params.git-revision) \
+          --ciDir=$(params.context) \
+          --output=$(params.output) \
+          --appId="$(cat /etc/github-app-secret/app-id)" \
+          --privateKeyPath=/etc/github-app-secret/app-cert-pkcs8
 
       volumeMounts:
         - name: github-app-secret
@@ -78,8 +75,6 @@ spec:
         # only for demo simplify.
         remote_script_url="${remote_repo_url%.git}/raw/$(params.git-revision)/.ci/scripts/compose.ts"
 
-        deno run \
-          --allow-read \
-          --allow-write \
+        deno run -q --allow-read --allow-write \
           "${remote_script_url}" \
             --input=$(params.output)
