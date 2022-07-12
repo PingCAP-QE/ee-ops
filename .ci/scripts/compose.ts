@@ -75,10 +75,10 @@ function composeTriggerTemplate(run: pipelineRun, pr: prInfo): triggerTemplate {
         apiVersion: "triggers.tekton.dev/v1beta1",
         kind: "TriggerTemplate",
         metadata: {
-            name: "github-template-owner-repo-pr-12345",
+            name: `${pr.baseOwner.toLowerCase()}-${pr.baseRepo}-pr-${pr.number}`,
             labels: {
                 type: "github-pr",
-                prNum: pr.number,
+                prNum: `${pr.number}`,
                 prOwner: pr.baseOwner,
                 prRepo: pr.baseRepo,
             },
@@ -115,11 +115,11 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
         apiVersion: "triggers.tekton.dev/v1beta1",
         kind: "Trigger",
         metadata: {
-            name: "github-template-owner-repo-pr-12345",
+            name: `${pr.baseOwner.toLowerCase()}-${pr.baseRepo}-pr-${pr.number}`,
             labels: {
                 // TODO(wuhuizuo): label value should be 63 characters or less. 
                 type: "github-pr",
-                prNum: pr.number,
+                prNum: `${pr.number}`,
                 prOwner: pr.baseOwner,
                 prRepo: pr.baseRepo,
             },
