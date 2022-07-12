@@ -34,8 +34,8 @@ spec:
       description: CI manifest dir.
     - name: output
       type: string
-      default: "ci.yaml"
-      description: ci manifest parsed output file path.
+      default: "tekton"
+      description: tekton k8s yaml saving path.
     - name: github-app-secret
       description: |
         The name of the kubernetes secret that contains the GitHub app id and private key token.
@@ -61,7 +61,6 @@ spec:
           --gitUrl="$(params.git-url)" \
           --sha=$(params.git-revision) \
           --ciDir=$(params.context) \
-          --output=$(params.output) \
           --appId="$(cat /etc/github-app-secret/app-id)" \
           --privateKeyPath=/etc/github-app-secret/app-cert-pkcs8
 
@@ -80,6 +79,8 @@ spec:
 
         deno run -q --allow-read --allow-write \
           "${remote_script_url}" \
-            --input=$(params.output) \
+            --output=$(params.output) \
             --gitUrl=$(params.git-url) \
             --pr.number=$(params.pr-number)
+
+        ls -l $(params.output)

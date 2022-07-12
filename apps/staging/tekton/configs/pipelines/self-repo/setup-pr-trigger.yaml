@@ -25,6 +25,8 @@ spec:
           value: $(params.git-revision)
         - name: pr-number
           value: $(params.pr-number)
+        - name: output
+          value: tekton
       workspaces:
         - name: output
           workspace: output
@@ -48,7 +50,7 @@ spec:
             ls -lh
             echo "-----------"
             kubectl -n ci-demo get deploy
+            kubectl -n ci-demo apply -f tekton/
       workspaces:
         - name: manifest-dir
           workspace: output
-          subPath: ".ci"
