@@ -106,9 +106,9 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
     const filterFormat = `\
         header.match('X-GitHub-Event', 'pull_request') && \
         body.action in ['opened', 'synchronize'] && \
-        body.pull_request.base.user.login == '%s' && \
-        body.pull_request.base.repo.name == '%s' && \
-        body.pull_request.number == %d`;
+        body.pull_request.base.user.login == '${pr.baseOwner}' && \
+        body.pull_request.base.repo.name == '${pr.baseRepo}' && \
+        body.pull_request.number == ${pr.number}`;
 
     const filter = sprintf(filterFormat, pr.baseOwner, pr.baseRepo, pr.number);
     const ret: trigger = {
@@ -129,17 +129,10 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
             template: {
                 ref: templateName,
             },
-            interceptors: [
-                {
-                    ref: { name: "cel" },
-                    params: [
-                        {
-                            name: "filter",
-                            value: filter,
-                        },
-                    ],
-                },
-            ],
+            interceptors: [{
+                ref: { name: "cel" },
+                params: [{ name: "filter", value: filter },],
+            }],
         },
     };
 

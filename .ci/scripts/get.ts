@@ -58,7 +58,7 @@ async function getCiFiles(
     repo: string,
     sha: string,
     dir: string,
-) {
+): Promise<ciFileBlob[]> {
     // get tree path
     const { data: { tree: dirs } } = await octokit.rest.git.getTree({
         owner: owner,
@@ -73,6 +73,10 @@ async function getCiFiles(
         },
     );
 
+    if (!matched) {
+        return Promise.resolve([])
+    }
+
     // get files
     const { data: { tree } } = await octokit.rest.git.getTree({
         owner: owner,
@@ -86,7 +90,6 @@ async function getCiFiles(
         map(async (f: { sha: string; path: string; }) => {
             const { data: { content } } = await octokit.rest.git.getBlob({ owner, repo, file_sha: f.sha });
             const file_content = new TextDecoder().decode(base64.decode(content));
-
             return { path: f.path, file_sha: f.sha, content: file_content } as ciFileBlob;
         })
     );
