@@ -77,10 +77,10 @@ function composeTriggerTemplate(run: pipelineRun, pr: prInfo): triggerTemplate {
         metadata: {
             name: `${pr.baseOwner.toLowerCase()}-${pr.baseRepo}-pr-${pr.number}`,
             labels: {
-                type: "github-pr",
-                prNum: `${pr.number}`,
-                prOwner: pr.baseOwner,
-                prRepo: pr.baseRepo,
+                'type': "github-pr",
+                'pr-num': `${pr.number}`,
+                'pr-owner': pr.baseOwner,
+                'pr-repo': pr.baseRepo,
             },
         },
         spec: {
@@ -106,8 +106,8 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
     const filterFormat = `\
         header.match('X-GitHub-Event', 'pull_request') && \
         body.action in ['opened', 'synchronize'] && \
-        body.pull_request.base.user.login == %s && \
-        body.pull_request.base.repo.name == %s && \
+        body.pull_request.base.user.login == '%s' && \
+        body.pull_request.base.repo.name == '%s' && \
         body.pull_request.number == %d`;
 
     const filter = sprintf(filterFormat, pr.baseOwner, pr.baseRepo, pr.number);
@@ -118,10 +118,10 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
             name: `${pr.baseOwner.toLowerCase()}-${pr.baseRepo}-pr-${pr.number}`,
             labels: {
                 // TODO(wuhuizuo): label value should be 63 characters or less. 
-                type: "github-pr",
-                prNum: `${pr.number}`,
-                prOwner: pr.baseOwner,
-                prRepo: pr.baseRepo,
+                'type': "github-pr",
+                'pr-num': `${pr.number}`,
+                'pr-owner': pr.baseOwner,
+                'pr-repo': pr.baseRepo,
             },
         },
         spec: {
