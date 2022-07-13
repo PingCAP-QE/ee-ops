@@ -24,6 +24,7 @@ spec:
           "tekton.dev/git-repo": $(tt.params.git-url)
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
+        serviceAccountName: tekton-trigger-admin-self-repo
         pipelineRef:
           name: teardown-pr-trigger
         params:

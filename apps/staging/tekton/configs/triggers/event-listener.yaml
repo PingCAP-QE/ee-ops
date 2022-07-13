@@ -4,7 +4,7 @@ kind: EventListener
 metadata:
   name: trigger-groups-listener
 spec:
-  serviceAccountName: tekton-triggers
+  serviceAccountName: tekton-trigger-eventlistener
   triggerGroups:
     # prepare for self pipeline proposal.
     #  - before run setup tasks,pipelines,trigger templates, triggers.
