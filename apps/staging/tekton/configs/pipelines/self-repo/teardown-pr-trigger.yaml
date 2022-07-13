@@ -46,10 +46,11 @@ spec:
       params:
         - name: script
           value: |
-            ls -lh tekton
-            echo "-----------"
-            find tekton/ -type f | xargs kubectl -n ci-demo apply --dry-run=client -f
-            find tekton/ -type f | xargs kubectl -n ci-demo apply --dry-run=server -f
+            (\
+            ls tekton/* && \
+            kubectl -n ci-demo apply -f tekton/ --dry-run=client && \
+            kubectl -n ci-demo apply -f tekton/ --dry-run=server \
+            ) || echo no ci files
       workspaces:
         - name: manifest-dir
           workspace: output
@@ -60,7 +61,7 @@ spec:
         name: kubernetes-actions
       params:
         - name: script
-          value: find tekton/ -type f | xargs kubectl -n ci-demo delete -f
+          value: (ls tekton/* && kubectl -n ci-demo delete -f tekton/) || echo no ci files
       workspaces:
         - name: manifest-dir
           workspace: output
