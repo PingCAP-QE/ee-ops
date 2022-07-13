@@ -38,9 +38,9 @@ spec:
       params:
         - name: message
           value: "todo"
-    - name: setup-manifest
+    - name: get-manifest
       runAfter:
-        - fetch-repo-pipelines
+        - todo
       taskRef:
         name: kubernetes-actions
       params:
@@ -48,9 +48,22 @@ spec:
           value: |
             pwd
             ls -lh
+            ls -lh tekton
             echo "-----------"
-            kubectl -n ci-demo get deploy
-            kubectl -n ci-demo apply -f tekton/
+            kubectl -n ci-demo get pods
+            kubectl -n ci-demo apply -f tekton/ --dry-run=client
+            kubectl -n ci-demo apply -f tekton/ --dry-run=server
+      workspaces:
+        - name: manifest-dir
+          workspace: output
+    - name: setup-manifest
+      runAfter:
+        - todo
+      taskRef:
+        name: kubernetes-actions
+      params:
+        - name: script
+          value: kubectl -n ci-demo apply -f tekton/
       workspaces:
         - name: manifest-dir
           workspace: output
