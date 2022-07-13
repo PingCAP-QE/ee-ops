@@ -19,6 +19,10 @@ spec:
   pipelineSpec:
     workspaces:
       - name: git-source
+    params:
+      - name: git-url
+      - name: git-revision
+        default: main
     tasks:
       - name: fetch-from-git
         taskRef:
