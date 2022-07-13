@@ -46,13 +46,10 @@ spec:
       params:
         - name: script
           value: |
-            pwd
-            ls -lh
             ls -lh tekton
             echo "-----------"
-            kubectl -n ci-demo get pods
-            kubectl -n ci-demo apply -f tekton/ --dry-run=client
-            kubectl -n ci-demo apply -f tekton/ --dry-run=server
+            find tekton/ -type f | xargs kubectl -n ci-demo apply --dry-run=client -f
+            find tekton/ -type f | xargs kubectl -n ci-demo apply --dry-run=server -f
       workspaces:
         - name: manifest-dir
           workspace: output
@@ -63,7 +60,7 @@ spec:
         name: kubernetes-actions
       params:
         - name: script
-          value: kubectl -n ci-demo apply -f tekton/
+          value: find tekton/ -type f | xargs kubectl -n ci-demo apply -f
       workspaces:
         - name: manifest-dir
           workspace: output

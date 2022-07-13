@@ -25,6 +25,8 @@ spec:
           value: $(params.git-revision)
         - name: pr-number
           value: $(params.pr-number)
+        - name: output
+          value: tekton
       workspaces:
         - name: output
           workspace: output
@@ -36,19 +38,29 @@ spec:
       params:
         - name: message
           value: "todo"
-    - name: teardown-manifest
+    - name: get-manifest
       runAfter:
-        - fetch-repo-pipelines
+        - todo
       taskRef:
         name: kubernetes-actions
       params:
         - name: script
           value: |
-            pwd
-            ls -lh
+            ls -lh tekton
             echo "-----------"
-            kubectl -n ci-demo get deploy
+            find tekton/ -type f | xargs kubectl -n ci-demo apply --dry-run=client -f
+            find tekton/ -type f | xargs kubectl -n ci-demo apply --dry-run=server -f
       workspaces:
         - name: manifest-dir
           workspace: output
-          subPath: ".ci"
+    - name: teardown-manifest
+      runAfter:
+        - todo
+      taskRef:
+        name: kubernetes-actions
+      params:
+        - name: script
+          value: find tekton/ -type f | xargs kubectl -n ci-demo delete -f
+      workspaces:
+        - name: manifest-dir
+          workspace: output
