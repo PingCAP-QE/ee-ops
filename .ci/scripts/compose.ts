@@ -103,14 +103,13 @@ function composeTriggerTemplate(run: pipelineRun, pr: prInfo): triggerTemplate {
 }
 
 function composeTrigger(templateName: string, pr: prInfo): trigger {
-    const filterFormat = `\
+    const filter = `\
         header.match('X-GitHub-Event', 'pull_request') && \
         body.action in ['opened', 'synchronize'] && \
         body.pull_request.base.user.login == '${pr.baseOwner}' && \
         body.pull_request.base.repo.name == '${pr.baseRepo}' && \
         body.pull_request.number == ${pr.number}`;
 
-    const filter = sprintf(filterFormat, pr.baseOwner, pr.baseRepo, pr.number);
     const ret: trigger = {
         apiVersion: "triggers.tekton.dev/v1beta1",
         kind: "Trigger",
