@@ -60,6 +60,7 @@ spec:
           "${remote_script_url}" \
           --gitUrl="$(params.git-url)" \
           --sha=$(params.git-revision) \
+          --pullNumber=$(params.pr-number) \
           --ciDir=$(params.context) \
           --appId="$(cat /etc/github-app-secret/app-id)" \
           --privateKeyPath=/etc/github-app-secret/app-cert-pkcs8
