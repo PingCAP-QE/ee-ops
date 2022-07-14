@@ -138,7 +138,7 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
 }
 
 function composePipelineRun(run: pipelineRun, pr: prInfo): pipelineRun {
-  return Object.assign({}, run, {
+  const ret = Object.assign({}, run, {
     spec: {
       params: [
         {
@@ -148,7 +148,9 @@ function composePipelineRun(run: pipelineRun, pr: prInfo): pipelineRun {
         { name: "git-revision", value: pr.headRef },
       ],
     },
-  });
+  })
+
+  return JSON.parse(JSON.stringify(ret, null, 2)) as pipelineRun;
 }
 
 function main({
@@ -169,6 +171,7 @@ function main({
     const eTriggerTemplate = composeTriggerTemplate(ePipelineRun, pr);
     const eTrigger = composeTrigger(eTriggerTemplate.metadata.name, pr);
     const ePipelineOnceRun = composePipelineRun(ePipelineRun, pr);
+    console.log(ePipelineOnceRun);
 
     const triggerTemplateYamlPath = path.join(
       output,
