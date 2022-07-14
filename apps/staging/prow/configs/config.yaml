@@ -4,7 +4,7 @@ tide:
     - labels:
         - lgtm
         - approved
-        - <other labels for auto merging gate>
+        # - <other labels for auto merging gate>
       missingLabels:
         - needs-rebase
         - do-not-merge/hold
