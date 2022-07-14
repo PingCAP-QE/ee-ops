@@ -146,7 +146,7 @@ function composePipelineRun(run: pipelineRun, pr: prInfo): pipelineRun {
       name: "git-url",
       value: `https://github.com/${pr.headOwner}/${pr.headRepo}`,
     },
-    { name: "git-revision", value: pr.headRef },
+    { name: "git-revision", value: pr.headRef || "main" },
   ];
 
   return ret;
