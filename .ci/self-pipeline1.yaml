@@ -76,6 +76,17 @@ spec:
         params:
           - name: packages
             value: ./...
+      - name: test
+        taskSpec:
+          steps:
+            - name: echo2
+              image: fedora,quay.io/buildah/stable
+              workingDir: \"/workspace/source/\${inputs.params.contextDir}\"
+              command:
+                - echo
+              args:
+                - "bye world"
+
     finally:
       - name: set-github-status-end
         taskRef:
