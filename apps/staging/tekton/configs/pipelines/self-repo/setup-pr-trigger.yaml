@@ -56,7 +56,7 @@ spec:
           workspace: output
     - name: setup-manifest
       runAfter:
-        - todo
+        - get-manifest
       taskRef:
         name: kubernetes-actions
       params:
