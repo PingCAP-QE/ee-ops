@@ -138,7 +138,7 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
 }
 
 function composePipelineRun(run: pipelineRun, pr: prInfo): pipelineRun {
-  const ret = JSON.parse(JSON.stringify(run, null, 2)) as pipelineRun;
+  const ret = yaml.parse(yaml.stringify(run)) as pipelineRun;
   ret.metadata.name = run.metadata.generateName +
     (Math.random() + 1).toString(36).substring(7);
   ret.spec.params = [
