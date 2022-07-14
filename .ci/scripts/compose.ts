@@ -141,7 +141,6 @@ function composePipelineRun(run: pipelineRun, pr: prInfo): pipelineRun {
   const ret = Object.assign({}, run, {
     metadata: {
       name: run.metadata.generateName + (Math.random() + 1).toString(36).substring(7),
-      generateName: "",
     },
     spec: {
       params: [
