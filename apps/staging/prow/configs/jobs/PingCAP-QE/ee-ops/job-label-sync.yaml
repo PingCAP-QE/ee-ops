@@ -13,7 +13,7 @@ periodics:
           args:
             - --config=/etc/config/labels.yaml
             - --confirm=true
-            - --orgs=kubernetes,kubernetes-client,kubernetes-csi,kubernetes-sigs
+            - --orgs=kubernetes\,kubernetes-client\,kubernetes-csi\,kubernetes-sigs
             - --token=/etc/github/oauth
             - --endpoint=http://ghproxy.default.svc.cluster.local
             - --endpoint=https://api.github.com
@@ -37,5 +37,4 @@ periodics:
       testgrid-alert-stale-results-hours: "12"
       testgrid-dashboards: sig-testing-misc
       testgrid-tab-name: label_sync
-      testgrid-alert-email: kubernetes-sig-testing-alerts@googlegroups.com, k8s-infra-oncall@google.com
       description: Runs label_sync to synchronize GitHub repo labels with the label config defined in label_sync/labels.yaml.
