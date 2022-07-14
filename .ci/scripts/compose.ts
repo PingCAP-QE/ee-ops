@@ -138,22 +138,18 @@ function composeTrigger(templateName: string, pr: prInfo): trigger {
 }
 
 function composePipelineRun(run: pipelineRun, pr: prInfo): pipelineRun {
-  const ret = Object.assign({}, run, {
-    metadata: {
-      name: run.metadata.generateName + (Math.random() + 1).toString(36).substring(7),
+  const ret = JSON.parse(JSON.stringify(run, null, 2)) as pipelineRun;
+  ret.metadata.name = run.metadata.generateName +
+    (Math.random() + 1).toString(36).substring(7);
+  ret.spec.params = [
+    {
+      name: "git-url",
+      value: `https://github.com/${pr.headOwner}/${pr.headRepo}`,
     },
-    spec: {
-      params: [
-        {
-          name: "git-url",
-          value: `https://github.com/${pr.headOwner}/${pr.headRepo}`,
-        },
-        { name: "git-revision", value: pr.headRef },
-      ],
-    },
-  })
+    { name: "git-revision", value: pr.headRef },
+  ];
 
-  return JSON.parse(JSON.stringify(ret, null, 2)) as pipelineRun;
+  return ret;
 }
 
 function main({
@@ -195,7 +191,10 @@ function main({
       yaml.stringify(eTriggerTemplate),
     );
     Deno.writeTextFileSync(triggerYamlPath, yaml.stringify(eTrigger));
-    Deno.writeTextFileSync(pipelineRunOnceYamlPath, yaml.stringify(ePipelineOnceRun))
+    Deno.writeTextFileSync(
+      pipelineRunOnceYamlPath,
+      yaml.stringify(ePipelineOnceRun),
+    );
   });
 }
 
