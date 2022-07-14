@@ -84,4 +84,6 @@ spec:
             --gitUrl=$(params.git-url) \
             --pr.number=$(params.pr-number)
 
+        cat tekton/*
+
         ls -l $(params.output)
