@@ -33,6 +33,7 @@ spec:
         stage('Main') {
             steps {
                 sh 'hostname'
+                sh 'echo hello'
             }
         }
     }
