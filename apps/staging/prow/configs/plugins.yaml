@@ -16,8 +16,27 @@ plugins:
       - verify-owners
       - wip
       - yuks
+  PingCAP-QE/ee-ops:
+    plugins:
+      - config-updater
+
+config_updater:
+  maps:
+    prow/config/labels.yaml:
+      name: labels-config
 # plugin_a:
 #   configs_for_plugin_a: {}
+
+# configuration of plugin `label`
+label:
+  additional_labels:
+    - tide/merge-method-squash
+    - tide/merge-method-rebase
+    - tide/merge-method-merge
+  # restricted_labels:
+  #   PingCAP-QE/ee-ops:
+  #     - allowed_teams:
+  #         - ee
 
 external_plugins:
   PingCAP-QE:

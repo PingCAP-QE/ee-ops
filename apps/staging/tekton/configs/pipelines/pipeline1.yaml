@@ -3,12 +3,12 @@ kind: Pipeline
 metadata:
   name: demo-pipeline1
 spec:
+  workspaces:
+    - name: git-source
   params:
     - name: git-url
     - name: git-revision
       default: main
-  workspaces:
-    - name: git-source
   tasks:
     # TODO: using commit-status-tracker to replace explicit tasks.
     # https://github.com/tektoncd/experimental/tree/main/commit-status-tracker

@@ -1,0 +1,11 @@
+reviewers:
+  - derekstrong
+  - purelind
+  - wuhuizuo
+# more reviewer
+approvers:
+  - wuhuizuo
+# more approvers
+
+labels:
+  - area/ci

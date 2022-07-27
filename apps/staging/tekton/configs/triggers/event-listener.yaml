@@ -4,8 +4,60 @@ kind: EventListener
 metadata:
   name: trigger-groups-listener
 spec:
-  serviceAccountName: tekton-triggers
+  serviceAccountName: tekton-trigger-eventlistener
   triggerGroups:
+    # prepare for self pipeline proposal.
+    #  - before run setup tasks,pipelines,trigger templates, triggers.
+    #  - then delivered to trigger group: `githug-pr`
+    - name: github-pr-setup-for-self-pipelines
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["pull_request"]
+        - name: "validate PR state and add field"
+          ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "body.action in ['opened', 'synchronize', 'reopened']"
+            - name: "overlays"
+              value:
+                - key: truncated_sha
+                  expression: body.pull_request.head.sha.truncate(7)
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ci-demo
+        labelSelector:
+          matchLabels:
+            type: github-pr-setup
+    # teardown for self pipeline proposal.
+    #  - clean triggers, trigger templates, pipelines, tasks when github PR fininshed(closed or merged)
+    #  - then delivered to trigger group: `githug-pr`
+    - name: github-pr-teardown-for-self-pipelines
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["pull_request"]
+        - name: "validate PR state is closed"
+          ref:
+            name: "cel"
+          params:
+            - name: "filter"
+              value: "body.action in ['merged', 'closed']"
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ci-demo
+        labelSelector:
+          matchLabels:
+            type: github-pr-teardown
     - name: github-pr
       interceptors:
         - name: "filter on eventType"

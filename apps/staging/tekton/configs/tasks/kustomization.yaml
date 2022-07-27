@@ -6,4 +6,5 @@ resources:
   - github-set-status.yaml
   - golang-build.yaml
   - golang-test.yaml
+  - kubernetes-actions.yaml
   - echo.yaml

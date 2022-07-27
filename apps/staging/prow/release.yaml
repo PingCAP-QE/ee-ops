@@ -83,3 +83,7 @@ spec:
       name: prow-job-config
       valuesKey: job4
       targetPath: prow.jobs.job4
+    - kind: ConfigMap
+      name: prow-job-config
+      valuesKey: job-label-sync
+      targetPath: prow.jobs.jobLabelSync

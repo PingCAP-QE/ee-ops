@@ -23,6 +23,13 @@ spec:
     require-git-ssh-secret-known-hosts: false
     running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
     default-timeout-minutes: 60 # unit is minutes, default timeout for TaskRun and PipelineRun.
+    default-service-account: "default"
+    # default empty dir, can not be shared between tasks.
+    default-task-run-workspace-binding: >
+      emptyDir: {}
+  trigger:
+    default-service-account: "default"
+    enable-api-fields: stable
   pruner:
     resources:
       - taskrun
