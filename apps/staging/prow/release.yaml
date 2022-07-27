@@ -71,10 +71,10 @@ spec:
       name: prow-job-config
       valuesKey: job1
       targetPath: prow.jobs.job1
-    - kind: ConfigMap
-      name: prow-job-config
-      valuesKey: job2
-      targetPath: prow.jobs.job2
+    # - kind: ConfigMap
+    #   name: prow-job-config
+    #   valuesKey: job2
+    #   targetPath: prow.jobs.job2
     - kind: ConfigMap
       name: prow-job-config
       valuesKey: job3
