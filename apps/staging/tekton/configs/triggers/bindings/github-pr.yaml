@@ -1,0 +1,26 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: github-pr
+spec:
+  params:
+    - name: git-revision
+      value: $(body.pull_request.head.sha)
+    - name: git-url
+      value: $(body.pull_request.head.repo.clone_url)
+    - name: pr-number
+      value: $(body.pull_request.number)
+    - name: pr-user
+      value: $(body.pull_request.user.login)
+    - name: pr-head-owner
+      value: $(body.pull_request.head.user.login)
+    - name: pr-head-repo
+      value: $(body.pull_request.head.repo.name)
+    - name: pr-head-ref
+      value: $(body.pull_request.head.ref)
+    - name: pr-base-owner
+      value: $(body.pull_request.base.user.login)
+    - name: pr-base-repo
+      value: $(body.pull_request.base.repo.name)
+    - name: pr-base-ref
+      value: $(body.pull_request.base.ref)

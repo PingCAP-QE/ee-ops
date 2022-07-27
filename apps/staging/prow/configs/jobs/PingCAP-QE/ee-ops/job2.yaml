@@ -1,16 +1,22 @@
 presubmits:
   PingCAP-QE/ee-ops:
-    - name: verifyCI-k8s-generic
-      always_run: false
+    - name: verifyCI2
+      always_run: true
       max_concurrency: 2
-      spec:
-        serviceAccountName: k8s-pod-full
-        containers:
-          - image: bitnami/kubectl
-            command:
-              - kubectl
-            args:
-              - --namespace
-              - prow-test-pods
-              - get
-              - pods
+      agent: tekton-pipelines
+      pipeline_run_spec:
+        pipelineSpec:
+          tasks:
+            - name: taskName
+              taskSpec:
+                steps:
+                  - name: build-sources
+                    image: ubuntu
+                    command:
+                      - /bin/bash
+                    args:
+                      - -c
+                      - |
+                        echo hello world
+                        pwd
+                        ls

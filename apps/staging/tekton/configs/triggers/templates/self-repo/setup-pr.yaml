@@ -1,0 +1,44 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: github-pr-setup
+spec:
+  params:
+    - name: git-url
+      description: The git repository full url
+    - name: git-revision
+      description: The git revision
+      default: main
+    - name: pr-number
+      description: Pull request number
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: setup-pr-trigger-run-
+        annotations:
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-context": "self-pipeline1"
+          "tekton.dev/status-description": "self pipeline forwarded by prow"
+          "tekton.dev/status-target-url": "https://dashboard.tekton.pingcap.net/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        serviceAccountName: tekton-trigger-admin-self-repo
+        pipelineRef:
+          name: setup-pr-trigger
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: pr-number
+            value: $(tt.params.pr-number)
+        workspaces:
+          - name: output
+            volumeClaimTemplate:
+              spec:
+                accessModes: [ReadWriteOnce]
+                resources:
+                  requests:
+                    storage: 100Mi

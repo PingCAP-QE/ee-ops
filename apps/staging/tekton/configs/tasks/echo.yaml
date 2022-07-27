@@ -22,7 +22,7 @@ spec:
     - name: printed
       description: The message printed.
   steps:
-    - name: clone
+    - name: echo-message
       image: "alpine"
       env:
         - name: MESSAGE
