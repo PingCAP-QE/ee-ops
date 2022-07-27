@@ -21,7 +21,7 @@ configMapGenerator:
       # add yours another job here.
       # - jobXxx=configs/jobs/<org>/<repo>/jobXxx.yaml
       - job1=configs/jobs/PingCAP-QE/ee-ops/job1.yaml
-      - job2=configs/jobs/PingCAP-QE/ee-ops/job2.yaml
+      # - job2=configs/jobs/PingCAP-QE/ee-ops/job2.yaml
       - job3=configs/jobs/PingCAP-QE/ee-ops/job3.yaml
       - job4=configs/jobs/PingCAP-QE/ee-ops/job4.yaml
       - job-label-sync=configs/jobs/PingCAP-QE/ee-ops/job-label-sync.yaml
