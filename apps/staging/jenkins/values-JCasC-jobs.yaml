@@ -30,28 +30,33 @@ controller:
                   No need to configure job on Jenkins Web UI anymore.
                   """
                 )
-                keepDependencies(false)
+                // keepDependencies(false)
                 scm {
-                  git('https://github.com/PingCAP-QE/ci.git', 'main')
+                  git {
+                    remote {
+                      url("PingCAP-QE/ci", "https")
+                    }
+                    branch("main")
+                  }
                 }
-                disabled(false)
-                concurrentBuild(false)
+                // disabled(false)
+                // concurrentBuild(false)
                 steps {
-                  dsl {
-                    text(readFileFromWorkspace('jobs/**/*.groovy'))
-                    ignoreExisting(false)
-                    removeAction("DELETE")
-                    removeViewAction("DELETE")
-                    lookupStrategy("SEED_JOB")
-                  }
+                  // dsl {
+                  //   text(readFileFromWorkspace('jobs/**/*.groovy'))
+                  //   ignoreExisting(false)
+                  //   removeAction("DELETE")
+                  //   removeViewAction("DELETE")
+                  //   lookupStrategy("SEED_JOB")
+                  // }
                 }
-                wrappers {
-                  preBuildCleanup {
-                    deleteDirectories(false)
-                    cleanupParameter()
-                  }
-                  timeout {
-                    absolute(3)
-                  }
-                }
+                // wrappers {
+                //   preBuildCleanup {
+                //     deleteDirectories(false)
+                //     cleanupParameter()
+                //   }
+                //   timeout {
+                //     absolute(3)
+                //   }
+                // }
               }
