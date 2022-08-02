@@ -22,13 +22,13 @@ controller:
 
   # List of plugins to be install during Jenkins controller start
   installPlugins:
-    - kubernetes:1.31.3
-    - workflow-aggregator:2.6
-    - git:4.11.1
-    - configuration-as-code:1429.v09b_044a_c93de
+    - kubernetes:3670.v6ca_059233222
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:4.11.4
+    - configuration-as-code:1512.vb_79d418d5fc8
     - prometheus:2.0.11
     - blueocean:1.25.5
-    - job-dsl:1.79
+    - job-dsl:1.81
     - google-login:1.6
     - matrix-auth:3.1.2
 
