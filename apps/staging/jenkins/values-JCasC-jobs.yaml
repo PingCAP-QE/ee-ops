@@ -23,8 +23,35 @@ controller:
       jobs-dsl: |
         jobs:
           - script: |
-              job("hello") {
+              job("seed") {
+                description(
+                  """
+                  Jenkins jobs As Code
+                  No need to configure job on Jenkins Web UI anymore.
+                  """
+                )
+                keepDependencies(false)
+                scm {
+                  git('https://github.com/PingCAP-QE/ci.git', 'main')
+                }
+                disabled(false)
+                concurrentBuild(false)
                 steps {
-                  shell('hello! this is a example job.')
+                  dsl {
+                    text(readFileFromWorkspace('jobs/**/*.groovy'))
+                    ignoreExisting(false)
+                    removeAction("DELETE")
+                    removeViewAction("DELETE")
+                    lookupStrategy("SEED_JOB")
+                  }
+                }
+                wrappers {
+                  preBuildCleanup {
+                    deleteDirectories(false)
+                    cleanupParameter()
+                  }
+                  timeout {
+                    absolute(3)
+                  }
                 }
               }
