@@ -5,8 +5,8 @@ controller:
       cpu: "50m"
       memory: "256Mi"
     limits:
-      cpu: "2000m"
-      memory: "4096Mi"
+      cpu: "4"
+      memory: 8Gi
 
   # Set min/max heap here if needed with:
   javaOpts: "-Xms512m -Xmx4096m"
