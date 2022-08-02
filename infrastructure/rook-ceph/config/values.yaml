@@ -24,11 +24,11 @@ cephClusterSpec:
   dashboard:
     enabled: true
     # serve the dashboard under a subpath (useful when you are accessing the dashboard via a reverse proxy)
-    # urlPrefix: /ceph-dashboard
+    urlPrefix: /ceph-dashboard
     # serve the dashboard at the given port.
     # port: 8443
     # serve the dashboard using SSL
-    ssl: true
+    ssl: false
   cleanupPolicy:
     method: quick
     # dataSource indicate where to get random bytes from to write on the disk
@@ -140,3 +140,9 @@ cephFileSystemVolumeSnapshotClass:
   labels: {}
   # see https://rook.io/docs/rook/latest/ceph-csi-snapshot.html#cephfs-snapshots for available configuration
   parameters: {}
+
+ingress:
+  dashboard:
+    ingressClassName: nginx
+    host:
+      path: "/ceph-dashboard(/|$)(.*)"
