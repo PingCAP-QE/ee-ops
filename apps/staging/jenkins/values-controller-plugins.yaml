@@ -1,0 +1,15 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+controller:
+  # List of plugins to be install during Jenkins controller start
+  installPlugins:
+    - kubernetes:3670.v6ca_059233222
+    - workflow-aggregator:590.v6a_d052e5a_a_b_5
+    - git:4.11.4
+    - configuration-as-code:1512.vb_79d418d5fc8
+    - prometheus:2.0.11
+    - blueocean:1.25.5
+    - job-dsl:1.81
+    - google-login:1.6
+    - matrix-auth:3.1.5
+    - jobcacher:264.vb_f4770b_79801
+    - ghprb:1.42.2
