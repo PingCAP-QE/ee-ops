@@ -57,7 +57,7 @@ controller:
     # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
     path: "/jenkins"
     # configures the hostname e.g. jenkins.example.com
-    hostName: do.pingcap.net
+    hostName: prow-ee.pingcap.net
     tls:
     # - secretName: jenkins.cluster.local
     #   hosts:
