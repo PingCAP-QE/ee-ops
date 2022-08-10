@@ -1,5 +1,7 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
+  agentListenerServiceType: NodePort
+  agentListenerNodePort: 32500
   resources:
     requests:
       cpu: "50m"
