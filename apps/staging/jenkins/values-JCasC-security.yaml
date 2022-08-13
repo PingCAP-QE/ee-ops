@@ -1,0 +1,9 @@
+controller:
+  JCasC:
+    configScripts:
+      security: |
+        security:
+          gitHostKeyVerificationConfiguration:
+            sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+          globalJobDslSecurityConfiguration:
+            useScriptSecurity: false
