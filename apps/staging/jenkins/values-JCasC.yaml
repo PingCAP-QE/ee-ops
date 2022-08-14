@@ -29,7 +29,7 @@ controller:
     - { name: jenkins-cloud, keyName: tunnel-addr }
     - { name: jenkins-cloud, keyName: base-url }
     - { name: jenkins-cloud, keyName: kubeconfig-ksyun }
-    
+
   additionalSecrets: []
   #  - name: nameOfSecret
   #    value: secretText
@@ -172,7 +172,16 @@ controller:
             extensions:
               - ghprbSimpleStatus:
                   addTestResults: false
+                  completedStatus:
+                    - message: "--none--"
+                      result: SUCCESS
+                    - message: "--none--"
+                      result: FAILURE
+                    - message: "--none--"
+                      result: ERROR
                   showMatrixStatus: false
+                  startedStatus: "--none--"
+                  triggeredStatus: "--none--"
             githubAuth:
               - credentialsId: github-bot-token
                 description: "ti-chi-bot"
