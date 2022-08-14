@@ -11,5 +11,7 @@ controller:
     - job-dsl:1.81
     - google-login:1.6
     - matrix-auth:3.1.5
-    - jobcacher:264.vb_f4770b_79801
     - ghprb:1.42.2
+  initScripts:
+    - |
+      println('curl -v -o ${JENKINS_HOME}/plugins/jenkins-pipeline-cache-0.1.4.hpi https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.4/jenkins-pipeline-cache-0.1.4.hpi'.execute().text)
