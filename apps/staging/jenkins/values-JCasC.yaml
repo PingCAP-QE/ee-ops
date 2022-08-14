@@ -186,3 +186,42 @@ controller:
             username: ${cache-s3-access-key}
             password: ${cache-s3-access-secret}
             threshold: 0 # 0 means no limits.
+      # for clouds.
+      clouds: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                containerCap: 100
+                containerCapStr: "100"
+                jenkinsTunnel: "jenkins-agent.apps.svc.cluster.local:50000"
+                jenkinsUrl: "http://jenkins.apps.svc.cluster.local:8080/jenkins"
+                name: "kubernetes"
+                namespace: "apps"
+                podLabels:
+                  - key: "jenkins/jenkins-jenkins-agent"
+                    value: "true"
+                serverUrl: "https://kubernetes.default"
+                templates:
+                  - containers:
+                      - args: "^${computer.jnlpmac} ^${computer.name}"
+                        envVars:
+                          - envVar:
+                              key: "JENKINS_URL"
+                              value: "http://jenkins.apps.svc.cluster.local:8080/jenkins"
+                        image: jenkins/inbound-agent:4.11.2-4
+                        name: "jnlp"
+                        resourceLimitCpu: "512m"
+                        resourceLimitMemory: "512Mi"
+                        resourceRequestCpu: "512m"
+                        resourceRequestMemory: "512Mi"
+                        workingDir: "/home/jenkins/agent"
+                    id: "7da789f81e849519d388ec07d73f5abea86f0f06a3df95ea70267ae19eb0a02b"
+                    label: "jenkins-jenkins-agent"
+                    name: "default"
+                    namespace: "apps"
+                    nodeUsageMode: "NORMAL"
+                    podRetention: "onFailure"
+                    serviceAccount: "default"
+                    slaveConnectTimeout: 100
+                    slaveConnectTimeoutStr: "100"
+                    yamlMergeStrategy: "override"
