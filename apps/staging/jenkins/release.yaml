@@ -17,6 +17,9 @@ spec:
   install:
     remediation:
       retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
   test:
     enable: true
     ignoreFailures: false
@@ -26,5 +29,3 @@ spec:
     - { kind: ConfigMap, name: jenkins-values, valuesKey: values3.yaml }
     - { kind: ConfigMap, name: jenkins-values, valuesKey: values4.yaml }
     - { kind: ConfigMap, name: jenkins-values, valuesKey: values5.yaml }
-    - { kind: ConfigMap, name: jenkins-values, valuesKey: values6.yaml }
-    - { kind: ConfigMap, name: jenkins-values, valuesKey: values7.yaml }
