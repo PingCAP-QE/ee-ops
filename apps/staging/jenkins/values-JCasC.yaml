@@ -25,6 +25,11 @@ controller:
     - { name: cache-s3, keyName: endpoint }
     - { name: cache-s3, keyName: access-key }
     - { name: cache-s3, keyName: access-secret }
+    # for jenkins clouds
+    - { name: jenkins-cloud, keyName: tunnel-addr }
+    - { name: jenkins-cloud, keyName: base-url }
+    - { name: jenkins-cloud, keyName: kubeconfig-ksyun }
+    
   additionalSecrets: []
   #  - name: nameOfSecret
   #    value: secretText
@@ -115,7 +120,15 @@ controller:
                       description: codecov token for tidb
                       scope: GLOBAL
                       secret: ${codecov-token-tidb}
-
+              - domain:
+                  name: kubernetes
+                credentials:
+                  - file:
+                      id: "kubeconfig-ksyun"
+                      description: "kube config for ksyun k8s cluster"
+                      fileName: "user-jenkins-ksyun.yml"
+                      scope: GLOBAL
+                      secretBytes: "${jenkins-cloud-kubeconfig-ksyun}"
       # for jobs.
       jobs-dsl: |
         jobs:
@@ -191,11 +204,11 @@ controller:
         jenkins:
           clouds:
             - kubernetes:
+                name: kubernetes
                 containerCap: 100
                 containerCapStr: "100"
                 jenkinsTunnel: "jenkins-agent.apps.svc.cluster.local:50000"
                 jenkinsUrl: "http://jenkins.apps.svc.cluster.local:8080/jenkins"
-                name: "kubernetes"
                 namespace: "apps"
                 podLabels:
                   - key: "jenkins/jenkins-jenkins-agent"
@@ -225,3 +238,17 @@ controller:
                     slaveConnectTimeout: 100
                     slaveConnectTimeoutStr: "100"
                     yamlMergeStrategy: "override"
+            - kubernetes:
+                name: kubernetes-ksyun
+                namespace: default
+                connectTimeout: 100
+                containerCap: 200
+                containerCapStr: "200"
+                credentialsId: kubeconfig-ksyun
+                jenkinsTunnel: ${jenkins-cloud-tunnel-addr}
+                jenkinsUrl: ${jenkins-cloud-base-url}
+                maxRequestsPerHost: 2050
+                maxRequestsPerHostStr: "2050"
+                podRetention: "onFailure"
+                readTimeout: 100
+                skipTlsVerify: true
