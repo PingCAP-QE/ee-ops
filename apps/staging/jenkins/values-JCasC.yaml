@@ -224,3 +224,11 @@ controller:
                 maxRequestsPerHost: 2000
                 maxRequestsPerHostStr: "2000"
                 skipTlsVerify: true
+      # for global env variables
+      env-vars: |
+        jenkins:
+          globalNodeProperties:
+            - envVars:
+                env:
+                  - key: "GOPROXY"
+                    value: "http://goproxy.pingcap.net,direct"
