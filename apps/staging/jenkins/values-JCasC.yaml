@@ -214,7 +214,7 @@ controller:
           clouds:
             - kubernetes:
                 name: kubernetes-ksyun
-                namespace: default
+                namespace: jenkins-tidb
                 connectTimeout: 100
                 containerCap: 200
                 containerCapStr: "200"
