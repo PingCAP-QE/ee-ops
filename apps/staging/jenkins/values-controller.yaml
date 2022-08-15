@@ -1,15 +1,17 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
+  agentListenerServiceType: NodePort
+  agentListenerNodePort: 32500
   resources:
     requests:
       cpu: "50m"
       memory: "256Mi"
     limits:
-      cpu: "2000m"
-      memory: "4096Mi"
+      cpu: "2"
+      memory: 4Gi
 
   # Set min/max heap here if needed with:
-  javaOpts: "-Xms512m -Xmx4096m"
+  javaOpts: "-Xms512m -Xmx4000m"
 
   # jenkinsOpts: ""
   # If you are using the ingress definitions provided by this chart via the `controller.ingress` block the configured hostname will be the ingress hostname starting with `https://` or `http://` depending on the `tls` configuration.
@@ -19,18 +21,6 @@ controller:
   # jenkinsUrl: ""
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
   jenkinsUriPrefix: "/jenkins"
-
-  # List of plugins to be install during Jenkins controller start
-  installPlugins:
-    - kubernetes:1.31.3
-    - workflow-aggregator:2.6
-    - git:4.11.1
-    - configuration-as-code:1429.v09b_044a_c93de
-    - prometheus:2.0.11
-    - blueocean:1.25.5
-    - job-dsl:1.79
-    - google-login:1.6
-    - matrix-auth:3.1.2
 
   ingress:
     enabled: true
@@ -57,7 +47,7 @@ controller:
     # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
     path: "/jenkins"
     # configures the hostname e.g. jenkins.example.com
-    hostName:
+    hostName: prow-ee.pingcap.net
     tls:
     # - secretName: jenkins.cluster.local
     #   hosts:

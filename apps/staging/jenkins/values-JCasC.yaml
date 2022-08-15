@@ -6,13 +6,29 @@ controller:
   # 'name' and 'keyName' must be lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-',
   # and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc')
   additionalExistingSecrets:
-    # you should setup the secret `google-oauth2` with key:
-    #  `client-id` and `client-secret` before deploy jenkins
-    #  in the same namespace.
-    - name: google-oauth2
-      keyName: client-id
-    - name: google-oauth2
-      keyName: client-secret
+    #   # you should setup the secret `google-oauth2` with key:
+    #   #  `client-id` and `client-secret` before deploy jenkins
+    #   #  in the same namespace.
+    #   - name: google-oauth2
+    #     keyName: client-id
+    #   - name: google-oauth2
+    #     keyName: client-secret
+    # for git clone for private repo.
+    - { name: github, keyName: git-private-key }
+    - { name: github, keyName: git-username }
+    - { name: github, keyName: bot-token }
+    # for codecov.io uploading
+    - { name: codecov-token, keyName: tidb }
+    # for ci cache
+    - { name: cache-s3, keyName: region }
+    - { name: cache-s3, keyName: bucket }
+    - { name: cache-s3, keyName: endpoint }
+    - { name: cache-s3, keyName: access-key }
+    - { name: cache-s3, keyName: access-secret }
+    # for jenkins clouds
+    - { name: jenkins-cloud, keyName: tunnel-addr }
+    - { name: jenkins-cloud, keyName: base-url }
+    - { name: jenkins-cloud, keyName: kubeconfig-ksyun }
 
   additionalSecrets: []
   #  - name: nameOfSecret
@@ -21,26 +37,35 @@ controller:
   JCasC:
     defaultConfig: true
     # Ignored if authorizationStrategy is defined in controller.JCasC.configScripts
-    # authorizationStrategy: |-
-    # loggedInUsersCanDoAnything:
-    #   allowAnonymousRead: true # allow users to read builds logs without logging in.
     authorizationStrategy: |-
-      globalMatrix:
-        permissions:
-        - "Job/Read:anonymous"
-        - "Lockable Resources/View:anonymous"
-        - "Metrics/View:anonymous"
-        - "Overall/Read:anonymous"
-        - "Overall/Read:authenticated"
-        - "View/Read:anonymous"
-        # add more...
+      loggedInUsersCanDoAnything:
+        allowAnonymousRead: true # allow users to read builds logs without logging in.
+    # authorizationStrategy: |-
+    #   globalMatrix:
+    #     permissions:
+    #     - "Job/Read:anonymous"
+    #     - "Lockable Resources/View:anonymous"
+    #     - "Metrics/View:anonymous"
+    #     - "Overall/Read:anonymous"
+    #     - "Overall/Read:authenticated"
+    #     - "View/Read:anonymous"
+    #     # add more...
 
     securityRealm: |-
-      googleOAuth2:
-        # will read from key `client-id` from secret `google-oauth2`
-        clientId: "${google-oauth2-client-id}"
-        # will read from key `client-secret` from secret `google-oauth2`
-        clientSecret: "${google-oauth2-client-secret}"
+      local:
+        allowsSignup: false
+        enableCaptcha: false
+        users:
+        - id: "${chart-admin-username}"
+          name: "Jenkins Admin"
+          password: "${chart-admin-password}"
+
+    # securityRealm: |-
+    #   googleOAuth2:
+    #     # will read from key `client-id` from secret `google-oauth2`
+    #     clientId: "${google-oauth2-client-id}"
+    #     # will read from key `client-secret` from secret `google-oauth2`
+    #     clientSecret: "${google-oauth2-client-secret}"
 
     configScripts:
       #  welcome-message: |
@@ -56,3 +81,148 @@ controller:
       #         clientId: "${google-oauth2-client-id}"
       #         # will read from key `client-secret` from secret `google-oauth2`
       #         clientSecret: "${google-oauth2-client-secret}"
+
+      # for security.
+      security: |
+        security:
+          gitHostKeyVerificationConfiguration:
+            sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+          globalJobDslSecurityConfiguration:
+            useScriptSecurity: false
+
+      # for credenti
+      credentials: |
+        credentials:
+          system:
+            domainCredentials:
+              - domain:
+                  name: github.com
+                  description: github ssh and open api
+                credentials:
+                  - basicSSHUserPrivateKey:
+                      id: github-sre-bot-ssh # TODO: change the id.
+                      privateKeySource:
+                        directEntry:
+                          privateKey: ${github-git-private-key}
+                      scope: GLOBAL
+                      username: ${github-git-username}
+                      usernameSecret: true
+                  - string:
+                      id: github-bot-token
+                      description: github private token to call api.
+                      scope: GLOBAL
+                      secret: ${github-bot-token}
+              - domain:
+                  name: codecov.io
+                credentials:
+                  - string:
+                      id: codecov-token-tidb
+                      description: codecov token for tidb
+                      scope: GLOBAL
+                      secret: ${codecov-token-tidb}
+              - domain:
+                  name: kubernetes
+                credentials:
+                  - file:
+                      id: "kubeconfig-ksyun"
+                      description: "kube config for ksyun k8s cluster"
+                      fileName: "user-jenkins-ksyun.yml"
+                      scope: GLOBAL
+                      secretBytes: "${jenkins-cloud-kubeconfig-ksyun}"
+      # for jobs.
+      jobs-dsl: |
+        jobs:
+          - script: |
+              job("seed") {
+                description(
+                  """
+                  Jenkins jobs As Code
+                  No need to configure job on Jenkins Web UI anymore.
+                  """
+                )
+                scm {
+                  git {
+                    remote {
+                      github("PingCAP-QE/ci", "https")
+                    }
+                    branch("main")
+                  }
+                }
+                steps {
+                  jobDsl {
+                    targets('jobs/**/*.groovy')
+                    failOnMissingPlugin(false)
+                    ignoreMissingFiles(true)
+                    ignoreExisting(false)
+                    removedJobAction("DELETE")
+                    removedConfigFilesAction("DELETE")
+                    removedViewAction("DELETE")
+                    lookupStrategy("SEED_JOB")
+                    sandbox(false)
+                  }
+                }
+              }
+
+              queue('seed')
+      github-pull-request-builder-trigger: |
+        unclassified:
+          ghprbTrigger:
+            autoCloseFailedPullRequests: false
+            cron: "H/5 * * * *"
+            extensions:
+              - ghprbSimpleStatus:
+                  addTestResults: false
+                  completedStatus:
+                    - message: "--none--"
+                      result: SUCCESS
+                    - message: "--none--"
+                      result: FAILURE
+                    - message: "--none--"
+                      result: ERROR
+                  showMatrixStatus: false
+                  startedStatus: "--none--"
+                  triggeredStatus: "--none--"
+            githubAuth:
+              - credentialsId: github-bot-token
+                description: "ti-chi-bot"
+                secret: ""
+                serverAPIUrl: "https://api.github.com" # replace with github proxy.
+            manageWebhooks: true
+            okToTestPhrase: ".*ok\\W+to\\W+test.*"
+            requestForTestingPhrase: "Can one of the admins verify this patch?"
+            retestPhrase: ".*test\\W+this\\W+please.*"
+            skipBuildPhrase: ".*\\[skip\\W+ci\\].*"
+            useComments: true
+            useDetailedComments: true
+            whitelistPhrase: ".*add\\W+to\\W+whitelist.*"
+      github-plugin-config: |
+        unclassified:
+          gitHubPluginConfig:
+            hookUrl: "https://prow-ee.pingcap.net/jenkins/github-webhook/"
+      pipeline-cache: |
+        unclassified:
+          pipeline-cache:
+            region: ${cache-s3-region}
+            bucket: ${cache-s3-bucket}
+            endpoint: ${cache-s3-endpoint}
+            username: ${cache-s3-access-key}
+            password: ${cache-s3-access-secret}
+            threshold: 0 # 0 means no limits.
+      # for clouds.
+      clouds: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                name: kubernetes-ksyun
+                namespace: default
+                connectTimeout: 100
+                containerCap: 200
+                containerCapStr: "200"
+                credentialsId: kubeconfig-ksyun
+                jenkinsTunnel: ${jenkins-cloud-tunnel-addr}
+                jenkinsUrl: ${jenkins-cloud-base-url}
+                maxRequestsPerHost: 2050
+                maxRequestsPerHostStr: "2050"
+                podRetention: "onFailure"
+                readTimeout: 100
+                skipTlsVerify: true
