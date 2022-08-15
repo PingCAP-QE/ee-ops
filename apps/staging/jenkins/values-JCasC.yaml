@@ -90,7 +90,7 @@ controller:
           globalJobDslSecurityConfiguration:
             useScriptSecurity: false
 
-      # for credenti
+      # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
       credentials: |
         credentials:
           system:
@@ -126,9 +126,9 @@ controller:
                   - file:
                       id: "kubeconfig-ksyun"
                       description: "kube config for ksyun k8s cluster"
-                      fileName: "user-jenkins-ksyun.yml"
+                      fileName: "user-jenkins.yml"
                       scope: GLOBAL
-                      secretBytes: "${jenkins-cloud-kubeconfig-ksyun}"
+                      secretBytes: "${readFileBase64:/run/secrets/additional/jenkins-cloud-kubeconfig-ksyun}"
       # for jobs.
       jobs-dsl: |
         jobs:
@@ -209,20 +209,18 @@ controller:
             password: ${cache-s3-access-secret}
             threshold: 0 # 0 means no limits.
       # for clouds.
-      # clouds: |
-      #   jenkins:
-      #     clouds:
-      #       - kubernetes:
-      #           name: kubernetes-ksyun
-      #           namespace: jenkins-tidb
-      #           connectTimeout: 100
-      #           containerCap: 200
-      #           containerCapStr: "200"
-      #           credentialsId: kubeconfig-ksyun
-      #           jenkinsTunnel: ${jenkins-cloud-tunnel-addr}
-      #           jenkinsUrl: ${jenkins-cloud-base-url}
-      #           maxRequestsPerHost: 2050
-      #           maxRequestsPerHostStr: "2050"
-      #           podRetention: "onFailure"
-      #           readTimeout: 100
-      #           skipTlsVerify: true
+      clouds: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                name: kubernetes-ksyun
+                namespace: jenkins-tidb
+                connectTimeout: 10
+                containerCap: 200
+                containerCapStr: "200"
+                credentialsId: kubeconfig-ksyun
+                jenkinsTunnel: "${jenkins-cloud-tunnel-addr}"
+                jenkinsUrl: "${jenkins-cloud-base-url}"
+                maxRequestsPerHost: 2000
+                maxRequestsPerHostStr: "2000"
+                skipTlsVerify: true
