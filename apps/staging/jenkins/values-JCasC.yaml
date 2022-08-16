@@ -29,6 +29,8 @@ controller:
     - { name: jenkins-cloud, keyName: tunnel-addr }
     - { name: jenkins-cloud, keyName: base-url }
     - { name: jenkins-cloud, keyName: kubeconfig-ksyun }
+    # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
+    - { name: mongodb, keyName: mongodb-root-password }
 
   additionalSecrets: []
   #  - name: nameOfSecret
@@ -232,3 +234,28 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "http://goproxy.pingcap.net,direct"
+      build-failure-analyzer: |
+        unclassified:
+          buildFailureAnalyzer:
+            doNotAnalyzeAbortedJob: true
+            gerritTriggerEnabled: false
+            globalEnabled: true
+            graphsEnabled: false
+            knowledgeBase:
+              mongoDB:
+                dbName: jenkins-failure-pattern
+                enableStatistics: true
+                host: mongodb.apps.svc
+                password: "${mongodb-mongodb-root-password}"
+                port: 27017
+                successfulLogging: true
+                userName: root
+            maxLogSize: 0
+            metricSquashingEnabled: true
+            noCausesEnabled: true
+            noCausesMessage: >-
+              No problems were identified. If you know why this problem occurred,
+              please add a suitable Cause for it.
+            nrOfScanThreads: 3
+            testResultParsingEnabled: true
+            testResultCategories: "UT"

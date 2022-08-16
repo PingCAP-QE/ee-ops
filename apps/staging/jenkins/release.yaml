@@ -23,6 +23,8 @@ spec:
   test:
     enable: true
     ignoreFailures: false
+  dependsOn:
+    - { name: mongodb, namespace: apps }
   valuesFrom:
     - { kind: ConfigMap, name: jenkins-values, valuesKey: values1.yaml }
     - { kind: ConfigMap, name: jenkins-values, valuesKey: values2.yaml }
