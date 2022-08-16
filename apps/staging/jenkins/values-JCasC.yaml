@@ -255,7 +255,7 @@ controller:
             noCausesEnabled: true
             noCausesMessage: >-
               No problems were identified. If you know why this problem occurred,
-              please add a suitable Cause for it.
+              please add a suitable Cause in https://pingcap.feishu.cn/wiki/wikcno79XYpVsvJeiRsMm38b5eh, add a config it.
             nrOfScanThreads: 3
-            testResultParsingEnabled: true
+            testResultParsingEnabled: false
             testResultCategories: "UT"
