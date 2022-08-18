@@ -209,7 +209,7 @@ controller:
             endpoint: ${cache-s3-endpoint}
             username: ${cache-s3-access-key}
             password: ${cache-s3-access-secret}
-            threshold: 0 # 0 means no limits.
+            threshold: 100000 # limit to 100GiB
       # for clouds.
       clouds: |
         jenkins:
