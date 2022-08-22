@@ -17,7 +17,7 @@ persistence:
   annotations: {}
   labels: {}
   accessMode: "ReadWriteOnce"
-  size: "8Gi"
+  size: "100Gi"
   volumes:
   #  - name: nothing
   #    emptyDir: {}
