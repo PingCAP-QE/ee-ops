@@ -53,6 +53,13 @@ controller:
     #     - "View/Read:anonymous"
     #     # add more...
 
+    # for security.
+    security:
+      gitHostKeyVerificationConfiguration:
+        sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+      globalJobDslSecurityConfiguration:
+        useScriptSecurity: false
+
     securityRealm: |-
       local:
         allowsSignup: false
@@ -83,14 +90,6 @@ controller:
       #         clientId: "${google-oauth2-client-id}"
       #         # will read from key `client-secret` from secret `google-oauth2`
       #         clientSecret: "${google-oauth2-client-secret}"
-
-      # for security.
-      security: |
-        security:
-          gitHostKeyVerificationConfiguration:
-            sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
-          globalJobDslSecurityConfiguration:
-            useScriptSecurity: false
 
       # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
       credentials: |
