@@ -2,17 +2,41 @@
 controller:
   # List of plugins to be install during Jenkins controller start
   installPlugins:
-    - kubernetes:3670.v6ca_059233222
-    - workflow-aggregator:590.v6a_d052e5a_a_b_5
-    - git:4.11.4
-    - configuration-as-code:1512.vb_79d418d5fc8
-    - prometheus:2.0.11
-    - blueocean:1.25.5
-    - job-dsl:1.81
-    - google-login:1.6
-    - matrix-auth:3.1.5
-    - ghprb:1.42.2
-    - build-failure-analyzer:2.3.0
-  initScripts:
-    - |
-      println('curl -v -o ${JENKINS_HOME}/plugins/jenkins-pipeline-cache-0.1.4.hpi https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.4/jenkins-pipeline-cache-0.1.4.hpi'.execute().text)
+    # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
+    # but without outer `plugin` key.
+    - artifactId: kubernetes
+      source:
+        version: 3697.v771155683e38
+    - artifactId: workflow-aggregator
+      source:
+        version: 590.v6a_d052e5a_a_b_5
+    - artifactId: git
+      source:
+        version: 4.11.4
+    - artifactId: configuration-as-code
+      source:
+        version: 1512.vb_79d418d5fc8
+    - artifactId: prometheus
+      source:
+        version: 2.0.11
+    - artifactId: blueocean
+      source:
+        version: 1.25.5
+    - artifactId: job-dsl
+      source:
+        version: 1.81
+    - artifactId: google-login
+      source:
+        version: 1.6
+    - artifactId: matrix-auth
+      source:
+        version: 3.1.5
+    - artifactId: ghprb
+      source:
+        version: 1.42.2
+    - artifactId: build-failure-analyzer
+      source:
+        version: 2.4.0
+    - artifactId: jenkins-pipeline-cache
+      source:
+        url: https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.4/jenkins-pipeline-cache-0.1.4.hpi
