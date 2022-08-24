@@ -1,0 +1,11 @@
+apiVersion: v2
+appVersion: v2.3.8
+description: Helm chart to deploy [bazel-remote](https://github.com/buchgr/bazel-remote).
+home: https://github.com/slamdev/helm-charts/tree/master/charts/bazel-remote
+icon: https://bazel.build/images/bazel-icon.svg
+maintainers:
+  - email: valentin.fedoskin@gmail.com
+    name: slamdev
+name: bazel-remote
+type: application
+version: 0.0.3
