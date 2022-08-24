@@ -12,7 +12,7 @@ controller:
         version: 590.v6a_d052e5a_a_b_5
     - artifactId: git
       source:
-        version: 4.11.4
+        version: 4.11.5
     - artifactId: configuration-as-code
       source:
         version: 1512.vb_79d418d5fc8
