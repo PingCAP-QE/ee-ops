@@ -29,6 +29,8 @@ controller:
     - { name: jenkins-cloud, keyName: tunnel-addr }
     - { name: jenkins-cloud, keyName: base-url }
     - { name: jenkins-cloud, keyName: kubeconfig-ksyun }
+    # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
+    - { name: mongodb, keyName: mongodb-root-password }
 
   additionalSecrets: []
   #  - name: nameOfSecret
@@ -50,6 +52,13 @@ controller:
     #     - "Overall/Read:authenticated"
     #     - "View/Read:anonymous"
     #     # add more...
+
+    # for security.
+    security:
+      gitHostKeyVerificationConfiguration:
+        sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+      globalJobDslSecurityConfiguration:
+        useScriptSecurity: false
 
     securityRealm: |-
       local:
@@ -81,14 +90,6 @@ controller:
       #         clientId: "${google-oauth2-client-id}"
       #         # will read from key `client-secret` from secret `google-oauth2`
       #         clientSecret: "${google-oauth2-client-secret}"
-
-      # for security.
-      security: |
-        security:
-          gitHostKeyVerificationConfiguration:
-            sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
-          globalJobDslSecurityConfiguration:
-            useScriptSecurity: false
 
       # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
       credentials: |
@@ -207,7 +208,7 @@ controller:
             endpoint: ${cache-s3-endpoint}
             username: ${cache-s3-access-key}
             password: ${cache-s3-access-secret}
-            threshold: 0 # 0 means no limits.
+            threshold: 100000 # limit to 100GiB
       # for clouds.
       clouds: |
         jenkins:
@@ -232,3 +233,28 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "http://goproxy.pingcap.net,direct"
+      build-failure-analyzer: |
+        unclassified:
+          buildFailureAnalyzer:
+            doNotAnalyzeAbortedJob: true
+            gerritTriggerEnabled: false
+            globalEnabled: true
+            graphsEnabled: false
+            knowledgeBase:
+              mongoDB:
+                dbName: jenkins-failure-pattern
+                enableStatistics: true
+                host: mongodb.apps.svc
+                password: "${mongodb-mongodb-root-password}"
+                port: 27017
+                successfulLogging: true
+                userName: root
+            maxLogSize: 0
+            metricSquashingEnabled: true
+            noCausesEnabled: true
+            noCausesMessage: >-
+              No problems were identified. If you know why this problem occurred,
+              please add a suitable Cause in https://pingcap.feishu.cn/wiki/wikcno79XYpVsvJeiRsMm38b5eh, add a config it.
+            nrOfScanThreads: 3
+            testResultParsingEnabled: false
+            testResultCategories: "UT"

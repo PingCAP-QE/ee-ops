@@ -12,7 +12,7 @@ spec:
         kind: HelmRepository
         name: jenkins
         namespace: flux-system
-      version: "4.1.13"
+      version: "4.1.17"
   interval: 1h0m0s
   install:
     remediation:
@@ -23,6 +23,8 @@ spec:
   test:
     enable: true
     ignoreFailures: false
+  dependsOn:
+    - { name: mongodb, namespace: apps }
   valuesFrom:
     - { kind: ConfigMap, name: jenkins-values, valuesKey: values1.yaml }
     - { kind: ConfigMap, name: jenkins-values, valuesKey: values2.yaml }

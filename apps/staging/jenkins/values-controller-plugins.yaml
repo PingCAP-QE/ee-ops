@@ -12,6 +12,7 @@ controller:
     - google-login:1.6
     - matrix-auth:3.1.5
     - ghprb:1.42.2
+    - build-failure-analyzer:2.3.0
   initScripts:
     - |
       println('curl -v -o ${JENKINS_HOME}/plugins/jenkins-pipeline-cache-0.1.4.hpi https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.4/jenkins-pipeline-cache-0.1.4.hpi'.execute().text)
