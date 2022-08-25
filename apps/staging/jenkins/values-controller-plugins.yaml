@@ -52,3 +52,19 @@ controller:
       source:
         # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
         url: https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.5/jenkins-pipeline-cache-0.1.5.hpi
+
+  # for plugin build-failure-analyzer
+  #   Exporting to prometheus
+  #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
+  prometheus:
+    metricRelabelings:
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_category_(.*)
+        targetLabel: "category"
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_cause_(.*)
+        targetLabel: cause
+      - sourceLabels: [ __name__]
+        regex: "jenkins_bfa_(.*)_(.*)"
+        replacement: "jenkins_bfa"
+        targetLabel: __name__
