@@ -3,9 +3,10 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: ingress-nginx
-  namespace: nginx
+  namespace: flux-system
 spec:
   releaseName: ingress-nginx
+  targetNamespace: nginx
   chart:
     spec:
       chart: ingress-nginx
@@ -23,7 +24,7 @@ spec:
       service:
         type: NodePort
         nodePorts:
-          # TODO: should change to more special ports @wuhuizuo
+          # TODO(wuhuizuo): should change to more special ports
           http: "30704"
           https: "32631"
       ingressClassResource:

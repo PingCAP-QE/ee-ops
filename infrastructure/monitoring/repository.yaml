@@ -1,0 +1,12 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: kube-prometheus
+  namespace: flux-system
+spec:
+  interval: 24h
+  ref:
+    branch: release-0.9
+  secretRef:
+    name: flux-system
+  url: https://github.com/prometheus-operator/kube-prometheus.git
