@@ -4,3 +4,4 @@ resources:
   - sources
   - nginx
   - rook-ceph
+  - monitoring
