@@ -37,7 +37,7 @@ spec:
           imagePullPolicy: {{ .Values.pipeline.image.pullPolicy }}
           args:
             - --all-contexts
-            - --config=/etc/prow-config/config.yaml
+            - --config=/etc/config/config.yaml
           env:
           # Use KUBECONFIG envvar rather than --kubeconfig flag in order to provide multiple configs to merge.
           - name: KUBECONFIG
