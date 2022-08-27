@@ -238,16 +238,16 @@ controller:
 
   # List of plugins to be install during Jenkins controller start
   installPlugins:
-    - artifactID: kubernetes
+    - artifactId: kubernetes
       source:
         version: 3697.v771155683e38
-    - artifactID: workflow-aggregator
+    - artifactId: workflow-aggregator
       source:
         version: 581.v0c46fa_697ffd
-    - artifactID: git
+    - artifactId: git
       source:
         version: 4.11.3
-    - artifactID: configuration-as-code
+    - artifactId: configuration-as-code
       source:
         version: 1429.v09b_044a_c93de
 
