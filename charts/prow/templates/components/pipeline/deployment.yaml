@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.pipeline" . }}
+  labels:
+    {{- include "prow.labels.pipeline" . | nindent 4 }}
+spec:
+  {{- if not .Values.pipeline.autoscaling.enabled }}
+  replicas: {{ .Values.pipeline.replicaCount }}
+  {{- end }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.pipeline" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.pipeline" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.pipeline" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.pipeline.image.repository }}:{{ .Values.pipeline.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.pipeline.image.pullPolicy }}
+          args:
+            - --all-contexts
+            - --config=/etc/config/config.yaml
+          env:
+          # Use KUBECONFIG envvar rather than --kubeconfig flag in order to provide multiple configs to merge.
+          - name: KUBECONFIG
+            value: "/etc/kubeconfig/config"
+          volumeMounts:
+            {{- if .Values.pipeline.kubeconfigSecret }}
+            - mountPath: /etc/kubeconfig
+              name: kubeconfig
+              readOnly: true
+            {{- end }}
+            - name: config
+              mountPath: /etc/config
+              readOnly: true            
+          resources:
+            {{- toYaml .Values.pipeline.resources | nindent 12 }}
+      volumes:
+        {{- with .Values.pipeline.kubeconfigSecret }}
+        - name: kubeconfig
+          secret:
+            defaultMode: 420
+            # todo: setup secret.
+            secretName: {{ . }}
+        {{- end }}
+        - name: config
+          configMap:
+            name: {{ include "prow.fullname" . }}-config          
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

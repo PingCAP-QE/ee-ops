@@ -74,6 +74,13 @@ full name for component sinker
 {{- end }}
 
 {{/*
+full name for component pipeline
+*/}}
+{{- define "prow.fullname.pipeline" -}}
+{{ include "prow.fullname" . }}-pipeline
+{{- end }}
+
+{{/*
 full name for component statusReconciler
 */}}
 {{- define "prow.fullname.statusReconciler" -}}
@@ -163,6 +170,14 @@ app.kubernetes.io/app: sinker
 {{- end }}
 
 {{/*
+Labels for pipeline
+*/}}
+{{- define "prow.labels.pipeline" -}}
+{{ include "prow.labels" . }}
+app.kubernetes.io/app: pipeline
+{{- end }}
+
+{{/*
 Labels for status-reconciler
 */}}
 {{- define "prow.labels.statusReconciler" -}}
@@ -244,6 +259,14 @@ app.kubernetes.io/app: sinker
 {{- end }}
 
 {{/*
+Selector labels for pipeline
+*/}}
+{{- define "prow.selectorLabels.pipeline" -}}
+{{ include "prow.selectorLabels" . }}
+app.kubernetes.io/app: pipeline
+{{- end }}
+
+{{/*
 Selector labels for statusReconciler
 */}}
 {{- define "prow.selectorLabels.statusReconciler" -}}
@@ -310,6 +333,14 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{- define "prow.serviceAccountName.pipeline" -}}
+{{- if .Values.pipeline.serviceAccount.create }}
+{{- default (include "prow.fullname.pipeline" .) .Values.pipeline.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.pipeline.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
 {{- define "prow.serviceAccountName.statusReconciler" -}}
 {{- if .Values.statusReconciler.serviceAccount.create }}
 {{- default (include "prow.fullname.statusReconciler" .) .Values.statusReconciler.serviceAccount.name }}
@@ -365,6 +396,12 @@ Create the name of the role
 {{- end }}
 {{- end }}
 
+{{- define "prow.roleName.pipeline" -}}
+{{- if .Values.pipeline.serviceAccount.roleBinding.create }}
+{{- default (include "prow.fullname.pipeline" .) .Values.pipeline.serviceAccount.roleBinding.name }}
+{{- end }}
+{{- end }}
+
 {{- define "prow.roleName.statusReconciler" -}}
 {{- if .Values.statusReconciler.serviceAccount.roleBinding.create }}
 {{- default (include "prow.fullname.statusReconciler" .) .Values.statusReconciler.serviceAccount.roleBinding.name }}
@@ -414,6 +451,12 @@ Create the name of the role binding
 {{- define "prow.roleBindingName.sinker" -}}
 {{- if .Values.sinker.serviceAccount.roleBinding.create }}
 {{- default (include "prow.fullname.sinker" .) .Values.sinker.serviceAccount.roleBinding.name }}
+{{- end }}
+{{- end }}
+
+{{- define "prow.roleBindingName.pipeline" -}}
+{{- if .Values.pipeline.serviceAccount.roleBinding.create }}
+{{- default (include "prow.fullname.pipeline" .) .Values.pipeline.serviceAccount.roleBinding.name }}
 {{- end }}
 {{- end }}
 
