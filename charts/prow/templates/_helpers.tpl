@@ -81,6 +81,13 @@ full name for component pipeline
 {{- end }}
 
 {{/*
+full name for component jenkins-operator
+*/}}
+{{- define "prow.fullname.jenkinsoperator" -}}
+{{ include "prow.fullname" . }}-jenkins-operator
+{{- end }}
+
+{{/*
 full name for component statusReconciler
 */}}
 {{- define "prow.fullname.statusReconciler" -}}
@@ -178,6 +185,14 @@ app.kubernetes.io/app: pipeline
 {{- end }}
 
 {{/*
+Labels for jenkins operator
+*/}}
+{{- define "prow.labels.jenkinsoperator" -}}
+{{ include "prow.labels" . }}
+app.kubernetes.io/app: jenkins-operator
+{{- end }}
+
+{{/*
 Labels for status-reconciler
 */}}
 {{- define "prow.labels.statusReconciler" -}}
@@ -264,6 +279,14 @@ Selector labels for pipeline
 {{- define "prow.selectorLabels.pipeline" -}}
 {{ include "prow.selectorLabels" . }}
 app.kubernetes.io/app: pipeline
+{{- end }}
+
+{{/*
+Selector labels for jenkins operator
+*/}}
+{{- define "prow.selectorLabels.jenkinsoperator" -}}
+{{ include "prow.selectorLabels" . }}
+app.kubernetes.io/app: jenkins-operator
 {{- end }}
 
 {{/*

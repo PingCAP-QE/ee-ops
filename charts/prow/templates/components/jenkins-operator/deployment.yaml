@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "prow.fullname.jenkinsoperator" . }}
+  labels:
+    {{- include "prow.labels.jenkinsoperator" . | nindent 4 }}
+spec:
+  {{- if not .Values.jenkinsOperator.autoscaling.enabled }}
+  replicas: {{ .Values.jenkinsOperator.replicaCount }}
+  {{- end }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels.jenkinsoperator" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels.jenkinsoperator" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.jenkinsOperator.image.repository }}:{{ .Values.jenkinsOperator.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.jenkinsOperator.image.pullPolicy }}
+          args:
+            - --skip-report={{ .Values.jenkinsOperator.skipReport }}
+            - --dry-run={{ .Values.jenkinsOperator.dryRun }}
+            - --csrf-protect={{ .Values.jenkinsOperator.csrfProtect }}
+            - --jenkins-url={{ .Values.jenkinsOperator.jenkinsUrl }}
+            - --config-path=/etc/config/config.yaml
+            {{/* basic auth */}}
+            - --jenkins-user="$(JENKINS_AUTH_BASIC_USER)"
+            - --jenkins-token-file="$(JENKINS_AUTH_BASIC_TOKEN_FILE)"
+            {{/* bearer token auth */}}
+            - --jenkins-bearer-token-file="$(JENKINS_AUTH_BEARER_TOKEN_FILE)"
+            {{/* cert auth */}}
+            - --cert-file="$(JENKINS_AUTH_CERT_FILE)"
+            - --key-file="$(JENKINS_AUTH_KEY_FIEL)"
+            - --ca-cert-file="$(JENKINS_AUTH_CA_CERT_FILE)"
+          env:
+            {{- if .Values.jenkinsOperator.auth.secretName }}
+            {{- with .Values.jenkinsOperator.auth }}
+            {{- if .secretKeyJenkinsUser }}
+            - name: JENKINS_AUTH_BASIC_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .secretName }}
+                  key: {{ .secretKeyJenkinsUser }}
+            {{- end }}
+            {{- with .secretKeyJenkinsToken }}
+            - name: JENKINS_AUTH_BASIC_TOKEN_FILE
+              value: /etc/jenkins/{{ . }}
+            {{- end }}
+            {{- with .secretKeyJenkinsBearerToken }}
+            - name: JENKINS_AUTH_BEARER_TOKEN_FILE
+              value: /etc/jenkins/{{ . }}
+            {{- end }}
+            {{- with .secretKeyCert }}
+            - name: JENKINS_AUTH_CERT_FILE
+              value: /etc/jenkins/{{ . }}
+            {{- end }}
+            {{- with .secretKeyKey }}
+            - name: JENKINS_AUTH_KEY_FIEL
+              value: /etc/jenkins/{{ . }}
+            {{- end }}
+            {{- with .secretKeyCaCert }}
+            - name: JENKINS_AUTH_CA_CERT_FILE
+              value: /etc/jenkins/{{ . }}
+            {{- end }}
+            {{- end }}
+            {{- else }}[]
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            {{- if .Values.jenkinsOperator.auth.secretName }}
+            - name: jenkins-auth
+              mountPath: /etc/jenkins
+              readOnly: true
+            {{- end }}
+          resources:
+            {{- toYaml .Values.jenkinsOperator.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "prow.fullname" . }}-config
+        {{- with .Values.jenkinsOperator.auth.secretName }}
+        - name: jenkins-auth
+          secret:
+            secretName: {{ . }}
+            optional: true
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
