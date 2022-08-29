@@ -32,6 +32,8 @@ spec:
     volumes:
       - name: brc-cache
         emptyDir: {}
+    serviceMonitor:
+      enabled: true
     volumeMounts:
       - name: brc-cache
         mountPath: /cache
