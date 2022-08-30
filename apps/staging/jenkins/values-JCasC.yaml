@@ -200,15 +200,15 @@ controller:
         unclassified:
           gitHubPluginConfig:
             hookUrl: "https://prow-ee.pingcap.net/jenkins/github-webhook/"
-      pipeline-cache: |
-        unclassified:
-          pipeline-cache:
-            region: ${cache-s3-region}
-            bucket: ${cache-s3-bucket}
-            endpoint: ${cache-s3-endpoint}
-            username: ${cache-s3-access-key}
-            password: ${cache-s3-access-secret}
-            threshold: 100000 # limit to 100GiB
+      # pipeline-cache: |
+      #   unclassified:
+      #     pipeline-cache:
+      #       region: ${cache-s3-region}
+      #       bucket: ${cache-s3-bucket}
+      #       endpoint: ${cache-s3-endpoint}
+      #       username: ${cache-s3-access-key}
+      #       password: ${cache-s3-access-secret}
+      #       threshold: 100000 # limit to 100GiB
       # for clouds.
       clouds: |
         jenkins:
