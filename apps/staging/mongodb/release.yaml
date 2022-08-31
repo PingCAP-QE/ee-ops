@@ -28,3 +28,8 @@ spec:
       storageClass: ceph-block
     persistence:
       size: 8Gi
+    service:
+      type: NodePort
+      portName: mongodb
+      nodePorts:
+        mongodb: "32017"
