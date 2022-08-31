@@ -258,3 +258,4 @@ controller:
             nrOfScanThreads: 3
             testResultParsingEnabled: false
             testResultCategories: "UT"
+            fallbackCategoriesAsString: unknown
