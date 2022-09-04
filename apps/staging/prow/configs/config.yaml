@@ -13,3 +13,18 @@ tide:
       orgs:
         - PingCAP-QE
         # - your-another-org-name
+
+# doc: https://github.com/kubernetes/test-infra/blob/master/prow/inrepoconfig.md
+in_repo_config:
+  enabled:
+    # The key can be one of "*" for "globally", "org" or "org/repo".
+    # The narrowest match is used. Here the key is "kubernetes/kubernetes".
+    PingCAP-QE/ci: true
+    PingCAP-QE/ee-ops: true
+
+  # Clusters must be allowed before they can be used. Here we allow the "default"
+  # cluster globally. This setting also allows using "*" for "globally", "org" or "org/repo" as key.
+  # All clusters that are allowed for the specific repo, its org or
+  # globally can be used.
+  allowed_clusters:
+    "*": ["default"]
