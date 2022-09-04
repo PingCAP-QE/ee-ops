@@ -6,47 +6,47 @@ controller:
     # but without outer `plugin` key.
     - artifactId: kubernetes
       source:
-        # renovate: datasource=jenkins depName=kubernetes
+        # renovate: datasource=jenkins-plugins depName=kubernetes
         version: 3697.v771155683e38
     - artifactId: workflow-aggregator
       source:
-        # renovate: datasource=jenkins depName=workflow-aggregator
+        # renovate: datasource=jenkins-plugins depName=workflow-aggregator
         version: 590.v6a_d052e5a_a_b_5
     - artifactId: git
       source:
-        # renovate: datasource=jenkins depName=git
+        # renovate: datasource=jenkins-plugins depName=git
         version: 4.11.5
     - artifactId: configuration-as-code
       source:
-        # renovate: datasource=jenkins depName=configuration-as-code
+        # renovate: datasource=jenkins-plugins depName=configuration-as-code
         version: 1512.vb_79d418d5fc8
     - artifactId: prometheus
       source:
-        # renovate: datasource=jenkins depName=prometheus
+        # renovate: datasource=jenkins-plugins depName=prometheus
         version: 2.0.11
     - artifactId: blueocean
       source:
-        # renovate: datasource=jenkins depName=blueocean
+        # renovate: datasource=jenkins-plugins depName=blueocean
         version: 1.25.5
     - artifactId: job-dsl
       source:
-        # renovate: datasource=jenkins depName=job-dsl
+        # renovate: datasource=jenkins-plugins depName=job-dsl
         version: 1.81
     - artifactId: google-login
       source:
-        # renovate: datasource=jenkins depName=google-login
+        # renovate: datasource=jenkins-plugins depName=google-login
         version: 1.6
     - artifactId: matrix-auth
       source:
-        # renovate: datasource=jenkins depName=matrix-auth
+        # renovate: datasource=jenkins-plugins depName=matrix-auth
         version: 3.1.5
     - artifactId: ghprb
       source:
-        # renovate: datasource=jenkins depName=ghprb
+        # renovate: datasource=jenkins-plugins depName=ghprb
         version: 1.42.2
     - artifactId: build-failure-analyzer
       source:
-        # renovate: datasource=jenkins depName=build-failure-analyzer
+        # renovate: datasource=jenkins-plugins depName=build-failure-analyzer
         version: 2.4.0
     - artifactId: jenkins-pipeline-cache
       source:
