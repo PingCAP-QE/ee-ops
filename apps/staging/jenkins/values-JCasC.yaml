@@ -91,6 +91,12 @@ controller:
       #         # will read from key `client-secret` from secret `google-oauth2`
       #         clientSecret: "${google-oauth2-client-secret}"
 
+      common: |
+        unclassified:
+          location:
+            adminAddress: "address not configured yet <nobody@nowhere>"
+            url: "https://prow-ee.pingcap.net/jenkins/"
+
       # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
       credentials: |
         credentials:
@@ -199,6 +205,8 @@ controller:
             whitelistPhrase: ".*add\\W+to\\W+whitelist.*"
       github-plugin-config: |
         unclassified:
+          gitHubConfiguration:
+            apiRateLimitChecker: ThrottleOnOver
           gitHubPluginConfig:
             hookUrl: "https://prow-ee.pingcap.net/jenkins/github-webhook/"
       pipeline-cache: |
