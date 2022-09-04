@@ -91,6 +91,12 @@ controller:
       #         # will read from key `client-secret` from secret `google-oauth2`
       #         clientSecret: "${google-oauth2-client-secret}"
 
+      common: |
+        unclassified:
+          location:
+            adminAddress: "address not configured yet <nobody@nowhere>"
+            url: "https://prow-ee.pingcap.net/jenkins/"
+
       # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
       credentials: |
         credentials:
@@ -134,20 +140,21 @@ controller:
       jobs-dsl: |
         jobs:
           - script: |
-              job("seed") {
-                description(
-                  """
-                  Jenkins jobs As Code
-                  No need to configure job on Jenkins Web UI anymore.
-                  """
-                )
+              job('seed') {
+                description('''
+                    Jenkins jobs As Code
+                    No need to configure job on Jenkins Web UI anymore.
+                ''')
                 scm {
                   git {
                     remote {
-                      github("PingCAP-QE/ci", "https")
+                      github('PingCAP-QE/ci', 'https')
                     }
-                    branch("main")
+                    branch('main')
                   }
+                }
+                triggers {
+                  githubPush()
                 }
                 steps {
                   jobDsl {
@@ -155,10 +162,10 @@ controller:
                     failOnMissingPlugin(false)
                     ignoreMissingFiles(true)
                     ignoreExisting(false)
-                    removedJobAction("DELETE")
-                    removedConfigFilesAction("DELETE")
-                    removedViewAction("DELETE")
-                    lookupStrategy("SEED_JOB")
+                    removedJobAction('DELETE')
+                    removedConfigFilesAction('DELETE')
+                    removedViewAction('DELETE')
+                    lookupStrategy('SEED_JOB')
                     sandbox(false)
                   }
                 }
@@ -198,6 +205,8 @@ controller:
             whitelistPhrase: ".*add\\W+to\\W+whitelist.*"
       github-plugin-config: |
         unclassified:
+          gitHubConfiguration:
+            apiRateLimitChecker: ThrottleOnOver
           gitHubPluginConfig:
             hookUrl: "https://prow-ee.pingcap.net/jenkins/github-webhook/"
       pipeline-cache: |

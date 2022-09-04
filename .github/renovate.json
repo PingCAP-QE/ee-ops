@@ -4,7 +4,16 @@
     "config:base"
   ],
   "jenkins": {
-    "enabled": true,
-    "fileMatch": ["plugins\\.yaml$"]
-  }
+    "enabled": true
+  },
+  "regexManagers": [
+    {
+      "fileMatch": [".*-plugins\\.yaml$$"],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*url: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    }
+  ]
 }
