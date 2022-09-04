@@ -27,7 +27,7 @@ controller:
     - artifactId: blueocean
       source:
         # renovate: datasource=jenkins-plugins depName=blueocean
-        version: 1.25.5
+        version: 1.25.7
     - artifactId: job-dsl
       source:
         # renovate: datasource=jenkins-plugins depName=job-dsl
