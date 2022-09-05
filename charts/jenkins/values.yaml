@@ -140,6 +140,12 @@ controller:
   #   bar: foo
   # Jenkins controller service labels
   serviceLabels: {}
+  serviceSessionAffinity: None # None | ClientIP
+  serviceSessionAffinityConfig: {}
+  # serviceSessionAffinityConfig:
+  #   clientIP:
+  #     timeoutSeconds: 10
+
   #   service.beta.kubernetes.io/aws-load-balancer-backend-protocol: https
   # Put labels on Jenkins controller pod
   podLabels: {}
@@ -219,6 +225,12 @@ controller:
   # agentListenerServiceAnnotations:
   #   service.beta.kubernetes.io/aws-load-balancer-internal: "True"
   #   service.beta.kubernetes.io/load-balancer-source-ranges: "172.0.0.0/8, 10.0.0.0/8"
+  agentListenerServiceSessionAffinity: None # None | ClientIP
+  agentListenerServiceSessionAffinityConfig: {}
+  # agentListenerServiceSessionAffinityConfig:
+  #   clientIP:
+  #     timeoutSeconds: 10
+
 
   # LoadBalancerSourcesRange is a list of allowed CIDR values, which are combined with ServicePort to
   # set allowed inbound rules on the security group assigned to the controller load balancer

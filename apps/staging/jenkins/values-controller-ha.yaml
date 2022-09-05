@@ -1,0 +1,33 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+controller:
+  replicas: 2
+
+  # HA should on same node.
+  affinity:
+    podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              # Pod flag
+              - key: app.kubernetes.io/component 
+                operator: In
+                values: [jenkins-controller]
+              # Chart name
+              - key: app.kubernetes.io/name 
+                operator: In
+                values: [jenkins]
+              # Release name. should keep same with `.spec.releaseNmae` in file ./release.yaml
+              - key: app.kubernetes.io/instance 
+                operator: In
+                values: [jenkins]
+            topologyKey: kubernetes.io/hostname
+
+  # Service should affinity to client ip
+  serviceSessionAffinity: ClientIP
+  serviceSessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 36000 # 10 hours
+  agentListenerServiceSessionAffinity: ClientIP
+  agentListenerServiceSessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 36000 # 10 hours
