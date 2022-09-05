@@ -1,45 +1,29 @@
-{{- $root := . }}
-{{- if .Values.controller.sidecars.configAutoReload.enabled }}
-{{- range $key, $val := .Values.controller.JCasC.configScripts }}
-{{- if $val }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ template "jenkins.casc.configName" (list (printf "config-%s" $key) $ )}}
-  namespace: {{ template "jenkins.namespace" $root }}
-  labels:
-    "app.kubernetes.io/name": {{ template "jenkins.name" $root}}
-    {{- if $root.Values.renderHelmLabels }}
-    "helm.sh/chart": "{{ $root.Chart.Name }}-{{ $root.Chart.Version }}"
-    {{- end }}
-    "app.kubernetes.io/managed-by": "{{ $.Release.Service }}"
-    "app.kubernetes.io/instance": "{{ $.Release.Name }}"
-    "app.kubernetes.io/component": "{{ $.Values.controller.componentName }}"
-    {{ template "jenkins.fullname" $root }}-jenkins-config: "true"
-data:
-  {{ $key }}.yaml: |-
-{{ tpl $val $| indent 4 }}
-{{- end }}
-{{- end }}
-{{- if .Values.controller.JCasC.defaultConfig }}
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{ template "jenkins.casc.configName" (list "jcasc-config" $ )}}
-  namespace: {{ template "jenkins.namespace" $root }}
+  namespace: {{ template "jenkins.namespace" . }}
   labels:
-    "app.kubernetes.io/name": {{ template "jenkins.name" $root}}
+    "app.kubernetes.io/name": {{ template "jenkins.name" . }}
     {{- if .Values.renderHelmLabels }}
-    "helm.sh/chart": "{{ $root.Chart.Name }}-{{ $root.Chart.Version }}"
+    "helm.sh/chart": "{{ .Chart.Name }}-{{ .Chart.Version }}"
     {{- end }}
     "app.kubernetes.io/managed-by": "{{ $.Release.Service }}"
     "app.kubernetes.io/instance": "{{ $.Release.Name }}"
     "app.kubernetes.io/component": "{{ $.Values.controller.componentName }}"
-    {{ template "jenkins.fullname" $root }}-jenkins-config: "true"
+    {{ template "jenkins.fullname" . }}-jenkins-config: "true"
 data:
+  {{- if .Values.controller.JCasC.defaultConfig }}
   jcasc-default-config.yaml: |-
     {{- include "jenkins.casc.defaults" . |nindent 4 }}
-{{- end}}
-{{- end }}
+  {{- end}}{{/* if */}}
+  {{- $root := . }}
+  {{- range $key, $val := .Values.controller.JCasC.configScripts }}
+  {{- if $val }}
+    {{- if and (eq $key "jcasc-default-config") $.Values.controller.JCasC.defaultConfig }}
+      {{ fail ".controller.JCasC: should not have 'jcasc-default-config' key in `.configScripts` when `.default` enabled"}}
+    {{- end }}
+  {{ $key }}.yaml: |-
+{{ tpl $val $| indent 4 }}
+  {{- end }}{{/* if */}}
+  {{- end }}{{/* range */}}
