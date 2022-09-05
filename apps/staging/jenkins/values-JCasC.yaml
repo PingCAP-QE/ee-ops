@@ -76,6 +76,10 @@ controller:
     #     # will read from key `client-secret` from secret `google-oauth2`
     #     clientSecret: "${google-oauth2-client-secret}"
 
+    # REF Doc: https://github.com/PingCAP-QE/ee-ops/blob/main/charts/jenkins/README.md
+    #
+    # Notable: if you want delete some key, first please delete the conetnt but keep the key.
+    #   after deployed, then create other commit and push to delete the key.
     configScripts:
       #  welcome-message: |
       #    jenkins:
@@ -90,12 +94,6 @@ controller:
       #         clientId: "${google-oauth2-client-id}"
       #         # will read from key `client-secret` from secret `google-oauth2`
       #         clientSecret: "${google-oauth2-client-secret}"
-
-      common: |
-        unclassified:
-          location:
-            adminAddress: "address not configured yet <nobody@nowhere>"
-            url: "https://prow-ee.pingcap.net/jenkins/"
 
       # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
       credentials: |
