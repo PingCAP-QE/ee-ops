@@ -16,6 +16,8 @@ clusterZone: "cluster.local"
 renderHelmLabels: true
 
 controller:
+  # May be HA take no effects and can not start when it set > 1.
+  replicas: 1
   # Used for label app.kubernetes.io/component
   componentName: "jenkins-controller"
   image: "jenkins/jenkins"
