@@ -4,7 +4,7 @@ resources:
   - release.yaml
 configMapGenerator:
   - name: jenkins-values
-    namespace: apps
+    namespace: flux-system
     files:
       - values1.yaml=values-controller.yaml
       - values2.yaml=values-persistence.yaml
