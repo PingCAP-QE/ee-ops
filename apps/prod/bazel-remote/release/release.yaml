@@ -1,0 +1,44 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: brc
+  namespace: apps
+spec:
+  releaseName: brc
+  chart:
+    spec:
+      chart: ./charts/bazel-remote
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    replicaCount: 2
+    volumes:
+      - name: brc-cache
+        emptyDir: {}
+    serviceMonitor:
+      enabled: true
+    volumeMounts:
+      - name: brc-cache
+        mountPath: /cache
+  valuesFrom:
+    - kind: Secret
+      name: bazel-config
+      valuesKey: configuration
+      targetPath: conf
