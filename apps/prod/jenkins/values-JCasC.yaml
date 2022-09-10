@@ -193,7 +193,7 @@ controller:
           gitHubConfiguration:
             apiRateLimitChecker: ThrottleOnOver
           gitHubPluginConfig:
-            hookUrl: "https://prow-ee.pingcap.net/jenkins/github-webhook/"
+            hookUrl: "https://do.pingcap.net/jenkins/github-webhook/"
       pipeline-cache: |
         unclassified:
           pipeline-cache:
