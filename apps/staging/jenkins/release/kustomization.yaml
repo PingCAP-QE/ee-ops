@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - release.yaml
+configMapGenerator:
+  - name: jenkins-values
+    namespace: apps
+    files:
+      - values1.yaml=values-controller.yaml
+      - values2.yaml=values-persistence.yaml
+      - values3.yaml=values-agent.yaml
+      - values4.yaml=values-controller-plugins.yaml
+      - values5.yaml=values-JCasC.yaml
+      - values6.yaml=values-controller-ha.yaml
+configurations:
+  - kustomize-config.yaml

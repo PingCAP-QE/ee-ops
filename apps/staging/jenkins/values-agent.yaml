@@ -1,3 +1,0 @@
-agent:
-  podRetention: OnFailure
-  containerCap: 100
