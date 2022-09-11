@@ -1,10 +1,14 @@
-apiVersion: objectbucket.io/v1alpha1
-kind: ObjectBucketClaim
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
 metadata:
-  name: ci-pipeline-cache
-  namespace: apps
+  name: jenkins-pre-obc
+  namespace: flux-system
 spec:
-  additionalConfig:
-    maxSize: 300G
-  bucketName: ci-pipeline-cache
-  storageClassName: ceph-bucket
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/staging/jenkins/pre/obc
+  prune: true
