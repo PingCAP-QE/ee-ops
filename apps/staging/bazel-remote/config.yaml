@@ -5,6 +5,9 @@ metadata:
   name: bazel-remote-cache-server-config
   namespace: apps
 spec:
+  dependsOn:
+    - name: bazel-remote-cache-server-pre
+      namespace: flux-system
   interval: 5m0s
   sourceRef:
     kind: GitRepository
@@ -15,5 +18,6 @@ spec:
   postBuild:
     substituteFrom:
       - kind: Secret
-        name: bazel-s3 # should manual created in namespace `apps`
-        optional: false
+        name: ci-bazel-remote-cache
+      - kind: ConfigMap
+        name: ci-bazel-remote-cache
