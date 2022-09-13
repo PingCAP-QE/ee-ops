@@ -185,8 +185,8 @@ controller:
             requestForTestingPhrase: "Can one of the admins verify this patch?"
             retestPhrase: ".*test\\W+this\\W+please.*"
             skipBuildPhrase: ".*\\[skip\\W+ci\\].*"
-            useComments: true
-            useDetailedComments: true
+            useComments: false
+            useDetailedComments: false
             whitelistPhrase: ".*add\\W+to\\W+whitelist.*"
       github-plugin-config: |
         unclassified:
