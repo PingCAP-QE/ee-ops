@@ -1,0 +1,10 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: ci-pipeline-cache
+  namespace: apps
+spec:
+  additionalConfig:
+    maxSize: 300G
+  bucketName: ci-pipeline-cache
+  storageClassName: ceph-bucket

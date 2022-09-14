@@ -57,3 +57,55 @@ subjects:
   - kind: ServiceAccount
     name: jenkins
     namespace: apps
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: deno-dir
+  namespace: jenkins-tidb
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: ceph-filesystem
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gocache
+  namespace: jenkins-tidb
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: ceph-filesystem
+  volumeMode: Filesystem
+status:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 200Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gopathcache
+  namespace: jenkins-tidb
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: ceph-filesystem
+  volumeMode: Filesystem
+status:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 50Gi

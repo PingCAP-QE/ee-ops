@@ -7,6 +7,7 @@ metadata:
 spec:
   dependsOn:
     - name: jenkins-release
+      namespace: apps
   interval: 5m0s
   sourceRef:
     kind: GitRepository
