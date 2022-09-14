@@ -25,10 +25,6 @@ controller:
     - { name: cache-s3, keyName: endpoint }
     - { name: cache-s3, keyName: access-key }
     - { name: cache-s3, keyName: access-secret }
-    # for jenkins clouds
-    - { name: jenkins-cloud, keyName: tunnel-addr }
-    - { name: jenkins-cloud, keyName: base-url }
-    - { name: jenkins-cloud, keyName: kubeconfig-ksyun }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
     - { name: mongodb, keyName: mongodb-root-password }
 
@@ -125,15 +121,6 @@ controller:
                       description: codecov token for tidb
                       scope: GLOBAL
                       secret: ${codecov-token-tidb}
-              - domain:
-                  name: kubernetes
-                credentials:
-                  - file:
-                      id: "kubeconfig-ksyun"
-                      description: "kube config for ksyun k8s cluster"
-                      fileName: "user-jenkins.yml"
-                      scope: GLOBAL
-                      secretBytes: "${readFileBase64:/run/secrets/additional/jenkins-cloud-kubeconfig-ksyun}"
       # for jobs.
       jobs-dsl: |
         jobs:
@@ -216,22 +203,6 @@ controller:
             username: ${cache-s3-access-key}
             password: ${cache-s3-access-secret}
             threshold: 100000 # limit to 100GiB
-      # for clouds.
-      clouds: |
-        jenkins:
-          clouds:
-            - kubernetes:
-                name: kubernetes-ksyun
-                namespace: jenkins-tidb
-                connectTimeout: 10
-                containerCap: 200
-                containerCapStr: "200"
-                credentialsId: kubeconfig-ksyun
-                jenkinsTunnel: "${jenkins-cloud-tunnel-addr}"
-                jenkinsUrl: "${jenkins-cloud-base-url}"
-                maxRequestsPerHost: 2000
-                maxRequestsPerHostStr: "2000"
-                skipTlsVerify: true
       # for global env variables
       env-vars: |
         jenkins:
