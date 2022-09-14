@@ -19,12 +19,12 @@ controller:
     - { name: github, keyName: bot-token }
     # for codecov.io uploading
     - { name: codecov-token, keyName: tidb }
-    # for ci cache
-    - { name: cache-s3, keyName: region }
-    - { name: cache-s3, keyName: bucket }
-    - { name: cache-s3, keyName: endpoint }
-    - { name: cache-s3, keyName: access-key }
-    - { name: cache-s3, keyName: access-secret }
+    # for ci cache, no need create manually.
+    - { name: jenkins-cache, keyName: region }
+    - { name: jenkins-cache, keyName: bucket }
+    - { name: jenkins-cache, keyName: endpoint }
+    - { name: jenkins-cache, keyName: access-key }
+    - { name: jenkins-cache, keyName: access-secret }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
     - { name: mongodb, keyName: mongodb-root-password }
 
@@ -197,11 +197,11 @@ controller:
       pipeline-cache: |
         unclassified:
           pipeline-cache:
-            region: ${cache-s3-region}
-            bucket: ${cache-s3-bucket}
-            endpoint: ${cache-s3-endpoint}
-            username: ${cache-s3-access-key}
-            password: ${cache-s3-access-secret}
+            region: ${jenkins-cache-region}
+            bucket: ${jenkins-cache-bucket}
+            endpoint: ${jenkins-cache-endpoint}
+            username: ${jenkins-cache-access-key}
+            password: ${jenkins-cache-access-secret}
             threshold: 100000 # limit to 100GiB
       # for global env variables
       env-vars: |
