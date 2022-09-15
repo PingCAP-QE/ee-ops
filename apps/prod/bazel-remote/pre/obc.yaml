@@ -1,0 +1,10 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: ci-bazel-remote-cache
+  namespace: apps
+spec:
+  additionalConfig:
+    maxSize: 1100Gi
+  bucketName: ci-bazel-remote-cache
+  storageClassName: ceph-bucket
