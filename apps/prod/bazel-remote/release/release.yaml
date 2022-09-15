@@ -35,6 +35,8 @@ spec:
         emptyDir: {}
     serviceMonitor:
       enabled: true
+      additionalLabels:
+        release: kps
     volumeMounts:
       - name: brc-cache
         mountPath: /cache

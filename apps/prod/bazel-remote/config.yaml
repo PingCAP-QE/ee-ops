@@ -11,7 +11,7 @@ spec:
     name: flux-system
     namespace: flux-system
   path: ./apps/staging/bazel-remote/config
-  prune: true
+  prune: false
   postBuild:
     substituteFrom:
       - kind: Secret
