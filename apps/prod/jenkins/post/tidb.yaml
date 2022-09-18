@@ -57,3 +57,14 @@ subjects:
   - kind: ServiceAccount
     name: jenkins
     namespace: apps
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: bazel
+  namespace: jenkins-tidb
+type: Opaque
+stringData:
+  bazel:
+    build:ci --remote_cache=http://brc-bazel-remote.apps.svc
+    --remote_timeout="10s"
