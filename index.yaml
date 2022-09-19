@@ -1,6 +1,80 @@
 apiVersion: v1
 entries:
+  bazel-remote:
+  - apiVersion: v2
+    appVersion: v2.3.8
+    created: "2022-09-19T10:17:09.81421822Z"
+    description: Helm chart to deploy [bazel-remote](https://github.com/buchgr/bazel-remote).
+    digest: 10ee215476615d7245754f195ade3b8e8b554b94c06d350f1e122765754743cf
+    home: https://github.com/slamdev/helm-charts/tree/master/charts/bazel-remote
+    icon: https://bazel.build/images/bazel-icon.svg
+    maintainers:
+    - email: valentin.fedoskin@gmail.com
+      name: slamdev
+    name: bazel-remote
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/bazel-remote-0.0.3/bazel-remote-0.0.3.tgz
+    version: 0.0.3
+  jenkins:
+  - annotations:
+      artifacthub.io/images: |
+        - name: jenkins
+          image: jenkins/jenkins:2.346.3-jdk11
+        - name: k8s-sidecar
+          image: kiwigrid/k8s-sidecar:1.15.0
+        - name: inbound-agent
+          image: jenkins/inbound-agent:4.11.2-4
+        - name: backup
+          image: maorfr/kube-tasks:0.2.0
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/jenkinsci/helm-charts/tree/main/charts/jenkins
+        - name: Jenkins
+          url: https://www.jenkins.io/
+    apiVersion: v2
+    appVersion: 2.346.3
+    created: "2022-09-19T10:17:09.966030605Z"
+    description: Jenkins - Build great things at any scale! The leading open source
+      automation server, Jenkins provides hundreds of plugins to support building,
+      deploying and automating any project.
+    digest: 1147c7e72d65c6b50a2abbba44ce865a85adec45555417eadcd03ec93b0bdb82
+    home: https://jenkins.io/
+    icon: https://get.jenkins.io/art/jenkins-logo/logo.svg
+    maintainers:
+    - email: wuhuizuo@gmail.com
+      name: wuhuizuo
+    name: jenkins
+    sources:
+    - https://github.com/jenkinsci/jenkins
+    - https://github.com/jenkinsci/docker-inbound-agent
+    - https://github.com/maorfr/kube-tasks
+    - https://github.com/jenkinsci/configuration-as-code-plugin
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/jenkins-4.1.21/jenkins-4.1.21.tgz
+    version: 4.1.21
   prow:
+  - apiVersion: v2
+    appVersion: v20220504-0b3a7e15f4
+    created: "2022-09-19T10:17:10.137445155Z"
+    dependencies:
+    - name: prow-crd
+      repository: ""
+      version: 0.1.0
+    - name: minio
+      repository: https://charts.bitnami.com/bitnami
+      version: 11.9.2
+    description: 'A Helm chart for deploying Prow in self kubernetes cluster with
+      S3 storage served by minio. '
+    digest: 7ede15ce817c6cec13e4b818ce3774ea2b3c8fab023205d0fb205659428f0a52
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: prow
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-0.1.2/prow-0.1.2.tgz
+    version: 0.1.2
   - apiVersion: v2
     appVersion: v20220504-0b3a7e15f4
     created: "2022-06-28T07:42:54.199175915Z"
@@ -57,4 +131,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2022-06-28T07:42:54.199191415Z"
+generated: "2022-09-19T10:17:10.137460655Z"
