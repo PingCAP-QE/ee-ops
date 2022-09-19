@@ -4,8 +4,6 @@ metadata:
   labels:
     app.kubernetes.io/component: jenkins-controller
     app.kubernetes.io/instance: jenkins
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: jenkins
   name: jenkins-schedule-agents
 rules:
   - apiGroups:
