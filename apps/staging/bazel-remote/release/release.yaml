@@ -50,7 +50,7 @@ spec:
       s3_proxy:
         endpoint: "${BUCKET_HOST}:${BUCKET_PORT}"
         bucket: ${BUCKET_NAME}
-        prefix: bazel/cache-
+        prefix: data
         disable_ssl: true
         auth_method: access_key
         access_key_id: ${AWS_ACCESS_KEY_ID}
