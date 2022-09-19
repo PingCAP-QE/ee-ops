@@ -1,0 +1,7 @@
+reviewers:
+  - mahjonp
+  - purelind
+approvers:
+  - wuhuizuo
+labels:
+  - area/apps/prod
