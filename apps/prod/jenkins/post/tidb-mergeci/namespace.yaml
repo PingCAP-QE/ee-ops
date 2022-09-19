@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: jenkins-ci-default
+  name: jenkins-mergeci
   annotations:
     scheduler.alpha.kubernetes.io/defaultTolerations:
       '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated",
