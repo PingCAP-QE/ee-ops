@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - obc.yaml
   - secret.yaml
+  - cronjobs.yaml
