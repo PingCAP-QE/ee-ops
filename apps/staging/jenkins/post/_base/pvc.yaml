@@ -41,10 +41,3 @@ spec:
       storage: 50Gi
   storageClassName: ceph-filesystem
   volumeMode: Filesystem
-status:
-  accessModes:
-    - ReadWriteMany
-  capacity:
-    storage: 50Gi
----
-
