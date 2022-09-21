@@ -10,5 +10,5 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/staging/bazel-remote/pre
+  path: ./apps/prod/bazel-remote/pre
   prune: true
