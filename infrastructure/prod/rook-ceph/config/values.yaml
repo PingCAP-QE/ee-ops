@@ -1,0 +1,130 @@
+cephBlockPools:
+  - name: ceph-blockpool
+    spec:
+      failureDomain: host
+      replicated:
+        size: 3
+    storageClass:
+      allowVolumeExpansion: true
+      enabled: true
+      isDefault: false
+      mountOptions: []
+      name: ceph-block
+      parameters:
+        csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
+        csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+        csi.storage.k8s.io/fstype: ext4
+        csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+        csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+        csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
+        csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+        imageFeatures: layering
+        imageFormat: "2"
+      reclaimPolicy: Delete
+cephClusterSpec:
+  cephVersion:
+    image: quay.io/ceph/ceph:v17.2.3
+  cleanupPolicy:
+    dataSource: zero
+    iteration: 1
+    method: quick
+  dashboard:
+    enabled: true
+    ssl: true
+  dataDirHostPath: /var/lib/rook
+  mon:
+    allowMultiplePerNode: false
+    count: 3
+  storage:
+    config:
+      osdsPerDevice: "5"
+    deviceFilter: nvme3n1
+    nodes:
+      - name: 10.2.12.13
+      - name: 10.2.12.20
+      - name: 10.2.12.21
+    onlyApplyOSDPlacement: false
+    useAllDevices: false
+    useAllNodes: false
+cephFileSystemVolumeSnapshotClass:
+  annotations: {}
+  deletionPolicy: Delete
+  enabled: false
+  isDefault: true
+  labels: {}
+  name: ceph-filesystem
+  parameters: {}
+cephFileSystems:
+  - name: ceph-filesystem
+    spec:
+      dataPools:
+        - failureDomain: host
+          name: data0
+          replicated:
+            size: 3
+      metadataPool:
+        replicated:
+          size: 3
+      metadataServer:
+        activeCount: 1
+        activeStandby: true
+        priorityClassName: system-cluster-critical
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 1000m
+            memory: 4Gi
+    storageClass:
+      allowVolumeExpansion: true
+      enabled: true
+      isDefault: false
+      mountOptions: []
+      name: ceph-filesystem
+      parameters:
+        csi.storage.k8s.io/controller-expand-secret-name: rook-csi-cephfs-provisioner
+        csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
+        csi.storage.k8s.io/fstype: ext4
+        csi.storage.k8s.io/node-stage-secret-name: rook-csi-cephfs-node
+        csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+        csi.storage.k8s.io/provisioner-secret-name: rook-csi-cephfs-provisioner
+        csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+      pool: data0
+      reclaimPolicy: Delete
+cephObjectStores:
+  - name: ceph-objectstore
+    spec:
+      dataPool:
+        erasureCoded:
+          codingChunks: 1
+          dataChunks: 2
+        failureDomain: host
+      gateway:
+        instances: 3
+        port: 80
+        priorityClassName: system-cluster-critical
+        resources:
+          limits:
+            cpu: 4000m
+            memory: 4Gi
+          requests:
+            cpu: 1000m
+            memory: 1Gi
+      healthCheck:
+        bucket:
+          interval: 60s
+      metadataPool:
+        failureDomain: host
+        replicated:
+          size: 3
+      preservePoolsOnDelete: true
+    storageClass:
+      enabled: true
+      name: ceph-bucket
+      parameters:
+        region: us-east-1
+      reclaimPolicy: Delete
+operatorNamespace: rook-ceph
+toolbox:
+  enabled: true
