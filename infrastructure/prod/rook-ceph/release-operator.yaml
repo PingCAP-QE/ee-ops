@@ -21,6 +21,16 @@ spec:
   values:
     csi:
       kubeletDirPath: /data/nvme0n1/kubelet
+      provisionerTolerations:
+        - key: dedicated
+          operator: Equal
+          value: test-infra
+          effect: NoSchedule
+      pluginTolerations:
+        - key: dedicated
+          operator: Equal
+          value: test-infra
+          effect: NoSchedule
     logLevel: INFO
     monitoring:
       enabled: true
