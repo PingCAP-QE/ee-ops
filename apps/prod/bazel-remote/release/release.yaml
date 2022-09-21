@@ -31,11 +31,11 @@ spec:
   values:
     replicaCount: 2
     resources:
-      limits:
-        cpu: "1"
-        memory: 1Gi
       requests:
         cpu: "1"
+        memory: 1Gi
+      limits:
+        cpu: "2"
         memory: 16Gi
     volumes:
       - name: brc-cache
