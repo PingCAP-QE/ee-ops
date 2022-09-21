@@ -21,6 +21,8 @@ spec:
   values:
     csi:
       kubeletDirPath: /data/nvme0n1/kubelet
+      pluginNodeAffinity: enable-ci=true
+      provisionerNodeAffinity: enable-ci=true
       provisionerTolerations:
         - key: dedicated
           operator: Equal
