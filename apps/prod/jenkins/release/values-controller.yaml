@@ -3,13 +3,20 @@ controller:
   resources:
     requests:
       cpu: "1"
-      memory: "1Gi"
+      memory: "8Gi"
     limits:
       cpu: "4"
-      memory: 16Gi
+      memory: 64Gi
 
+  # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
+  # current jenkins using java-11.
   # Set min/max heap here if needed with:
-  javaOpts: "-Xms1000m -Xmx15000m"
+  javaOpts: >-
+    -Xms8192m -Xmx8192m -XX:+UseG1GC -XX:+AlwaysPreTouch
+    -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled
+    -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
+    -XX:+UnlockDiagnosticVMOptions
+    -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
 
   # jenkinsOpts: ""
   # If you are using the ingress definitions provided by this chart via the `controller.ingress` block the configured hostname will be the ingress hostname starting with `https://` or `http://` depending on the `tls` configuration.
