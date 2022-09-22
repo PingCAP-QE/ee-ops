@@ -29,7 +29,7 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 2
+    replicaCount: 4
     resources:
       requests:
         cpu: "1"
@@ -50,7 +50,7 @@ spec:
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /cache
-      max_size: 50
+      max_size: 500
       http_address: 0.0.0.0:8080
       grpc_address: 0.0.0.0:9092
       experimental_remote_asset_api: true
