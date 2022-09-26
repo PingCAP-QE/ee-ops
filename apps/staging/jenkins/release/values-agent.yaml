@@ -1,5 +1,5 @@
 agent:
   maxRequestsPerHostStr: "50" # need to restart controller after updated it.
   namespace: jenkins-ci-default
-  podRetention: OnFailure
+  podRetention: Never
   containerCap: 50
