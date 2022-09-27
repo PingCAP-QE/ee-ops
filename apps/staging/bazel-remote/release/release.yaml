@@ -30,6 +30,13 @@ spec:
     ignoreFailures: false
   values:
     replicaCount: 2
+    resources:
+      requests:
+        cpu: "100m"
+        memory: 100Mi
+      limits:
+        cpu: "2"
+        memory: 4Gi
     volumes:
       - name: brc-cache
         emptyDir: {}
@@ -41,7 +48,7 @@ spec:
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /cache
-      max_size: 50
+      max_size: 100
       http_address: 0.0.0.0:8080
       grpc_address: 0.0.0.0:9092
       experimental_remote_asset_api: true
