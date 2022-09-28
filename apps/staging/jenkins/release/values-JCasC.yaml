@@ -143,7 +143,7 @@ controller:
                 }
                 steps {
                   jobDsl {
-                    targets('jobs/**/*.groovy')
+                    targets('staging/jobs/**/*.groovy')
                     failOnMissingPlugin(false)
                     ignoreMissingFiles(true)
                     ignoreExisting(false)
