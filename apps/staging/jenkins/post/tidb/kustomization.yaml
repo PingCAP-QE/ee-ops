@@ -4,3 +4,4 @@ namespace: jenkins-tidb
 resources:
   - namespace.yaml
   - ../_base
+  - pvc.yaml
