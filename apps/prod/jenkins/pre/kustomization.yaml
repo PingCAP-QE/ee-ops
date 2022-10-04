@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - pre.yaml
-  - release.yaml
-  - post.yaml
+  - obc.yaml
+  - secret.yaml
+  - cronjobs.yaml
