@@ -202,7 +202,7 @@ controller:
             endpoint: ${cache-s3-endpoint}
             username: ${cache-s3-access-key}
             password: ${cache-s3-access-secret}
-            threshold: 100000 # limit to 100GiB
+            threshold: 200000 # limit to 100GiB
       # for global env variables
       env-vars: |
         jenkins:
