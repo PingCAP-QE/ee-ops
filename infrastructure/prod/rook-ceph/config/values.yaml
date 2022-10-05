@@ -23,7 +23,7 @@ cephBlockPools:
       reclaimPolicy: Delete
 cephClusterSpec:
   cephVersion:
-    image: quay.io/ceph/ceph:v17.2.3
+    image: quay.io/ceph/ceph:v17.2.4
   cleanupPolicy:
     dataSource: zero
     iteration: 1
