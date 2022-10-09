@@ -8,12 +8,13 @@
   },
   "regexManagers": [
     {
-      "fileMatch": [".*-plugins\\.yaml$$"],
+      "fileMatch": [
+        ".*-plugins\\.yaml$$"
+      ],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*url: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+      ]
     }
   ]
 }
