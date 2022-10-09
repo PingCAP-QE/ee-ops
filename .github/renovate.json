@@ -14,7 +14,8 @@
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*url: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
-      ]
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}maven{{/if}}"
     }
   ]
 }
