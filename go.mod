@@ -1,3 +1,3 @@
 module github.com/PingCAP-QE/ee-ops
 
-go 1.18
+go 1.19
