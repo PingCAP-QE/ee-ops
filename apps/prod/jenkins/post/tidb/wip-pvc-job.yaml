@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: xxx
+  namespace: jenkins-tidb
+spec:
+  restartPolicy: "Never"
+  securityContext:
+    fsGroup: 1000
+  containers:
+    - name: golang
+      image: "<current-bumped-bazel-image>"
+      tty: true
+      resources:
+        limits:
+          memory: "1Gi"
+          cpu: "1"
+        requests:
+          memory: "1Gi"
+          cpu: "1"
+      volumeMounts:
+        - mountPath: /bazel-data
+          name: "bazel-out-data"
+  volumes:
+    - name: bazel-out-data
+      persistentVolumeClaim:
+        claimName: bazel-out-data
+# in container, run:
+#   mkdir -p /bazel-data/tidb/go<ver>
+#   cp -r /home/jenkins/.tidb/tmp/* /bazel-data/tidb/go<ver>/
