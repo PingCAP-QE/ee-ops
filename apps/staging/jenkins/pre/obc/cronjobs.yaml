@@ -9,11 +9,10 @@ spec:
     spec:
       template:
         spec:
-          restartPolicy: OnFailure
+          restartPolicy: Never
           containers:
             - name: deno
               image: "denoland/deno:1.25.1"
-              tty: true
               args:
                 - run
                 - --allow-all

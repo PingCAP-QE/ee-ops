@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: shrink-ci-bazel-remote-cache
+  namespace: apps
+spec:
+  schedule: "@hourly"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: deno
+              image: "denoland/deno:1.26.1"
+              args:
+                - run
+                - --v8-flags=--max-old-space-size=8000
+                - --unstable
+                - --allow-all
+                - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/s3-cache.ts
+                - --op=shrink
+                - --key-prefix=data
+                - --keep-size-g=1000
+              envFrom:
+                - secretRef:
+                    name: ci-bazel-remote-cache
+                - configMapRef:
+                    name: ci-bazel-remote-cache
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                # limits:
+                #   memory: "2Gi" # about up to 3M object metas to store in list.
+                #   cpu: "1"
