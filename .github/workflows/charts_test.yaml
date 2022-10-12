@@ -58,8 +58,6 @@ jobs:
           orgName=$(dirname ${{ github.event.repository.full_name }})
           yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
 
-          cat values.yaml
-
       - name: Run chart-testing (install)
         run: |
           ct install \

@@ -401,7 +401,7 @@ jenkinsOperator:
 
   auth:
     # store auth secret contents.
-    secretName: "jenkins"
+    secretName: ""
 
     # Basic auth and bearer token are mutually exclusive options whereas cert-based auth is complementary to both of them.
     #

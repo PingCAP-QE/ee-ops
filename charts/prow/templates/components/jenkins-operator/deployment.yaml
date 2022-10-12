@@ -40,18 +40,35 @@ spec:
             - --csrf-protect={{ .Values.jenkinsOperator.csrfProtect }}
             - --jenkins-url={{ .Values.jenkinsOperator.jenkinsUrl }}
             - --config-path=/etc/config/config.yaml
+            {{- with .Values.jenkinsOperator.auth }}{{- if .secretName }}
+
             {{/* basic auth */}}
-            - --jenkins-user="$(JENKINS_AUTH_BASIC_USER)"
+            {{- if .secretKeyJenkinsUser }}
+            - --jenkins-user="$(JENKINS_AUTH_BASIC_USER)"            
+            {{- end }}
+            {{- if .secretKeyJenkinsToken }}
             - --jenkins-token-file="$(JENKINS_AUTH_BASIC_TOKEN_FILE)"
+            {{- end }}
+
             {{/* bearer token auth */}}
+            {{- if .secretKeyJenkinsBearerToken }}            
             - --jenkins-bearer-token-file="$(JENKINS_AUTH_BEARER_TOKEN_FILE)"
+            {{- end }}
+                     
             {{/* cert auth */}}
-            - --cert-file="$(JENKINS_AUTH_CERT_FILE)"
+            {{- if .secretKeyCert }}
+            - --cert-file="$(JENKINS_AUTH_CERT_FILE)" 
+            {{- end }}
+            {{- if .secretKeyKey }}
             - --key-file="$(JENKINS_AUTH_KEY_FIEL)"
+            {{- end }}
+            {{- if .secretKeyCaCert }}
             - --ca-cert-file="$(JENKINS_AUTH_CA_CERT_FILE)"
+            {{- end }}
+
+            {{- end }}{{- end }}
           env:
-            {{- if .Values.jenkinsOperator.auth.secretName }}
-            {{- with .Values.jenkinsOperator.auth }}
+            {{- with .Values.jenkinsOperator.auth }}{{- if .secretName }}
             {{- if .secretKeyJenkinsUser }}
             - name: JENKINS_AUTH_BASIC_USER
               valueFrom:
@@ -79,9 +96,7 @@ spec:
             - name: JENKINS_AUTH_CA_CERT_FILE
               value: /etc/jenkins/{{ . }}
             {{- end }}
-            {{- end }}
-            {{- else }}[]
-            {{- end }}
+            {{- end }}{{- end }}
           volumeMounts:
             - name: config
               mountPath: /etc/config
