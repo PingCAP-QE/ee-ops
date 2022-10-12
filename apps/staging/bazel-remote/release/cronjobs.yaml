@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: shrink-ci-pipeline-cache
+  name: shrink-ci-bazel-remote-cache
   namespace: apps
 spec:
   schedule: "@hourly"
@@ -9,26 +9,26 @@ spec:
     spec:
       template:
         spec:
-          restartPolicy: OnFailure
+          restartPolicy: Never
           containers:
             - name: deno
-              image: "denoland/deno:1.25.1"
-              tty: true
+              image: "denoland/deno:1.26.1"
               args:
                 - run
                 - --allow-all
                 - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/s3-cache.ts
                 - --op=shrink
-                - --keep-size-g=100
+                - --key-prefix=data
+                - --keep-size-g=1000
               envFrom:
                 - secretRef:
-                    name: ci-pipeline-cache
+                    name: ci-bazel-remote-cache
                 - configMapRef:
-                    name: ci-pipeline-cache
+                    name: ci-bazel-remote-cache
               resources:
                 requests:
-                  memory: "128Mi"
                   cpu: "100m"
+                  memory: "512Mi" # 1M * 512B(average for each key)
                 limits:
-                  memory: "512Mi"
-                  cpu: "500m"
+                  cpu: "1"
+                  memory: "1Gi"
