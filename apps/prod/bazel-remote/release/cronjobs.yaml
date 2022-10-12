@@ -26,7 +26,7 @@ spec:
                 - configMapRef:
                     name: ci-bazel-remote-cache
               resources:
-                requires:
+                requests:
                   cpu: "100m"
                   memory: "1536Mi" # 3M * 512B(average for each key)
                 limits:
