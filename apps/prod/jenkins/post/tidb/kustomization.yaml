@@ -5,4 +5,4 @@ resources:
   - namespace.yaml
   - ../_base
   - pvc.yaml
-  - pvc.job
+  - pvc-job.yaml
