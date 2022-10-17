@@ -57,14 +57,16 @@ jobs:
   #     - name: Setup secret for prow
   #       run: |
   #         echo "${{ secrets.PROW_APP_CERT }}" > github-app.cert
+  #         echo "${{ secrets.GITHUB_TOKEN }}" > github-oauth-token.txt
 
   #         kubectl -n apps create secret generic github-app-prow \
   #           --from-literal domain-name=prow.test.io \
   #           --from-literal app-id="${{ secrets.PROW_APP_ID }}" \
   #           --from-file    app-cert=github-app.cert \
+  #           --from-file    oauth=github-oauth-token.txt \
   #           --from-literal webhook-secret="${{ secrets.PROW_HMAC_TOKEN }}"
 
-  #         rm github-app.cert
+  #         rm github-app.cert github-oauth-token.txt
   #     - name: Setup secret for tekton
   #       run: |
   #         kubectl -n apps create secret generic tekton-ingress \

@@ -66,6 +66,7 @@ jobs:
           yq -i e '.prow.domainName = "prow.test.io"' values.yaml
           yq -i e '.prow.githubAppId = "${{ secrets.PROW_APP_ID }}"' values.yaml
           yq -i e '.prow.githubAppCert = "${{ secrets.PROW_APP_CERT }}" | .prow.githubAppCert style="double"' values.yaml
+          yq -i e '.prow.githubOauthToken = "${{ secrets.GITHUB_TOKEN }}"' values.yaml
           yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' values.yaml
           orgName=$(dirname ${{ github.event.repository.full_name }})
           yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml

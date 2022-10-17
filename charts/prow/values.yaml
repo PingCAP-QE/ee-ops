@@ -19,8 +19,11 @@ prow:
   podsNamespace: default
 
   domainName: << REPLACE >>
+  # one type of github app:
   githubAppId: << REPLACE >>
   githubAppCert: << REPLACE >>
+  # or oauth:
+  githubOauthToken: << REPLACE >>
   # Generate via `openssl rand -hex 20`.
   # This is the secret used in the GitHub webhook configuration
   githubHmacToken: << REPLACE >>

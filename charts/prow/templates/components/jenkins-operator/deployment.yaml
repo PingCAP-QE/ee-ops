@@ -36,8 +36,7 @@ spec:
           image: "{{ .Values.jenkinsOperator.image.repository }}:{{ .Values.jenkinsOperator.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.jenkinsOperator.image.pullPolicy }}
           args:
-            - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert
+            - --github-token-path=/etc/github/oauth
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --skip-report={{ .Values.jenkinsOperator.skipReport }}
             - --dry-run={{ .Values.jenkinsOperator.dryRun }}
@@ -48,7 +47,7 @@ spec:
 
             {{/* basic auth */}}
             {{- if .secretKeyJenkinsUser }}
-            - --jenkins-user="$(JENKINS_AUTH_BASIC_USER)"            
+            - --jenkins-user="$(JENKINS_AUTH_BASIC_USER)"
             {{- end }}
             {{- if .secretKeyJenkinsToken }}
             - --jenkins-token-file="$(JENKINS_AUTH_BASIC_TOKEN_FILE)"
@@ -72,11 +71,6 @@ spec:
 
             {{- end }}{{- end }}
           env:
-            - name: GITHUB_APP_ID
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "prow.fullname" . }}-github-token
-                  key: appid
             {{- with .Values.jenkinsOperator.auth }}{{- if .secretName }}
             {{- if .secretKeyJenkinsUser }}
             - name: JENKINS_AUTH_BASIC_USER
