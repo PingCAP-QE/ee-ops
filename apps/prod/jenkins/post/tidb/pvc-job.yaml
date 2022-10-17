@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: update-bazel-local-data-go1.19.2
+  namespace: jenkins-tidb
+spec:
+  template:
+    spec:
+      restartPolicy: "Never"
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: golang
+          image: "hub.pingcap.net/wangweizhen/tidb_image:go11920221013"
+          command:
+            - /bin/bash
+            - -exec
+          args:
+            - |
+              mkdir -p /bazel-data/tidb/go.new
+              cp -r /home/jenkins/.tidb/tmp/* /bazel-data/tidb/go.new
+              rm -rf /bazel-data/tidb/go.new/install/* # need delete.
+
+              if [ -d /bazel-data/tidb/go$(GO_VER) ]; then
+                mv /bazel-data/tidb/go$(GO_VER) /bazel-data/tidb/go.old
+                mv /bazel-data/tidb/go.new /bazel-data/tidb/go$(GO_VER)
+                sudo rm -rf /bazel-data/tidb/go.old
+              else
+                mv /bazel-data/tidb/go.new /bazel-data/tidb/go$(GO_VER)
+              fi
+
+              echo "done."
+          env:
+            - name: GO_VER
+              value: "1.19.2"
+          resources:
+            limits:
+              memory: "100Mi"
+              cpu: "100m"
+            requests:
+              memory: "1Gi"
+              cpu: "1"
+          volumeMounts:
+            - mountPath: /bazel-data
+              name: "bazel-out-data"
+      volumes:
+        - name: bazel-out-data
+          persistentVolumeClaim:
+            claimName: bazel-out-data
