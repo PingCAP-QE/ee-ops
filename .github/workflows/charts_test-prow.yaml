@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - "charts/**"
+      - "charts/prow/**"
       - ".github/workflows/chart*"
 jobs:
   chart-test:
@@ -51,36 +51,35 @@ jobs:
       - name: Add test optional files for charts/prow
         working-directory: charts/prow/templates
         run: |
-          cat <<EOF > secret-jenkins.yaml
+          kubectl create ns prow
+          kubectl apply -f - <<EOF > cat
           apiVersion: v1
           kind: Secret
           metadata:
             name: jenkins
-            namespace: {{ .Release.Namespace }}
+            namespace: prow
           stringData:
-            user: test
-            password: test
+            jenkins-admin-user: test
+            jenkins-admin-password: test
           EOF
       - name: Replace fields in `charts/prow/values.yaml`
-        working-directory: charts/prow
         run: |
-          yq -i e '.prow.domainName = "prow.test.io"' values.yaml
-          yq -i e '.prow.githubAppId = "${{ secrets.PROW_APP_ID }}"' values.yaml
-          yq -i e '.prow.githubAppCert = "${{ secrets.PROW_APP_CERT }}" | .prow.githubAppCert style="double"' values.yaml
-          yq -i e '.prow.githubOauthToken = "${{ secrets.GITHUB_TOKEN }}"' values.yaml
-          yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' values.yaml
+          yq -i e '.prow.domainName = "prow.test.io"' ct-values.yaml
+          yq -i e '.prow.githubAppId = "${{ secrets.PROW_APP_ID }}"' ct-values.yaml
+          yq -i e '.prow.githubAppCert = "${{ secrets.PROW_APP_CERT }}" | .prow.githubAppCert style="double"' ct-values.yaml
+          yq -i e '.prow.githubOauthToken = "${{ secrets.GITHUB_TOKEN }}"' ct-values.yaml
+          yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' ct-values.yaml
           orgName=$(dirname ${{ github.event.repository.full_name }})
-          yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
+          yq -i e ".prow.githubOrg = \"${orgName}\"" ct-values.yaml
 
           # yq -i e '.jenkinsOperator.enabled = true' values.yaml
           # yq -i e '.jenkinsOperator.auth.secretName = "jenkins"' values.yaml
           # yq -i e '.jenkinsOperator.dryRun = false' values.yaml
-          # yq -i e '.jenkinsOperator.auth.secretKeyJenkinsUser = "user"' values.yaml
-          # yq -i e '.jenkinsOperator.auth.secretKeyJenkinsToken = "password"' values.yaml
-
       - name: Run chart-testing (install)
-        run: |
-          ct install \
-            --all \
-            --debug \
-            --chart-repos "bitnami=https://charts.bitnami.com/bitnami"
+        run: >
+          ct install 
+            --charts charts/prow 
+            --chart-repos "bitnami=https://charts.bitnami.com/bitnami" 
+            --helm-extra-set-args '-f ct-values.yaml'
+            --namespace prow
+            --debug
