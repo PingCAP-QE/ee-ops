@@ -1,4 +1,4 @@
-name: Charts Test
+name: Charts Test - Prow
 
 on:
   pull_request:
@@ -62,8 +62,9 @@ jobs:
             jenkins-admin-user: test
             jenkins-admin-password: test
           EOF
-      - name: Replace fields in `charts/prow/values.yaml`
+      - name: Prepare custom values file for chart testing`
         run: |
+          touch ct-values.yaml
           yq -i e '.prow.domainName = "prow.test.io"' ct-values.yaml
           yq -i e '.prow.githubAppId = "${{ secrets.PROW_APP_ID }}"' ct-values.yaml
           yq -i e '.prow.githubAppCert = "${{ secrets.PROW_APP_CERT }}" | .prow.githubAppCert style="double"' ct-values.yaml
@@ -72,14 +73,14 @@ jobs:
           orgName=$(dirname ${{ github.event.repository.full_name }})
           yq -i e ".prow.githubOrg = \"${orgName}\"" ct-values.yaml
 
-          # yq -i e '.jenkinsOperator.enabled = true' values.yaml
-          # yq -i e '.jenkinsOperator.auth.secretName = "jenkins"' values.yaml
-          # yq -i e '.jenkinsOperator.dryRun = false' values.yaml
+          yq -i e '.jenkinsOperator.enabled = true' ct-values.yaml
+          yq -i e '.jenkinsOperator.auth.secretName = "jenkins"' ct-values.yaml
+          yq -i e '.jenkinsOperator.dryRun = false' ct-values.yaml
       - name: Run chart-testing (install)
-        run: >
-          ct install 
-            --charts charts/prow 
-            --chart-repos "bitnami=https://charts.bitnami.com/bitnami" 
-            --helm-extra-set-args '-f ct-values.yaml'
-            --namespace prow
+        run: |
+          ct install \
+            --charts charts/prow \
+            --chart-repos "bitnami=https://charts.bitnami.com/bitnami" \
+            --helm-extra-set-args '-f ct-values.yaml' \
+            --namespace prow \
             --debug

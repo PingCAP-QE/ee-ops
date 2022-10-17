@@ -48,10 +48,10 @@ spec:
 
             {{/* basic auth */}}
             {{- if .secretKeyJenkinsUser }}
-            - --jenkins-user="$(JENKINS_AUTH_BASIC_USER)"
+            - --jenkins-user=$(JENKINS_AUTH_BASIC_USER)
             {{- end }}
             {{- if .secretKeyJenkinsToken }}
-            - --jenkins-token-file="$(JENKINS_AUTH_BASIC_TOKEN_FILE)"
+            - --jenkins-token-file=$(JENKINS_AUTH_BASIC_TOKEN_FILE)
             {{- end }}
 
             {{/* bearer token auth */}}
