@@ -48,6 +48,18 @@ jobs:
           # renovate: datasource=go depName=sigs.k8s.io/kind
           version: v0.12.0
 
+      - name: Add test optional files for charts/prow
+        working-directory: charts/prow
+        run: |
+          cat <<EOF > secret-jenkins.yaml
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: jenkins
+          stringData:
+              user: test
+              password: test
+          EOF
       - name: Replace fields in `charts/prow/values.yaml`
         working-directory: charts/prow
         run: |
@@ -57,6 +69,9 @@ jobs:
           yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' values.yaml
           orgName=$(dirname ${{ github.event.repository.full_name }})
           yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
+          yq -i e '.jenkinsOperator.auth.secretName = "jenkins"' values.yaml
+          yq -i e '.jenkinsOperator.auth.secretKeyJenkinsUser = "user"' values.yaml
+          yq -i e '.jenkinsOperator.auth.secretKeyJenkinsToken = "password"' values.yaml
 
       - name: Run chart-testing (install)
         run: |

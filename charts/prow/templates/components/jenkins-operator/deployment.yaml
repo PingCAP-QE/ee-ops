@@ -26,6 +26,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      serviceAccountName: {{ include "prow.serviceAccountName.jenkinsoperator" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -35,6 +36,9 @@ spec:
           image: "{{ .Values.jenkinsOperator.image.repository }}:{{ .Values.jenkinsOperator.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.jenkinsOperator.image.pullPolicy }}
           args:
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
+            - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --skip-report={{ .Values.jenkinsOperator.skipReport }}
             - --dry-run={{ .Values.jenkinsOperator.dryRun }}
             - --csrf-protect={{ .Values.jenkinsOperator.csrfProtect }}
@@ -68,6 +72,11 @@ spec:
 
             {{- end }}{{- end }}
           env:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "prow.fullname" . }}-github-token
+                  key: appid
             {{- with .Values.jenkinsOperator.auth }}{{- if .secretName }}
             {{- if .secretKeyJenkinsUser }}
             - name: JENKINS_AUTH_BASIC_USER
@@ -101,6 +110,9 @@ spec:
             - name: config
               mountPath: /etc/config
               readOnly: true
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
             {{- if .Values.jenkinsOperator.auth.secretName }}
             - name: jenkins-auth
               mountPath: /etc/jenkins
@@ -112,6 +124,9 @@ spec:
         - name: config
           configMap:
             name: {{ include "prow.fullname" . }}-config
+        - name: github-token
+          secret:
+            secretName: {{ include "prow.fullname" . }}-github-token
         {{- with .Values.jenkinsOperator.auth.secretName }}
         - name: jenkins-auth
           secret:
