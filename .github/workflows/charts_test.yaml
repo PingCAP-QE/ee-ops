@@ -49,7 +49,7 @@ jobs:
           version: v0.12.0
 
       - name: Add test optional files for charts/prow
-        working-directory: charts/prow
+        working-directory: charts/prow/templates
         run: |
           cat <<EOF > secret-jenkins.yaml
           apiVersion: v1
@@ -71,6 +71,7 @@ jobs:
           orgName=$(dirname ${{ github.event.repository.full_name }})
           yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
           yq -i e '.jenkinsOperator.auth.secretName = "jenkins"' values.yaml
+          yq -i e '.jenkinsOperator.dryRun = false' values.yaml
           yq -i e '.jenkinsOperator.auth.secretKeyJenkinsUser = "user"' values.yaml
           yq -i e '.jenkinsOperator.auth.secretKeyJenkinsToken = "password"' values.yaml
 
