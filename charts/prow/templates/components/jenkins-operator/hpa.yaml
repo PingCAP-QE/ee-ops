@@ -1,3 +1,4 @@
+{{- if .Values.jenkinsOperator.enabled }}
 {{- if .Values.jenkinsOperator.autoscaling.enabled }}
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
@@ -13,16 +14,17 @@ spec:
   minReplicas: {{ .Values.jenkinsOperator.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.jenkinsOperator.autoscaling.maxReplicas }}
   metrics:
-    {{- if .Values.jenkinsOperator.autoscaling.targetCPUUtilizationPercentage }}
+    {{- with .Values.jenkinsOperator.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: {{ .Values.jenkinsOperator.autoscaling.targetCPUUtilizationPercentage }}
+        targetAverageUtilization: {{ . }}
     {{- end }}
-    {{- if .Values.jenkinsOperator.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- with .Values.jenkinsOperator.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: {{ .Values.jenkinsOperator.autoscaling.targetMemoryUtilizationPercentage }}
+        targetAverageUtilization: {{ . }}
     {{- end }}
+{{- end }}
 {{- end }}

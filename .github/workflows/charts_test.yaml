@@ -56,9 +56,10 @@ jobs:
           kind: Secret
           metadata:
             name: jenkins
+            namespace: {{ .Release.Namespace }}
           stringData:
-              user: test
-              password: test
+            user: test
+            password: test
           EOF
       - name: Replace fields in `charts/prow/values.yaml`
         working-directory: charts/prow
@@ -70,10 +71,12 @@ jobs:
           yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' values.yaml
           orgName=$(dirname ${{ github.event.repository.full_name }})
           yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
-          yq -i e '.jenkinsOperator.auth.secretName = "jenkins"' values.yaml
-          yq -i e '.jenkinsOperator.dryRun = false' values.yaml
-          yq -i e '.jenkinsOperator.auth.secretKeyJenkinsUser = "user"' values.yaml
-          yq -i e '.jenkinsOperator.auth.secretKeyJenkinsToken = "password"' values.yaml
+
+          # yq -i e '.jenkinsOperator.enabled = true' values.yaml
+          # yq -i e '.jenkinsOperator.auth.secretName = "jenkins"' values.yaml
+          # yq -i e '.jenkinsOperator.dryRun = false' values.yaml
+          # yq -i e '.jenkinsOperator.auth.secretKeyJenkinsUser = "user"' values.yaml
+          # yq -i e '.jenkinsOperator.auth.secretKeyJenkinsToken = "password"' values.yaml
 
       - name: Run chart-testing (install)
         run: |
