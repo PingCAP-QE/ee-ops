@@ -81,6 +81,13 @@ full name for component pipeline
 {{- end }}
 
 {{/*
+full name for component jenkins-operator
+*/}}
+{{- define "prow.fullname.jenkinsoperator" -}}
+{{ include "prow.fullname" . }}-jenkins-operator
+{{- end }}
+
+{{/*
 full name for component statusReconciler
 */}}
 {{- define "prow.fullname.statusReconciler" -}}
@@ -178,6 +185,14 @@ app.kubernetes.io/app: pipeline
 {{- end }}
 
 {{/*
+Labels for jenkins operator
+*/}}
+{{- define "prow.labels.jenkinsoperator" -}}
+{{ include "prow.labels" . }}
+app.kubernetes.io/app: jenkins-operator
+{{- end }}
+
+{{/*
 Labels for status-reconciler
 */}}
 {{- define "prow.labels.statusReconciler" -}}
@@ -267,6 +282,14 @@ app.kubernetes.io/app: pipeline
 {{- end }}
 
 {{/*
+Selector labels for jenkins operator
+*/}}
+{{- define "prow.selectorLabels.jenkinsoperator" -}}
+{{ include "prow.selectorLabels" . }}
+app.kubernetes.io/app: jenkins-operator
+{{- end }}
+
+{{/*
 Selector labels for statusReconciler
 */}}
 {{- define "prow.selectorLabels.statusReconciler" -}}
@@ -341,6 +364,14 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+{{- define "prow.serviceAccountName.jenkinsoperator" -}}
+{{- if .Values.pipeline.serviceAccount.create }}
+{{- default (include "prow.fullname.jenkinsoperator" .) .Values.jenkinsOperator.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.jenkinsOperator.serviceAccount.name }}
+{{- end }}
+{{- end }}
+
 {{- define "prow.serviceAccountName.statusReconciler" -}}
 {{- if .Values.statusReconciler.serviceAccount.create }}
 {{- default (include "prow.fullname.statusReconciler" .) .Values.statusReconciler.serviceAccount.name }}
@@ -402,6 +433,12 @@ Create the name of the role
 {{- end }}
 {{- end }}
 
+{{- define "prow.roleName.jenkinsoperator" -}}
+{{- if .Values.jenkinsOperator.serviceAccount.roleBinding.create }}
+{{- default (include "prow.fullname.jenkinsoperator" .) .Values.jenkinsOperator.serviceAccount.roleBinding.name }}
+{{- end }}
+{{- end }}
+
 {{- define "prow.roleName.statusReconciler" -}}
 {{- if .Values.statusReconciler.serviceAccount.roleBinding.create }}
 {{- default (include "prow.fullname.statusReconciler" .) .Values.statusReconciler.serviceAccount.roleBinding.name }}
@@ -457,6 +494,12 @@ Create the name of the role binding
 {{- define "prow.roleBindingName.pipeline" -}}
 {{- if .Values.pipeline.serviceAccount.roleBinding.create }}
 {{- default (include "prow.fullname.pipeline" .) .Values.pipeline.serviceAccount.roleBinding.name }}
+{{- end }}
+{{- end }}
+
+{{- define "prow.roleBindingName.jenkinsoperator" -}}
+{{- if .Values.jenkinsOperator.serviceAccount.roleBinding.create }}
+{{- default (include "prow.fullname.jenkinsoperator" .) .Values.jenkinsOperator.serviceAccount.roleBinding.name }}
 {{- end }}
 {{- end }}
 

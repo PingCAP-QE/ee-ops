@@ -64,3 +64,7 @@ tide:
     {{- end }}
 
 decorate_all_jobs: true
+
+jenkins_operators:
+  - max_concurrency: 150
+    max_goroutines: 20

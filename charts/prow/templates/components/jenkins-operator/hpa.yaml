@@ -1,0 +1,30 @@
+{{- if .Values.jenkinsOperator.enabled }}
+{{- if .Values.jenkinsOperator.autoscaling.enabled }}
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "prow.fullname.jenkinsoperator" . }}
+  labels:
+    {{- include "prow.labels.jenkinsoperator" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "prow.fullname.jenkinsoperator" . }}
+  minReplicas: {{ .Values.jenkinsOperator.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.jenkinsOperator.autoscaling.maxReplicas }}
+  metrics:
+    {{- with .Values.jenkinsOperator.autoscaling.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: {{ . }}
+    {{- end }}
+    {{- with .Values.jenkinsOperator.autoscaling.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: {{ . }}
+    {{- end }}
+{{- end }}
+{{- end }}
