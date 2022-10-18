@@ -1,3 +1,4 @@
+---
 # Default values for prow.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -18,8 +19,11 @@ prow:
   podsNamespace: default
 
   domainName: << REPLACE >>
+  # one type of github app:
   githubAppId: << REPLACE >>
   githubAppCert: << REPLACE >>
+  # or oauth:
+  githubOauthToken: << REPLACE >>
   # Generate via `openssl rand -hex 20`.
   # This is the secret used in the GitHub webhook configuration
   githubHmacToken: << REPLACE >>
@@ -372,3 +376,69 @@ pipeline:
   resources: {}
   # kubeconfigSecret: external kubeconfig secret contain keys: "config"
   kubeconfigSecret: ""
+
+jenkinsOperator:
+  enabled: false
+  image:
+    repository: gcr.io/k8s-prow/jenkins-operator
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: ""
+  replicaCount: 1
+  autoscaling:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 100
+    targetCPUUtilizationPercentage: 80
+    # targetMemoryUtilizationPercentage: 80
+  serviceAccount:
+    # Specifies whether a service account should be created
+    create: true
+    # Annotations to add to the service account
+    annotations: {}
+    # The name of the service account to use.
+    # If not set and create is true,
+    # a name is generated using the `fullname` template
+    name: ""
+    roleBinding:
+      create: true
+      name: ""
+  resources: {}
+
+  # Whether or not to make mutating API calls to GitHub/Kubernetes/Jenkins.
+  dryRun: true
+  # Whether or not to ignore report with githubClient
+  skipReport: false
+
+  # Jenkins URL
+  jenkinsUrl: http://jenkins-proxy
+  # If CSRF protection is enabled in Jenkins, --csrf-protect=true needs to be used on the operator's side to allow Prow to work correctly.
+  csrfProtect: false
+
+  auth:
+    # store auth secret contents.
+    secretName: ""
+
+    # Basic auth and bearer token are mutually exclusive options whereas cert-based auth is complementary to both of them.
+    #
+    # basic auth, using --jenkins-user and --jenkins-token-file.
+    #
+    secretKeyJenkinsUser: jenkins-admin-user
+    secretKeyJenkinsToken: jenkins-admin-password
+
+    # OpenShift bearer token auth, using --jenkins-bearer-token-file.
+    #
+    secretKeyJenkinsBearerToken: ""
+
+    # certificate-based auth, using --cert-file, --key-file, and optionally --ca-cert-file.
+    #
+    secretKeyCert: ""
+    secretKeyKey: ""
+    secretKeyCaCert: ""
+
+  # TODO(wuhuizuo): implement sharding deployment
+  # sharding:
+  #   # will add run args to each jenkins-operator intance container with `--label-selector=<key=value>`
+  #   labelSelectors:
+  #     - master=jenkins-master1
+  #     - master=jenkins-master2
