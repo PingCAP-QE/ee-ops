@@ -266,7 +266,7 @@ controller:
     - artifactId: configuration-as-code
       source:
         # renovate: datasource=jenkins-plugins depName=configuration-as-code
-        version: 1429.v09b_044a_c93de
+        version: 1559.v38a_b_2e3b_6b_b_7
 
   # Set to false to download the minimum required version of all dependencies.
   installLatestPlugins: true
