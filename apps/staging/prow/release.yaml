@@ -5,6 +5,8 @@ metadata:
   namespace: apps
 spec:
   releaseName: prow
+  dependsOn:
+    - { name: jenkins, namespace: apps }
   chart:
     spec:
       chart: ./charts/prow
@@ -33,6 +35,14 @@ spec:
     prow:
       githubOrg: PingCAP-QE
       podsNamespace: prow-test-pods # should delete old prow-pcm pods when changed.
+    jenkinsOperator:
+      dryRun: false
+      jenkinsUrl: http://jenkins:8080
+      auth:
+        secretName: jenkins
+        secretKeyJenkinsUser: jenkins-admin-user
+        secretKeyJenkinsToken: jenkins-admin-password
+
   valuesFrom:
     #### secret `github-app-prow` should be created manually.
     - kind: Secret

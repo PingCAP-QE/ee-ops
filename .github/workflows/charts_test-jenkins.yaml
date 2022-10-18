@@ -1,10 +1,10 @@
-name: Charts Test
+name: Charts Test - Jenkins
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - "charts/**"
+      - "charts/jenkins/**"
       - ".github/workflows/chart*"
 jobs:
   chart-test:
@@ -25,7 +25,7 @@ jobs:
           python-version: 3.7
 
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.3.1
+        uses: helm/chart-testing-action@v2.3.0
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -48,21 +48,5 @@ jobs:
           # renovate: datasource=go depName=sigs.k8s.io/kind
           version: v0.12.0
 
-      - name: Replace fields in `charts/prow/values.yaml`
-        working-directory: charts/prow
-        run: |
-          yq -i e '.prow.domainName = "prow.test.io"' values.yaml
-          yq -i e '.prow.githubAppId = "${{ secrets.PROW_APP_ID }}"' values.yaml
-          yq -i e '.prow.githubAppCert = "${{ secrets.PROW_APP_CERT }}" | .prow.githubAppCert style="double"' values.yaml
-          yq -i e '.prow.githubHmacToken = "${{ secrets.PROW_HMAC_TOKEN }}"' values.yaml
-          orgName=$(dirname ${{ github.event.repository.full_name }})
-          yq -i e ".prow.githubOrg = \"${orgName}\"" values.yaml
-
-          cat values.yaml
-
       - name: Run chart-testing (install)
-        run: |
-          ct install \
-            --all \
-            --debug \
-            --chart-repos "bitnami=https://charts.bitnami.com/bitnami"
+        run: ct install --charts charts/jenkins --debug
