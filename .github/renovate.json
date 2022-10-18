@@ -9,7 +9,8 @@
   "regexManagers": [
     {
       "fileMatch": [
-        ".*-plugins\\.yaml$$"
+        ".*-plugins\\.yaml$$",
+        "charts/.*/values\\.yaml$$"
       ],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
