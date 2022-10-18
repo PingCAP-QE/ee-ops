@@ -34,10 +34,10 @@ spec:
             - name: GO_VER
               value: "1.19.2"
           resources:
-            limits:
+            requests:
               memory: "100Mi"
               cpu: "100M"
-            requests:
+            limits:
               memory: "1Gi"
               cpu: "1"
           volumeMounts:
