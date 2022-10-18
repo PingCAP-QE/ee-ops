@@ -78,7 +78,7 @@ jobs:
   #         echo "source branch: ${GITHUB_HEAD_REF}"
   #     - name: Setup cluster reconciliation
   #       run: |
-  #         kubectl apply -f - <<EOF > cat
+  #         kubectl apply -f - <<EOF
   #         apiVersion: source.toolkit.fluxcd.io/v1beta2
   #         kind: GitRepository
   #         metadata:

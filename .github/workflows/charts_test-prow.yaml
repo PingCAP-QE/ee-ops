@@ -52,7 +52,7 @@ jobs:
         working-directory: charts/prow/templates
         run: |
           kubectl create ns prow
-          kubectl apply -f - <<EOF > cat
+          kubectl apply -f - <<EOF
           apiVersion: v1
           kind: Secret
           metadata:
