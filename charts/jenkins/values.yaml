@@ -258,7 +258,7 @@ controller:
     - artifactId: workflow-aggregator
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-aggregator
-        version: 581.v0c46fa_697ffd
+        version: 590.v6a_d052e5a_a_b_5
     - artifactId: git
       source:
         # renovate: datasource=jenkins-plugins depName=git
