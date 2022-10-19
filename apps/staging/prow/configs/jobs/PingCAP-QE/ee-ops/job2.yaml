@@ -20,9 +20,4 @@ presubmits:
                         echo hello world
                         pwd
                         ls
-    - name: pingcap-qe/ee-ops/prow_debug # it's a debug job in jenkins server.
-      agent: jenkins
-      always_run: true
-      context: debug/prow-call-jenkins
-      rerun_command: "/test prow-call-jenkins"
-      trigger: "((?m)^/test( all| prow-call-jenkins),?(\\s+|$))"
+

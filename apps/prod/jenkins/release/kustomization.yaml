@@ -12,5 +12,6 @@ configMapGenerator:
       - values3.yaml=values-agent.yaml
       - values4.yaml=values-controller-plugins.yaml
       - values5.yaml=values-JCasC.yaml
+      - values6.yaml=values-service-account.yaml
 configurations:
   - kustomize-config.yaml
