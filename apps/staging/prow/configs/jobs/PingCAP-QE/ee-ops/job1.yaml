@@ -7,3 +7,10 @@ presubmits:
         containers:
           - image: alpine
             command: ["/bin/date"]
+    - name: prow_debug # it's a debug job in jenkins server.
+      agent: jenkins
+      decorate: false # need add this.
+      always_run: true
+      context: debug/prow-call-jenkins
+      rerun_command: "/test prow-call-jenkins"
+      trigger: "((?m)^/test( all| prow-call-jenkins),?(\\s+|$))"            
