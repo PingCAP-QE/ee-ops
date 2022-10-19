@@ -59,6 +59,10 @@ spec:
       targetPath: prow.githubAppCert
     - kind: Secret
       name: github-app-prow
+      valuesKey: oauth-token
+      targetPath: prow.githubOauthToken
+    - kind: Secret
+      name: github-app-prow
       valuesKey: webhook-secret
       targetPath: prow.githubHmacToken
     #### for prow plugins, DO NOT EDIT ###
