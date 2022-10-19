@@ -26,7 +26,11 @@ deck:
         name: podinfo
       required_files:
       - podinfo.json
-
+  {{- if .Values.jenkinsOperator.enabled }}
+  external_agent_logs:
+  - agent: jenkins    
+    url_template: 'http://{{ include "prow.fullname.jenkinsoperator" . }}/job/{{`{{.Spec.Job}}/{{.Status.BuildID}}/consoleText`}}'
+  {{- end }}
 plank:
   job_url_prefix_config:
     "*": https://{{ .Values.prow.domainName }}/view/
@@ -66,5 +70,10 @@ tide:
 decorate_all_jobs: true
 
 jenkins_operators:
-  - max_concurrency: 150
-    max_goroutines: 20
+  - max_concurrency: {{ .Values.jenkinsOperator.config.maxConcurrency }}
+    max_goroutines: {{ .Values.jenkinsOperator.config.maxGoroutines }}
+    job_url_template: >-
+        https://{{ .Values.prow.domainName }}/view/s3/prow-logs/{{`{{if eq .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}`}}/
+    report_templates:
+      '*': >-
+          [Full PR test history](https://{{ .Values.prow.domainName }}/pr-history?{{`org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end }}`}}).
