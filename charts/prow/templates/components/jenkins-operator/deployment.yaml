@@ -71,6 +71,9 @@ spec:
             {{- end }}
 
             {{- end }}{{- end }}
+          ports:
+            - name: http
+              containerPort: 80
           env:
             {{- with .Values.jenkinsOperator.auth }}{{- if .secretName }}
             {{- if .secretKeyJenkinsUser }}
