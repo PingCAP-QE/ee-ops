@@ -67,16 +67,35 @@ spec:
   postRenderers:
     - kustomize:
         patchesJson6902:
-          # for updating ConfigMap in after release deployment.
+          # for updating ConfigMaps in after release deployment.
           - target:
               version: v1
               kind: ConfigMap
               name: prow-config
               namespace: apps
             patch:
+              # for merging configmap
+              # TODO(wuhuizuo): how to merge the inner yaml from value content.
               - op: replace
-                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/prune
-                value: disabled
+                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
+                value: merge
+          - target:
+              version: v1
+              kind: ConfigMap
+              name: prow-job-config
+              namespace: apps
+            patch:
+              # for merging configmap
+              # TODO(wuhuizuo): how to merge the inner yaml from value content.
+              - op: replace
+                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
+                value: merge
+          - target:
+              version: v1
+              kind: ConfigMap
+              name: prow-plugins
+              namespace: apps
+            patch:  
               # for merging configmap
               # TODO(wuhuizuo): how to merge the inner yaml from value content.
               - op: replace
