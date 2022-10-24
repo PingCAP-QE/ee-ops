@@ -6,4 +6,4 @@ presubmits:
       always_run: true
       context: debug/prow-call-jenkins
       rerun_command: /test prow-call-jenkins
-      trigger: ((?m)^/test( all| prow-call-jenkins),?(\s+|$))
+      trigger: '((?m)^/test( all| prow-call-jenkins),?(\s+|$))'
