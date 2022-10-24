@@ -6,7 +6,6 @@ configMapGenerator:
     behavior: create
     options:
       disableNameSuffixHash: true
-      immutable: true
     files:
       - job-call-jenkins.yaml
       - job-curl-call-tekton-task-run.yaml
