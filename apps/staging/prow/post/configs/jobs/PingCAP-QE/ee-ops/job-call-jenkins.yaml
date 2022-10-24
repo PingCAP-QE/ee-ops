@@ -5,5 +5,5 @@ presubmits:
       decorate: false # need add this.
       always_run: true
       context: debug/prow-call-jenkins
-      rerun_command: "/test prow-call-jenkins"
-      trigger: "((?m)^/test( all| prow-call-jenkins),?(\\s+|$))"            
+      rerun_command: /test prow-call-jenkins
+      trigger: ((?m)^/test( all| prow-call-jenkins),?(\s+|$))
