@@ -1,34 +1,34 @@
 # TODO: (@wuhuizuo) add json schema.
 deck:
   external_agent_logs:
-  - agent: jenkins
-    url_template: 'http://prow-jenkins-operator/job/{{.Spec.Job}}/{{.Status.BuildID}}/consoleText'
+    - agent: jenkins
+      url_template: "http://prow-jenkins-operator/job/{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/consoleText"
   spyglass:
     lenses:
-    - lens:
-        name: metadata
-      required_files:
-      - started.json|finished.json
-    - lens:
-        config: null
-        name: buildlog
-      required_files:
-      - build-log.txt
-    - lens:
-        name: junit
-      required_files:
-      - .*/junit.*\.xml
-    - lens:
-        name: podinfo
-      required_files:
-      - podinfo.json
+      - lens:
+          name: metadata
+        required_files:
+          - started.json|finished.json
+      - lens:
+          config: null
+          name: buildlog
+        required_files:
+          - build-log.txt
+      - lens:
+          name: junit
+        required_files:
+          - .*/junit.*\.xml
+      - lens:
+          name: podinfo
+        required_files:
+          - podinfo.json
 decorate_all_jobs: true
 in_repo_config:
   enabled:
-    '*': true
+    "*": true
 plank:
   default_decoration_configs:
-    '*':
+    "*":
       gcs_configuration:
         bucket: s3://prow-logs
         path_strategy: explicit
@@ -39,29 +39,43 @@ plank:
         initupload: gcr.io/k8s-prow/initupload:v20220504-0b3a7e15f4
         sidecar: gcr.io/k8s-prow/sidecar:v20220504-0b3a7e15f4
   job_url_prefix_config:
-    '*': https://${DOMAIN_NAME}/view/
+    "*": https://${DOMAIN_NAME}/view/
   report_templates:
-    '*': '[Full PR test history](https://${DOMAIN_NAME}/pr-history?org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with
-      index .Spec.Refs.Pulls 0}}{{.Number}}{{end }}). [Your PR dashboard](https://${DOMAIN_NAME}/pr?query=is:pr+state:open+author:{{with
-      index .Spec.Refs.Pulls 0}}{{.Author}}{{end }}).'
+    "*":
+      "[Full PR test
+      history](https://${DOMAIN_NAME}/pr-history?org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with
+      index .Spec.Refs.Pulls 0}}{{.Number}}{{end }}). [Your PR
+      dashboard](https://${DOMAIN_NAME}/pr?query=is:pr+state:open+author:{{with
+      index .Spec.Refs.Pulls 0}}{{.Author}}{{end }})."
 pod_namespace: ${TEST_PODS_NAMESPACE}
 prowjob_namespace: apps
 tide:
   queries:
-  - labels:
-    - lgtm
-    - approved
-    missingLabels:
-    - needs-rebase
-    - do-not-merge/hold
-    - do-not-merge/work-in-progress
-    - do-not-merge/invalid-owners-file
-    orgs:
-    - PingCAP-QE
+    - labels:
+        - lgtm
+        - approved
+      missingLabels:
+        - needs-rebase
+        - do-not-merge/hold
+        - do-not-merge/work-in-progress
+        - do-not-merge/invalid-owners-file
+      orgs:
+        - PingCAP-QE
 
 # for jenkins operator component.
 jenkins_operators:
-- max_concurrency: 20
-  max_goroutines: 20
-  job_url_template: 'https://${DOMAIN_NAME}/view/s3/prow-logs/{{if eq .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}/'
-  report_template: '[Full PR test history](https://${DOMAIN_NAME}/pr-history/{{if ne .Spec.Refs.Repo "origin"}}{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}/{{end}}{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}).'
+  - max_concurrency: 20
+    max_goroutines: 20
+    job_url_template:
+      'https://${DOMAIN_NAME}/view/s3/prow-logs/{{if eq .Spec.Type
+      "presubmit"}}pr-logs/pull{{else if eq .Spec.Type
+      "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo
+      "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type
+      "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if
+      eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}/'
+    report_templates:
+      "*":
+        '[Full PR test history](https://${DOMAIN_NAME}/pr-history/{{if ne
+        .Spec.Refs.Repo
+        "origin"}}{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}/{{end}}{{with index
+        .Spec.Refs.Pulls 0}}{{.Number}}{{end}}).'
