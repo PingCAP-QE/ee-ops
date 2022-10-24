@@ -211,6 +211,8 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "http://goproxy.pingcap.net,direct"
+                  - key: PROW_DECK_URL
+                    value: "http://prow-deck.apps.svc"
       build-failure-analyzer: |
         unclassified:
           buildFailureAnalyzer:
@@ -237,3 +239,25 @@ controller:
             testResultParsingEnabled: false
             testResultCategories: "UT"
             fallbackCategoriesAsString: unknown
+      global-libraries: |
+        globalLibraries:
+          libraries:
+          - name: tipipeline # An identifier you pick for this library, to be used in the @Library annotation.
+            defaultVersion: main
+            # If checked, scripts may select a custom version of the library by appending @someversion in the @Library annotation.
+            allowVersionOverride: true
+            implicit: false
+            includeInChangesets: false
+            retriever:
+              modernSCM:
+                libraryPath: libraries/tipipeline
+                scm:
+                  github:
+                    configuredByUrl: true
+                    repositoryUrl: "https://github.com/PingCAP-QE/ci"
+                    # useless but required.
+                    repoOwner: "PingCAP-QE"
+                    repository: "ci"
+            cachingConfiguration:
+              refreshTimeMinutes: 60
+            excludedVersionsStr: 'feature/ fix/ bugfix/'
