@@ -1,29 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespaces.yaml
+  - pre.yaml
   - release.yaml
-  - rbac/
-configMapGenerator:
-  - name: prow-config
-    namespace: apps
-    files:
-      # DO NOT EDIT.
-      - config.yaml=configs/config.yaml
-  - name: prow-plugins
-    namespace: apps
-    files:
-      # DO NOT EDIT.
-      - plugins.yaml=configs/plugins.yaml
-  - name: prow-job-config
-    namespace: apps
-    files:
-      # add yours another job here.
-      # - jobXxx=configs/jobs/<org>/<repo>/jobXxx.yaml
-      - job1=configs/jobs/PingCAP-QE/ee-ops/job1.yaml
-      # - job2=configs/jobs/PingCAP-QE/ee-ops/job2.yaml
-      - job3=configs/jobs/PingCAP-QE/ee-ops/job3.yaml
-      - job4=configs/jobs/PingCAP-QE/ee-ops/job4.yaml
-      - job-label-sync=configs/jobs/PingCAP-QE/ee-ops/job-label-sync.yaml
-configurations:
-  - kustomize-config.yaml
+  - post.yaml

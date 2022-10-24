@@ -1,103 +1,35 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
 metadata:
-  name: prow
-  namespace: apps
+  name: prow-release
+  namespace: flux-system
 spec:
-  releaseName: prow
   dependsOn:
-    - { name: jenkins, namespace: flux-system }
-  chart:
-    spec:
-      chart: ./charts/prow
-      sourceRef:
-        kind: GitRepository
-        name: flux-system
-        namespace: flux-system
-  interval: 5m
-  timeout: 5m
-  install:
-    crds: CreateReplace
-    remediation:
-      retries: 3
-  rollback:
-    cleanupOnFail: true
-    recreate: true
-  upgrade:
-    crds: CreateReplace
-    cleanupOnFail: true
-    remediation:
-      retries: 3
-  test:
-    enable: true
-    ignoreFailures: false
-  values:
-    prow:
-      githubOrg: PingCAP-QE
-      podsNamespace: prow-test-pods # should delete old prow-pcm pods when changed.
-    jenkinsOperator:
-      dryRun: false
-      jenkinsUrl: http://jenkins:8080
-      auth:
-        secretName: jenkins
-        secretKeyJenkinsUser: jenkins-admin-user
-        secretKeyJenkinsToken: jenkins-admin-password
+    - name: prow-pre
+      namespace: flux-system
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/staging/prow/release
+  prune: true
+  wait: true
+  postBuild:
+    substitute:
+      TEST_PODS_NAMESPACE: prow-test-pods
 
-  valuesFrom:
-    #### secret `github-app-prow` should be created manually.
-    - kind: Secret
-      name: github-app-prow
-      valuesKey: domain-name
-      targetPath: prow.domainName
-    - kind: Secret
-      name: github-app-prow
-      valuesKey: app-id
-      targetPath: prow.githubAppId
-    - kind: Secret
-      name: github-app-prow
-      valuesKey: app-cert
-      targetPath: prow.githubAppCert
-    - kind: Secret
-      name: github-app-prow
-      valuesKey: oauth-token
-      targetPath: prow.githubOauthToken
-    - kind: Secret
-      name: github-app-prow
-      valuesKey: webhook-secret
-      targetPath: prow.githubHmacToken
-    #### for prow plugins, DO NOT EDIT ###
-    - kind: ConfigMap
-      name: prow-plugins
-      valuesKey: plugins.yaml
-      targetPath: prow.plugins
-    #### for prow global config, DO NOT EDIT ###
-    - kind: ConfigMap
-      name: prow-config
-      valuesKey: config.yaml
-      targetPath: prow.config
-    #### for prow jobs #####
-    #  add your another job:
-    # - kind: ConfigMap
-    #   name: prow-job-config
-    #   valuesKey: jobXxx
-    #   targetPath: prow.jobs.jobXxx
-    - kind: ConfigMap
-      name: prow-job-config
-      valuesKey: job1
-      targetPath: prow.jobs.job1
-    # - kind: ConfigMap
-    #   name: prow-job-config
-    #   valuesKey: job2
-    #   targetPath: prow.jobs.job2
-    - kind: ConfigMap
-      name: prow-job-config
-      valuesKey: job3
-      targetPath: prow.jobs.job3
-    - kind: ConfigMap
-      name: prow-job-config
-      valuesKey: job4
-      targetPath: prow.jobs.job4
-    - kind: ConfigMap
-      name: prow-job-config
-      valuesKey: job-label-sync
-      targetPath: prow.jobs.jobLabelSync
+      ### need secret `prow` with keys:
+      # - GITHUB_APP_ID
+      # - GITHUB_APP_CERT
+      # - GITHUB_APP_WEBHOOK_HMAC
+      # - GITHUB_TOKEN
+      # - DOMAIN_NAME
+      PROW_SECRET_NAME: prow
+
+      ### need secret `prow-jenkins-operator-auth` with keys:
+      # - user
+      # - token
+      JENKINS_OPERATOR_AUTH_SEC_NAME: prow-jenkins-operator-auth
+      JENKINS_OPERATOR_AUTH_SEC_KEY_USER: user
+      JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN: token

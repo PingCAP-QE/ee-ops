@@ -438,6 +438,9 @@ jenkinsOperator:
     secretKeyCert: ""
     secretKeyKey: ""
     secretKeyCaCert: ""
+  config:
+    maxConcurrency: 100
+    maxGoroutines: 10
 
   # TODO(wuhuizuo): implement sharding deployment
   # sharding:
