@@ -58,6 +58,7 @@ spec:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
       githubOrg: PingCAP-QE
     jenkinsOperator:
+      enabled: true
       dryRun: false
       jenkinsUrl: http://jenkins:8080/jenkins/
       auth:
