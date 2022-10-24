@@ -261,5 +261,5 @@ controller:
                       repository: "ci"
               cachingConfiguration:
                 refreshTimeMinutes: 60
-              excludedVersionsStr: 'feature/ fix/ bugfix/'
+                excludedVersionsStr: 'feature/ fix/ bugfix/'
 
