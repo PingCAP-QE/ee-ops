@@ -48,6 +48,14 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=build-failure-analyzer
         version: 2.4.0
+    - artifactId: pipeline-utility-steps
+      source:
+        # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
+        version: 2.13.0
+    - artifactId: http_request
+      source:
+        # renovate: datasource=jenkins-plugins depName=http_request
+        version: 1.16
     - artifactId: jenkins-pipeline-cache
       source:
         # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
