@@ -1,7 +1,7 @@
 presubmits:
   PingCAP-QE/ee-ops:
     - name: verifyCI2
-      always_run: true
+      always_run: false
       max_concurrency: 2
       agent: tekton-pipelines
       pipeline_run_spec:
@@ -20,4 +20,3 @@ presubmits:
                         echo hello world
                         pwd
                         ls
-

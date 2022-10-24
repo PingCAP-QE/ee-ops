@@ -1,12 +1,5 @@
 presubmits:
   PingCAP-QE/ee-ops:
-    - name: verifyCI1
-      always_run: true
-      max_concurrency: 2
-      spec:
-        containers:
-          - image: alpine
-            command: ["/bin/date"]
     - name: prow_debug # it's a debug job in jenkins server.
       agent: jenkins
       decorate: false # need add this.

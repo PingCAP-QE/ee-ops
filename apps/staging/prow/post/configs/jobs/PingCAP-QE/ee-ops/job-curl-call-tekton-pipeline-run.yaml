@@ -1,0 +1,73 @@
+presubmits:
+  PingCAP-QE/ee-ops:
+    - name: verifyCI-tekton-pipelineRun
+      always_run: false
+      max_concurrency: 2
+      spec:
+        containers:
+          - image: alpine/curl
+            command:
+              - curl
+            args:
+              - http://tekton-dashboard.tekton-pipelines.svc:9097/apis/tekton.dev/v1beta1/namespaces/ci-demo/pipelineruns/
+              - -H
+              - "Accept: application/json"
+              - -H
+              - "Content-Type: application/json"
+              - -H
+              - "Sec-Fetch-Mode: cors"
+              - -H
+              - "Sec-Fetch-Dest: empty"
+              - -H
+              - "Sec-Fetch-Site: same-origin"
+              - -H
+              - "Tekton-Client: prowjobs.prow.k8s.io/ee-ops"
+              - --fail-with-body
+              - --compressed
+              - --data-raw
+              - >-
+                {
+                  "apiVersion": "tekton.dev/v1beta1",
+                  "kind": "PipelineRun",
+                  "metadata": {
+                    "generateName": "getting-started-pipeline1-run-by-prow-",
+                    "labels": {
+                      "prow": "true"
+                    }
+                  },
+                  "spec": {
+                    "workspaces": [
+                      {
+                        "name": "git-source",
+                        "volumeClaimTemplate": {
+                          "spec": {
+                            "accessModes": [
+                              "ReadWriteMany"
+                            ],
+                            "resources": {
+                              "request": {
+                                "storage": "1Gi"
+                              }
+                            },
+                            "volumeMode": "Filesystem"
+                          }
+                        }
+                      }
+                    ],
+                    "pipelineRef": {
+                      "name": "getting-started-pipeline1"
+                    },
+                    "params": [
+                      {
+                        "name": "repo-name",
+                        "value": "${REPO_OWNER}/${REPO_NAME}"
+                      },
+                      {
+                        "name": "git-revision",
+                        "value": "${PULL_PULL_SHA}"
+                      }
+                    ],
+                    "serviceAccountName": "default",
+                    "timeout": "3m"
+                  }
+                }
