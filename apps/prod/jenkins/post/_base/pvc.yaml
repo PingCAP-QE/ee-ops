@@ -27,7 +27,7 @@ status:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: 200Gi
+    storage: 500Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
