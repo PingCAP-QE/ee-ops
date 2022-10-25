@@ -20,14 +20,9 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 200Gi
+      storage: 500Gi
   storageClassName: ceph-filesystem
   volumeMode: Filesystem
-status:
-  accessModes:
-    - ReadWriteMany
-  capacity:
-    storage: 200Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
