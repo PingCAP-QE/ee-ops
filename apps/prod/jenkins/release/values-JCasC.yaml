@@ -26,7 +26,7 @@ controller:
     - { name: jenkins-cache, keyName: access-key }
     - { name: jenkins-cache, keyName: access-secret }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
-    - { name: mongodb-external, keyName: mongodb-root-password }
+    - { name: mongodb, keyName: mongodb-root-password }
 
   additionalSecrets: []
   #  - name: nameOfSecret
@@ -222,9 +222,9 @@ controller:
               mongoDB:
                 dbName: jenkins-failure-pattern
                 enableStatistics: true
-                host: 172.16.5.83
-                password: "${mongodb-external-mongodb-root-password}"
-                port: 32017
+                host: mongodb.apps.svc
+                password: "${mongodb-mongodb-root-password}"
+                port: 27017
                 successfulLogging: true
                 userName: root
             maxLogSize: 0

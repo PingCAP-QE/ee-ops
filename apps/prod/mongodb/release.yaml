@@ -36,3 +36,8 @@ spec:
       limits:
         cpu: "2"
         memory: 2Gi
+    service:
+      type: NodePort
+      portName: mongodb
+      nodePorts:
+        mongodb: "32017"
