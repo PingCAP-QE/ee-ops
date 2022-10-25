@@ -140,3 +140,9 @@ cephFileSystemVolumeSnapshotClass:
   labels: {}
   # see https://rook.io/docs/rook/latest/ceph-csi-snapshot.html#cephfs-snapshots for available configuration
   parameters: {}
+
+configOverride: |
+  [client.rgw.ceph.objectstore.a]
+    rgw_d3n_l1_local_datacache_enabled = true
+    rgw_d3n_l1_datacache_persistent_path = "/var/lib/ceph/rgw/ceph-ceph-objectstore/rgw_datacache"
+    rgw_d3n_l1_datacache_size = 10737418240
