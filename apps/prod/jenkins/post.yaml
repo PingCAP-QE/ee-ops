@@ -14,3 +14,4 @@ spec:
     namespace: flux-system
   path: ./apps/prod/jenkins/post
   prune: true
+  force: true
