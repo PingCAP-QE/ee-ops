@@ -50,9 +50,12 @@ plank:
 pod_namespace: ${TEST_PODS_NAMESPACE}
 prowjob_namespace: apps
 tide:
+  merge_method:
+    PingCAP-QE/ee-ops: squash
+    PingCAP-QE/ci: squash
   queries:
     - labels:
-        - lgtm
+        # - lgtm # current no need lgtm.
         - approved
       missingLabels:
         - needs-rebase
