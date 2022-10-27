@@ -13,7 +13,7 @@ spec:
         kind: HelmRepository
         name: rook
         namespace: flux-system
-      version: "v1.9.6"
+      version: "v1.9.12"
   interval: 1h0m0s
   install:
     remediation:
