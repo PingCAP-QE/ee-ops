@@ -23,11 +23,6 @@ spec:
       storage: 200Gi
   storageClassName: ceph-filesystem
   volumeMode: Filesystem
-status:
-  accessModes:
-    - ReadWriteMany
-  capacity:
-    storage: 200Gi
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
