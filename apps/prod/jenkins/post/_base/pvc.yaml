@@ -36,3 +36,16 @@ spec:
       storage: 50Gi
   storageClassName: ceph-filesystem
   volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bazel-repository-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: ceph-filesystem
+  volumeMode: Filesystem
