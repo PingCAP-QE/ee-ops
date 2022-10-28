@@ -74,10 +74,11 @@ spec:
           osdsPerDevice: "5"
         deviceFilter: nvme3n1
         nodes:
+          - name: 10.2.12.10
+          - name: 10.2.12.11        
           - name: 10.2.12.13
           - name: 10.2.12.20
           - name: 10.2.12.21
-          - name: 10.2.12.10
     cephFileSystems:
       - name: ceph-filesystem
         spec:
@@ -130,10 +131,10 @@ spec:
             priorityClassName: system-cluster-critical
             resources:
               limits:
-                cpu: 4000m
+                cpu: '4'
                 memory: 4Gi
               requests:
-                cpu: 1000m
+                cpu: '1'
                 memory: 1Gi
           healthCheck:
             bucket:
@@ -152,7 +153,6 @@ spec:
     operatorNamespace: rook-ceph
     toolbox:
       enabled: true
-
   valuesFrom:
     # may you should set custom values in you cluster, for example: config/values-nodes.tpl.yaml
     - kind: Secret
