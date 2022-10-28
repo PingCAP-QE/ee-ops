@@ -55,7 +55,7 @@ tide:
     PingCAP-QE/ci: squash
   queries:
     - labels:
-        # - lgtm # current no need lgtm.
+        - lgtm
         - approved
       missingLabels:
         - needs-rebase
