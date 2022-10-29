@@ -75,7 +75,8 @@ spec:
         deviceFilter: nvme3n1
         nodes:
           - name: 10.2.12.10
-          - name: 10.2.12.11        
+          - name: 10.2.12.11
+          - name: 10.2.12.12
           - name: 10.2.12.13
           - name: 10.2.12.20
           - name: 10.2.12.21
