@@ -3,5 +3,11 @@ kind: Kustomization
 resources:
   - rbac.yaml
   - pvc.yaml
-  - secrets.yaml
   - cronjob-go-caches.yaml
+secretGenerator:
+  - name: bazel
+    options:
+      disableNameSuffixHash: true
+    files:
+      - "files/bazel"
+      - "files/bazel-prepare-in-container.sh"
