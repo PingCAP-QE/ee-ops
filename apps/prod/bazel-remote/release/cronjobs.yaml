@@ -4,7 +4,7 @@ metadata:
   name: shrink-ci-bazel-remote-cache
   namespace: apps
 spec:
-  schedule: "@hourly"
+  schedule: "0 */2 * * *"
   jobTemplate:
     spec:
       template:
