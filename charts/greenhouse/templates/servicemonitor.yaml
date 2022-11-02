@@ -1,0 +1,20 @@
+{{- if .Values.serviceMonitor.enabled }}
+{{- if .Values.metricsService.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "greenhouse.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "greenhouse.labels" . | nindent 4 }}
+  {{- if .Values.serviceMonitor.additionalLabels }}
+    {{- toYaml .Values.serviceMonitor.additionalLabels | nindent 4 }}
+  {{- end }}
+spec:
+  endpoints:
+    - port: metrics
+  selector:
+    matchLabels:
+      {{- include "greenhouse.selectorLabels" . | nindent 6 }}
+{{- end }}
+{{- end }}
