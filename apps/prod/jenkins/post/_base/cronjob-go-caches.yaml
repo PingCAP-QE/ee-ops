@@ -27,10 +27,10 @@ spec:
                       echo "cleaned."
                   fi
 
-                  # clean cache when usage > 80%
+                  # clean build cache when usage > 50%
                   gocache_used_percent=$(df -h | grep "$(go env GOCACHE)" | awk '{print $5}' | grep -oE "[0-9]+")
                   echo "mount of $(go env GOCACHE) usage is ${gocache_used_percent}%"
-                  if (( gocache_used_percent > 80 )); then
+                  if (( gocache_used_percent > 50 )); then
                       echo "go build cache is too large, I am cleaning it."
                       go clean -cache -x
                       echo "cleaned."
