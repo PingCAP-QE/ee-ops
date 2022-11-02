@@ -20,7 +20,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 500Gi
+      storage: 600Gi
   storageClassName: ceph-filesystem
   volumeMode: Filesystem
 ---
