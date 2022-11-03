@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "greenhouse.fullname" . }}
+  labels:
+    {{- include "greenhouse.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - name: http
+      port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP      
+    {{- if .Values.metricsService.enabled }}
+    - name: metrics
+      port: {{ .Values.metricsService.port }}
+      targetPort: metrics
+      protocol: TCP
+    {{- end }}
+  selector:
+    {{- include "greenhouse.selectorLabels" . | nindent 4 }}
