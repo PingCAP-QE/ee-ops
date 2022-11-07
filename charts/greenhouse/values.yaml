@@ -5,11 +5,9 @@
 replicaCount: 1
 
 image:
-  # TODO(wuhuizuo): the image is too old, not updated after 2018.
-  repository: gcr.io/k8s-testimages/greenhouse
+  repository: hub.pingcap.net/ee/greenhouse
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "latest"
+  tag: ""
 
 imagePullSecrets: []
 nameOverride: ""
