@@ -54,7 +54,9 @@ tide:
     PingCAP-QE/ee-ops: squash
     PingCAP-QE/ci: squash
   queries:
-    - labels:
+    - orgs:
+        - PingCAP-QE
+      labels:
         - lgtm
         - approved
       missingLabels:
@@ -62,9 +64,15 @@ tide:
         - do-not-merge/hold
         - do-not-merge/work-in-progress
         - do-not-merge/invalid-owners-file
-      orgs:
-        - PingCAP-QE
-
+    - repos: 
+       - PingCAP-QE/ee-ops
+      labels:
+        - approved
+      missingLabels:
+        - needs-rebase
+        - do-not-merge/hold
+        - do-not-merge/work-in-progress
+        - do-not-merge/invalid-owners-file
 # for jenkins operator component.
 jenkins_operators:
   - max_concurrency: 20
