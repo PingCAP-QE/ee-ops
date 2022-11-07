@@ -59,6 +59,9 @@ spec:
       githubOrg: PingCAP-QE
     jenkinsOperator:
       enabled: true
+      image:
+        repository: hub.pingcap.net/ee/jenkins-operator
+        tag: v20221107-93ba3423d9
       dryRun: false
       jenkinsUrl: http://jenkins:8080/jenkins/
       auth:
