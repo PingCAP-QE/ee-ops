@@ -102,7 +102,7 @@ spec:
       enabled: true
       image:
         repository: hub.pingcap.net/ee/jenkins-operator
-        tag: v20221108-93ba3423d9
+        tag: v20221108-7045713ae7
       dryRun: false
       jenkinsUrl: http://jenkins:8080/jenkins/
       auth:
