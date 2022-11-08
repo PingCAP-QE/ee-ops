@@ -40,7 +40,7 @@ spec:
     - kind: Secret
       name: ${PROW_SECRET_NAME}
       valuesKey: GITHUB_APP_CERT
-      targetPath: prow.githubAppCert      
+      targetPath: prow.githubAppCert
     - kind: Secret
       name: ${PROW_SECRET_NAME}
       valuesKey: GITHUB_APP_WEBHOOK_HMAC
@@ -57,11 +57,52 @@ spec:
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
       githubOrg: PingCAP-QE
+    pcm:
+      image:
+        repository: hub.pingcap.net/ee/prow-controller-manager
+        tag: v20221108-93ba3423d9
+    deck:
+      image:
+        repository: hub.pingcap.net/ee/deck
+        tag: v20221108-93ba3423d9
+    crier:
+      image:
+        repository: hub.pingcap.net/ee/crier
+        tag: v20221108-93ba3423d9
+
+    ghproxy:
+      image:
+        repository: hub.pingcap.net/ee/ghproxy
+        tag: v20221108-93ba3423d9
+    hook:
+      image:
+        repository: hub.pingcap.net/ee/hook
+        tag: v20221108-93ba3423d9
+    horologium:
+      image:
+        repository: hub.pingcap.net/ee/horologium
+        tag: v20221108-93ba3423d9
+    sinker:
+      image:
+        repository: hub.pingcap.net/ee/sinker
+        tag: v20221108-93ba3423d9
+    statusReconciler:
+      image:
+        repository: hub.pingcap.net/ee/status-reconciler
+        tag: v20221108-93ba3423d9
+    tide:
+      image:
+        repository: hub.pingcap.net/ee/tide
+        tag: v20221108-93ba3423d9
+    pipeline:
+      image:
+        repository: hub.pingcap.net/ee/pipeline
+        tag: v20221108-93ba3423d9
     jenkinsOperator:
       enabled: true
       image:
         repository: hub.pingcap.net/ee/jenkins-operator
-        tag: v20221107-93ba3423d9
+        tag: v20221108-93ba3423d9
       dryRun: false
       jenkinsUrl: http://jenkins:8080/jenkins/
       auth:
@@ -99,7 +140,7 @@ spec:
               kind: ConfigMap
               name: prow-plugins
               namespace: apps
-            patch:  
+            patch:
               # for merging configmap
               # TODO(wuhuizuo): how to merge the inner yaml from value content.
               - op: replace
