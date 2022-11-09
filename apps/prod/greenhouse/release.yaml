@@ -44,5 +44,7 @@ spec:
       size: 100Gi
     serviceMonitor:
       enabled: true
+      additionalLabels:
+        release: kps
     metricsService:
       enabled: true
