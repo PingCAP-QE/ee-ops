@@ -6,5 +6,4 @@ resources:
   - tekton
   - prow
   - mongodb
-  - bazel-remote
   - greenhouse
