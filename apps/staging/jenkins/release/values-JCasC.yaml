@@ -19,6 +19,7 @@ controller:
     - { name: github, keyName: bot-token }
     # for codecov.io uploading
     - { name: codecov-token, keyName: tidb }
+    - { name: codecov-token, keyName: tikv-migration }
     # for ci cache, no need create manually.
     - { name: jenkins-cache, keyName: region }
     - { name: jenkins-cache, keyName: bucket }
@@ -121,6 +122,11 @@ controller:
                       description: codecov token for tidb
                       scope: GLOBAL
                       secret: ${codecov-token-tidb}
+                  - string:
+                      id: codecov-token-tikv-migration
+                      description: codecov token for tikv/migration
+                      scope: GLOBAL
+                      secret: ${codecov-token-tikv-migration}
       # for jobs.
       jobs-dsl: |
         jobs:
