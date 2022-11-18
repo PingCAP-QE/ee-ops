@@ -59,14 +59,15 @@ ingress:
 # volumnes for pod.
 volumes: []
   # - name: cfgmap
-  #   subPath: to-override-config.conf
-  #   mountPath: /etc/trafficserver/to-override-config.conf
+  #   configMap:
+  #     name: ats-config-override-cfgmap
+
 
 # volumne mounts in container
 volumeMounts: []
   # - name: cfgmap
-  #   configMap:
-  #     name: ats-config-override-cfgmap
+  #   subPath: to-override-config.conf
+  #   mountPath: /etc/trafficserver/to-override-config.conf
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

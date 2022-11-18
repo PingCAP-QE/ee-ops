@@ -12,5 +12,3 @@ configMapGenerator:
       - config-override/records.config
       - config-override/remap.config
       - config-override/storage.config
-
-

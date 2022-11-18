@@ -39,7 +39,7 @@ spec:
               protocol: TCP
           {{- with .Values.volumeMounts }}
           volumeMounts:
-            {{ toYaml . | indent 12 }}
+            {{- toYaml . | nindent 12 }}
           {{- end }}
           livenessProbe:
             tcpSocket:
@@ -51,7 +51,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}            
       {{- with .Values.volumes }}
       volumes:
-        {{ toYaml . | indent 10 }}
+        {{- toYaml . | nindent 10 }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
