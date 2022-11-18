@@ -39,7 +39,7 @@ spec:
           volumeMounts:
             {{- if .Values.persistence.mounts }}
 {{ toYaml .Values.persistence.mounts | indent 12 }}
-            {{- end }}          
+            {{- end }}
             - name: cache
               mountPath: /data
           ports:
