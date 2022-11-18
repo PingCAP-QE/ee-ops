@@ -1,0 +1,64 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ats
+  namespace: flux-system
+spec:
+  releaseName: ats
+  targetNamespace: apps
+  dependsOn:
+    - name: greenhouse
+  chart:
+    spec:
+      chart: ./charts/ats
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    replicaCount: 1
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
+    volumnes:
+      - name: data
+        emptyDir: {}
+      - name: config-override
+        configMap:
+          name: ats-config-override
+    volumeMounts:
+      # cache data storage path
+      - name: data
+        mountPath: /data/ats
+      # config overrides
+      - name: ats-config-override
+        subPath: cache.config
+        mountPath: /etc/trafficserver/cache.config
+      - name: ats-config-override
+        subPath: records.config
+        mountPath: /etc/trafficserver/records.config
+      - name: ats-config-override
+        subPath: remap.config
+        mountPath: /etc/trafficserver/remap.config
+      - name: ats-config-override
+        subPath: storage.config
+        mountPath: /etc/trafficserver/storage.config
