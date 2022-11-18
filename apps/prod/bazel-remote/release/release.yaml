@@ -39,7 +39,8 @@ spec:
         memory: 16Gi
     volumes:
       - name: brc-cache
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: brc-cache
     serviceMonitor:
       enabled: true
       additionalLabels:
@@ -56,11 +57,3 @@ spec:
       experimental_remote_asset_api: true
       access_log_level: none
       enable_endpoint_metrics: true
-      s3_proxy:
-        endpoint: "${BUCKET_HOST}:${BUCKET_PORT}"
-        bucket: ${BUCKET_NAME}
-        prefix: data
-        disable_ssl: true
-        auth_method: access_key
-        access_key_id: ${AWS_ACCESS_KEY_ID}
-        secret_access_key: ${AWS_SECRET_ACCESS_KEY}
