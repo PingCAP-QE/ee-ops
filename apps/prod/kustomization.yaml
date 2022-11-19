@@ -6,3 +6,4 @@ resources:
   - bazel-remote
   - mongodb
   - greenhouse
+  - ats
