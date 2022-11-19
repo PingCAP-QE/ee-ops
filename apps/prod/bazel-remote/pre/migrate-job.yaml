@@ -11,7 +11,7 @@ spec:
       containers:
       - name: migrate
         image: busybox
-        command: ["sh", "-c", "cp -r /old/* /new/"]
+        command: ["cp",  "-r", "/old", "/new/data"]
         volumeMounts:
           - mountPath: /old
             name: old
