@@ -48,12 +48,9 @@ spec:
     volumeMounts:
       - name: brc-cache-rbd
         mountPath: /cache
-        volumeMounts:
-      - name: brc-cache
-        mountPath: /cache-old
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
-      dir: /cache
+      dir: /cache/data
       max_size: 500
       http_address: 0.0.0.0:8080
       grpc_address: 0.0.0.0:9092
