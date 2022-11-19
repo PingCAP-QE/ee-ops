@@ -41,7 +41,8 @@ spec:
         memory: 33Gi
     volumes:
       - name: data
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: ats-store
       - name: config-override
         configMap:
           name: ats-config-override
