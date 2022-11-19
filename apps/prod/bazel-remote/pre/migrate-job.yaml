@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-brc-cache-data
+  namespace: apps
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: migrate
+        image: busybox
+        command: ["cp",  "-r", "/old/*", "/new/"]
+        volumeMounts:
+          - mountPath: /old
+            name: old
+          - mountPath: /new
+            name: new
+      volumes:
+        - name: old
+          persistentVolumeClaim:
+            claimName: brc-cache
+        - name: new
+          persistentVolumeClaim:
+            claimName: brc-cache-rbd

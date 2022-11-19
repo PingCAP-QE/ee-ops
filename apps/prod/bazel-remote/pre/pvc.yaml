@@ -12,3 +12,17 @@ spec:
   volumeMode: Filesystem
   accessModes:
     - ReadWriteMany
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: brc-cache-rbd
+  namespace: apps
+spec:
+  resources:
+    requests:
+      storage: 550Gi
+  storageClassName: ceph-block
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
