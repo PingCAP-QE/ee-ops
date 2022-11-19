@@ -35,9 +35,6 @@ spec:
         cpu: "16"
         memory: 32Gi
     volumes:
-      - name: brc-cache
-        persistentVolumeClaim:
-          claimName: brc-cache
       - name: brc-cache-rbd
         persistentVolumeClaim:
           claimName: brc-cache-rbd
@@ -51,7 +48,7 @@ spec:
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /cache/data
-      max_size: 500
+      max_size: 1000
       http_address: 0.0.0.0:8080
       grpc_address: 0.0.0.0:9092
       experimental_remote_asset_api: true
