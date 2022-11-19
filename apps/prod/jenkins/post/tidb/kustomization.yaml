@@ -6,3 +6,10 @@ resources:
   - ../_base
   - pvc.yaml
   - pvc-job.yaml
+secretGenerator:
+  - name: bazel
+    options:
+      disableNameSuffixHash: true
+    files:
+      - "files/bazel"
+      - "files/bazel-prepare-in-container.sh"
