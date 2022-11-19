@@ -42,7 +42,7 @@ spec:
     volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: ats-store
+          claimName: ats-storage
       - name: config-override
         configMap:
           name: ats-config-override
