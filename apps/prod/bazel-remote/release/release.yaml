@@ -29,25 +29,28 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 4
+    replicaCount: 1
     resources:
-      requests:
-        cpu: "1"
-        memory: 1Gi
       limits:
-        cpu: "4"
-        memory: 16Gi
+        cpu: "16"
+        memory: 32Gi
     volumes:
       - name: brc-cache
         persistentVolumeClaim:
           claimName: brc-cache
+      - name: brc-cache-rbd
+        persistentVolumeClaim:
+          claimName: brc-cache-rbd
     serviceMonitor:
       enabled: true
       additionalLabels:
         release: kps
     volumeMounts:
-      - name: brc-cache
+      - name: brc-cache-rbd
         mountPath: /cache
+        volumeMounts:
+      - name: brc-cache
+        mountPath: /cache-old
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /cache
