@@ -5,6 +5,7 @@ resources:
   - release.yaml
 configMapGenerator:
   - name: ats-config-override
+    namespace: apps
     options:
       disableNameSuffixHash: true
     files:
