@@ -1,0 +1,27 @@
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Provider
+metadata:
+  name: lark
+  namespace: flux-system
+spec:
+  type: lark
+  secretRef:
+    name: lark-token
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta1
+kind: Alert
+metadata:
+  name: lark-alert
+  namespace: flux-system
+spec:
+  summary: "[Testing] Staging cluster GitOps notify"
+  providerRef:
+    name: lark
+  eventSeverity: info
+  eventSources:
+    - kind: GitRepository
+      name: '*'
+    - kind: Kustomization
+      name: '*'
+    - kind: HelmRelease
+      name: '*'
