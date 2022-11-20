@@ -36,12 +36,12 @@ spec:
         memory: 128Mi
       limits:
         cpu: "4"
-        memory: 16Gi
+        memory: 32Gi
     persistence:
       enabled: true
       storageClass: ceph-block
       accessMode: ReadWriteOnce
-      size: 100Gi
+      size: 1Ti
     serviceMonitor:
       enabled: true
       additionalLabels:
