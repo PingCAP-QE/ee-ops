@@ -72,7 +72,7 @@ spec:
         useAllNodes: false
         config:
           osdsPerDevice: "5"
-        deviceFilter: nvme3n1
+        deviceFilter: ^nvme[23]n1
         nodes:
           - name: 10.2.12.10
           - name: 10.2.12.11
