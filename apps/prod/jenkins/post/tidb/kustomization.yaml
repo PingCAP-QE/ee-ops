@@ -12,5 +12,4 @@ secretGenerator:
       disableNameSuffixHash: true
     files:
       - "files/bazel"
-      - "files/bazel2"
       - "files/bazel-prepare-in-container.sh"
