@@ -38,7 +38,8 @@ spec:
         memory: 1Gi
       limits:
         cpu: "4"
-        memory: 48Gi
+        # ats ram-cache size + 8GiB
+        memory: 72Gi
     volumes:
       - name: data
         persistentVolumeClaim:
