@@ -41,7 +41,7 @@ spec:
       enabled: true
       storageClass: ceph-block
       accessMode: ReadWriteOnce
-      size: 2500Gi
+      size: 3Ti
     serviceMonitor:
       enabled: true
       additionalLabels:
