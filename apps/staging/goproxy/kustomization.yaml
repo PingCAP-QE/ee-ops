@@ -5,3 +5,4 @@ resources:
 - goproxy-deployment.yaml
 - goproxy-storage.yaml
 - goproxy-svc.yaml
+- gopaoxy-ingress.yaml
