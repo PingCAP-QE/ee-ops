@@ -20,6 +20,9 @@ controller:
     # for codecov.io uploading
     - { name: codecov-token, keyName: tidb }
     - { name: codecov-token, keyName: tikv-migration }
+    - { name: codecov-token, keyName: ticdc }
+    # for coveralls uploading
+    - { name: coveralls-token, keyName: ticdc }
     # for ci cache, no need create manually.
     - { name: jenkins-cache, keyName: region }
     - { name: jenkins-cache, keyName: bucket }
@@ -127,6 +130,19 @@ controller:
                       description: codecov token for tikv/migration
                       scope: GLOBAL
                       secret: ${codecov-token-tikv-migration}
+                  - string:
+                      id: codecov-token-ticdc
+                      description: codecov token for ticdc
+                      scope: GLOBAL
+                      secret: ${codecov-token-ticdc}
+              - domain:
+                  name: coveralls.io
+                credentials:
+                  - string:
+                      id: coveralls-token-ticdc
+                      description: coveralls token for ticdc
+                      scope: GLOBAL
+                      secret: ${coveralls-token-ticdc}
       # for jobs.
       jobs-dsl: |
         jobs:
