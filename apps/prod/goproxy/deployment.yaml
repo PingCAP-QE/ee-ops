@@ -19,6 +19,12 @@ spec:
           - "-listen=0.0.0.0:8080"
           - "-cacheDir=/opt/cache"
           - "-proxy=https://proxy.golang.org"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
         resources:
           limits:
             memory: "8Gi"
