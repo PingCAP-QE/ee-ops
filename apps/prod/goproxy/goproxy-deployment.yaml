@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goproxy
+spec:
+  selector:
+    matchLabels:
+      app: goproxy
+  template:
+    metadata:
+      labels:
+        app: goproxy
+    spec:
+      containers:
+      - name: goproxy
+        image: goproxy/goproxy:latest
+        imagePullPolicy: IfNotPresent
+        args:
+          - "-listen=0.0.0.0:8080"
+          - "-cacheDir=/opt/cache"
+          - "-proxy=https://proxy.golang.org"
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: data
+          mountPath: /opt/cache
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: goproxy-xxx
