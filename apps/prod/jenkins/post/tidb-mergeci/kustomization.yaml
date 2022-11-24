@@ -3,4 +3,3 @@ kind: Kustomization
 namespace: jenkins-tidb-mergeci
 resources:
   - namespace.yaml
-  - ../_base
