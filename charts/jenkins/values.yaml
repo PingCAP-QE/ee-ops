@@ -262,7 +262,7 @@ controller:
     - artifactId: git
       source:
         # renovate: datasource=jenkins-plugins depName=git
-        version: 4.13.0
+        version: 4.14.0
     - artifactId: configuration-as-code
       source:
         # renovate: datasource=jenkins-plugins depName=configuration-as-code
