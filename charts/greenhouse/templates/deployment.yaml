@@ -35,7 +35,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           args:
             - --dir=/data
-            - --min-percent-blocks-free=2
+            - --min-percent-blocks-free={{ .Values.run.minPercentBlocksFree }}
+            - --evict-until-percent-blocks-free={{ .Values.run.evictUntilPercentBlocksFree }}
+            - --disk-check-interval={{ .Values.run.diskCheckInterval }}
           volumeMounts:
             {{- if .Values.persistence.mounts }}
             {{ toYaml .Values.persistence.mounts | indent 12 }}
