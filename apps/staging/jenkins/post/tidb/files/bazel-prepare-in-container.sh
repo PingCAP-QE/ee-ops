@@ -46,7 +46,7 @@ if [ -d /etc/containerinfo ]; then
     cpu_limit=$(cat /etc/containerinfo/cpu_limit)
     mem_limit=$(cat /etc/containerinfo/mem_limit)
     mem_limit=$(((mem_limit / 1048576) * 9 / 10 ))
-    echo "build --local_ram_resources=${mem_limit} --local_cpu_resources=${cpu_limit}" >> ~/.bazelrc
+    echo "build --local_ram_resources=${mem_limit} --local_cpu_resources=${cpu_limit} --jobs=${cpu_limit}" >> ~/.bazelrc
 fi
 
 # set repository cache: https://docs.bazel.build/versions/5.3.1/guide.html#the-repository-cache
