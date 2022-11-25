@@ -6,13 +6,6 @@ controller:
   # 'name' and 'keyName' must be lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-',
   # and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc')
   additionalExistingSecrets:
-    #   # you should setup the secret `google-oauth2` with key:
-    #   #  `client-id` and `client-secret` before deploy jenkins
-    #   #  in the same namespace.
-    #   - name: google-oauth2
-    #     keyName: client-id
-    #   - name: google-oauth2
-    #     keyName: client-secret
     # for git clone for private repo.
     - { name: github, keyName: git-private-key }
     - { name: github, keyName: git-username }
@@ -39,16 +32,6 @@ controller:
     authorizationStrategy: |-
       loggedInUsersCanDoAnything:
         allowAnonymousRead: true # allow users to read builds logs without logging in.
-    # authorizationStrategy: |-
-    #   globalMatrix:
-    #     permissions:
-    #     - "Job/Read:anonymous"
-    #     - "Lockable Resources/View:anonymous"
-    #     - "Metrics/View:anonymous"
-    #     - "Overall/Read:anonymous"
-    #     - "Overall/Read:authenticated"
-    #     - "View/Read:anonymous"
-    #     # add more...
 
     # for security.
     security:
@@ -63,13 +46,6 @@ controller:
         - id: "${chart-admin-username}"
           name: "Jenkins Admin"
           password: "${chart-admin-password}"
-
-    # securityRealm: |-
-    #   googleOAuth2:
-    #     # will read from key `client-id` from secret `google-oauth2`
-    #     clientId: "${google-oauth2-client-id}"
-    #     # will read from key `client-secret` from secret `google-oauth2`
-    #     clientSecret: "${google-oauth2-client-secret}"
 
     # REF Doc: https://github.com/PingCAP-QE/ee-ops/blob/main/charts/jenkins/README.md
     #

@@ -19,14 +19,14 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes
         version: 3734.v562b_b_a_627ea_c
-    - artifactId: workflow-aggregator
+    - artifactId: mailer
       source:
-        # renovate: datasource=jenkins-plugins depName=workflow-aggregator
-        version: 590.v6a_d052e5a_a_b_5
+        # renovate: datasource=jenkins-plugins depName=mailer
+        version: 435.438.v5b_81173f5b_a_1
     - artifactId: git
       source:
         # renovate: datasource=jenkins-plugins depName=git
-        version: 4.13.0
+        version: 4.14.0
     - artifactId: configuration-as-code
       source:
         # renovate: datasource=jenkins-plugins depName=configuration-as-code
@@ -43,27 +43,50 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=job-dsl
         version: 1.81
-    - artifactId: google-login
-      source:
-        # renovate: datasource=jenkins-plugins depName=google-login
-        version: 1.6
-    - artifactId: matrix-auth
-      source:
-        # renovate: datasource=jenkins-plugins depName=matrix-auth
-        version: 3.1.5
-    - artifactId: ghprb
-      source:
-        # renovate: datasource=jenkins-plugins depName=ghprb
-        version: 1.42.2
     - artifactId: build-failure-analyzer
       source:
         # renovate: datasource=jenkins-plugins depName=build-failure-analyzer
         version: 2.4.0
+    - artifactId: pipeline-groovy-lib
+      source:
+        # renovate: datasource=jenkins-plugins depName=pipeline-groovy-lib
+        version: 621.vb_44ce045b_582
+    - artifactId: pipeline-utility-steps
+      source:
+        # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
+        version: 2.13.2
+    - artifactId: http_request
+      source:
+        # renovate: datasource=jenkins-plugins depName=http_request
+        version: 1.16
+    - artifactId: workflow-job
+      source:
+        # renovate: datasource=jenkins-plugins depName=workflow-job
+        version: 1189.va_d37a_e9e4eda_
+    - artifactId: workflow-aggregator
+      source:
+        # renovate: datasource=jenkins-plugins depName=workflow-aggregator
+        version: 590.v6a_d052e5a_a_b_5
+    - artifactId: workflow-cps-global-lib
+      source:
+        # renovate: datasource=jenkins-plugins depName=workflow-cps-global-lib
+        version: 609.vd95673f149b_b
+    - artifactId: instance-identity
+      source:
+        # renovate: datasource=jenkins-plugins depName=instance-identity
+        version: 116.vf8f487400980
     - artifactId: jenkins-pipeline-cache
       source:
         # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
         url: https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.5/jenkins-pipeline-cache-0.1.5.hpi
-
+    - artifactId: ghprb
+      source:
+        # renovate: datasource=jenkins-plugins depName=ghprb
+        version: 1.42.2
+    - artifactId: generic-webhook-trigger
+      source:
+        # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
+        version: 1.85.2
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
