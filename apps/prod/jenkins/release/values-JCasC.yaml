@@ -52,8 +52,6 @@ controller:
 
     # for security.
     security:
-      gitHostKeyVerificationConfiguration:
-        sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
       globalJobDslSecurityConfiguration:
         useScriptSecurity: false
 

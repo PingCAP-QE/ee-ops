@@ -1,5 +1,16 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
+  initContainerEnv:
+    - name: JENKINS_UC
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  containerEnv:
+    - name: JENKINS_UC
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+
   # List of plugins to be install during Jenkins controller start
   installPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
