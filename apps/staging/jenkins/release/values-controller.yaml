@@ -1,5 +1,6 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
+  tag: "2.361.1"
   resources:
     requests:
       cpu: "500m"
