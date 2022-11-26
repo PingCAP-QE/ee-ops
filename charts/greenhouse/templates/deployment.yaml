@@ -40,7 +40,7 @@ spec:
             - --disk-check-interval={{ .Values.run.diskCheckInterval }}
           volumeMounts:
             {{- if .Values.persistence.mounts }}
-            {{ toYaml .Values.persistence.mounts | nindent 12 }}
+            {{- toYaml .Values.persistence.mounts | nindent 12 }}
             {{- end }}
             - name: cache
               mountPath: /data
@@ -65,9 +65,13 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
         {{- if .Values.persistence.volumes }}
-        {{ toYaml .Values.persistence.volumes | nindent 8 }}
+        {{- toYaml .Values.persistence.volumes | nindent 8 }}
         {{- end }}
-        {{- if not (contains "cache" (quote .Values.persistence.volumes)) }}
+        {{- $hasCacheVolume := 0 -}}
+        {{- range .Values.persistence.volumes -}}
+          {{- if eq .name "cache" }}{{ $hasCacheVolume = 1 }}{{- end }}
+        {{- end -}}
+        {{- if not $hasCacheVolume }}
         - name: cache
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
