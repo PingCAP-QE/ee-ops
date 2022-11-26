@@ -40,7 +40,7 @@ spec:
             - --disk-check-interval={{ .Values.run.diskCheckInterval }}
           volumeMounts:
             {{- if .Values.persistence.mounts }}
-            {{ toYaml .Values.persistence.mounts | indent 12 }}
+            {{ toYaml .Values.persistence.mounts | nindent 12 }}
             {{- end }}
             - name: cache
               mountPath: /data
@@ -64,12 +64,17 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
+        {{- if .Values.persistence.volumes }}
+        {{ toYaml .Values.persistence.volumes | nindent 8 }}
+        {{- end }}
+        {{- if not (contains "cache" (quote .Values.persistence.volumes)) }}
         - name: cache
         {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
             claimName: {{ .Values.persistence.existingClaim | default (include "greenhouse.fullname" .) }}
         {{- else }}
           emptyDir: {} # should not using when replicas > 1.
+        {{- end -}}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
