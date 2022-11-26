@@ -114,3 +114,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# greenhouse eviction
+run:
+  minPercentBlocksFree: 5 # %5
+  evictUntilPercentBlocksFree: 20 # %20
+  diskCheckInterval: 10s
