@@ -40,12 +40,9 @@ spec:
       accessMode: ReadWriteOnce
       size: 3Ti
       volumes:
-      - name: new-cache
+      - name: cache
         hostPath:
           path: /data/brc
-      mounts:
-       - mountPath: /new-data
-         name: new-cache
     serviceMonitor:
       enabled: true
       additionalLabels:
