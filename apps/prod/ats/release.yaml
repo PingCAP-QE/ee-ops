@@ -42,8 +42,8 @@ spec:
       dedicated: greenhouse
     volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: ats-storage
+        hostPath:
+          path: /data/ats
       - name: config-override
         configMap:
           name: ats-config-override
