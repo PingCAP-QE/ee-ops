@@ -14,10 +14,12 @@ metadata:
   name: lark-alert
   namespace: flux-system
 spec:
-  summary: "[Testing] Production cluster GitOps notify"
+  summary: "Production cluster GitOps notify"
   providerRef:
     name: lark
-  eventSeverity: info
+  eventSeverity: error
+  exclusionList:
+    - ""
   eventSources:
     - kind: GitRepository
       name: '*'
