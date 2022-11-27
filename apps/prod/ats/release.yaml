@@ -33,17 +33,17 @@ spec:
   values:
     replicaCount: 1
     resources:
-      requests:
-        cpu: "1"
-        memory: 1Gi
       limits:
         cpu: "4"
         # ats ram-cache size + 8GiB
-        memory: 72Gi
+        memory: 136Gi
+    # deploy on dedicated node.
+    nodeSelector:
+      dedicated: greenhouse
     volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: ats-storage
+        hostPath:
+          path: /data/ats
       - name: config-override
         configMap:
           name: ats-config-override
