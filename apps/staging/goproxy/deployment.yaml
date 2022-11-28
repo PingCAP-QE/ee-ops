@@ -6,6 +6,7 @@ spec:
   selector:
     matchLabels:
       app: goproxy
+  replicas: 1
   template:
     metadata:
       labels:
@@ -17,8 +18,8 @@ spec:
         imagePullPolicy: IfNotPresent
         args:
           - "-listen=0.0.0.0:8080"
-          - "-cacheDir=/opt/cache"
-          - "-proxy=https://proxy.golang.org"
+          - "-cacheDir=/data"
+          - "-proxy=https://goproxy.cn" # using qiniu cloud proxy.
         resources:
           limits:
             memory: "8Gi"
@@ -28,8 +29,8 @@ spec:
           name: http
         volumeMounts:
         - name: data
-          mountPath: /opt/cache
+          mountPath: /data
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: goproxy-xxx
+          claimName: goproxy
