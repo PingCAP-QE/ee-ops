@@ -5,6 +5,6 @@ metadata:
   namespace: apps
 spec:
   additionalConfig:
-    maxSize: 300G
+    maxSize: 600G
   bucketName: ci-pipeline-cache
   storageClassName: ceph-bucket
