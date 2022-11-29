@@ -3,11 +3,11 @@ controller:
   tag: "2.379"
   resources:
     requests:
-      cpu: "4"
-      memory: 64Gi
+      cpu: "8"
+      memory: 80Gi
     limits:
-      cpu: "4"
-      memory: 64Gi
+      cpu: "8"
+      memory: 80Gi
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # current jenkins using java-11.
