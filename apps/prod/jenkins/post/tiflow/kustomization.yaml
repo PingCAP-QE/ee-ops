@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: jenkins-tiflow
 resources:
   - namespace.yaml
-  - ../_base/rbac.yaml
+  - ../_base
