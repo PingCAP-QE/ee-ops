@@ -198,7 +198,7 @@ controller:
             endpoint: ${jenkins-cache-endpoint}
             username: ${jenkins-cache-access-key}
             password: ${jenkins-cache-access-secret}
-            threshold: 200000 # limit to 200GiB
+            threshold: 400000 # limit to 400GiB
       # for global env variables
       env-vars: |
         jenkins:
