@@ -3,6 +3,6 @@ kind: Kustomization
 resources:
   - tidb
   - tidb-mergeci
-  - ticdc
+  - tiflow
   - ti-pipeline
   - cd
