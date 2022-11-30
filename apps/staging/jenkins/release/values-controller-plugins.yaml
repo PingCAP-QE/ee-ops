@@ -87,6 +87,9 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
         version: 1.85.2
+    - artifactID: build-failure-analyzer
+      source:
+        url: https://github.com/lijie0123/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
@@ -98,7 +101,32 @@ controller:
       - sourceLabels: [__name__]
         regex: jenkins_bfa_cause_(.*)
         targetLabel: cause
-      - sourceLabels: [ __name__]
-        regex: "jenkins_bfa_(.*)_(.*)"
-        replacement: "jenkins_bfa"
+      - regex: jenkins_bfa_(?:cause|category)_.*
+        replacement: jenkins_bfa
+        sourceLabels:
+        - __name__
+        targetLabel: __name__
+      - regex: jenkins_bfa_job_cause:_:(.*):_:.*
+        sourceLabels:
+        - __name__
+        targetLabel: jobname
+      - regex: jenkins_bfa_job_cause:_:.*:_:(.*)
+        sourceLabels:
+        - __name__
+        targetLabel: cause
+      - regex: jenkins_bfa_job_category:_:(.*):_:.*
+        sourceLabels:
+        - __name__
+        targetLabel: jobname
+      - regex: jenkins_bfa_job_category:_:.*:_:(.*)
+        sourceLabels:
+        - __name__
+        targetLabel: category
+      - regex: (jenkins_bfa_job_cause):_:.*:_:.*
+        sourceLabels:
+        - __name__
+        targetLabel: __name__
+      - regex: (jenkins_bfa_job_category):_:.*:_:.*
+        sourceLabels:
+        - __name__
         targetLabel: __name__
