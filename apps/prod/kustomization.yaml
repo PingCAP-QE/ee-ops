@@ -6,4 +6,3 @@ resources:
   - mongodb
   - greenhouse
   - ats
-  - goproxy
