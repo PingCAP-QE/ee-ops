@@ -249,12 +249,8 @@ controller:
                 modernSCM:
                   libraryPath: libraries/tipipeline
                   scm:
-                    github:
-                      configuredByUrl: true
-                      repositoryUrl: "https://github.com/PingCAP-QE/ci"
-                      # useless but required.
-                      repoOwner: "PingCAP-QE"
-                      repository: "ci"
+                    git:
+                      remote: "https://github.com/PingCAP-QE/ci"
               cachingConfiguration:
                 refreshTimeMinutes: 60
                 excludedVersionsStr: 'feature/ fix/ bugfix/'
