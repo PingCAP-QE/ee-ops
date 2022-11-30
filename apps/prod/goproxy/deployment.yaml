@@ -6,11 +6,20 @@ spec:
   selector:
     matchLabels:
       app: goproxy
+  replicas: 2
   template:
     metadata:
       labels:
         app: goproxy
     spec:
+      affinity:
+        # for ceph-block RBD mounting.
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: goproxy
+              topologyKey: kubernetes.io/hostname
       containers:
       - name: goproxy
         image: goproxy/goproxy:latest
