@@ -3,3 +3,7 @@ agent:
   namespace: jenkins-ci-default
   podRetention: Never
   containerCap: 100
+  image: "jenkins/inbound-agent"
+  tag: "4.11-1"
+  command: ""
+  args: ""
