@@ -87,7 +87,7 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
         version: 1.85.2
-    - artifactID: build-failure-analyzer
+    - artifactId: build-failure-analyzer
       source:
         url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
   # for plugin build-failure-analyzer
