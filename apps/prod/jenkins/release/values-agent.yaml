@@ -1,8 +1,8 @@
 agent:
-  maxRequestsPerHostStr: "100" # need to restart controller after updated it.
+  maxRequestsPerHostStr: "150" # need to restart controller after updated it.
   namespace: jenkins-ci-default
   podRetention: Never
-  containerCap: 100
+  containerCap: 150
   image: "jenkins/inbound-agent"
   tag: "4.11-1"
   command: ""
