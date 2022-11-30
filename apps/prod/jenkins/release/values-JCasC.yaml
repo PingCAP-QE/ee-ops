@@ -206,7 +206,7 @@ controller:
             - envVars:
                 env:
                   - key: "GOPROXY"
-                    value: "http://goproxy.pingcap.net,https://proxy.golang.org,direct"
+                    value: "http://goproxy.apps.svc,https://proxy.golang.org,direct"
       build-failure-analyzer: |
         unclassified:
           buildFailureAnalyzer:
