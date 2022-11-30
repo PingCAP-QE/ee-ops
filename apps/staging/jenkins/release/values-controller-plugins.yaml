@@ -89,7 +89,7 @@ controller:
         version: 1.85.2
     - artifactID: build-failure-analyzer
       source:
-        url: https://github.com/lijie0123/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
+        url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
