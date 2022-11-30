@@ -29,11 +29,11 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 1
+    replicaCount: 2
     resources:
       limits:
-        cpu: "4"
-        memory: 32Gi
+        cpu: "8"
+        memory: 16Gi
     persistence:
       enabled: true
       storageClass: ceph-block
