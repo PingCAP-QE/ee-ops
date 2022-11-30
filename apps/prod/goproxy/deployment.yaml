@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goproxy
+spec:
+  selector:
+    matchLabels:
+      app: goproxy
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: goproxy
+    spec:
+      affinity:
+        # for ceph-block RBD mounting.
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: goproxy
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: goproxy
+        image: goproxy/goproxy:latest
+        imagePullPolicy: IfNotPresent
+        args:
+          - "-listen=0.0.0.0:8080"
+          - "-cacheDir=/opt/cache"
+          - "-proxy=https://proxy.golang.org"
+        readinessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 8080
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        resources:
+          limits:
+            memory: "8Gi"
+            cpu: "4"
+        ports:
+        - containerPort: 8080
+          name: http
+        volumeMounts:
+        - name: data
+          mountPath: /opt/cache
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: goproxy
