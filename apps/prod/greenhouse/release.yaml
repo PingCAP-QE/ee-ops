@@ -30,6 +30,10 @@ spec:
     ignoreFailures: false
   values:
     replicaCount: 2
+    run:
+      minPercentBlocksFree: 10 # %10
+      evictUntilPercentBlocksFree: 20 # %20
+      diskCheckInterval: 30s
     resources:
       limits:
         cpu: "8"
