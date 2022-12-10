@@ -80,6 +80,8 @@ spec:
           - name: 10.2.12.13
           - name: 10.2.12.20
           - name: 10.2.12.21
+          - name: node3
+            deviceFilter: ^nvme[3]n1
     cephFileSystems:
       - name: ceph-filesystem
         spec:
