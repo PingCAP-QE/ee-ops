@@ -82,6 +82,28 @@ spec:
           - name: 10.2.12.21
           - name: node3
             deviceFilter: ^nvme[3]n1
+      resources:
+        mgr:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "1"
+            memory: "1Gi"
+        mon:
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+          requests:
+            cpu: "2"
+            memory: "2Gi"
+        osd:
+          limits:
+            cpu: "2"
+            memory: "8Gi"
+          requests:
+            cpu: "2"
+            memory: "8Gi"
     cephFileSystems:
       - name: ceph-filesystem
         spec:
