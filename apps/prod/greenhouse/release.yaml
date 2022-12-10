@@ -42,11 +42,7 @@ spec:
       enabled: true
       storageClass: ceph-block
       accessMode: ReadWriteOnce
-      size: 3Ti
-      volumes:
-      - name: cache
-        hostPath:
-          path: /data/brc
+      size: 4Ti
     serviceMonitor:
       enabled: true
       additionalLabels:
