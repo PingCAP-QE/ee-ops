@@ -29,11 +29,11 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 2
+    replicaCount: 3
     run:
-      minPercentBlocksFree: 10 # %10
+      minPercentBlocksFree: 5 # %5
       evictUntilPercentBlocksFree: 20 # %20
-      diskCheckInterval: 30s
+      diskCheckInterval: 60s
     resources:
       limits:
         cpu: "8"
@@ -42,7 +42,7 @@ spec:
       enabled: true
       storageClass: ceph-block
       accessMode: ReadWriteOnce
-      size: 4Ti
+      size: 8Ti
     serviceMonitor:
       enabled: true
       additionalLabels:
