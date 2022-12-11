@@ -45,8 +45,7 @@ controller:
         version: 1.81
     - artifactId: build-failure-analyzer
       source:
-        # renovate: datasource=jenkins-plugins depName=build-failure-analyzer
-        version: 2.4.0
+        url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
     - artifactId: pipeline-groovy-lib
       source:
         # renovate: datasource=jenkins-plugins depName=pipeline-groovy-lib
@@ -87,46 +86,37 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
         version: 1.85.2
-    - artifactId: build-failure-analyzer
-      source:
-        url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
   prometheus:
     metricRelabelings:
+      # add label: category
       - sourceLabels: [__name__]
         regex: jenkins_bfa_category_(.*)
-        targetLabel: "category"
+        targetLabel: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:.*:_:(.*)
+        targetLabel: category
+
+      # add label: cause
       - sourceLabels: [__name__]
         regex: jenkins_bfa_cause_(.*)
         targetLabel: cause
-      - regex: jenkins_bfa_(?:cause|category)_.*
-        replacement: jenkins_bfa
-        sourceLabels:
-        - __name__
-        targetLabel: __name__
-      - regex: jenkins_bfa_job_cause:_:(.*):_:.*
-        sourceLabels:
-        - __name__
-        targetLabel: jobname
-      - regex: jenkins_bfa_job_cause:_:.*:_:(.*)
-        sourceLabels:
-        - __name__
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:.*:_:(.*)
         targetLabel: cause
-      - regex: jenkins_bfa_job_category:_:(.*):_:.*
-        sourceLabels:
-        - __name__
+
+      # add label: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:(.*):_:.*
         targetLabel: jobname
-      - regex: jenkins_bfa_job_category:_:.*:_:(.*)
-        sourceLabels:
-        - __name__
-        targetLabel: category
-      - regex: (jenkins_bfa_job_cause):_:.*:_:.*
-        sourceLabels:
-        - __name__
-        targetLabel: __name__
-      - regex: (jenkins_bfa_job_category):_:.*:_:.*
-        sourceLabels:
-        - __name__
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:(.*):_:.*
+        targetLabel: jobname
+
+      # aggerate to uniq metric: jenkins_bfa
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_.*_.*
+        replacement: jenkins_bfa
         targetLabel: __name__
