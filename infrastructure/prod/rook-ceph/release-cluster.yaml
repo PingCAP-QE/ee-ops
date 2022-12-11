@@ -88,6 +88,12 @@ spec:
             deviceFilter: ^nvme[3]n1
           - name: node6
             deviceFilter: ^nvme[3]n1
+          - name: node7
+            deviceFilter: ^nvme[3]n1
+          - name: node8
+            deviceFilter: ^nvme[3]n1
+          - name: node9
+            deviceFilter: ^nvme[3]n1
       resources:
         mgr:
           limits:
