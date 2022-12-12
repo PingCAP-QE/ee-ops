@@ -32,6 +32,13 @@ spec:
     ignoreFailures: false
   values:
     replicaCount: 1
+    ingress:
+      enabled: true
+      hosts:
+        - host: ats.internal.pingcap.net
+          paths:
+            - path: /
+              pathType: ImplementationSpecific
     resources:
       limits:
         cpu: "4"
