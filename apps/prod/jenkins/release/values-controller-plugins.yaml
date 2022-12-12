@@ -18,7 +18,7 @@ controller:
     - artifactId: kubernetes
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes
-        version: 3734.v562b_b_a_627ea_c
+        version: 3743.v1fa_4c724c3b_7
     - artifactId: mailer
       source:
         # renovate: datasource=jenkins-plugins depName=mailer
