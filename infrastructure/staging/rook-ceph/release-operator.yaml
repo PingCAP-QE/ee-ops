@@ -14,7 +14,7 @@ spec:
         name: rook
         namespace: flux-system
       # renovate: datasource=helm registryUrl=https://charts.rook.io/release depName=rook-ceph
-      version: "v1.10.4"
+      version: "v1.10.7"
   interval: 1h0m0s
   install:
     remediation:
