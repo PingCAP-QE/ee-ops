@@ -17,7 +17,7 @@ spec:
         name: rook
         namespace: flux-system
       # renovate: datasource=helm registryUrl=https://charts.rook.io/release depName=rook-ceph-cluster
-      version: "v1.10.4"
+      version: "v1.10.7"
   interval: 1h0m0s
   install:
     remediation:
@@ -41,13 +41,28 @@ spec:
         # Rook will immediately stop configuring the cluster and only wait for the delete command.
         # If the empty string is set, Rook will not destroy any data on hosts during uninstall.
         confirmation: "yes-really-destroy-data"
+      storage:
+        useAllNodes: false
+        useAllDevices: false
+        nodes:
+          - name: "172.16.5.55"
+            deviceFilter: "nvme0n1"
+            config:
+              osdsPerDevice: "5"
+          - name: "172.16.5.90"
+            devices:
+              - name: "nvme0n1"
+                config: { osdsPerDevice: "5" }
+              - name: "nvme1n1"
+                config: { osdsPerDevice: "5" }
+          - name: "172.16.5.83"
+            config:
+              osdsPerDevice: "1"
+            devices:
+            - name: sdb
+            - name: sdc
     configOverride: |
       [client.rgw.ceph.objectstore.a]
         rgw_d3n_l1_local_datacache_enabled = true
         rgw_d3n_l1_datacache_persistent_path = "/var/lib/ceph/rgw/ceph-ceph-objectstore/rgw_datacache"
         rgw_d3n_l1_datacache_size = 10737418240
-  valuesFrom:
-    # may you should set custom values in you cluster, for example: config/values-nodes.tpl.yaml
-    - kind: Secret
-      name: cluster-release-optional-values
-      optional: true
