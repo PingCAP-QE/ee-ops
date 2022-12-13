@@ -1,4 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - PingCAP-QE
+configMapGenerator:
+  - name: prow-job-config
+    namespace: apps
+    behavior: create
+    options:
+      disableNameSuffixHash: true
+    files:
+      - PingCAP-QE/ee-ops/job-call-jenkins.yaml
+      - PingCAP-QE/ee-ops/job-curl-call-tekton-pipeline-run.yaml
+      - PingCAP-QE/ee-ops/job-curl-call-tekton-task-run.yaml
+      - PingCAP-QE/ee-ops/job-label-sync.yaml
+      - PingCAP-QE/ee-ops/job-prowjob.yaml
+      - PingCAP-QE/ee-ops/job-tekton-pipeline-spec.yaml
