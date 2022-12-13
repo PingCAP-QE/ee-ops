@@ -5,12 +5,12 @@
   ],
   "jenkins": {
     "enabled": true,
-    "fileMatch": [
-      ".*-plugins\\.ya?ml$",
-      "charts/jenkins/values\\.ya?ml$"
-    ],
     "regexManagers": [
       {
+        "fileMatch": [
+          ".*-plugins\\.ya?ml$",
+          "charts/jenkins/values\\.ya?ml$"
+        ],
         "matchStrings": [
           "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
           "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*url: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
