@@ -28,6 +28,7 @@ version: "0.2.0"
 # application. Versions are not expected to follow Semantic Versioning.
 # They should reflect the version the application is using.
 # It is recommended to use it with quotes.
+# renovate: datasource=docker registryUrl=gcr.io depName=k8s-prow/tide
 appVersion: v20220504-0b3a7e15f4
 
 dependencies:
