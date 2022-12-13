@@ -17,7 +17,7 @@ spec:
         name: rook
         namespace: flux-system
       # renovate: datasource=helm registryUrl=https://charts.rook.io/release depName=rook-ceph-cluster
-      version: "v1.10.4"
+      version: "v1.10.7"
   interval: 1h0m0s
   install:
     remediation:
@@ -30,7 +30,20 @@ spec:
       enabled: true
       createPrometheusRules: true
     cephClusterSpec:
-      dataDirHostPath: /var/lib/rook
+      cephVersion:
+        image: quay.io/ceph/ceph:v17.2.5
+      storage:
+        useAllDevices: false
+        useAllNodes: false
+        nodes:
+          - name: node1
+            deviceFilter: ^nvme[1]n1
+            config:
+              osdsPerDevice: "6"
+          - name: node2
+            deviceFilter: ^nvme[1]n1
+            config:
+              osdsPerDevice: "6"
       dashboard:
         enabled: true
         ssl: false
@@ -46,8 +59,3 @@ spec:
         rgw_d3n_l1_local_datacache_enabled = true
         rgw_d3n_l1_datacache_persistent_path = "/var/lib/ceph/rgw/ceph-ceph-objectstore/rgw_datacache"
         rgw_d3n_l1_datacache_size = 10737418240
-  valuesFrom:
-    # may you should set custom values in you cluster, for example: config/values-nodes.tpl.yaml
-    - kind: Secret
-      name: cluster-release-optional-values
-      optional: true
