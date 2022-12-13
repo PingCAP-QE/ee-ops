@@ -190,8 +190,3 @@ spec:
     operatorNamespace: rook-ceph
     toolbox:
       enabled: true
-  valuesFrom:
-    # may you should set custom values in you cluster, for example: config/values-nodes.tpl.yaml
-    - kind: Secret
-      name: cluster-release-optional-values
-      optional: true
