@@ -16,6 +16,7 @@ spec:
         kind: HelmRepository
         name: rook
         namespace: flux-system
+      # renovate: datasource=helm registryUrl=https://charts.rook.io/release depName=rook-ceph-cluster
       version: "v1.10.4"
   interval: 1h0m0s
   install:

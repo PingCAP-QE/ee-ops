@@ -4,19 +4,19 @@
     "config:base"
   ],
   "jenkins": {
-    "enabled": true
-  },
-  "regexManagers": [
-    {
-      "fileMatch": [
-        ".*-plugins\\.yaml$$",
-        "charts/.*/values\\.yaml$$"
-      ],
-      "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*url: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
-      ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}maven{{/if}}"
-    }
-  ]
+    "enabled": true,
+    "fileMatch": [
+      ".*-plugins\\.ya?ml$",
+      "charts/jenkins/values\\.ya?ml$"
+    ],
+    "regexManagers": [
+      {
+        "matchStrings": [
+          "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
+          "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*url: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
+        ],
+        "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}maven{{/if}}"
+      }
+    ]
+  }
 }
