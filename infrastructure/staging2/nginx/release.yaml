@@ -24,9 +24,8 @@ spec:
       service:
         type: NodePort
         nodePorts:
-          # TODO(wuhuizuo): should change to more special ports
-          http: "30704"
-          https: "32631"
+          http: "30080"
+          https: "30443"
       ingressClassResource:
         default: true
 
