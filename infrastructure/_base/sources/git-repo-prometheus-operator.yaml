@@ -6,5 +6,5 @@ metadata:
 spec:
   interval: 24h
   ref:
-    branch: release-0.9
+    tag: v0.11.0
   url: https://github.com/prometheus-operator/kube-prometheus.git
