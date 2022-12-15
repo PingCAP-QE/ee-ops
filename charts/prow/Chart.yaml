@@ -36,4 +36,4 @@ dependencies:
     version: "0.1.0"
   - name: minio
     repository: https://charts.bitnami.com/bitnami
-    version: "11.10.18"
+    version: "11.10.24"
