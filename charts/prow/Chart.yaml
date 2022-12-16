@@ -33,6 +33,7 @@ appVersion: v20220504-0b3a7e15f4
 
 dependencies:
   - name: prow-crd
+    repository: https://pingcap-qe.github.io/ee-ops
     version: "0.1.0"
   - name: minio
     repository: https://charts.bitnami.com/bitnami
