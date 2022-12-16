@@ -1,6 +1,6 @@
 apiVersion: v2
 name: prow-crd
-description: Prow custom resource definations.
+description: Prow's CRD
 maintainers:
   - name: wuhuizuo
     email: wuhuizuo@126.com
