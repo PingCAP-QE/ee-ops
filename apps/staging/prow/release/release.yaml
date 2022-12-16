@@ -10,10 +10,11 @@ spec:
   targetNamespace: apps
   chart:
     spec:
-      chart: ./charts/prow
+      chart: prow
+      version: 0.3.0
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: ee-ops
         namespace: flux-system
   interval: 5m
   timeout: 5m
@@ -57,52 +58,8 @@ spec:
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
       githubOrg: PingCAP-QE
-    pcm:
-      image:
-        repository: hub.pingcap.net/ee/prow-controller-manager
-        tag: v20221108-93ba3423d9
-    deck:
-      image:
-        repository: hub.pingcap.net/ee/deck
-        tag: v20221108-93ba3423d9
-    crier:
-      image:
-        repository: hub.pingcap.net/ee/crier
-        tag: v20221108-93ba3423d9
-
-    ghproxy:
-      image:
-        repository: hub.pingcap.net/ee/ghproxy
-        tag: v20221108-93ba3423d9
-    hook:
-      image:
-        repository: hub.pingcap.net/ee/hook
-        tag: v20221108-93ba3423d9
-    horologium:
-      image:
-        repository: hub.pingcap.net/ee/horologium
-        tag: v20221108-93ba3423d9
-    sinker:
-      image:
-        repository: hub.pingcap.net/ee/sinker
-        tag: v20221108-93ba3423d9
-    statusReconciler:
-      image:
-        repository: hub.pingcap.net/ee/status-reconciler
-        tag: v20221108-93ba3423d9
-    tide:
-      image:
-        repository: hub.pingcap.net/ee/tide
-        tag: v20221108-93ba3423d9
-    pipeline:
-      image:
-        repository: hub.pingcap.net/ee/pipeline
-        tag: v20221108-93ba3423d9
     jenkinsOperator:
       enabled: true
-      image:
-        repository: hub.pingcap.net/ee/jenkins-operator
-        tag: v20221108-7045713ae7
       dryRun: false
       jenkinsUrl: http://jenkins:8080/jenkins/
       auth:
