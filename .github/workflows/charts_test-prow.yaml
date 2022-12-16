@@ -81,6 +81,7 @@ jobs:
           ct install \
             --charts charts/prow \
             --chart-repos "bitnami=https://charts.bitnami.com/bitnami" \
+            --chart-repos "self=https://pingcap-qe.github.io/ee-ops" \
             --helm-extra-set-args '-f ct-values.yaml' \
             --namespace prow \
             --debug
