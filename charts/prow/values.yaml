@@ -472,6 +472,27 @@ thirdPlugins: {}
   # ti-community-merge:
   # ti-community-tars:
   # ti-web:
+  #   service:
+  #     type: ClusterIP
+  #     port: 80
+
+  #   ingress:
+  #     enabled: true
+  #     className: ""
+  #     annotations:
+  #       cert-manager.io/cluster-issuer: letsencrypt-staging
+  #       # kubernetes.io/ingress.class: nginx
+  #       # kubernetes.io/tls-acme: "true"
+  #     hosts:
+  #       - paths:
+  #           - path: /tichi
+  #             pathType: Prefix
+  #         # host: << REPLACE >>
+  #     tls: []
+  #     #  - secretName: chart-example-tls
+  #     #    hosts:
+  #     #      - << REPLACE >>
+
   #   replicaCount: 1
   #   image:
   #     repository: ticommunityinfra/tichi-web

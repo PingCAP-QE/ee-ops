@@ -1,0 +1,23 @@
+{{- $root := . -}}
+{{- range $name, $val := .Values.thirdPlugins }}
+{{- if $val.service }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: "{{ include "prow.fullname" $root }}-{{ $name }}"
+  labels:
+    {{- include "prow.labels" $root | nindent 4 }}
+    app.kubernetes.io/app: {{ $name }}
+spec:
+  type: {{ default "ClusterIP" $val.service.type }}
+  ports:
+    - port: {{ $val.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector: 
+    {{- include "prow.selectorLabels" $root | nindent 4 }}
+    app.kubernetes.io/app: {{ $name }}
+{{- end }}
+{{- end }}
