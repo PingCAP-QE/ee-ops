@@ -8,7 +8,7 @@ presubmits:
       pipeline_run_spec:
         pipelineSpec:
           tasks:
-            - name: taskName
+            - name: easy-step
               taskSpec:
                 steps:
                   - name: build-sources
