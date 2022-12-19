@@ -1,9 +1,9 @@
 presubmits:
   PingCAP-QE/ee-ops:
     - name: verifyCI2
-      always_run: false
+      always_run: true
       max_concurrency: 2
-      agent: tekton-pipelines
+      agent: tekton-pipeline
       pipeline_run_spec:
         pipelineSpec:
           tasks:
