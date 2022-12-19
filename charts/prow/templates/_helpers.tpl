@@ -365,7 +365,7 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "prow.serviceAccountName.jenkinsoperator" -}}
-{{- if .Values.pipeline.serviceAccount.create }}
+{{- if .Values.jenkinsOperator.serviceAccount.create }}
 {{- default (include "prow.fullname.jenkinsoperator" .) .Values.jenkinsOperator.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.jenkinsOperator.serviceAccount.name }}

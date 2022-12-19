@@ -6,8 +6,8 @@ kind: Deployment
 metadata:
   name: "{{ include "prow.fullname" $root }}-{{ $name }}"
   labels:
-    app: {{ $name }}
-    chart: "{{ $root.Chart.Name }}-{{ $root.Chart.Version | replace "+" "_" }}"
+    {{- include "prow.labels" $root | nindent 4 }}
+    app.kubernetes.io/app: {{ $name }}
 spec:
   {{- if $val.autoscaling }}
     {{- if $val.autoscaling.enabled }}
