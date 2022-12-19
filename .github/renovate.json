@@ -9,14 +9,24 @@
   "regexManagers": [
     {
       "fileMatch": [
-        ".*-plugins\\.yaml$$",
-        "charts/.*/values\\.yaml$$"
+        "apps/.*-plugins\\.yaml$$",
+        "charts/jenkins/values\\.yaml$$"
       ],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*version: (?<currentValue>.*)\\s",
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*url: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
       ],
       "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}maven{{/if}}"
+    },
+    {
+      "fileMatch": [
+        ".*/values-.*\\.yaml$$",
+        "charts/.*/Charts\\.yaml$$"
+      ],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*(tag|version|appVersion): (?<currentValue>.*)\\s",
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}"
     }
   ]
 }
