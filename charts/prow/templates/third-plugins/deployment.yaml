@@ -1,0 +1,133 @@
+{{- $root := . -}}
+{{- range $name, $val := .Values.thirdPlugins }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ include "prow.fullname" $root }}-{{ $name }}"
+  labels:
+    app: {{ $name }}
+    chart: "{{ $root.Chart.Name }}-{{ $root.Chart.Version | replace "+" "_" }}"
+spec:
+  {{- if $val.autoscaling }}
+    {{- if $val.autoscaling.enabled }}
+    {{- else }}
+  replicas: {{ $val.replicaCount }}
+    {{- end }}
+  {{- else }}
+  replicas: {{ $val.replicaCount }}
+  {{- end }}
+  strategy:
+    type: Recreate  
+  selector:
+    matchLabels:
+      {{- include "prow.selectorLabels" $root | nindent 6 }}
+      app.kubernetes.io/app: {{ $name }}
+  template:
+    metadata:
+      {{- with .podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "prow.selectorLabels" $root | nindent 8 }}
+        app.kubernetes.io/app: {{ $name }}
+    spec:
+      {{- with $root.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ $val.serviceAccountName | default "default" }}
+      {{- with $val.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $name }}
+          {{-  with $val.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ $val.image.repository }}:{{ $val.image.tag | default $root.Chart.AppVersion }}"
+          imagePullPolicy: {{ $val.image.pullPolicy }}
+          {{- if $val.args }}
+          args:
+            {{- toYaml $val.args | nindent 12 }}
+          {{- else if eq ($val.args | toJson) "[]" }}
+          {{- else }}
+          args:
+            - --dry-run=false
+            - --config-path=/etc/config/config.yaml
+            - --job-config-path=/etc/job-config            
+            - --github-app-id=$(GITHUB_APP_ID)
+            - --github-app-private-key-path=/etc/github/cert
+            # - --github-token-path=/etc/github/token
+            - --github-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}
+            - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}/graphql
+          {{- end }}
+          {{- if $val.env }}
+          env:
+            {{- toYaml $val.env | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: {{ $val.ports.http | default 80 }}
+          volumeMounts:
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true   
+            - name: hmac
+              mountPath: /etc/webhook
+              readOnly: true              
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: job-config
+              mountPath: /etc/job-config
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
+              readOnly: true
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+          livenessProbe:
+          {{- with $val.livenessProbe }}
+            {{- toYaml . | nindent 12 }}
+          {{- else }}
+            httpGet:
+              path: /healthz
+              port: 8081
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          {{- end }}
+          readinessProbe:
+          {{- with $val.readinessProbe }}
+            {{- toYaml . | nindent 12 }}
+          {{- else }}
+            httpGet:
+              path: /healthz/ready
+              port: 8081
+            initialDelaySeconds: 10
+            periodSeconds: 3
+          {{- end }}
+      volumes:
+        - name: github-token
+          secret:
+            secretName: {{ include "prow.fullname" $root }}-github-token      
+        - name: hmac
+          secret:
+            secretName: hmac-token
+        - name: config
+          configMap:
+            name: {{ include "prow.fullname" $root }}-config
+        - name: job-config
+          configMap:
+            name: {{ include "prow.fullname" $root }}-job-config
+        - name: plugins
+          configMap:
+            name: {{ include "prow.fullname" $root }}-plugins
+        - name: external-plugins-config
+          configMap:
+            name: {{ include "prow.fullname" $root }}-external-plugins-config
+{{- end }}

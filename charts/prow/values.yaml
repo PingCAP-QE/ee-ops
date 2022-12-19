@@ -448,3 +448,52 @@ jenkinsOperator:
   #   labelSelectors:
   #     - master=jenkins-master1
   #     - master=jenkins-master2
+
+thirdPlugins: {}
+  # needs-rebase:
+  #   replicaCount: 1
+  #   serviceAccountName: ""
+  #   podSecurityContext: {}
+  #   containerSecurityContext: {}
+  #   image:
+  #     repository: gcr.io/k8s-prow/needs-rebase
+  #     pullPolicy: Always
+  #   ports:
+  #     http: 80
+  # ti-community-autoresponder: {}
+  # ti-community-blunderbuss:
+  # ti-community-cherrypicker:
+  # ti-community-contribution:
+  # ti-community-format-checker:
+  # ti-community-issue-triage:
+  # ti-community-label-blocker:
+  # ti-community-label:
+  # ti-community-lgtm:
+  # ti-community-merge:
+  # ti-community-tars:
+  # ti-web:
+  #   replicaCount: 1
+  #   image:
+  #     repository: ticommunityinfra/tichi-web
+  #     tag: v2.4.0
+  #     pullPolicy: Always
+  #   args: []
+  #   ports:
+  #     http: 3000
+  #   env:
+  #     - name: EXTERNAL_PLUGINS_CONFIG
+  #       value: /etc/external_plugins_config/external_plugins_config.yaml
+  #   livenessProbe:
+  #     httpGet:
+  #       path: tichi
+  #       port: http
+  #       scheme: HTTP
+  #     initialDelaySeconds: 3
+  #     periodSeconds: 3
+  #   readinessProbe:
+  #     httpGet:
+  #       path: tichi
+  #       port: http
+  #       scheme: HTTP
+  #     initialDelaySeconds: 10
+  #     periodSeconds: 3
