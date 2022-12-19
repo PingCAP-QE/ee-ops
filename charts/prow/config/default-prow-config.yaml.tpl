@@ -41,14 +41,16 @@ plank:
   default_decoration_configs:
     "*":
       gcs_configuration:
-        bucket: s3://prow-logs
+        bucket: {{ include "prow.persistent.scheme" . }}://prow-logs
         path_strategy: explicit
-      s3_credentials_secret: {{ include "prow.fullname" . }}-s3-credentials
+      {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      {{ .Values.persistent.type }}_credentials_secret: {{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials
+      {{- end }}{{- end }}
       utility_images:
-        clonerefs: gcr.io/k8s-prow/clonerefs:v20220504-0b3a7e15f4
-        entrypoint: gcr.io/k8s-prow/entrypoint:v20220504-0b3a7e15f4
-        initupload: gcr.io/k8s-prow/initupload:v20220504-0b3a7e15f4
-        sidecar: gcr.io/k8s-prow/sidecar:v20220504-0b3a7e15f4
+        clonerefs: gcr.io/k8s-prow/clonerefs:{{ .Chart.AppVersion }}
+        entrypoint: gcr.io/k8s-prow/entrypoint:{{ .Chart.AppVersion }}
+        initupload: gcr.io/k8s-prow/initupload:{{ .Chart.AppVersion }}
+        sidecar: gcr.io/k8s-prow/sidecar:{{ .Chart.AppVersion }}
 
 tide:
   queries:
@@ -73,7 +75,7 @@ jenkins_operators:
   - max_concurrency: {{ .Values.jenkinsOperator.config.maxConcurrency }}
     max_goroutines: {{ .Values.jenkinsOperator.config.maxGoroutines }}
     job_url_template: >-
-        https://{{ .Values.prow.domainName }}/view/s3/prow-logs/{{`{{if eq .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}`}}/
+        https://{{ .Values.prow.domainName }}/view/{{ include "prow.persistent.scheme" . }}/prow-logs/{{`{{if eq .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}`}}/
     report_templates:
       '*': >-
           [Full PR test history](https://{{ .Values.prow.domainName }}/pr-history?{{`org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end }}`}}).

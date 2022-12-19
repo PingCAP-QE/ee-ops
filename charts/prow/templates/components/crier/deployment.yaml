@@ -37,7 +37,9 @@ spec:
           args:
             - --config-path=/etc/config/config.yaml
             - --job-config-path=/etc/job-config
-            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
+            {{- end }}{{- end }}
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/cert            
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
@@ -60,9 +62,11 @@ spec:
             - name: github-token
               mountPath: /etc/github
               readOnly: true
-            - name: s3-credentials
-              mountPath: /etc/s3-credentials
+            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            - name: persistent-credentials
+              mountPath: /etc/persistent-credentials
               readOnly: true
+            {{- end }}{{- end }}
           resources:
             {{- toYaml .Values.crier.resources | nindent 12 }}
 
@@ -76,9 +80,11 @@ spec:
       - name: github-token
         secret:
           secretName: {{ include "prow.fullname" . }}-github-token
-      - name: s3-credentials
+      {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      - name: persistent-credentials
         secret:
-          secretName: {{ include "prow.fullname" . }}-s3-credentials
+          secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
+      {{- end }}{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

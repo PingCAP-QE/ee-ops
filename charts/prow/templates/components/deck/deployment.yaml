@@ -49,7 +49,9 @@ spec:
             - --github-app-private-key-path=/etc/github/cert            
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" . }}/graphql
-            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
+            {{- end }}{{- end }}
             - --spyglass=true
           env:
             - name: GITHUB_APP_ID
@@ -64,21 +66,23 @@ spec:
           resources:
             {{- toYaml .Values.deck.resources | nindent 12 }}
           volumeMounts:
-          - name: config
-            mountPath: /etc/config
-            readOnly: true
-          - name: plugins
-            mountPath: /etc/plugins
-            readOnly: true            
-          - name: job-config
-            mountPath: /etc/job-config
-            readOnly: true            
-          - name: github-token
-            mountPath: /etc/github
-            readOnly: true
-          - name: s3-credentials
-            mountPath: /etc/s3-credentials
-            readOnly: true
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: plugins
+              mountPath: /etc/plugins
+              readOnly: true            
+            - name: job-config
+              mountPath: /etc/job-config
+              readOnly: true            
+            - name: github-token
+              mountPath: /etc/github
+              readOnly: true
+            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            - name: persistent-credentials
+              mountPath: /etc/persistent-credentials
+              readOnly: true
+            {{- end }}{{- end }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -105,9 +109,11 @@ spec:
       - name: github-token
         secret:
           secretName: {{ include "prow.fullname" . }}-github-token
-      - name: s3-credentials
+      {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      - name: persistent-credentials
         secret:
-          secretName: {{ include "prow.fullname" . }}-s3-credentials
+          secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
+      {{- end }}{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

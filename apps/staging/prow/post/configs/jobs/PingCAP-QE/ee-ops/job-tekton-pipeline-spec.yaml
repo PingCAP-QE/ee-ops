@@ -3,6 +3,7 @@ presubmits:
     - name: verifyCI2
       always_run: true
       max_concurrency: 2
+      decoration_config: null
       agent: tekton-pipeline
       pipeline_run_spec:
         pipelineSpec:
