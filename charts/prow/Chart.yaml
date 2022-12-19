@@ -2,7 +2,7 @@ apiVersion: v2
 name: prow
 description: >
   A Helm chart for deploying Prow in
-  self kubernetes cluster with S3 storage served by minio.
+  self kubernetes cluster.
 maintainers:
   - name: wuhuizuo
     email: wuhuizuo@126.com
@@ -21,7 +21,7 @@ type: application
 # time you make changes to the chart and its templates,
 # including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: "0.4.0"
+version: "0.5.0"
 
 # This is the version number of the application being deployed.
 # This version number should be incremented each time you make changes to the
@@ -35,6 +35,3 @@ dependencies:
   - name: prow-crd
     repository: https://pingcap-qe.github.io/ee-ops
     version: "0.1.0"
-  - name: minio
-    repository: https://charts.bitnami.com/bitnami
-    version: "11.10.18"

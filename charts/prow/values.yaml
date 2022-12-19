@@ -51,18 +51,17 @@ prow:
               - image: alpine
                 command: ["/bin/date"]
 
-### Values for minIO Sub chart.
-minio:
-  regionName: prow
-  auth:
-    rootUser: root
-    rootPassword: password
-  defaultBuckets: "prow-logs,tide,status-reconciler"
-  persistence:
-    size: 10Gi
-  extraEnvVars:
-    - name: MINIO_REGION_NAME
-      value: prow
+persistent:
+  type: mem    # s3|gcs|mem, file is not ready yet.
+  credentials: ""
+  # credentials: |
+  #   {
+  #     "region": "minio",
+  #     "endpoint": "https://minio-hl-svc.minio-operator-ns:9000",
+  #     "s3_force_path_style": true,
+  #     "access_key": "access_key",
+  #     "secret_key": "secret_key"
+  #   }
 
 ########################################
 # Configuration for prow components    #
@@ -100,7 +99,7 @@ deck:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
-  replicaCount: 2
+  replicaCount: 1
   autoscaling:
     enabled: false
     minReplicas: 1
@@ -167,7 +166,7 @@ hook:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
-  replicaCount: 2
+  replicaCount: 1
   autoscaling:
     enabled: false
     minReplicas: 1
