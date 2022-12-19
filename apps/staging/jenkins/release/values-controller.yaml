@@ -1,5 +1,6 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
+  # renovate: datasource=docker depName=jenkins/jenkins
   tag: "2.379"
   resources:
     requests:
