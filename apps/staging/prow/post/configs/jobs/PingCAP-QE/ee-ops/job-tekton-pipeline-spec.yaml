@@ -3,12 +3,12 @@ presubmits:
     - name: verifyCI2
       always_run: true
       max_concurrency: 2
-      decoration_config: null
+      decorate: false # need add this.
       agent: tekton-pipeline
       pipeline_run_spec:
         pipelineSpec:
           tasks:
-            - name: taskName
+            - name: easy-step
               taskSpec:
                 steps:
                   - name: build-sources
