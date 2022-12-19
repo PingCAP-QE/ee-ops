@@ -42,9 +42,11 @@ spec:
             - --job-config-path=/etc/job-config
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert            
-            - --status-path=s3://status-reconciler/status-reconciler-status
-            - --s3-credentials-file=/etc/s3-credentials/service-account.json
+            - --github-app-private-key-path=/etc/github/cert
+            - --status-path={{ include "prow.persistent.scheme" . }}://status-reconciler/status-reconciler-status
+            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            - --{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json
+            {{- end }}{{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -64,9 +66,11 @@ spec:
             - name: job-config
               mountPath: /etc/job-config
               readOnly: true              
-            - name: s3-credentials
-              mountPath: /etc/s3-credentials
+            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            - name: persistent-credentials
+              mountPath: /etc/persistent-credentials
               readOnly: true
+            {{- end }}{{- end }}
           resources:
             {{- toYaml .Values.statusReconciler.resources | nindent 12 }}
       volumes:
@@ -82,9 +86,11 @@ spec:
       - name: job-config
         configMap:
           name: {{ include "prow.fullname" . }}-job-config          
-      - name: s3-credentials
+      {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      - name: persistent-credentials
         secret:
-          secretName: {{ include "prow.fullname" . }}-s3-credentials
+          secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
+      {{- end }}{{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

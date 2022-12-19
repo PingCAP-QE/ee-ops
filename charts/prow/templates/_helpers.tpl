@@ -514,3 +514,12 @@ Create the name of the role binding
 {{- default (include "prow.fullname.tide" .) .Values.tide.serviceAccount.roleBinding.name }}
 {{- end }}
 {{- end }}
+
+
+{{- define "prow.persistent.scheme" -}}
+{{- if eq .Values.persistent.type "gcs" }}
+{{- print "gs" }}
+{{- else }}
+{{- default "mem" .Values.persistent.type }}
+{{- end }}
+{{- end }}
