@@ -55,7 +55,9 @@ prow:
 persistent:
   type: mem    # s3|gcs|mem, file is not ready yet.
   bucketName: "prow"
-  credentials: ""
+  # set this or credentials, when `credentialsBase64` setted, `credentials` will be ignored
+  credentialsBase64: ""
+  credentials: ""       
   # credentials: |
   #   {
   #     "region": "minio",

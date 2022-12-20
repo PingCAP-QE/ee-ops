@@ -44,9 +44,9 @@ spec:
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/cert
             - --status-path={{ include "prow.persistent.baseUrl" . }}/status-reconciler/status-reconciler-status
-            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            {{- if include "prow.persistent.needCredentials" . }}
             - --{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json
-            {{- end }}{{- end }}
+            {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -66,11 +66,11 @@ spec:
             - name: job-config
               mountPath: /etc/job-config
               readOnly: true              
-            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            {{- if include "prow.persistent.needCredentials" . }}
             - name: persistent-credentials
               mountPath: /etc/persistent-credentials
               readOnly: true
-            {{- end }}{{- end }}
+            {{- end }}
           resources:
             {{- toYaml .Values.statusReconciler.resources | nindent 12 }}
       volumes:
@@ -86,11 +86,11 @@ spec:
       - name: job-config
         configMap:
           name: {{ include "prow.fullname" . }}-job-config          
-      {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      {{- if include "prow.persistent.needCredentials" . }}
       - name: persistent-credentials
         secret:
           secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
-      {{- end }}{{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

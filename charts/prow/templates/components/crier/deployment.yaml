@@ -43,9 +43,9 @@ spec:
             - --github-workers=10
             - --blob-storage-workers=10
             - --kubernetes-blob-storage-workers=10
-            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            {{- if include "prow.persistent.needCredentials" . }}
             - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
-            {{- end }}{{- end }}
+            {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -62,11 +62,11 @@ spec:
             - name: github-token
               mountPath: /etc/github
               readOnly: true
-            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            {{- if include "prow.persistent.needCredentials" . }}
             - name: persistent-credentials
               mountPath: /etc/persistent-credentials
               readOnly: true
-            {{- end }}{{- end }}
+            {{- end }}
           resources:
             {{- toYaml .Values.crier.resources | nindent 12 }}
 
@@ -80,11 +80,11 @@ spec:
       - name: github-token
         secret:
           secretName: {{ include "prow.fullname" . }}-github-token
-      {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      {{- if include "prow.persistent.needCredentials" . }}
       - name: persistent-credentials
         secret:
           secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
-      {{- end }}{{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
