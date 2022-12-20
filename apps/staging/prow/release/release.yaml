@@ -66,14 +66,14 @@ spec:
         secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
         secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
         secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
-    thirdPlugins:
-      needs-rebase:
-        replicaCount: 1
-        image:
-          repository: gcr.io/k8s-prow/needs-rebase
-          pullPolicy: Always
-        ports:
-          http: 80
+    # thirdPlugins:
+    #   needs-rebase:
+    #     replicaCount: 1
+    #     image:
+    #       repository: gcr.io/k8s-prow/needs-rebase
+    #       pullPolicy: Always
+    #     ports:
+    #       http: 80
     persistent:
       type: s3
       bucketName: ${BUCKET_NAME}
