@@ -43,7 +43,7 @@ spec:
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/cert
-            - --status-path={{ include "prow.persistent.scheme" . }}://status-reconciler/status-reconciler-status
+            - --status-path={{ include "prow.persistent.baseUrl" . }}/status-reconciler/status-reconciler-status
             {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
             - --{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json
             {{- end }}{{- end }}

@@ -1,0 +1,10 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: prow-data
+  namespace: apps
+spec:
+  additionalConfig:
+    maxSize: 50G
+  bucketName: prow
+  storageClassName: ceph-bucket

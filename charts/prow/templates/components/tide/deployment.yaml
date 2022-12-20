@@ -43,8 +43,8 @@ spec:
             - --github-app-private-key-path=/etc/github/cert
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" . }}/graphql
-            - --history-uri={{ include "prow.persistent.scheme" . }}://tide/tide-history.json"
-            - --status-path={{ include "prow.persistent.scheme" . }}://status-reconciler/status-reconciler-status
+            - --history-uri={{ include "prow.persistent.baseUrl" . }}/tide/tide-history.json"
+            - --status-path={{ include "prow.persistent.baseUrl" . }}/status-reconciler/status-reconciler-status
             {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
             - --{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json
             {{- end }}{{- end }}

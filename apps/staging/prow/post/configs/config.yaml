@@ -30,7 +30,7 @@ plank:
   default_decoration_configs:
     "*":
       gcs_configuration:
-        bucket: s3://prow-logs
+        bucket: s3://prow
         path_strategy: explicit
       s3_credentials_secret: prow-s3-credentials
       utility_images:
@@ -78,7 +78,7 @@ jenkins_operators:
   - max_concurrency: 20
     max_goroutines: 20
     job_url_template:
-      'https://${DOMAIN_NAME}/view/s3/prow-logs/{{if eq .Spec.Type
+      'https://${DOMAIN_NAME}/view/s3/prow/prow-logs/{{if eq .Spec.Type
       "presubmit"}}pr-logs/pull{{else if eq .Spec.Type
       "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo
       "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type
