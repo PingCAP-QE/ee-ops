@@ -79,7 +79,6 @@ spec:
           - --github-app-id=$(GITHUB_APP_ID)
           - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://ghproxy
-          - --github-graphql-endpoint=http://ghproxy/graphql
         volumes:
           - name: external-plugins-config
             configMap:
