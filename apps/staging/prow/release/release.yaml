@@ -79,7 +79,7 @@ spec:
       bucketName: ${BUCKET_NAME}
       credentials: |
         {
-          "region": "${BUCKET_REGION}",
+          "region": "${BUCKET_REGION:=ceph}",
           "endpoint": "${BUCKET_HOST}:${BUCKET_PORT}",
           "insecure": true,
           "s3_force_path_style": true,
