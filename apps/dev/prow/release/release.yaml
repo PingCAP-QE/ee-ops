@@ -90,7 +90,7 @@ spec:
             mountPath: /etc/external_plugins_config
             readOnly: true
         service:
-          type: Cluster
+          type: ClusterIP
     persistent:
       type: gcs
       bucketName: ${BUCKET_NAME}
