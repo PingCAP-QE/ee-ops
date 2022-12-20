@@ -57,7 +57,7 @@ persistent:
   bucketName: "prow"
   # set this or credentials, when `credentialsBase64` setted, `credentials` will be ignored
   credentialsBase64: ""
-  credentials: ""       
+  credentials: ""
   # credentials: |
   #   {
   #     "region": "minio",

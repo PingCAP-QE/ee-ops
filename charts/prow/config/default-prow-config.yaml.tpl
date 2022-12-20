@@ -43,9 +43,9 @@ plank:
       gcs_configuration:
         bucket: {{ include "prow.persistent.baseUrl" . }}
         path_strategy: explicit
-      {{- if or .Values.persistent.credentialsBase64 .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      {{- if include "prow.persistent.needCredentials" . }}
       {{ .Values.persistent.type }}_credentials_secret: {{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials
-      {{- end }}{{- end }}
+      {{- end }}
       utility_images:
         clonerefs: gcr.io/k8s-prow/clonerefs:{{ .Chart.AppVersion }}
         entrypoint: gcr.io/k8s-prow/entrypoint:{{ .Chart.AppVersion }}
