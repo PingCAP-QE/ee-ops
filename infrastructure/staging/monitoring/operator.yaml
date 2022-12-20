@@ -4,7 +4,7 @@ metadata:
   name: prometheus-operator
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 24h
   path: ./manifests/setup
   prune: true
   sourceRef:
