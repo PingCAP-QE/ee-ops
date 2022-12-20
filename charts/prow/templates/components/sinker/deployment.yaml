@@ -32,7 +32,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.sinker.image.repository }}:{{ .Values.sinker.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.sinker.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.sinker.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --dry-run=false
             - --config-path=/etc/config/config.yaml

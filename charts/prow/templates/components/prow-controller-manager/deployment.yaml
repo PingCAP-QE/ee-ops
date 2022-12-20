@@ -32,7 +32,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.pcm.image.repository }}:{{ .Values.pcm.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.pcm.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.pcm.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --dry-run=false
             - --enable-controller=plank
