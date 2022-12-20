@@ -119,7 +119,7 @@ spec:
             secretName: {{ include "prow.fullname" $root }}-github-token      
         - name: hmac
           secret:
-            secretName: {{ include "prow.fullname" . }}-hmac-token
+            secretName: {{ include "prow.fullname" $root }}-hmac-token
         - name: config
           configMap:
             name: {{ include "prow.fullname" $root }}-config
