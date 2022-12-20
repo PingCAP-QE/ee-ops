@@ -523,3 +523,7 @@ Create the name of the role binding
 {{- default "mem" .Values.persistent.type }}
 {{- end }}
 {{- end }}
+
+{{- define "prow.persistent.baseUrl" -}}
+{{ include "prow.persistent.scheme" . }}{{ print "://" }}{{ .Values.persistent.bucketName }}
+{{- end }}

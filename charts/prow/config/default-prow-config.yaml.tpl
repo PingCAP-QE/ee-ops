@@ -41,7 +41,7 @@ plank:
   default_decoration_configs:
     "*":
       gcs_configuration:
-        bucket: {{ include "prow.persistent.scheme" . }}://prow-logs
+        bucket: {{ include "prow.persistent.baseUrl" . }}
         path_strategy: explicit
       {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
       {{ .Values.persistent.type }}_credentials_secret: {{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials
@@ -75,7 +75,7 @@ jenkins_operators:
   - max_concurrency: {{ .Values.jenkinsOperator.config.maxConcurrency }}
     max_goroutines: {{ .Values.jenkinsOperator.config.maxGoroutines }}
     job_url_template: >-
-        https://{{ .Values.prow.domainName }}/view/{{ include "prow.persistent.scheme" . }}/prow-logs/{{`{{if eq .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}`}}/
+        https://{{ .Values.prow.domainName }}/view/{{ include "prow.persistent.scheme" . }}/{{ .Values.persistent.bucketName }}/prow-logs/{{`{{if eq .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}`}}/
     report_templates:
       '*': >-
           [Full PR test history](https://{{ .Values.prow.domainName }}/pr-history?{{`org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end }}`}}).
