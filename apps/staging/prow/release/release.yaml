@@ -66,26 +66,39 @@ spec:
         secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
         secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
         secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
-    # thirdPlugins:
-    #   needs-rebase:
-    #     replicaCount: 1
-    #     image:
-    #       repository: gcr.io/k8s-prow/needs-rebase
-    #       pullPolicy: Always
-    #     ports:
-    #       http: 80
-    persistent:
-      type: s3
-      bucketName: ${BUCKET_NAME}
-      credentials: |
-        {
-          "region": "${BUCKET_REGION:=ceph}",
-          "endpoint": "${BUCKET_HOST}:${BUCKET_PORT}",
-          "insecure": true,
-          "s3_force_path_style": true,
-          "access_key": "${AWS_ACCESS_KEY_ID}",
-          "secret_key": "${AWS_SECRET_ACCESS_KEY}"
-        }
+    thirdPlugins:
+      needs-rebase:
+        replicaCount: 1
+        image:
+          repository: gcr.io/k8s-prow/needs-rebase
+        ports:
+          http: 80
+        resources: {}
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://ghproxy
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
+        persistent:
+          type: s3
+          bucketName: ${BUCKET_NAME}
+          credentials: |
+            {
+              "region": "${BUCKET_REGION:=ceph}",
+              "endpoint": "${BUCKET_HOST}:${BUCKET_PORT}",
+              "insecure": true,
+              "s3_force_path_style": true,
+              "access_key": "${AWS_ACCESS_KEY_ID}",
+              "secret_key": "${AWS_SECRET_ACCESS_KEY}"
+            }
   postRenderers:
     - kustomize:
         patchesJson6902:
