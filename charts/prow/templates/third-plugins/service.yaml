@@ -12,7 +12,7 @@ metadata:
 spec:
   type: {{ default "ClusterIP" $val.service.type }}
   ports:
-    - port: {{ $val.service.port }}
+    - port: {{ default 80 $val.service.port }}
       targetPort: http
       protocol: TCP
       name: http
