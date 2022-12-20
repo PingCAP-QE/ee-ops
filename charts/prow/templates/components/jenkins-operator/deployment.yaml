@@ -35,7 +35,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.jenkinsOperator.image.repository }}:{{ .Values.jenkinsOperator.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.jenkinsOperator.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.jenkinsOperator.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --github-token-path=/etc/github/oauth
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}

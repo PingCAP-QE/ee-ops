@@ -33,7 +33,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.ghproxy.image.repository }}:{{ .Values.ghproxy.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.ghproxy.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.ghproxy.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --cache-dir=/cache
             - --cache-sizeGB=99

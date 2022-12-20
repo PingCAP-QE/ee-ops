@@ -34,7 +34,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.pipeline.image.repository }}:{{ .Values.pipeline.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.pipeline.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.pipeline.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --all-contexts
             - --config=/etc/config/config.yaml
