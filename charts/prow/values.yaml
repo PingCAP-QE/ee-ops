@@ -460,6 +460,10 @@ thirdPlugins: {}
   #   ports:
   #     http: 80
   #   resources: {}
+  #   service: true   # or
+  #   service:
+  #     type: ClusterIP
+  #     port: 80
   # ti-community-autoresponder: {}
   # ti-community-blunderbuss:
   # ti-community-cherrypicker:
