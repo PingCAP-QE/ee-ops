@@ -454,13 +454,12 @@ thirdPlugins: {}
   # needs-rebase:
   #   replicaCount: 1
   #   serviceAccountName: ""
-  #   podSecurityContext: {}
-  #   containerSecurityContext: {}
   #   image:
   #     repository: gcr.io/k8s-prow/needs-rebase
   #     pullPolicy: Always
   #   ports:
   #     http: 80
+  #   resources: {}
   # ti-community-autoresponder: {}
   # ti-community-blunderbuss:
   # ti-community-cherrypicker:
@@ -476,7 +475,6 @@ thirdPlugins: {}
   #   service:
   #     type: ClusterIP
   #     port: 80
-
   #   ingress:
   #     enabled: true
   #     className: ""
@@ -493,7 +491,6 @@ thirdPlugins: {}
   #     #  - secretName: chart-example-tls
   #     #    hosts:
   #     #      - << REPLACE >>
-
   #   replicaCount: 1
   #   image:
   #     repository: ticommunityinfra/tichi-web
