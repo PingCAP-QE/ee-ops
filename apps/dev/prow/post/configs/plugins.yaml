@@ -1,0 +1,40 @@
+# enable plugins for any repos in the org.
+plugins:
+  ti-community-infra/test-dev:
+    plugins:
+      - approve
+      - assign
+      - blunderbuss
+      - cat
+      - dog
+      - help
+      - heart
+      - hold
+      - label
+      - lgtm
+      - trigger
+      - verify-owners
+      - wip
+      - yuks
+
+config_updater:
+  maps:
+    prow/config/labels.yaml:
+      name: labels-config
+# plugin_a:
+#   configs_for_plugin_a: {}
+
+# configuration of plugin `label`
+label:
+  additional_labels:
+    - tide/merge-method-squash
+    - tide/merge-method-rebase
+    - tide/merge-method-merge
+
+external_plugins:
+  ti-community-infra:
+    - name: needs-rebase
+      events:
+        - issue_comment
+        - pull_request
+      endpoint: http://prow-needs-rebase

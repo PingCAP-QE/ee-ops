@@ -1,0 +1,134 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: prow
+  namespace: flux-system
+spec:
+  releaseName: prow
+  targetNamespace: apps
+  chart:
+    spec:
+      chart: prow
+      version: 0.6.4
+      sourceRef:
+        kind: HelmRepository
+        name: ee-ops
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    crds: CreateReplace
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  valuesFrom:
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
+      valuesKey: GITHUB_APP_ID
+      targetPath: prow.githubAppId
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
+      valuesKey: GITHUB_APP_CERT
+      targetPath: prow.githubAppCert
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
+      valuesKey: GITHUB_APP_WEBHOOK_HMAC
+      targetPath: prow.githubHmacToken
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
+      valuesKey: GITHUB_TOKEN
+      targetPath: prow.githubOauthToken
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
+      valuesKey: DOMAIN_NAME
+      targetPath: prow.domainName
+    - kind: Secret
+      name: ${GCS_SECRET_NAME}
+      valuesKey: service-account.json
+      targetPath: persistent.credentials
+  values:
+    prow:
+      podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
+      githubOrg: ti-community-infra
+    jenkinsOperator:
+      enabled: true
+      dryRun: false
+      jenkinsUrl: ${JENKINS_BASE_URL}
+      auth:
+        secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
+        secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
+        secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
+    thirdPlugins:
+      needs-rebase:
+        replicaCount: 1
+        image:
+          repository: gcr.io/k8s-prow/needs-rebase
+        ports:
+          http: 80
+        resources: {}
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://ghproxy
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
+        service:
+          type: Cluster
+    persistent:
+      type: gcs
+      bucketName: ${BUCKET_NAME}
+    
+  postRenderers:
+    - kustomize:
+        patchesJson6902:
+          # for updating ConfigMaps in after release deployment.
+          - target:
+              version: v1
+              kind: ConfigMap
+              name: prow-config
+              namespace: apps
+            patch:
+              # for merging configmap
+              # TODO(wuhuizuo): how to merge the inner yaml from value content.
+              - op: replace
+                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
+                value: merge
+          - target:
+              version: v1
+              kind: ConfigMap
+              name: prow-job-config
+              namespace: apps
+            patch:
+              # for merging configmap
+              # TODO(wuhuizuo): how to merge the inner yaml from value content.
+              - op: replace
+                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
+                value: merge
+          - target:
+              version: v1
+              kind: ConfigMap
+              name: prow-plugins
+              namespace: apps
+            patch:
+              # for merging configmap
+              # TODO(wuhuizuo): how to merge the inner yaml from value content.
+              - op: replace
+                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
+                value: merge
