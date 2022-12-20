@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.6.4
+      version: 0.6.5
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -53,9 +53,9 @@ spec:
       valuesKey: DOMAIN_NAME
       targetPath: prow.domainName
     - kind: Secret
-      name: ${GCS_SECRET_NAME}
-      valuesKey: service-account.json
-      targetPath: persistent.credentials
+      name: ${PROW_SECRET_NAME}
+      valuesKey: GCS_CREDENTIALS_BASE64
+      targetPath: persistent.credentialsBase64
   values:
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.

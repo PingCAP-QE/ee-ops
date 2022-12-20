@@ -18,7 +18,6 @@ spec:
   postBuild:
     substitute:
       BUCKET_NAME: prow-dev-tidb-logs
-      GCS_SECRET_NAME: gcs-credentials
       TEST_PODS_NAMESPACE: prow-test-pods
 
       ### need secret `prow` with keys:

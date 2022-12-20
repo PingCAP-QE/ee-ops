@@ -50,9 +50,9 @@ spec:
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" . }}/graphql
             - --spyglass=true
-            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            {{- if include "prow.persistent.needCredentials" . }}
             - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
-            {{- end }}{{- end }}
+            {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -78,11 +78,11 @@ spec:
             - name: github-token
               mountPath: /etc/github
               readOnly: true
-            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            {{- if include "prow.persistent.needCredentials" . }}
             - name: persistent-credentials
               mountPath: /etc/persistent-credentials
               readOnly: true
-            {{- end }}{{- end }}
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -109,11 +109,11 @@ spec:
       - name: github-token
         secret:
           secretName: {{ include "prow.fullname" . }}-github-token
-      {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+      {{- if include "prow.persistent.needCredentials" . }}
       - name: persistent-credentials
         secret:
           secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
-      {{- end }}{{- end }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
