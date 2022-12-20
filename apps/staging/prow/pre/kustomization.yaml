@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - namespace-test-pods.yaml
   - rbac-test-pods-k8s-pod-full.yaml
+  - obc.yaml
