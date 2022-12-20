@@ -37,15 +37,15 @@ spec:
           args:
             - --config-path=/etc/config/config.yaml
             - --job-config-path=/etc/job-config
-            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
-            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
-            {{- end }}{{- end }}
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/cert            
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-workers=10
             - --blob-storage-workers=10
             - --kubernetes-blob-storage-workers=10
+            {{- if .Values.persistent.credentials }}{{- if contains .Values.persistent.type "gcs s3" }}
+            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
+            {{- end }}{{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:

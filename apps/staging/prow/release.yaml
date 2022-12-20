@@ -2,7 +2,7 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
   name: prow-release
-  namespace: flux-system
+  namespace: apps
 spec:
   dependsOn:
     - name: prow-pre
@@ -16,6 +16,12 @@ spec:
   prune: true
   wait: true
   postBuild:
+    substituteFrom:
+      # gencrated by prow-pre
+      - kind: Secret
+        name: prow-data
+      - kind: ConfigMap
+        name: prow-data
     substitute:
       TEST_PODS_NAMESPACE: prow-test-pods
 
