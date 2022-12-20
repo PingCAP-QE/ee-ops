@@ -4,6 +4,7 @@
 # Declare variables to be passed into your templates.
 
 ### Global Pod configurations.
+imagePullPolicy: IfNotPresent
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""

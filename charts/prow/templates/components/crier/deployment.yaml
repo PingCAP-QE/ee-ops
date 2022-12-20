@@ -33,7 +33,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.crier.image.repository }}:{{ .Values.crier.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.crier.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.crier.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --config-path=/etc/config/config.yaml
             - --job-config-path=/etc/job-config

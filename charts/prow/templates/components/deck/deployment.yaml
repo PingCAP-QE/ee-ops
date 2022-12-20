@@ -38,7 +38,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.deck.image.repository }}:{{ .Values.deck.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.deck.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.deck.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --config-path=/etc/config/config.yaml
             - --plugin-config=/etc/plugins/plugins.yaml

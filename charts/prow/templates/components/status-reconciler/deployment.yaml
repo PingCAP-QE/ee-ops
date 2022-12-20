@@ -33,7 +33,7 @@ spec:
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.statusReconciler.image.repository }}:{{ .Values.statusReconciler.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.statusReconciler.image.pullPolicy }}
+          imagePullPolicy: {{ .Values.statusReconciler.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --dry-run=false
             - --continue-on-error=true
