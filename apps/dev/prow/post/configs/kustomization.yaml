@@ -15,3 +15,17 @@ configMapGenerator:
       disableNameSuffixHash: true
     files:
       - plugins.yaml
+  - name: prow-labels-config
+    namespace: apps
+    behavior: create
+    options:
+      disableNameSuffixHash: true
+    files:
+      - labels.yaml
+  - name: prow-external-plugins-config
+    namespace: apps
+    behavior: create
+    options:
+      disableNameSuffixHash: true
+    files:
+      - external_plugins_config.yaml
