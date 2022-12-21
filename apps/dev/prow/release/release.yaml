@@ -90,6 +90,246 @@ spec:
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         service:
           type: ClusterIP
+      ti-community-autoresponder:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-autoresponder-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-blunderbuss:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-blunderbuss-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-cherrypicker:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-cherrypicker-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-contribution:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-contribution-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-format-checker:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-format-checker-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-issue-triage:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-issue-triage-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-label:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-label-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-label-blocker:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-label-blocker-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-lgtm:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-lgtm-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-merge:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-merge-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
       ti-community-owners:
         service:
           type: ClusterIP
@@ -100,6 +340,36 @@ spec:
         image:
           repository: ticommunityinfra/tichi-owners-plugin
           tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      ti-community-tars:
+        service:
+          type: ClusterIP
+        ports:
+          http: 80
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ticommunityinfra/tichi-tars-plugin
+          tag: v2.4.0
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
           - name: external-plugins-config
             configMap:
