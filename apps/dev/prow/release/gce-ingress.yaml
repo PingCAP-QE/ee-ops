@@ -44,6 +44,8 @@ spec:
         backend:
           service:
             name: prow-tichi-web
+            port:
+              name: http
   tls:
   - hosts:
     - '*.tidb.net'
