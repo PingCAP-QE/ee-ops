@@ -34,5 +34,5 @@ spec:
               number: 80
   tls:
   - hosts:
-    - '${DOMAIN_NAME}'
+    - '*.tidb.net'
     secretName: prow-tls
