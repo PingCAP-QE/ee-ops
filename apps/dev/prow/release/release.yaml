@@ -92,6 +92,7 @@ spec:
           - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+          - --update-period=5m
         service:
           type: ClusterIP
       ti-community-autoresponder:
