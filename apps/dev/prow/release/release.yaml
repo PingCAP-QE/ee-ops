@@ -80,15 +80,8 @@ spec:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
           - --github-app-private-key-path=/etc/github/cert
-          - --github-endpoint=http://ghproxy
-        volumes:
-          - name: external-plugins-config
-            configMap:
-              name: prow-external-plugins-config
-        volumeMounts:
-          - name: external-plugins-config
-            mountPath: /etc/external_plugins_config
-            readOnly: true
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
         service:
           type: ClusterIP
     persistent:

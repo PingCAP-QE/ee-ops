@@ -15,7 +15,7 @@ periodics:
             - --confirm=true
             - --orgs=kubernetes\,kubernetes-client\,kubernetes-csi\,kubernetes-sigs
             - --token=/etc/github/oauth
-            - --endpoint=http://ghproxy.apps.svc.cluster.local
+            - --endpoint=http://prow-ghproxy.apps.svc
             - --endpoint=https://api.github.com
             - --debug
           volumeMounts:
