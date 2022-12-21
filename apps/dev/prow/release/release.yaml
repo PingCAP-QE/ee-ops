@@ -90,6 +90,55 @@ spec:
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         service:
           type: ClusterIP
+      ti-community-owners:
+        service:
+          type: ClusterIP
+        serviceAccount: hook
+        image:
+          repository: ticommunityinfra/tichi-owners-plugin
+          tag: v2.4.0
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+      tichi-web:
+        service:
+          type: ClusterIP
+        ports:
+          http: 3000
+        image:
+          repository: ticommunityinfra/tichi-web
+          tag: v2.4.0
+        args: []
+        env:
+          - name: EXTERNAL_PLUGINS_CONFIG
+            value: /etc/external_plugins_config/external_plugins_config.yaml
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+            - name: external-plugins-config
+              mountPath: /etc/external_plugins_config
+              readOnly: true
+        livenessProbe:
+          httpGet:
+            path: tichi
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: tichi
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 3
     persistent:
       type: gcs
       bucketName: ${BUCKET_NAME}

@@ -13,7 +13,7 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/staging/prow/post
+  path: ./apps/staging/dev/post
   prune: true
   postBuild:  
     substitute:
