@@ -24,14 +24,26 @@ spec:
           service:
             name: prow-deck
             port:
-              number: 80
+              name: http
       - path: /hook
         pathType: Prefix
         backend:
           service:
             name: prow-hook
             port:
-              number: 80
+              name: http
+      - path: /ti-community-owners
+        pathType: Prefix
+        backend:
+          service:
+            name: prow-ti-community-owners
+            port:
+              name: http
+      - path: /tichi
+        pathType: Prefix
+        backend:
+          service:
+            name: prow-tichi-web
   tls:
   - hosts:
     - '*.tidb.net'

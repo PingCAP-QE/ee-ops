@@ -18,6 +18,7 @@ spec:
   postBuild:  
     substitute:
       TEST_PODS_NAMESPACE: prow-test-pods
+      BUCKET_NAME: prow
     substituteFrom:
       ### need secret `prow` with keys:
       # - DOMAIN_NAME
