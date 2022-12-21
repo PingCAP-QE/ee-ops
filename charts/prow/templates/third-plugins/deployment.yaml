@@ -67,9 +67,13 @@ spec:
           env:
             {{- toYaml $val.env | nindent 12 }}
           {{- end }}
+          {{- with $val.ports }}
           ports:
-            - name: http
-              containerPort: {{ $val.ports.http | default 80 }}
+            {{- range $pn, $pv := . }}
+            - name: {{ $pn }}
+              containerPort: {{ default 80 $pv }}
+            {{- end }}
+          {{- end }}
           {{- with $val.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
