@@ -63,6 +63,10 @@ spec:
     deck:
       ingress:
         enabled: false
+    tide:
+      image:
+        repository: ticommunityinfra/tide
+        tag: v20221207-9225e3a153
     hook:
       ingress:
         enabled: false
@@ -102,8 +106,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -126,8 +129,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -150,8 +152,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -174,8 +175,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -198,8 +198,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -222,8 +221,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -246,8 +244,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -270,8 +267,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -294,8 +290,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -318,8 +313,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -342,8 +336,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
@@ -366,8 +359,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
