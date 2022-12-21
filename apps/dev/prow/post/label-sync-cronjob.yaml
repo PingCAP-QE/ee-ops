@@ -20,7 +20,7 @@ spec:
                 - --config=/etc/config/labels.yaml
                 - --confirm=true
                 - --only=ti-community-infra/test-dev
-                - --token=/etc/github/token
+                - --token=/etc/github/oauth
               volumeMounts:
                 - name: github-token
                   mountPath: /etc/github
