@@ -7,7 +7,7 @@ metadata:
 spec:
   dependsOn:
     - name: prow-release
-      namespace: apps
+      namespace: flux-system
   interval: 5m0s
   sourceRef:
     kind: GitRepository

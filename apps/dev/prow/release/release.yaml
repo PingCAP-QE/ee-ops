@@ -62,28 +62,10 @@ spec:
       githubOrg: ti-community-infra
     deck:
       ingress:
-        enabled: true
-        annotations:
-          kubernetes.io/ingress.global-static-ip-name: prow-dev-tidb-net-ip
-          kubernetes.io/ingress.class: "gce"
-          networking.gke.io/v1beta1.FrontendConfig: ingress-security-config
-          kubernetes.io/ingress.allow-http: "true"
-        tls:
-          - hosts:
-              - "*.tidb.net"
-            secretName: prow-tls
+        enabled: false
     hook:
       ingress:
-        enabled: true
-        annotations:
-          kubernetes.io/ingress.global-static-ip-name: prow-dev-tidb-net-ip
-          kubernetes.io/ingress.class: "gce"
-          networking.gke.io/v1beta1.FrontendConfig: ingress-security-config
-          kubernetes.io/ingress.allow-http: "true"
-        tls:
-          - hosts:
-              - "*.tidb.net"
-            secretName: prow-tls
+        enabled: false
     jenkinsOperator:
       enabled: true
       dryRun: false
