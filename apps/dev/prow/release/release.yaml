@@ -75,9 +75,6 @@ spec:
     deck:
       ingress:
         enabled: false
-    ghproxy:
-      persistence:
-        size: 2Gi
     tide:
       image:
         repository: ticommunityinfra/tide
