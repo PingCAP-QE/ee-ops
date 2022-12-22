@@ -88,8 +88,7 @@ spec:
         resources: {}
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --update-period=5m
@@ -314,8 +313,7 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-token-path=/etc/github/oauth
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
