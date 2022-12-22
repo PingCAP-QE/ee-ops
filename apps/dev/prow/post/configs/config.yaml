@@ -78,6 +78,7 @@ tide:
   merge_method:
     ti-community-infra/test-dev: squash
 
+  # Note: \\w => \\\\w
   merge_commit_template:
     ti-community-infra/test-dev:
       title: "{{ .Title }} (#{{ .Number }})"
@@ -95,7 +96,7 @@ tide:
           {{- " " -}}
         {{- end -}}
 
-        {{- $description := .ExtractContent "(?i)\x60\x60\x60commit-message(?P<content>[\\w|\\W]+)\x60\x60\x60" $body -}}
+        {{- $description := .ExtractContent "(?i)\x60\x60\x60commit-message(?P<content>[\\\\w|\\\\W]+)\x60\x60\x60" $body -}}
         {{- if $description -}}{{- "\n\n" -}}{{- end -}}
         {{- $description -}}
 
