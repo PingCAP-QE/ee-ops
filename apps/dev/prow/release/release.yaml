@@ -84,7 +84,7 @@ spec:
         image:
           repository: gcr.io/k8s-prow/needs-rebase
         ports:
-          http: 80
+          http: 8888
         resources: {}
         args:
           - --dry-run=false
