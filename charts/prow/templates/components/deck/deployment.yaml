@@ -45,6 +45,8 @@ spec:
             - --job-config-path=/etc/job-config
             - --tide-url=http://{{ include "prow.fullname.tide" . }}/
             - --hook-url=http://{{ include "prow.fullname.hook" . }}/plugin-help
+            - --oauth-url=/github-login
+            - --cookie-secret=/etc/github/oauth-cookie-secret
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/cert            
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
