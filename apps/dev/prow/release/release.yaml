@@ -54,6 +54,18 @@ spec:
       targetPath: prow.domainName
     - kind: Secret
       name: ${PROW_SECRET_NAME}
+      valuesKey: GITHUB_APP_CLIENT_ID
+      targetPath: prow.githubAppClientId
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
+      valuesKey: GITHUB_APP_CLIENT_SECRET
+      targetPath: prow.githubAppClientSecret
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
+      valuesKey: OAUTH_COOKIE_SECRET
+      targetPath: prow.githubOauthCookieSecret
+    - kind: Secret
+      name: ${PROW_SECRET_NAME}
       valuesKey: GCS_CREDENTIALS_BASE64
       targetPath: persistent.credentialsBase64
   values:
