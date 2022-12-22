@@ -96,19 +96,25 @@ tide:
         {{- end -}}
 
         {{- $signedAuthors := .NormalizeSignedOffBy -}}
-        {{- if $signedAuthors -}}{{- "\n\n" -}}{{- end -}}
-        {{- range $index, $author := $signedAuthors -}}
-          {{- if $index -}}{{- "\n" -}}{{- end -}}
-          {{- "Signed-off-by:" }} {{ .Name }} <{{- .Email -}}>
+        {{- if $signedAuthors -}}
+
+
+          {{- range $index, $author := $signedAuthors -}}
+            {{- if $index -}}{{- "\n" -}}{{- end -}}
+            {{- "Signed-off-by:" }} {{ .Name }} <{{- .Email -}}>
+          {{- end -}}
         {{- end -}}
 
         {{- $coAuthors := .NormalizeCoAuthorBy -}}
-        {{- if $coAuthors -}}{{- "\n\n" -}}{{- end -}}
+        {{- if $coAuthors -}}
+
+
           {{- range $index, $author := $coAuthors -}}
-          {{- if $index -}}{{- "\n" -}}{{- end -}}
-          {{- "Co-authored-by:" }} {{ .Name }} <{{- .Email -}}>
+            {{- if $index -}}{{- "\n" -}}{{- end -}}
+            {{- "Co-authored-by:" }} {{ .Name }} <{{- .Email -}}>
+          {{- end -}}
         {{- end -}}
-        
+
       # {{- $description := .ExtractContent "(?i)\x60\x60\x60commit-message(?P<content>[\\w|\\W]+)\x60\x60\x60" $body -}}
       # {{- if $description -}}{{- "\n\n" -}}{{- end -}}
       # {{- $description -}}
