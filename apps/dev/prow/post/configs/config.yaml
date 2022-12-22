@@ -102,16 +102,17 @@ tide:
           {{- "Signed-off-by:" }} {{ .Name }} <{{- .Email -}}>
         {{- end -}}
 
+        {{- $coAuthors := .NormalizeCoAuthorBy -}}
+        {{- if $coAuthors -}}{{- "\n\n" -}}{{- end -}}
+          {{- range $index, $author := $coAuthors -}}
+          {{- if $index -}}{{- "\n" -}}{{- end -}}
+          {{- "Co-authored-by:" }} {{ .Name }} <{{- .Email -}}>
+        {{- end -}}
+        
       # {{- $description := .ExtractContent "(?i)\x60\x60\x60commit-message(?P<content>[\\w|\\W]+)\x60\x60\x60" $body -}}
       # {{- if $description -}}{{- "\n\n" -}}{{- end -}}
       # {{- $description -}}
 
-      #   {{- $coAuthors := .NormalizeCoAuthorBy -}}
-      #   {{- if $coAuthors -}}{{- "\n\n" -}}{{- end -}}
-      #     {{- range $index, $author := $coAuthors -}}
-      #     {{- if $index -}}{{- "\n" -}}{{- end -}}
-      #     {{- "Co-authored-by:" }} {{ .Name }} <{{- .Email -}}>
-      #   {{- end -}}
   queries:
     - repos:
         - ti-community-infra/test-dev
