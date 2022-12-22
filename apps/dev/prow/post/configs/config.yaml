@@ -82,8 +82,8 @@ tide:
     ti-community-infra/test-dev:
       title: "{{ .Title }} (#{{ .Number }})"
       # Regex for matching issue number line: https://regex101.com/r/ezCYFC/1/
-      # body: |
-      #   {{- $body := print .Body -}}
+      body: |
+        {{- $body := print .Body -}}
 
       #   {{- $numbers := .NormalizeIssueNumbers $body -}}
       #   {{- if $numbers -}}
