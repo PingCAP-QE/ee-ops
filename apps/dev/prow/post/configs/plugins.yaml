@@ -43,7 +43,6 @@ triggers:
 
 repo_milestone:
   ti-community-infra/test-dev:
-    maintainers_id: 4300209
     maintainers_team: bots-maintainers
     maintainers_friendly_name: Robots Maintainers
 
@@ -53,8 +52,6 @@ milestone_applier:
 
 override:
   allow_top_level_owners: true
-
-
 
 # enable plugins for any repos in the org.
 plugins:
