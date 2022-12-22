@@ -42,7 +42,7 @@ spec:
       enabled: true
       storageClass: ceph-block
       accessMode: ReadWriteOnce
-      size: 8Ti
+      size: 10Ti
     serviceMonitor:
       enabled: true
       additionalLabels:
