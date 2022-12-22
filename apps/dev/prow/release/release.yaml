@@ -353,7 +353,7 @@ spec:
         service:
           type: ClusterIP
         ports:
-          http: 80
+          http: 8888
         serviceAccount:
           name: prow-hook
         image:
