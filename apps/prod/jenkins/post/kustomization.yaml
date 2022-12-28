@@ -6,3 +6,4 @@ resources:
   - tiflow
   - ti-pipeline
   - cd
+  - pd
