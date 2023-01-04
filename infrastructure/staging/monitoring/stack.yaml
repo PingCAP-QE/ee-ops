@@ -6,7 +6,7 @@ metadata:
 spec:
   dependsOn:
     - name: prometheus-operator
-  interval: 10m0s
+  interval: 24h
   path: ./manifests
   prune: true
   sourceRef:
