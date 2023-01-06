@@ -12,15 +12,6 @@ spec:
       labels:
         app: goproxy
     spec:
-      affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/hostname
-                operator: NotIn
-                values:
-                - 10.2.12.20
       containers:
       - name: goproxy
         image: goproxy/goproxy:latest
