@@ -3,5 +3,4 @@ kind: Kustomization
 namespace: apps
 resources:
 - deployment.yaml
-- storage.yaml
 - svc.yaml
