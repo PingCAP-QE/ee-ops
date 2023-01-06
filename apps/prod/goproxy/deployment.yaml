@@ -16,9 +16,12 @@ spec:
         # for ceph-block RBD mounting.
         podAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchLabels:
-                  app: goproxy
+            - nodeSelectorTerms:
+              - matchExpressions:
+                - key: kubernetes.io/hostname
+                  operator: NotIn
+                  values:
+                  - 10.2.12.20
               topologyKey: kubernetes.io/hostname
       containers:
       - name: goproxy
@@ -50,5 +53,4 @@ spec:
           mountPath: /opt/cache
       volumes:
       - name: data
-        persistentVolumeClaim:
-          claimName: goproxy
+        emptyDir: {}
