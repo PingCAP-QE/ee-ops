@@ -19,7 +19,7 @@ spec:
         args:
           - "-listen=0.0.0.0:8080"
           - "-cacheDir=/opt/cache"
-          - "-proxy=https://goproxy.io"
+          - "-proxy=https://proxy.golang.org"
         readinessProbe:
           tcpSocket:
             port: 8080
