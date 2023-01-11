@@ -41,3 +41,4 @@ spec:
       portName: mongodb
       nodePorts:
         mongodb: "32017"
+      externalTrafficPolicy: Cluster        
