@@ -78,7 +78,7 @@ spec:
     tide:
       image:
         repository: ticommunityinfra/tide
-        tag: v20221207-9225e3a153
+        tag: v20230112-192a3d7605
     hook:
       ingress:
         enabled: false

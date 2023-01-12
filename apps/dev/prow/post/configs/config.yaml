@@ -85,8 +85,8 @@ tide:
       # Regex for matching issue number line: https://regex101.com/r/ezCYFC/1/
       body: |
         {{- $body := print .Body -}}
-
-        {{- $numbers := .NormalizeIssueNumbers $body -}}
+        {{- $issueNumberLine := .ExtractContent "(?im)^Issue Number:.+" $body -}}
+        {{- $numbers := .GitHub.NormalizeIssueNumbers $issueNumberLine -}}
         {{- if $numbers -}}
           {{- range $index, $number := $numbers -}}
             {{- if $index }}, {{ end -}}
@@ -94,24 +94,6 @@ tide:
           {{- end -}}
         {{- else -}}
           {{- " " -}}
-        {{- end -}}
-
-        {{- $description := .ExtractContent "(?i)\x60\x60\x60commit-message(?P<content>[\\\\w|\\\\W]+)\x60\x60\x60" $body -}}
-        {{- if $description -}}{{- "\n\n" -}}{{- end -}}
-        {{- $description -}}
-
-        {{- $signedAuthors := .NormalizeSignedOffBy -}}
-        {{- if $signedAuthors -}}{{- "\n\n" -}}{{- end -}}
-        {{- range $index, $author := $signedAuthors -}}
-          {{- if $index -}}{{- "\n" -}}{{- end -}}
-          {{- "Signed-off-by:" }} {{ .Name }} <{{- .Email -}}>
-        {{- end -}}
-
-        {{- $coAuthors := .NormalizeCoAuthorBy -}}
-        {{- if $coAuthors -}}{{- "\n\n" -}}{{- end -}}
-          {{- range $index, $author := $coAuthors -}}
-          {{- if $index -}}{{- "\n" -}}{{- end -}}
-          {{- "Co-authored-by:" }} {{ .Name }} <{{- .Email -}}>
         {{- end -}}
 
   queries:
