@@ -22,7 +22,7 @@ controller:
     - artifactId: mailer
       source:
         # renovate: datasource=jenkins-plugins depName=mailer
-        version: 435.438.v5b_81173f5b_a_1
+        version: 438.v02c7f0a_12fa_4
     - artifactId: git
       source:
         # renovate: datasource=jenkins-plugins depName=git
