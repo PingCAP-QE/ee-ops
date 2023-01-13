@@ -73,7 +73,7 @@ controller:
     - artifactId: instance-identity
       source:
         # renovate: datasource=jenkins-plugins depName=instance-identity
-        version: 116.vf8f487400980
+        version: 142.v04572ca_5b_265
     - artifactId: jenkins-pipeline-cache
       source:
         # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
