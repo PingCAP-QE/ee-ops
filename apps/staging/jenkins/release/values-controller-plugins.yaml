@@ -19,14 +19,6 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes
         version: 3734.v562b_b_a_627ea_c
-    - artifactId: mailer
-      source:
-        # renovate: datasource=jenkins-plugins depName=mailer
-        version: 435.438.v5b_81173f5b_a_1
-    - artifactId: git
-      source:
-        # renovate: datasource=jenkins-plugins depName=git
-        version: 4.14.0
     - artifactId: configuration-as-code
       source:
         # renovate: datasource=jenkins-plugins depName=configuration-as-code
@@ -58,10 +50,6 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=http_request
         version: 1.16
-    - artifactId: workflow-job
-      source:
-        # renovate: datasource=jenkins-plugins depName=workflow-job
-        version: 1189.va_d37a_e9e4eda_
     - artifactId: workflow-aggregator
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-aggregator
@@ -70,10 +58,6 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-cps-global-lib
         version: 609.vd95673f149b_b
-    - artifactId: instance-identity
-      source:
-        # renovate: datasource=jenkins-plugins depName=instance-identity
-        version: 116.vf8f487400980
     - artifactId: jenkins-pipeline-cache
       source:
         # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
