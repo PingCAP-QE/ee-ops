@@ -61,7 +61,7 @@ controller:
     - artifactId: workflow-job
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-job
-        version: 1189.va_d37a_e9e4eda_
+        version: 1254.v3f64639b_11dd
     - artifactId: workflow-aggregator
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-aggregator
