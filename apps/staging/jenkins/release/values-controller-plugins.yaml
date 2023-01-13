@@ -88,7 +88,7 @@ controller:
         version: 1.85.2
     - artifactId: timestamper
       source:
-        # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
+        # renovate: datasource=jenkins-plugins depName=timestamper
         version: 1.21
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
