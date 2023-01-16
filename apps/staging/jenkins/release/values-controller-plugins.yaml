@@ -18,7 +18,7 @@ controller:
     - artifactId: kubernetes
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes
-        version: 3734.v562b_b_a_627ea_c
+        version: 3802.vb_b_600831fcb_3
     - artifactId: configuration-as-code
       source:
         # renovate: datasource=jenkins-plugins depName=configuration-as-code
