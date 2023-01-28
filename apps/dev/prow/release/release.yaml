@@ -100,10 +100,17 @@ spec:
         resources: {}
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --update-period=5m
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         service:
           type: ClusterIP
       ti-community-autoresponder:
@@ -118,17 +125,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-blunderbuss:
         service:
           type: ClusterIP
@@ -141,17 +155,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid          
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-cherrypicker:
         service:
           type: ClusterIP
@@ -164,17 +185,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-contribution:
         service:
           type: ClusterIP
@@ -187,17 +215,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-format-checker:
         service:
           type: ClusterIP
@@ -210,17 +245,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-issue-triage:
         service:
           type: ClusterIP
@@ -233,17 +275,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-label:
         service:
           type: ClusterIP
@@ -256,17 +305,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-label-blocker:
         service:
           type: ClusterIP
@@ -279,17 +335,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-lgtm:
         service:
           type: ClusterIP
@@ -302,17 +365,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-merge:
         service:
           type: ClusterIP
@@ -325,17 +395,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-owners:
         service:
           type: ClusterIP
@@ -348,17 +425,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       ti-community-tars:
         service:
           type: ClusterIP
@@ -371,17 +455,24 @@ spec:
           tag: v2.4.0
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       tichi-web:
         service:
           type: ClusterIP
@@ -399,9 +490,9 @@ spec:
             configMap:
               name: prow-external-plugins-config
         volumeMounts:
-            - name: external-plugins-config
-              mountPath: /etc/external_plugins_config
-              readOnly: true
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
         livenessProbe:
           httpGet:
             path: tichi
@@ -419,7 +510,7 @@ spec:
     persistent:
       type: gcs
       bucketName: ${BUCKET_NAME}
-    
+
   postRenderers:
     - kustomize:
         patchesJson6902:
