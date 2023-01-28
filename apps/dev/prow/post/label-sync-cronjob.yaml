@@ -15,12 +15,19 @@ spec:
         spec:
           containers:
             - name: label-sync
-              image: gcr.io/k8s-prow/label_sync:v20221205-a1b0b85d88
+              image: gcr.io/k8s-prow/label_sync:v20230128-8b677bb83b
               args:
                 - --config=/etc/config/labels.yaml
                 - --confirm=true
+                - --github-app-id=$(GITHUB_APP_ID)
+                - --github-app-private-key-path=/etc/github/cert
                 - --only=ti-community-infra/test-dev
-                - --token=/etc/github/oauth
+              env:
+                - name: GITHUB_APP_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: prow-github-token
+                      key: appid
               volumeMounts:
                 - name: github-token
                   mountPath: /etc/github
