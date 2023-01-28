@@ -100,10 +100,17 @@ spec:
         resources: {}
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --update-period=5m
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
         service:
           type: ClusterIP
       ti-community-autoresponder:
