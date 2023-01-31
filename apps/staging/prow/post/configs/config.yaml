@@ -53,18 +53,7 @@ tide:
   target_url: https://${DOMAIN_NAME}/tide
   merge_method:
     PingCAP-QE/ee-ops: squash
-    PingCAP-QE/ci: squash
   queries:
-    - repos:
-        - PingCAP-QE/ci
-      labels:
-        - lgtm
-        - approved
-      missingLabels:
-        - needs-rebase
-        - do-not-merge/hold
-        - do-not-merge/work-in-progress
-        - do-not-merge/invalid-owners-file
     - repos:
        - PingCAP-QE/ee-ops
       labels:

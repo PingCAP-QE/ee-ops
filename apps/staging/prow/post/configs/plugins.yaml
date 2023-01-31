@@ -1,6 +1,6 @@
 # enable plugins for any repos in the org.
 plugins:
-  PingCAP-QE:
+  PingCAP-QE/ee-ops:
     plugins:
       - approve
       - assign
@@ -16,8 +16,6 @@ plugins:
       - verify-owners
       - wip
       - yuks
-  PingCAP-QE/ee-ops:
-    plugins:
       - config-updater
 
 config_updater:
@@ -39,12 +37,13 @@ label:
   #         - ee
 
 external_plugins:
-  PingCAP-QE:
+  PingCAP-QE/ee-ops:
     - name: tektoncd # forward to tekton trigger event listener.
       endpoint: http://el-trigger-groups-listener.ci-demo.svc:8080
       events:
         - pull_request
     - name: needs-rebase
+      endpoint: http://prow-needs-rebase
       events:
         - issue_comment
         - pull_request
