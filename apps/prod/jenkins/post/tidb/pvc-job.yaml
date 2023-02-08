@@ -11,7 +11,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: golang
-          image: "hub.pingcap.net/wangweizhen/tidb_image:go11920221103"
+          image: "hub.pingcap.net/wangweizhen/tidb_image:go11920230207"
           command:
             - /bin/bash
             - -exec
@@ -51,7 +51,7 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: update-bazel-local-data-go1.19.3
+  name: update-bazel-local-data-go1.19
   namespace: jenkins-tidb
 spec:
   template:
@@ -61,7 +61,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: golang
-          image: "hub.pingcap.net/wangweizhen/tidb_image:go11920221108"
+          image: "hub.pingcap.net/wangweizhen/tidb_image:go11920230207"
           command:
             - /bin/bash
             - -exec
@@ -82,7 +82,7 @@ spec:
               echo "done."
           env:
             - name: GO_VER
-              value: "1.19.3"
+              value: "1.19"
           resources:
             requests:
               memory: "100Mi"
