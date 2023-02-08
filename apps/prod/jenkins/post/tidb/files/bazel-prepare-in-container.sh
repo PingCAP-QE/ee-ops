@@ -50,7 +50,9 @@ if [ -d /etc/containerinfo ]; then
     mem_limit=$(cat /etc/containerinfo/mem_limit)
     mem_limit=$(((mem_limit / 1048576) * 9 / 10))
 
-    job_limit=$((mem_limit / DEFAULT_BAZEL_JVM_MAX_MEM_MB))
+    # evaluate with 1/2 of the maximum memory size of bazel job.
+    # total: 32GB, max job mem: 8GB => 8 jobs.
+    job_limit=$((mem_limit * 2 / DEFAULT_BAZEL_JVM_MAX_MEM_MB))
     job_limit=$((job_limit < cpu_limit ? job_limit : cpu_limit))
     echo "build --local_ram_resources=${mem_limit} --local_cpu_resources=${cpu_limit} --jobs=${job_limit}" >>~/.bazelrc
 fi
