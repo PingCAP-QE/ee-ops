@@ -3,10 +3,10 @@ controller:
   tag: "2.379"
   resources:
     requests:
-      cpu: "8"
+      cpu: "16"
       memory: 80Gi
     limits:
-      cpu: "8"
+      cpu: "16"
       memory: 80Gi
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
