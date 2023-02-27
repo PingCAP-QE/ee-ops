@@ -45,17 +45,17 @@ spec:
         useAllNodes: false
         useAllDevices: false
         nodes:
-          - name: "172.16.5.55"
+          - name: "staging-node55"
             deviceFilter: "nvme0n1"
             config:
               osdsPerDevice: "5"
-          - name: "172.16.5.90"
+          - name: "staging-node90"
             devices:
               - name: "nvme0n1"
                 config: { osdsPerDevice: "5" }
               - name: "nvme1n1"
                 config: { osdsPerDevice: "5" }
-          - name: "172.16.5.83"
+          - name: "staging-node83"
             config:
               osdsPerDevice: "1"
             devices:
