@@ -80,6 +80,9 @@ spec:
         repository: ticommunityinfra/tide
         tag: v20230112-192a3d7605
     hook:
+      image:
+        repository: ticommunityinfra/hook
+        tag: v20230303-8e409833dd-dirty
       ingress:
         enabled: false
     jenkinsOperator:
