@@ -46,21 +46,14 @@ spec:
         useAllDevices: false
         nodes:
           - name: "staging-node55"
-            deviceFilter: "nvme0n1"
-            config:
-              osdsPerDevice: "5"
-          - name: "staging-node90"
-            devices:
-              - name: "nvme0n1"
-                config: { osdsPerDevice: "5" }
-              - name: "nvme1n1"
-                config: { osdsPerDevice: "5" }
+            deviceFilter: "nvme0n1" # 3.7T
+            config: { osdsPerDevice: "5" }
           - name: "staging-node83"
-            config:
-              osdsPerDevice: "1"
-            devices:
-            - name: sdb
-            - name: sdc
+            deviceFilter: "nvme0n1" # 1.5T
+            config: { osdsPerDevice: "2" }
+          - name: "staging-node90"
+            deviceFilter: "nvme0n1" # 3.7T
+            config: { osdsPerDevice: "5" }
     configOverride: |
       [client.rgw.ceph.objectstore.a]
         rgw_d3n_l1_local_datacache_enabled = true
