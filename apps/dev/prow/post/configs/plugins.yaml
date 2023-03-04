@@ -1,3 +1,77 @@
+# enable plugins for any repos in the org.
+plugins:
+  ti-community-infra/test-dev:
+    plugins:
+      - approve
+      - assign
+      - blunderbuss
+      - branchcleaner
+      - help
+      - hold
+      - lgtm
+      - lifecycle
+      - milestone
+      - milestoneapplier
+      - override
+      - owners-label
+      - size
+      - trigger
+      - verify-owners
+      - welcome
+      - wip
+
+# external plugins.
+external_plugins:
+  ti-community-infra/test-dev:
+    - name: ti-community-label
+      events:
+        - issue_comment
+      endpoint: http://prow-ti-community-label
+    - name: ti-community-autoresponder
+      events:
+        - issue_comment
+        - pull_request_review_comment
+        - pull_request_review
+        - pull_request
+        - issues
+      endpoint: http://prow-ti-community-autoresponder
+    - name: needs-rebase
+      events:
+        - pull_request
+        - issue_comment
+      endpoint: http://prow-needs-rebase
+    - name: ti-community-cherrypicker
+      events:
+        - pull_request
+        - issue_comment
+      endpoint: http://prow-ti-community-cherrypicker
+    - name: ti-community-label-blocker
+      events:
+        - pull_request
+      endpoint: http://prow-ti-community-label-blocker
+    - name: ti-community-contribution
+      events:
+        - pull_request
+      endpoint: http://prow-ti-community-contribution
+    - name: ti-community-tars
+      events:
+        - issue_comment
+        - push
+      endpoint: http://prow-ti-community-tars
+    - name: ti-community-format-checker
+      events:
+        - pull_request
+        - issues
+      endpoint: http://prow-ti-community-format-checker
+    - name: ti-community-issue-triage
+      events:
+        - pull_request
+        - issues
+        - issue_comment
+      endpoint: http://prow-ti-community-issue-triage
+
+
+# configurations for plugins:
 blunderbuss:
   # ExcludeApprovers controls whether approvers are considered to be
   # reviewers. By default, approvers are considered as reviewers if
@@ -53,24 +127,6 @@ milestone_applier:
 override:
   allow_top_level_owners: true
 
-# enable plugins for any repos in the org.
-plugins:
-  ti-community-infra/test-dev:
-    plugins:
-      - assign
-      - blunderbuss
-      - branchcleaner
-      - size
-      - welcome
-      - wip
-      - lifecycle
-      - help
-      - hold
-      - milestone
-      - milestoneapplier
-      - trigger
-      - override
-
 # configuration of plugin `label`
 label:
   additional_labels:
@@ -78,67 +134,13 @@ label:
     - tide/merge-method-rebase
     - tide/merge-method-merge
 
-external_plugins:
-  ti-community-infra/test-dev:
-    - name: ti-community-lgtm
-      events:
-        - pull_request_review
-        - pull_request
-      endpoint: http://prow-ti-community-lgtm
-    - name: ti-community-merge
-      events:
-        - issue_comment
-        - pull_request_review_comment
-        - pull_request
-      endpoint: http://prow-ti-community-merge
-    - name: ti-community-label
-      events:
-        - issue_comment
-      endpoint: http://prow-ti-community-label
-    - name: ti-community-autoresponder
-      events:
-        - issue_comment
-        - pull_request_review_comment
-        - pull_request_review
-        - pull_request
-        - issues
-      endpoint: http://prow-ti-community-autoresponder
-    - name: needs-rebase
-      events:
-        - pull_request
-        - issue_comment
-      endpoint: http://prow-needs-rebase
-    - name: ti-community-cherrypicker
-      events:
-        - pull_request
-        - issue_comment
-      endpoint: http://prow-ti-community-cherrypicker
-    - name: ti-community-label-blocker
-      events:
-        - pull_request
-      endpoint: http://prow-ti-community-label-blocker
-    - name: ti-community-contribution
-      events:
-        - pull_request
-      endpoint: http://prow-ti-community-contribution
-    - name: ti-community-tars
-      events:
-        - issue_comment
-        - push
-      endpoint: http://prow-ti-community-tars
-    - name: ti-community-format-checker
-      events:
-        - pull_request
-        - issues
-      endpoint: http://prow-ti-community-format-checker
-    - name: ti-community-issue-triage
-      events:
-        - pull_request
-        - issues
-        - issue_comment
-      endpoint: http://prow-ti-community-issue-triage
-    - name: ti-community-blunderbuss
-      events:
-        - pull_request
-        - issue_comment
-      endpoint: http://prow-ti-community-blunderbuss
+# Ref: https://github.com/ti-community-infra/test-infra/blob/feature/lgtm-count-reviewers/prow/plugins/config.go#L346-L366
+lgtm:
+  - repos:
+    - ti-community-infra/test-dev
+    review_acts_as_lgtm: true
+    request_count: 2
+
+owners:
+  skip_collaborators:
+    - ti-community-infra/test-dev
