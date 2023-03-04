@@ -17,7 +17,7 @@ spec:
         name: rook
         namespace: flux-system
       # renovate: datasource=helm registryUrl=https://charts.rook.io/release depName=rook-ceph-cluster versioning=helm
-      version: "v1.10.7"
+      version: "v1.11.0"
   interval: 1h0m0s
   install:
     remediation:
@@ -34,13 +34,6 @@ spec:
       dashboard:
         enabled: true
         ssl: false
-      cleanupPolicy:
-        # Since cluster cleanup is destructive to data, confirmation is required.
-        # To destroy all Rook data on hosts during uninstall, confirmation must be set to "yes-really-destroy-data".
-        # This value should only be set when the cluster is about to be deleted. After the confirmation is set,
-        # Rook will immediately stop configuring the cluster and only wait for the delete command.
-        # If the empty string is set, Rook will not destroy any data on hosts during uninstall.
-        confirmation: "yes-really-destroy-data"
       storage:
         useAllNodes: false
         useAllDevices: false
