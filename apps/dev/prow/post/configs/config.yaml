@@ -100,13 +100,13 @@ tide:
     - repos:
         - ti-community-infra/test-dev
       labels:
-        - status/can-merge
+        - lgtm
+        - approved
       missingLabels:
         - do-not-merge/hold
         - do-not-merge/work-in-progress
         - do-not-merge/invalid-commit-message
         - needs-rebase
-      reviewApprovedRequired: true
 
   context_options:
     orgs:
@@ -117,6 +117,11 @@ tide:
               - "markdown-test"
             skip-unknown-contexts: true
             from-branch-protection: false
+
+  batch_size_limit:
+    "ti-community-infra/test-dev": 4
+  prioritize_existing_batches:
+    "ti-community-infra/test-dev": true
 
 # for jenkins operator component.
 jenkins_operators:
