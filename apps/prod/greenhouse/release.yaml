@@ -32,7 +32,7 @@ spec:
     replicaCount: 3
     run:
       minPercentBlocksFree: 5 # %5
-      evictUntilPercentBlocksFree: 20 # %20
+      evictUntilPercentBlocksFree: 7 # %7
       diskCheckInterval: 60s
     resources:
       limits:
@@ -42,7 +42,7 @@ spec:
       enabled: true
       storageClass: ceph-block
       accessMode: ReadWriteOnce
-      size: 11Ti
+      size: 15Ti
     serviceMonitor:
       enabled: true
       additionalLabels:
