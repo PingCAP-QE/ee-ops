@@ -82,6 +82,7 @@ spec:
           - name: 10.2.12.21
           - name: 10.2.12.87
           - name: 10.2.12.88
+          - name: 10.2.12.89
           - name: 10.2.12.90
           - name: node3
             deviceFilter: ^nvme[3]n1
