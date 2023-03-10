@@ -80,6 +80,9 @@ spec:
           - name: 10.2.12.13
           - name: 10.2.12.20
           - name: 10.2.12.21
+          - name: 10.2.12.87
+          - name: 10.2.12.88
+          - name: 10.2.12.90
           - name: node3
             deviceFilter: ^nvme[3]n1
           - name: node4
@@ -100,7 +103,7 @@ spec:
         mgr:
           limits:
             cpu: "1"
-            memory: "1Gi"
+            memory: "2Gi"
           requests:
             cpu: "1"
             memory: "1Gi"
