@@ -51,6 +51,9 @@ spec:
         nginx.ingress.kubernetes.io/upstream-hash-by-subset-size: "3"
         nginx.ingress.kubernetes.io/use-regex: "true"
         nginx.ingress.kubernetes.io/rewrite-target: /$2
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
       hosts:
         - paths:
             - path: /ats(/|$)(.*)
