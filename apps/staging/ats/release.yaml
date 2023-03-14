@@ -52,10 +52,11 @@ spec:
         nginx.ingress.kubernetes.io/use-regex: "true"
         nginx.ingress.kubernetes.io/rewrite-target: /$2
       hosts:
-        - path: /ats(/|$)(.*)
-          pathType: Prefix
+        - paths:
+            - path: /ats(/|$)(.*)
+              pathType: Prefix
     volumes:
-      - name: data        
+      - name: data
         emptyDir: {}
       - name: config-override
         configMap:
