@@ -31,7 +31,7 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 1
+    replicaCount: 3
     resources:
       requests:
         cpu: 100m
@@ -39,10 +39,24 @@ spec:
       limits:
         cpu: "1"
         memory: 1Gi
+    ingress:
+      enabled: true
+      className: "nginx"
+      annotations:
+        # kubernetes.io/ingress.class: nginx
+        # kubernetes.io/tls-acme: "true"
+        # ref: https://github.com/kubernetes/ingress-nginx/blob/main/docs/user-guide/nginx-configuration/annotations.md
+        nginx.ingress.kubernetes.io/upstream-hash-by: "$request_uri"
+        nginx.ingress.kubernetes.io/upstream-hash-by-subset: "true"
+        nginx.ingress.kubernetes.io/upstream-hash-by-subset-size: "3"
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
+      hosts:
+        - path: /ats(/|$)(.*)
+          pathType: Prefix
     volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: ats-storage
+      - name: data        
+        emptyDir: {}
       - name: config-override
         configMap:
           name: ats-config-override

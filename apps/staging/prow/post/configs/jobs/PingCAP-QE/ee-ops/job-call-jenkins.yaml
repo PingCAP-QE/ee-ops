@@ -1,16 +1,2 @@
 presubmits:
-  PingCAP-QE/ee-ops:
-    - name: prow_debug # it's a debug job in jenkins server.
-      agent: jenkins
-      decorate: false # need add this.
-      always_run: true
-      context: debug/prow-call-jenkins
-      rerun_command: /test prow-call-jenkins
-      trigger: '((?m)^/test( all| prow-call-jenkins),?(\s+|$))'
-    - name: pingcap-qe/ee-ops/prow_debug # it's a debug job in jenkins server.
-      agent: jenkins
-      decorate: false # need add this.
-      always_run: true
-      context: debug/prow-call-nested-jenkins-job
-      rerun_command: /test prow-call-nested-jenkins-job
-      trigger: '((?m)^/test( all| prow-call-nested-jenkins-job),?(\s+|$))'
+  PingCAP-QE/ee-ops: []
