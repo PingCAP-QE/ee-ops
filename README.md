@@ -18,18 +18,9 @@ Before all please fork it into you personal account or organization.
 
 **required**:
 
-- secrets for jenkins component
-  > see [here](apps/staging/jenkins/README.md)
-- secrets for prow component
-  > `kubectl -n apps create secret generic github-app-prow --from-literal domain-name=<full prow domain> --from-literal app-id=<github app id> --from-file=app-cert=<github cert file path> --from-literal webhook-secret=<github-hmac-token>`
-- secrets for tekton component
-  > `kubectl -n apps create secret generic tekton-ingress --from-literal domain=<full tekton domain> --from-literal path_for_dashboard=/your-tekton-dashboard-path`
-  > `kubectl -n ci-demo create secret generic github-secret --from-literal secretToken=<hmac-token>`
-  > `kubectl -n ci-demo create secret generic github-app --from-literal app-id=<github app id> --from-file app-cert=<github app private key file path> --from-file app-cert-pkcs8=<github app private key with pkcs8 file path>`,
-  > you can convert from pkcs1 to pkcs8 with command:
-  > `openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in private-key.pem -out private-key-pkcs8.key`
+- secrets
+  > see the cluster `README.md`, for example: [clusters/staging/README.md](clusters/staging/README.md)
 
-**optional**:
 
 #### Github private token
 
@@ -50,4 +41,3 @@ flux bootstrap github \
 ```
 
 if you repo in under personal account, you should add cli option `--personal`.
-poc poc
