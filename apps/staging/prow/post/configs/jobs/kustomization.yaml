@@ -8,7 +8,5 @@ configMapGenerator:
       disableNameSuffixHash: true
     files:
       - PingCAP-QE/ee-ops/job-call-jenkins.yaml
-      - PingCAP-QE/ee-ops/job-curl-call-tekton-pipeline-run.yaml
-      - PingCAP-QE/ee-ops/job-curl-call-tekton-task-run.yaml
       - PingCAP-QE/ee-ops/job-prowjob.yaml
       - PingCAP-QE/ee-ops/job-tekton-pipeline-spec.yaml
