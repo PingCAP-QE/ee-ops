@@ -69,7 +69,7 @@ spec:
     hook:
       image:
         repository: ticommunityinfra/hook
-        tag: v20230323-3ade632
+        tag: v20230323-6be10e1
     jenkinsOperator:
       enabled: true
       dryRun: false
