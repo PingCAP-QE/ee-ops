@@ -8,3 +8,5 @@ resources:
   - golang-test.yaml
   - kubernetes-actions.yaml
   - echo.yaml
+  - ko.yaml
+  - ko-test-infra.yaml
