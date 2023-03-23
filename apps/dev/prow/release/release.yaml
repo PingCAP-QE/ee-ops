@@ -87,16 +87,16 @@ spec:
         enabled: false
       image:
         repository: ticommunityinfra/hook
-        tag: v20230323-6be10e1
+        tag: latest
     pipeline:
       image:
         repository: ticommunityinfra/pipeline
-        tag: v20230323-3ade632        
+        tag: latest
     jenkinsOperator:
       enabled: true
       image:
         repository: ticommunityinfra/jenkins-operator
-        tag: v20230323-3ade632      
+        tag: v20230323-3ade632
       dryRun: false
       jenkinsUrl: ${JENKINS_BASE_URL}
       auth:
@@ -177,7 +177,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: prow-github-token
-                key: appid          
+                key: appid
         volumes:
           - name: external-plugins-config
             configMap:
