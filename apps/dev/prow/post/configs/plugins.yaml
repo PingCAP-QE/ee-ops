@@ -139,7 +139,7 @@ lgtm:
   - repos:
     - ti-community-infra/test-dev
     review_acts_as_lgtm: true
-    request_count: 2
+    reviewer_count: 2
 
 owners:
   skip_collaborators:
