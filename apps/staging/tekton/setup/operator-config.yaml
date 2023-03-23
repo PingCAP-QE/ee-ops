@@ -11,6 +11,7 @@ spec:
   pipeline:
     disable-affinity-assistant: false
     disable-creds-init: false
+    disable-home-env-overwrite: true
     disable-working-directory-overwrite: true
     enable-api-fields: alpha # stable | alpha
     enable-custom-tasks: true
