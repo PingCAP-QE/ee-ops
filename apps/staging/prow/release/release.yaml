@@ -58,6 +58,18 @@ spec:
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
       githubOrg: PingCAP-QE
+    deck:
+      image:
+        repository: ticommunityinfra/deck
+        tag: v20230323-3ade632
+    tide:
+      image:
+        repository: ticommunityinfra/tide
+        tag: v20230323-3ade632
+    hook:
+      image:
+        repository: ticommunityinfra/hook
+        tag: v20230323-3ade632
     jenkinsOperator:
       enabled: true
       dryRun: false
