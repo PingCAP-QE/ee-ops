@@ -15,6 +15,14 @@ spec:
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
+      name: tekton-operator
+      namespace: tekton-operator
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-operator-webhook
+      namespace: tekton-operator
+    - apiVersion: apps/v1
+      kind: Deployment
       name: tekton-pipelines-controller
       namespace: tekton-pipelines
     - apiVersion: apps/v1

@@ -5,19 +5,20 @@ presubmits:
       max_concurrency: 2
       decorate: false # need add this.
       agent: tekton-pipeline
-      pipeline_run_spec:
-        pipelineSpec:
-          tasks:
-            - name: easy-step
-              taskSpec:
-                steps:
-                  - name: build-sources
-                    image: ubuntu
-                    command:
-                      - /bin/bash
-                    args:
-                      - -c
-                      - |
-                        echo hello world
-                        pwd
-                        ls
+      tekton_pipeline_run_spec:
+        v1beta1:
+          pipelineSpec:
+            tasks:
+              - name: easy-step
+                taskSpec:
+                  steps:
+                    - name: build-sources
+                      image: ubuntu
+                      command:
+                        - /bin/bash
+                      args:
+                        - -c
+                        - |
+                          echo hello world
+                          pwd
+                          ls
