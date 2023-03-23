@@ -16,13 +16,17 @@ spec:
     enable-api-fields: alpha # stable | alpha
     enable-custom-tasks: true
     enable-tekton-oci-bundles: true
+    require-git-ssh-secret-known-hosts: false
+    running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
+
+    ###### metrics items ########
     metrics.pipelinerun.duration-type: histogram
     metrics.pipelinerun.level: pipelinerun
     metrics.taskrun.duration-type: histogram
     metrics.taskrun.level: taskrun
-    require-git-ssh-secret-known-hosts: false
-    running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
-    default-timeout-minutes: 60 # unit is minutes, default timeout for TaskRun and PipelineRun.
+
+    ###### optional items #######
+    default-timeout-minutes: "60" # unit is minutes, default timeout for TaskRun and PipelineRun.
     default-service-account: "default"
     # default empty dir, can not be shared between tasks.
     default-task-run-workspace-binding: >
@@ -36,5 +40,9 @@ spec:
       - pipelinerun
     keep: 10
     schedule: "0 * * * *" # hourly
+  hub:
+    params:
+      - name: enable-devconsole-integration
+        value: "true"
   dashboard:
     readonly: false
