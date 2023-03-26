@@ -1,0 +1,92 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: kaniko-build
+spec:
+  params:
+    - name: git-url
+      type: string
+    - name: git-revision
+      default: main
+    - name: IMAGE
+      description: Name (reference) of the image to build.
+    - name: DOCKERFILE
+      description: Path to the Dockerfile to build.
+      default: ./Dockerfile
+    - name: CONTEXT
+      description: The build context used by Kaniko.
+      default: ./
+    - name: BUILDER_IMAGE
+      description: The image on which builds will run.
+      default: gcr.io/kaniko-project/executor:v1.9.1
+    - name: EXTRA_ARGS
+      type: array
+      default: []
+  tasks:
+    - name: fetch-from-git
+      taskRef:
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: git-source
+    - name: build
+      runAfter:
+        - fetch-from-git
+      taskRef:
+        name: kaniko
+      params:
+        - name: IMAGE
+          value: "$(params.IMAGE)"
+        - name: DOCKERFILE
+          value: "$(params.DOCKERFILE)"
+        - name: CONTEXT
+          value: "$(params.CONTEXT)"
+        - name: BUILDER_IMAGE
+          value: "$(params.BUILDER_IMAGE)"
+        - name: EXTRA_ARGS
+          value: ["$(params.EXTRA_ARGS[*])"]
+      workspaces:
+      - name: source
+        workspace: git-source
+      - name: dockerconfig
+        workspace: dockerconfig
+    - name: mult-arch-push
+      runAfter:
+        - "build"
+      taskSpec:
+        steps:
+          - name: mult-arch-push
+            script: |
+                #! /usr/bin/env bash
+
+                echo "image url: $(tasks.build.results.IMAGE_URL)"
+                echo "image digest: $(tasks.build.results.IMAGE_DIGEST)"
+
+                image_platform="linux/amd64"  # mock it.
+                image_url="$(tasks.build.results.IMAGE_URL)"
+
+                # Create an empty manifest list for the myimage:latest tag
+                docker manifest create myimage:latest
+
+                # Annotate the manifest list with the amd64 image
+                docker manifest annotate myimage:latest myimage:latest --arch amd64
+
+                # Annotate the manifest list with the arm64 image
+                docker manifest annotate myimage:latest myimage:latest --arch arm64
+
+                # Push the manifest list to the registry
+                docker manifest push myimage:latest
+
+                manifest-tool push from-args \
+                    --platforms ${image_platform} \
+                    --template ${image_url%:*}@$(tasks.build.results.IMAGE_DIGEST) \
+                    --target $(tasks.build.results.IMAGE_URL)
+  workspaces:
+    - name: git-source
+    - name: dockerconfig # contains file: config.json
+      optional: true
