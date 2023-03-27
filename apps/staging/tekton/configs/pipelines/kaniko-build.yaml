@@ -10,6 +10,9 @@ spec:
       default: main
     - name: IMAGE
       description: Name (reference) of the image to build.
+    - name: TAGS
+      description: image tags to push additionally.
+      default: "debug"
     - name: DOCKERFILE
       description: Path to the Dockerfile to build.
       default: ./Dockerfile
@@ -34,7 +37,7 @@ spec:
       workspaces:
         - name: output
           workspace: git-source
-    - name: build
+    - name: build-amd64
       runAfter:
         - fetch-from-git
       taskRef:
@@ -51,41 +54,28 @@ spec:
         - name: EXTRA_ARGS
           value: ["$(params.EXTRA_ARGS[*])"]
       workspaces:
-      - name: source
-        workspace: git-source
-      - name: dockerconfig
-        workspace: dockerconfig
+        - name: source
+          workspace: git-source
+        - name: dockerconfig
+          workspace: dockerconfig
     - name: mult-arch-push
       runAfter:
-        - "build"
-      taskSpec:
-        steps:
-          - name: mult-arch-push
-            script: |
-                #! /usr/bin/env bash
-
-                echo "image url: $(tasks.build.results.IMAGE_URL)"
-                echo "image digest: $(tasks.build.results.IMAGE_DIGEST)"
-
-                image_platform="linux/amd64"  # mock it.
-                image_url="$(tasks.build.results.IMAGE_URL)"
-
-                # Create an empty manifest list for the myimage:latest tag
-                docker manifest create myimage:latest
-
-                # Annotate the manifest list with the amd64 image
-                docker manifest annotate myimage:latest myimage:latest --arch amd64
-
-                # Annotate the manifest list with the arm64 image
-                docker manifest annotate myimage:latest myimage:latest --arch arm64
-
-                # Push the manifest list to the registry
-                docker manifest push myimage:latest
-
-                manifest-tool push from-args \
-                    --platforms ${image_platform} \
-                    --template ${image_url%:*}@$(tasks.build.results.IMAGE_DIGEST) \
-                    --target $(tasks.build.results.IMAGE_URL)
+        - "build-amd64"
+        # - "build-arm64"
+      taskRef:
+        name: multi-arch-image-push
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE)
+        - name: tags
+          value: "$(params.TAGS)"
+        - name: platform-and-digest-list
+          value:
+            - "linux/amd64 => $(tasks.build-amd64.results.IMAGE_DIGEST)"
+            # - "linux/arm64 => $(tasks.build-arm64.results.IMAGE_DIGEST)"
+      workspaces:
+        - name: dockerconfig
+          workspace: dockerconfig
   workspaces:
     - name: git-source
     - name: dockerconfig # contains file: config.json
