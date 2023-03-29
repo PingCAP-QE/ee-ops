@@ -25,6 +25,9 @@ controller:
     - { name: jenkins-cache, keyName: access-secret }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
     - { name: mongodb, keyName: mongodb-root-password }
+    # for harbor
+    - { name: harbor, keyName: tiflow-engine-username }
+    - { name: harbor, keyName: tiflow-engine-password }
 
   additionalSecrets: []
   #  - name: nameOfSecret
@@ -123,6 +126,15 @@ controller:
                       description: coveralls token for tiflow
                       scope: GLOBAL
                       secret: ${coveralls-token-tiflow}
+              - domain:
+                  name: hub.pingcap.net
+                credentials:
+                  - usernamePassword:
+                      scope: GLOBAL
+                      id: harbor-tiflow-engine
+                      description: user/password for tiflow engine test in harbor
+                      username: ${harbor-tiflow-engine-username}
+                      password: ${harbor-tiflow-engine-password}
       # for jobs.
       jobs-dsl: |
         jobs:
