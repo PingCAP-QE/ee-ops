@@ -10,6 +10,7 @@ controller:
     - { name: github, keyName: git-private-key }
     - { name: github, keyName: git-username }
     - { name: github, keyName: bot-token }
+    - { name: github, keyName: pr-diff-token }
     # for codecov.io uploading
     - { name: codecov-token, keyName: tidb }
     - { name: codecov-token, keyName: tikv-migration }
@@ -91,6 +92,11 @@ controller:
                       description: github private token to call api.
                       scope: GLOBAL
                       secret: ${github-bot-token}
+                  - string:
+                      id: github-pr-diff-token
+                      description: github token to list pr diff files.
+                      scope: GLOBAL
+                      secret: ${github-pr-diff-token}
               - domain:
                   name: codecov.io
                 credentials:
