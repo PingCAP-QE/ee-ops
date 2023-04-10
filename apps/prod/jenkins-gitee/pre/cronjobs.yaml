@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: shrink-gitee-ci-pipeline-cache
+  namespace: apps
+spec:
+  schedule: "*/15 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: deno
+              image: "denoland/deno:1.25.1"
+              tty: true
+              args:
+                - run
+                - --allow-all
+                - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/s3-cache.ts
+                - --op=shrink
+                - --keep-size-g=75
+              envFrom:
+                - secretRef:
+                    name: gitee-ci-pipeline-cache
+                - configMapRef:
+                    name: gitee-ci-pipeline-cache
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "500m"

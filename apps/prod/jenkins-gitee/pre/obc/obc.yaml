@@ -1,0 +1,10 @@
+apiVersion: objectbucket.io/v1alpha1
+kind: ObjectBucketClaim
+metadata:
+  name: gitee-ci-pipeline-cache
+  namespace: apps
+spec:
+  additionalConfig:
+    maxSize: 800G
+  bucketName: gitee-ci-pipeline-cache
+  storageClassName: ceph-bucket
