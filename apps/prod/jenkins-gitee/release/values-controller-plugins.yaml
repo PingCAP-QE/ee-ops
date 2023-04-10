@@ -1,0 +1,126 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+controller:
+  initContainerEnv:
+    - name: JENKINS_UC
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  containerEnv:
+    - name: JENKINS_UC
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+
+  # List of plugins to be install during Jenkins controller start
+  installPlugins:
+    # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
+    # but without outer `plugin` key.
+    - artifactId: kubernetes
+      source:
+        # renovate: datasource=jenkins-plugins depName=kubernetes
+        version: 3845.va_9823979a_744
+    - artifactId: kubernetes-client-api
+      source:
+        # renovate: datasource=jenkins-plugins depName=kubernetes-client-api
+        version: 6.3.1-206.v76d3b_6b_14db_b
+    - artifactId: mailer
+      source:
+        # renovate: datasource=jenkins-plugins depName=mailer
+        version: 438.v02c7f0a_12fa_4
+    - artifactId: git
+      source:
+        # renovate: datasource=jenkins-plugins depName=git
+        version: 5.0.0
+    - artifactId: configuration-as-code
+      source:
+        # renovate: datasource=jenkins-plugins depName=configuration-as-code
+        version: 1569.vb_72405b_80249
+    - artifactId: prometheus
+      source:
+        # renovate: datasource=jenkins-plugins depName=prometheus
+        version: 2.0.11
+    - artifactId: blueocean
+      source:
+        # renovate: datasource=jenkins-plugins depName=blueocean
+        version: 1.25.8
+    - artifactId: job-dsl
+      source:
+        # renovate: datasource=jenkins-plugins depName=job-dsl
+        version: 1.81
+    - artifactId: build-failure-analyzer
+      source:
+        url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
+    - artifactId: pipeline-groovy-lib
+      source:
+        # renovate: datasource=jenkins-plugins depName=pipeline-groovy-lib
+        version: 621.vb_44ce045b_582
+    - artifactId: pipeline-utility-steps
+      source:
+        # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
+        version: 2.13.2
+    - artifactId: http_request
+      source:
+        # renovate: datasource=jenkins-plugins depName=http_request
+        version: 1.16
+    - artifactId: workflow-job
+      source:
+        # renovate: datasource=jenkins-plugins depName=workflow-job
+        version: 1254.v3f64639b_11dd
+    - artifactId: workflow-aggregator
+      source:
+        # renovate: datasource=jenkins-plugins depName=workflow-aggregator
+        version: 590.v6a_d052e5a_a_b_5
+    - artifactId: workflow-cps-global-lib
+      source:
+        # renovate: datasource=jenkins-plugins depName=workflow-cps-global-lib
+        version: 609.vd95673f149b_b
+    - artifactId: instance-identity
+      source:
+        # renovate: datasource=jenkins-plugins depName=instance-identity
+        version: 142.v04572ca_5b_265
+    - artifactId: jenkins-pipeline-cache
+      source:
+        # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
+        url: https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.5/jenkins-pipeline-cache-0.1.5.hpi
+    - artifactId: ghprb
+      source:
+        # renovate: datasource=jenkins-plugins depName=ghprb
+        version: 1.42.2
+    - artifactId: generic-webhook-trigger
+      source:
+        # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
+        version: 1.85.2
+  # for plugin build-failure-analyzer
+  #   Exporting to prometheus
+  #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
+  prometheus:
+    metricRelabelings:
+      # add label: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_category_(.*)
+        targetLabel: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:.*:_:(.*)
+        targetLabel: category
+
+      # add label: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_cause_(.*)
+        targetLabel: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:.*:_:(.*)
+        targetLabel: cause
+
+      # add label: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:(.*):_:.*
+        targetLabel: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:(.*):_:.*
+        targetLabel: jobname
+
+      # aggerate to uniq metric: jenkins_bfa
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_(.*)_(.*)
+        replacement: jenkins_bfa
+        targetLabel: __name__
