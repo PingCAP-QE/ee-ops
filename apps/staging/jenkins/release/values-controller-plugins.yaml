@@ -45,7 +45,7 @@ controller:
     - artifactId: pipeline-groovy-lib
       source:
         # renovate: datasource=jenkins-plugins depName=pipeline-groovy-lib
-        version: 621.vb_44ce045b_582
+        version: 629.vb_5627b_ee2104
     - artifactId: pipeline-utility-steps
       source:
         # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
