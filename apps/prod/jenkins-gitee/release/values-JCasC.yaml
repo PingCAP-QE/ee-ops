@@ -12,8 +12,8 @@ controller:
     - { name: gitee, keyName: bot-token }
 
     # for read-only jenkins user.
-    - { name: jenkins-gitee-readonly-user, keyname: username }
-    - { name: jenkins-gitee-readonly-user, keyname: password }
+    - { name: jenkins-gitee-readonly-user, keyName: username }
+    - { name: jenkins-gitee-readonly-user, keyName: password }
 
     # for ci cache, no need create manually.
     - { name: jenkins-gitee-cache, keyName: region }
