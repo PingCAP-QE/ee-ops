@@ -8,5 +8,8 @@ resources:
   - golang-test.yaml
   - kubernetes-actions.yaml
   - echo.yaml
-  - ko.yaml
   - ko-test-infra.yaml
+  - multi-arch-image-push.yaml # multi-arch-image-push task
+  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/ko/0.1/ko.yaml # ko task
+  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/kaniko/0.6/kaniko.yaml # kaniko task
+  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml
