@@ -11,6 +11,10 @@ controller:
     - { name: gitee, keyName: git-username }
     - { name: gitee, keyName: bot-token }
 
+    # for read-only jenkins user.
+    - { name: jenkins-gitee-readonly-user, keyname: username }
+    - { name: jenkins-gitee-readonly-user, keyname: password }
+
     # for ci cache, no need create manually.
     - { name: jenkins-gitee-cache, keyName: region }
     - { name: jenkins-gitee-cache, keyName: bucket }
@@ -28,8 +32,27 @@ controller:
     defaultConfig: true
     # Ignored if authorizationStrategy is defined in controller.JCasC.configScripts
     authorizationStrategy: |-
-      loggedInUsersCanDoAnything:
-        allowAnonymousRead: false # allow users to read builds logs without logging in.
+      roleBased:
+        roles:
+          global:
+            - name: "admin"
+              pattern: ".*"
+              permissions:
+                - "Overall/Administer"
+              assignments:
+                - "${chart-admin-username}"
+            - name: "readonly"
+              pattern: ".*"
+              permissions:
+              - "Overall/Read"
+              - "Agent/Connect"          
+              - "Build Failure Analyzer/ViewCauses"
+              - "Credentials/View"
+              - "Job/Read"
+              - "Metrics/View"
+              - "View/Read"
+              assignments:
+              - "${jenkins-gitee-readonly-user-username}"
 
     # for security.
     security:
@@ -43,7 +66,10 @@ controller:
         users:
         - id: "${chart-admin-username}"
           name: "Jenkins Admin"
-          password: "${chart-admin-password}"
+          password: "${chart-admin-password}"        
+        - id: "${jenkins-gitee-readonly-user-username}"
+          name: "Read only user"
+          password: "${jenkins-gitee-readonly-user-password}"
 
     # REF Doc: https://github.com/PingCAP-QE/ee-ops/blob/main/charts/jenkins/README.md
     #
