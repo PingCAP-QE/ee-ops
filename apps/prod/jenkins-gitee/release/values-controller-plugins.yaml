@@ -82,6 +82,11 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=role-strategy
         version: 587.588.v850a_20a_30162
+    - artifactId: gitee
+      source:
+        # renovate: datasource=jenkins-plugins depName=gitee
+        version:  1.2.7
+
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
