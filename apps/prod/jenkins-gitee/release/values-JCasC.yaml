@@ -134,7 +134,7 @@ controller:
                 }
                 steps {
                   jobDsl {
-                    targets('jobs/gitee/**/*.groovy')
+                    targets('gitee/jobs/**/*.groovy')
                     failOnMissingPlugin(false)
                     ignoreMissingFiles(true)
                     ignoreExisting(false)
