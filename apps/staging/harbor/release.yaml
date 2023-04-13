@@ -1,9 +1,8 @@
----
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
   name: harbor-release
-  namespace: flux-system
+  namespace: apps
 spec:
   interval: 5m0s
   sourceRef:
@@ -12,3 +11,10 @@ spec:
     namespace: flux-system
   path: ./apps/staging/harbor/release
   prune: true
+  wait: true
+  postBuild:
+    substitute:
+      ### need secret `prow` with keys:
+      # - S3_REGION
+      # - S3_BUCKET
+      PROW_SECRET_NAME: harbor
