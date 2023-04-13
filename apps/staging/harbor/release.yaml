@@ -7,7 +7,7 @@ spec:
   interval: 5m0s
   sourceRef:
     kind: GitRepository
-    name: flux-system-wulifu
+    name: flux-system
     namespace: flux-system
   path: ./apps/staging/harbor/release
   prune: true
