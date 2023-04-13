@@ -24,6 +24,40 @@ spec:
   test:
     enable: true
     ignoreFailures: false
+  valuesFrom:
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: DATABASE_HOST
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: DATABASE_PORT
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: DATABASE_USENAME
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: DATABASE_PASSWORD
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: DATABASE_COREDATABASE
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: ADMIN_PASSWORD
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: S3_REGION
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: S3_BUCKET
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: S3_ACCESSKEY
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: S3_SECRETKEY
+    - kind: Secret
+      name: ${HARBOR_SECRET_NAME}
+      valuesKey: S3_REGIONENDPOINT
   values:
     expose:
       # Set the way how to expose the service. Set the type as "ingress",
