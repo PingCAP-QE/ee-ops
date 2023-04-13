@@ -13,8 +13,6 @@ spec:
   prune: true
   wait: true
   postBuild:
-    substitute:
-      ### need secret `harbor` with keys:
-      # - S3_REGION
-      # - S3_BUCKET
-      HARBOR_SECRET_NAME: harbor
+    substituteFrom:
+      - kind: Secret
+        name: harbor
