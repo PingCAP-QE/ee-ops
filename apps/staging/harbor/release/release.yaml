@@ -251,7 +251,7 @@ spec:
     logLevel: info
 
     # The initial password of Harbor admin. Change it from portal after launching Harbor
-    harborAdminPassword: ${harbor-admin-password}
+    harborAdminPassword: ${ADMIN_PASSWORD}
 
     # The name of the secret which contains key named "ca.crt". Setting this enables the
     # download link on portal to download the certificate of CA when the certificate isn't
