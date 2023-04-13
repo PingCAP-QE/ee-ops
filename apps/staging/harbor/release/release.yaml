@@ -1,0 +1,28 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: harbor
+  namespace: flux-system
+spec:
+  releaseName: harbor
+  targetNamespace: apps
+  chart:
+    spec:
+      chart: ./charts/harbor
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  interval: 1h0m0s
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+    ignoreFailures: false
+  valuesFrom:
+    - { kind: ConfigMap, name: harbor-values, valuesKey: values.yaml }
