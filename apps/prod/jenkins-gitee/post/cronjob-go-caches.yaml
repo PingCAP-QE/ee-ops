@@ -55,7 +55,7 @@ spec:
           volumes:
             - name: gopathcache
               persistentVolumeClaim:
-                claimName: gitee-gopathcache
+                claimName: gopathcache
             - name: gocache
               persistentVolumeClaim:
-                claimName: gitee-gocache
+                claimName: gocache
