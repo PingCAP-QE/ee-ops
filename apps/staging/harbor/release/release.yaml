@@ -2,7 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: harbor
-  namespace: flux-system
+  namespace: apps
 spec:
   releaseName: harbor
   targetNamespace: apps
