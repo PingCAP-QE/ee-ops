@@ -86,6 +86,10 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=gitee
         version:  1.2.7
+    - artifactId: ssh-agent
+      source:
+        # renovate: datasource=jenkins-plugins depName=ssh-agent
+        version: 327.v230ecd01f86f 
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
