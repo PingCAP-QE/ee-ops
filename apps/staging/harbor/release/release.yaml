@@ -26,37 +26,37 @@ spec:
     ignoreFailures: false
   valuesFrom:
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: DATABASE_HOST
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: DATABASE_PORT
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: DATABASE_USENAME
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: DATABASE_PASSWORD
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: DATABASE_COREDATABASE
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: ADMIN_PASSWORD
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: S3_REGION
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: S3_BUCKET
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: S3_ACCESSKEY
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: S3_SECRETKEY
     - kind: Secret
-      name: ${HARBOR_SECRET_NAME}
+      name: harbor
       valuesKey: S3_REGIONENDPOINT
   values:
     expose:
