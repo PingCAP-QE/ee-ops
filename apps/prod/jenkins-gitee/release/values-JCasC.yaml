@@ -197,3 +197,16 @@ controller:
             testResultParsingEnabled: false
             testResultCategories: "UT"
             fallbackCategoriesAsString: unknown
+
+      # for gitee plugin config.
+      gitee: |
+        unclassified:
+          giteeConnectionConfig:
+            connections:
+              - name: gitee.com
+                apiTokenId: gitee-bot-token
+                clientBuilderId: "v5"
+                connectionTimeout: 10
+                ignoreCertificateErrors: false
+                readTimeout: 10
+                url: "https://gitee.com"
