@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tibuild
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: tibuild
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tibuild
+    spec:
+      containers:
+      - image: hub.pingcap.net/tibuild/tibuild:fcb43ef
+        imagePullPolicy: Always
+        name: tibuild
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+        livenessProbe:
+          httpGet:
+            path: /swagger/index.html
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        volumeMounts:
+        - name: configs
+          mountPath: "/app/configs"
+          readOnly: true
+      volumes:
+      - name: configs
+        secret:
+          secretName: tibuild-configs
+      terminationGracePeriodSeconds: 30
