@@ -71,7 +71,7 @@ spec:
         # is disabled, the port must be included in the command when pull/push
         # images. Refer to https://github.com/goharbor/harbor/issues/5291
         # for the detail.
-        enabled: true
+        enabled: false
         # The source of the tls certificate. Set it as "auto", "secret"
         # or "none" and fill the information in the corresponding section
         # 1) auto: generate the tls certificate automatically
@@ -97,7 +97,7 @@ spec:
       ingress:
         hosts:
           core: harbor-ksyun.pingcpa.net
-          # notary: notary.harbor.domain
+          notary: notary.harbor.domain
         # set to the type of ingress controller if it has specific requirements.
         # leave as `default` for most ingress controllers.
         # set to `gce` if using the GCE ingress controller
@@ -106,9 +106,9 @@ spec:
         annotations:
           # note different ingress controllers may require a different ssl-redirect annotation
           # for Envoy, use ingress.kubernetes.io/force-ssl-redirect: "true" and remove the nginx lines below
-          ingress.kubernetes.io/ssl-redirect: "true"
+          # ingress.kubernetes.io/ssl-redirect: "true"
           ingress.kubernetes.io/proxy-body-size: "0"
-          nginx.ingress.kubernetes.io/ssl-redirect: "true"
+          # nginx.ingress.kubernetes.io/ssl-redirect: "true"
           nginx.ingress.kubernetes.io/proxy-body-size: "0"
         notary:
           # notary-specific annotations
@@ -116,53 +116,53 @@ spec:
         harbor:
           # harbor ingress-specific annotations
           annotations: {}
-      # clusterIP:
-      #   # The name of ClusterIP service
-      #   name: harbor
-      #   # Annotations on the ClusterIP service
-      #   annotations: {}
-      #   ports:
-      #     # The service port Harbor listens on when serving with HTTP
-      #     httpPort: 80
-      #     # The service port Harbor listens on when serving with HTTPS
-      #     httpsPort: 443
-      #     # The service port Notary listens on. Only needed when notary.enabled
-      #     # is set to true
-      #     notaryPort: 4443
-      # nodePort:
-      #   # The name of NodePort service
-      #   name: harbor
-      #   ports:
-      #     http:
-      #       # The service port Harbor listens on when serving with HTTP
-      #       port: 80
-      #       # The node port Harbor listens on when serving with HTTP
-      #       nodePort: 30002
-      #     https:
-      #       # The service port Harbor listens on when serving with HTTPS
-      #       port: 443
-      #       # The node port Harbor listens on when serving with HTTPS
-      #       nodePort: 30003
-      #     # Only needed when notary.enabled is set to true
-      #     notary:
-      #       # The service port Notary listens on
-      #       port: 4443
-      #       # The node port Notary listens on
-      #       nodePort: 30004
-      # loadBalancer:
-      #   # The name of LoadBalancer service
-      #   name: harbor
-      #   # Set the IP if the LoadBalancer supports assigning IP
-      #   IP: ""
-      #   ports:
-      #     # The service port Harbor listens on when serving with HTTP
-      #     httpPort: 80
-      #     # The service port Harbor listens on when serving with HTTPS
-      #     httpsPort: 443
-      #     # The service port Notary listens on. Only needed when notary.enabled
-      #     # is set to true
-      #     notaryPort: 4443
-      #   annotations: {}
+      clusterIP:
+        # The name of ClusterIP service
+        name: harbor
+        # Annotations on the ClusterIP service
+        annotations: {}
+        ports:
+          # The service port Harbor listens on when serving with HTTP
+          httpPort: 80
+          # The service port Harbor listens on when serving with HTTPS
+          httpsPort: 443
+          # The service port Notary listens on. Only needed when notary.enabled
+          # is set to true
+          notaryPort: 4443
+      nodePort:
+        # The name of NodePort service
+        name: harbor
+        ports:
+          http:
+            # The service port Harbor listens on when serving with HTTP
+            port: 80
+            # The node port Harbor listens on when serving with HTTP
+            nodePort: 30002
+          https:
+            # The service port Harbor listens on when serving with HTTPS
+            port: 443
+            # The node port Harbor listens on when serving with HTTPS
+            nodePort: 30003
+          # Only needed when notary.enabled is set to true
+          notary:
+            # The service port Notary listens on
+            port: 4443
+            # The node port Notary listens on
+            nodePort: 30004
+      loadBalancer:
+        # The name of LoadBalancer service
+        name: harbor
+        # Set the IP if the LoadBalancer supports assigning IP
+        IP: ""
+        ports:
+          # The service port Harbor listens on when serving with HTTP
+          httpPort: 80
+          # The service port Harbor listens on when serving with HTTPS
+          httpsPort: 443
+          # The service port Notary listens on. Only needed when notary.enabled
+          # is set to true
+          notaryPort: 4443
+        annotations: {}
         sourceRanges: []
 
     # The external URL for Harbor core service. It is used to
@@ -178,7 +178,68 @@ spec:
     # the IP address of k8s node
     #
     # If Harbor is deployed behind the proxy, set it as the URL of proxy
-    externalURL: http://harbor-ksyun.pingcpa.net:8030
+    externalURL: http://harbor-ksyun.pingcpa.net:30704
+
+    # The internal TLS used for harbor components secure communicating. In order to enable https
+    # in each components tls cert files need to provided in advance.
+    internalTLS:
+      # If internal TLS enabled
+      enabled: false
+      # There are three ways to provide tls
+      # 1) "auto" will generate cert automatically
+      # 2) "manual" need provide cert file manually in following value
+      # 3) "secret" internal certificates from secret
+      certSource: "auto"
+      # The content of trust ca, only available when `certSource` is "manual"
+      trustCa: ""
+      # core related cert configuration
+      core:
+        # secret name for core's tls certs
+        secretName: ""
+        # Content of core's TLS cert file, only available when `certSource` is "manual"
+        crt: ""
+        # Content of core's TLS key file, only available when `certSource` is "manual"
+        key: ""
+      # jobservice related cert configuration
+      jobservice:
+        # secret name for jobservice's tls certs
+        secretName: ""
+        # Content of jobservice's TLS key file, only available when `certSource` is "manual"
+        crt: ""
+        # Content of jobservice's TLS key file, only available when `certSource` is "manual"
+        key: ""
+      # registry related cert configuration
+      registry:
+        # secret name for registry's tls certs
+        secretName: ""
+        # Content of registry's TLS key file, only available when `certSource` is "manual"
+        crt: ""
+        # Content of registry's TLS key file, only available when `certSource` is "manual"
+        key: ""
+      # portal related cert configuration
+      portal:
+        # secret name for portal's tls certs
+        secretName: ""
+        # Content of portal's TLS key file, only available when `certSource` is "manual"
+        crt: ""
+        # Content of portal's TLS key file, only available when `certSource` is "manual"
+        key: ""
+      # chartmuseum related cert configuration
+      chartmuseum:
+        # secret name for chartmuseum's tls certs
+        secretName: ""
+        # Content of chartmuseum's TLS key file, only available when `certSource` is "manual"
+        crt: ""
+        # Content of chartmuseum's TLS key file, only available when `certSource` is "manual"
+        key: ""
+      # trivy related cert configuration
+      trivy:
+        # secret name for trivy's tls certs
+        secretName: ""
+        # Content of trivy's TLS key file, only available when `certSource` is "manual"
+        crt: ""
+        # Content of trivy's TLS key file, only available when `certSource` is "manual"
+        key: ""
 
     # The persistence is enabled by default and a default StorageClass
     # is needed in the k8s cluster to provision volumes dynamicly.
@@ -195,6 +256,17 @@ spec:
       # and redis components, i.e. they are never deleted automatically)
       resourcePolicy: "keep"
       persistentVolumeClaim:
+        registry:
+          # Use the existing PVC which must be created manually before bound,
+          # and specify the "subPath" if the PVC is shared with other components
+          existingClaim: ""
+          # Specify the "storageClass" used to provision the volume. Or the default
+          # StorageClass will be used(the default).
+          # Set it to "-" to disable dynamic provisioning
+          storageClass: ""
+          subPath: ""
+          accessMode: ReadWriteOnce
+          size: 5Gi
         chartmuseum:
           existingClaim: ""
           storageClass: ""
@@ -209,12 +281,12 @@ spec:
           size: 1Gi
         # If external database is used, the following settings for database will
         # be ignored
-        # database:
-        #   existingClaim: ""
-        #   storageClass: ""
-        #   subPath: ""
-        #   accessMode: ReadWriteOnce
-        #   size: 1Gi
+        database:
+          existingClaim: ""
+          storageClass: ""
+          subPath: ""
+          accessMode: ReadWriteOnce
+          size: 1Gi
         # If external Redis is used, the following settings for Redis will
         # be ignored
         redis:
@@ -250,6 +322,21 @@ spec:
         # "oss" and fill the information needed in the corresponding section. The type
         # must be "filesystem" if you want to use persistent volumes for registry
         # and chartmuseum
+        type: s3
+        filesystem:
+          rootdirectory: /storage
+          #maxthreads: 100
+        azure:
+          accountname: accountname
+          accountkey: base64encodedaccountkey
+          container: containername
+          #realm: core.windows.net
+        gcs:
+          bucket: bucketname
+          # The base64 encoded json file which contains the key
+          encodedkey: base64-encoded-json-key-file
+          #rootdirectory: /gcs/object/name/prefix
+          #chunksize: "5242880"
         s3:
           region: ${S3_REGION}
           bucket: ${S3_BUCKET}
@@ -266,7 +353,38 @@ spec:
           #storageclass: STANDARD
           multipartcopychunksize: "33554432"
           multipartcopymaxconcurrency: 100
-          multipartcopythresholdsize: "33554432"
+          multipartcopythresholdsize: "5368709120" 
+        # swift:
+        #   authurl: https://storage.myprovider.com/v3/auth
+        #   username: username
+        #   password: password
+        #   container: containername
+        #   #region: fr
+        #   #tenant: tenantname
+        #   #tenantid: tenantid
+        #   #domain: domainname
+        #   #domainid: domainid
+        #   #trustid: trustid
+        #   #insecureskipverify: false
+        #   #chunksize: 5M
+        #   #prefix:
+        #   #secretkey: secretkey
+        #   #accesskey: accesskey
+        #   #authversion: 3
+        #   #endpointtype: public
+        #   #tempurlcontainerkey: false
+        #   #tempurlmethods:
+        # oss:
+        #   accesskeyid: accesskeyid
+        #   accesskeysecret: accesskeysecret
+        #   region: regionname
+        #   bucket: bucketname
+        #   #endpoint: endpoint
+        #   #internal: false
+        #   #encrypt: false
+        #   #secure: true
+        #   #chunksize: 10M
+        #   #rootdirectory: rootdirectory
 
     imagePullPolicy: IfNotPresent
 
@@ -513,7 +631,7 @@ spec:
 
     trivy:
       # enabled the flag to enable Trivy scanner
-      enabled: true
+      enabled: false
       image:
         # repository the repository for Trivy adapter image
         repository: goharbor/trivy-adapter-photon
@@ -626,6 +744,40 @@ spec:
       # if external database is used, set "type" to "external"
       # and fill the connection informations in "external" section
       type: external
+      internal:
+        # set the service account to be used, default if left empty
+        serviceAccountName: ""
+        # mount the service account token
+        automountServiceAccountToken: false
+        image:
+          repository: goharbor/harbor-db
+          tag: v2.3.1
+        # The initial superuser password for internal database
+        password: "changeit"
+        # The size limit for Shared memory, pgSQL use it for shared_buffer
+        # More details see:
+        # https://github.com/goharbor/harbor/issues/15034
+        shmSizeLimit: 512Mi
+        # resources:
+        #  requests:
+        #    memory: 256Mi
+        #    cpu: 100m
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
+        ## The priority class to run the pod as
+        priorityClassName:
+        initContainer:
+          migrator: {}
+          # resources:
+          #  requests:
+          #    memory: 128Mi
+          #    cpu: 100m
+          permissions: {}
+          # resources:
+          #  requests:
+          #    memory: 128Mi
+          #    cpu: 100m
       external:
         host: ${DATABASE_HOST}
         port: ${DATABASE_PORT}
@@ -673,21 +825,21 @@ spec:
         affinity: {}
         ## The priority class to run the pod as
         priorityClassName:
-      # external:
-      #   # support redis, redis+sentinel
-      #   # addr for redis: <host_redis>:<port_redis>
-      #   # addr for redis+sentinel: <host_sentinel1>:<port_sentinel1>,<host_sentinel2>:<port_sentinel2>,<host_sentinel3>:<port_sentinel3>
-      #   addr: "192.168.0.2:6379"
-      #   # The name of the set of Redis instances to monitor, it must be set to support redis+sentinel
-      #   sentinelMasterSet: ""
-      #   # The "coreDatabaseIndex" must be "0" as the library Harbor
-      #   # used doesn't support configuring it
-      #   coreDatabaseIndex: "0"
-      #   jobserviceDatabaseIndex: "1"
-      #   registryDatabaseIndex: "2"
-      #   chartmuseumDatabaseIndex: "3"
-      #   trivyAdapterIndex: "5"
-      #   password: ""
+      external:
+        # support redis, redis+sentinel
+        # addr for redis: <host_redis>:<port_redis>
+        # addr for redis+sentinel: <host_sentinel1>:<port_sentinel1>,<host_sentinel2>:<port_sentinel2>,<host_sentinel3>:<port_sentinel3>
+        addr: "192.168.0.2:6379"
+        # The name of the set of Redis instances to monitor, it must be set to support redis+sentinel
+        sentinelMasterSet: ""
+        # The "coreDatabaseIndex" must be "0" as the library Harbor
+        # used doesn't support configuring it
+        coreDatabaseIndex: "0"
+        jobserviceDatabaseIndex: "1"
+        registryDatabaseIndex: "2"
+        chartmuseumDatabaseIndex: "3"
+        trivyAdapterIndex: "5"
+        password: ""
       ## Additional deployment annotations
       podAnnotations: {}
 
