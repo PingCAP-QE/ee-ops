@@ -23,10 +23,6 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes-client-api
         version: 6.3.1-206.v76d3b_6b_14db_b
-    - artifactId: mailer
-      source:
-        # renovate: datasource=jenkins-plugins depName=mailer
-        version: 438.v02c7f0a_12fa_4
     - artifactId: git
       source:
         # renovate: datasource=jenkins-plugins depName=git
@@ -50,10 +46,6 @@ controller:
     - artifactId: build-failure-analyzer
       source:
         url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
-    - artifactId: pipeline-groovy-lib
-      source:
-        # renovate: datasource=jenkins-plugins depName=pipeline-groovy-lib
-        version: 621.vb_44ce045b_582
     - artifactId: pipeline-utility-steps
       source:
         # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
@@ -62,10 +54,6 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=http_request
         version: 1.16
-    - artifactId: workflow-job
-      source:
-        # renovate: datasource=jenkins-plugins depName=workflow-job
-        version: 1254.v3f64639b_11dd
     - artifactId: workflow-aggregator
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-aggregator
