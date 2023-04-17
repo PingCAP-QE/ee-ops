@@ -24,40 +24,6 @@ spec:
   test:
     enable: true
     ignoreFailures: false
-  valuesFrom:
-    - kind: Secret
-      name: harbor
-      valuesKey: DATABASE_HOST
-    - kind: Secret
-      name: harbor
-      valuesKey: DATABASE_PORT
-    - kind: Secret
-      name: harbor
-      valuesKey: DATABASE_USENAME
-    - kind: Secret
-      name: harbor
-      valuesKey: DATABASE_PASSWORD
-    - kind: Secret
-      name: harbor
-      valuesKey: DATABASE_COREDATABASE
-    - kind: Secret
-      name: harbor
-      valuesKey: ADMIN_PASSWORD
-    - kind: Secret
-      name: harbor
-      valuesKey: S3_REGION
-    - kind: Secret
-      name: harbor
-      valuesKey: S3_BUCKET
-    - kind: Secret
-      name: harbor
-      valuesKey: S3_ACCESSKEY
-    - kind: Secret
-      name: harbor
-      valuesKey: S3_SECRETKEY
-    - kind: Secret
-      name: harbor
-      valuesKey: S3_REGIONENDPOINT
   values:
     expose:
       # Set the way how to expose the service. Set the type as "ingress",
