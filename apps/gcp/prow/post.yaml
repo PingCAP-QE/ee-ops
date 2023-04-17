@@ -1,0 +1,26 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: prow-post
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: prow-release
+      namespace: flux-system
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: ti-community-infra-configs
+    namespace: flux-system
+  path: prow
+  prune: true
+  postBuild:
+    substitute:
+      TEST_PODS_NAMESPACE: prow-test-pods
+      BUCKET_NAME: prow-tidb-logs
+    substituteFrom:
+      ### need secret `prow` with keys:
+      # - DOMAIN_NAME
+      - kind: Secret
+        name: prow
