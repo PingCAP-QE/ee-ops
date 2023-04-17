@@ -11,3 +11,4 @@ resources:
   - ats
   - goproxy
   - harbor
+  - sec-server

@@ -12,14 +12,48 @@ spec:
       labels:
         app: sec-server
     spec:
-      serviceAccountName: sec-account 
+      serviceAccountName: sec-account
+      imagePullSecrets:
+        - name: ${IMAGE_PULL_SECRET}
+      volumes:
+        - name: redis-cred
+          secret:
+            secretName: redis
+        - name: db-cred
+          secret:
+            secretName: db
+        - name: bucket-cred
+          secret:
+            secretName: bucket
       containers:
         - name: sec-server-container
           image: screw111/test-sec-agent:s1.8
+          args:
+            - --redis-user-file
+            - /etc/redis/username
+            - --redis-password-file
+            - /etc/redis/password
+            - --db-dsn-file
+            - /etc/db/dsn      
+            - --s3-cred-file
+            - /etc/bucket/cred.json
           ports:
-            - containerPort: 8888
+            - name: http
+              containerPort: 8888
           env:
             - name: APP_ENV
               value: "prod"
-      imagePullSecrets:
-        - name: my-registry-credentials
+          resources:
+            limits:
+              cpu: '2'
+              memory: 4Gi
+            requests:
+              cpu: '1'
+              memory: 1Gi
+          volumeMounts:
+            - name: redis-cred
+              mountPath: /etc/redis/user
+            - name: db-cred
+              mountPath: /etc/db
+            - name: bucket-cred
+              mountPath: /etc/bucket
