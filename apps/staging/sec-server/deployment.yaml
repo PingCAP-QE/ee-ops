@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sec-server
+  namespace: ${TEST_SEC_NAMESPACE}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sec-server
+  template:
+    metadata:
+      labels:
+        app: sec-server
+    spec:
+      serviceAccountName: sec-account 
+      containers:
+        - name: sec-server-container
+          image: screw111/test-sec-agent:s1.8
+          ports:
+            - containerPort: 8888
+          env:
+            - name: APP_ENV
+              value: "prod"
+      imagePullSecrets:
+        - name: my-registry-credentials

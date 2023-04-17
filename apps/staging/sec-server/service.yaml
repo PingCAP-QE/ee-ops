@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sec-server
+  namespace: ${TEST_SEC_NAMESPACE}
+spec:
+  type: NodePort
+  selector:
+    app: sec-server
+  ports:
+    - name: http
+      port: 30001
+      targetPort: 8888
+      nodePort: 31001
