@@ -85,11 +85,15 @@ controller:
     - artifactId: gitee
       source:
         # renovate: datasource=jenkins-plugins depName=gitee
-        version:  1.2.7
+        version: 1.2.7
     - artifactId: ssh-agent
       source:
         # renovate: datasource=jenkins-plugins depName=ssh-agent
-        version: 327.v230ecd01f86f 
+        version: 327.v230ecd01f86f
+    - artifactId: lockable-resources
+      source:
+        # renovate: datasource=jenkins-plugins depName=lockable-resources
+        version: 1141.v7c5f8f31d2ee
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
