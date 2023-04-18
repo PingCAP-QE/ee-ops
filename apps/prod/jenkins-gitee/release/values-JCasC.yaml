@@ -6,7 +6,12 @@ controller:
   # 'name' and 'keyName' must be lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-',
   # and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc')
   additionalExistingSecrets:
-    # for git clone for private repo.
+    # for git clone for private repo in github.com
+    - { name: github, keyName: git-private-key }
+    - { name: github, keyName: git-username }
+    - { name: github, keyName: bot-token }
+
+    # for git clone for repos in gitee.com
     - { name: gitee, keyName: git-private-key }
     - { name: gitee, keyName: git-username }
     - { name: gitee, keyName: bot-token }
@@ -112,6 +117,23 @@ controller:
                       description: gitee private token to call api.
                       scope: GLOBAL
                       secret: ${gitee-bot-token}
+              - domain:
+                  name: github.com
+                  description: github ssh and open api
+                credentials:
+                  - basicSSHUserPrivateKey:
+                      id: github-bot-ssh
+                      privateKeySource:
+                        directEntry:
+                          privateKey: ${github-git-private-key}
+                      scope: GLOBAL
+                      username: ${github-git-username}
+                      usernameSecret: true
+                  - string:
+                      id: github-bot-token
+                      description: github private token to call api.
+                      scope: GLOBAL
+                      secret: ${github-bot-token}                   
       # for jobs.
       jobs-dsl: |
         jobs:
