@@ -25,7 +25,11 @@ patches:
                     secretName: db
                 - name: bucket-cred
                   secret:
-                    secretName: bucket                
+                    secretName: bucket
+                - name: system-cred
+                  secret:
+                    secretName: system
+                   
       target:
         kind: Deployment
         name: sec-server
