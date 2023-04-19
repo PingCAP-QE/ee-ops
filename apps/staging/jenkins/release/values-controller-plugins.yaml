@@ -15,14 +15,18 @@ controller:
   installPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - artifactId: kubernetes-client-api
-      source:
-        # renovate: datasource=jenkins-plugins depName=kubernetes-client-api
-        version: 6.3.1-206.v76d3b_6b_14db_b
     - artifactId: kubernetes
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes
         version: 3845.va_9823979a_744
+    - artifactId: kubernetes-client-api
+      source:
+        # renovate: datasource=jenkins-plugins depName=kubernetes-client-api
+        version: 6.3.1-206.v76d3b_6b_14db_b
+    - artifactId: git
+      source:
+        # renovate: datasource=jenkins-plugins depName=git
+        version: 5.0.0
     - artifactId: configuration-as-code
       source:
         # renovate: datasource=jenkins-plugins depName=configuration-as-code
@@ -42,10 +46,6 @@ controller:
     - artifactId: build-failure-analyzer
       source:
         url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
-    - artifactId: pipeline-groovy-lib
-      source:
-        # renovate: datasource=jenkins-plugins depName=pipeline-groovy-lib
-        version: 621.vb_44ce045b_582
     - artifactId: pipeline-utility-steps
       source:
         # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
