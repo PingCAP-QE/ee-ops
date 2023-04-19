@@ -69,7 +69,11 @@ external_plugins:
         - issues
         - issue_comment
       endpoint: http://prow-ti-community-issue-triage
-
+    - name: chatgpt
+      events:
+        - pull_request
+        - issue_comment
+      endpoint: http://prow-chatgpt
 
 # configurations for plugins:
 blunderbuss:
