@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.7.1
+      version: 0.7.2
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -104,6 +104,39 @@ spec:
         secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
         secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
     thirdPlugins:
+      chatgpt:
+        service:
+          type: ClusterIP
+        replicaCount: 1
+        image:
+          repository: ticommunityinfra/chatgpt
+          tag: latest
+          pullPolicy: Always
+        ports:
+          http: 80
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/cert
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+          - --openai-config-file=/etc/openai/config.yaml
+          - --openai-model="gpt-3.5-turbo"
+        env:
+          - name: GITHUB_APP_ID
+            valueFrom:
+              secretKeyRef:
+                name: prow-github-token
+                key: appid
+        volumeMounts:
+          - name: openai-config
+            mountPath: /etc/openai
+            readOnly: true
+        volumes:
+          - name: openai-config
+            secret:
+              secretName: prow-openai
+              optional: true
       needs-rebase:
         replicaCount: 1
         image:
