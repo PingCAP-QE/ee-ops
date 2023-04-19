@@ -21,7 +21,7 @@ type: application
 # time you make changes to the chart and its templates,
 # including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: "0.7.1"
+version: "0.7.2"
 
 # This is the version number of the application being deployed.
 # This version number should be incremented each time you make changes to the
@@ -29,7 +29,7 @@ version: "0.7.1"
 # They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 # renovate: datasource=docker registryUrl=gcr.io depName=k8s-prow/tide
-appVersion: v20221216-06fc803e5c
+appVersion: v20230418-23b5d25059
 
 dependencies:
   - name: prow-crd
