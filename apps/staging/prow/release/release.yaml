@@ -92,7 +92,7 @@ spec:
           tag: latest
           pullPolicy: Always
         ports:
-          http: 80
+          http: 8888
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
