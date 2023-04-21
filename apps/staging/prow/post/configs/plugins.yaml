@@ -48,7 +48,13 @@ external_plugins:
         - issue_comment
         - pull_request
     - name: chatgpt
+      endpoint: http://prow-chatgpt
       events:
         - pull_request
         - issue_comment
+  PingCAP-QE/tirelease:
+    - name: chatgpt
       endpoint: http://prow-chatgpt
+      events:
+        - pull_request
+        - issue_comment
