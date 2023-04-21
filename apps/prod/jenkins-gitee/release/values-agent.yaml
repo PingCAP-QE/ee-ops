@@ -1,9 +1,0 @@
-agent:
-  maxRequestsPerHostStr: "200" # need to restart controller after updated it.
-  namespace: jenkins-gitee
-  podRetention: Never
-  containerCap: 200
-  image: "jenkins/inbound-agent"
-  tag: "4.11-1"
-  command: ""
-  args: ""
