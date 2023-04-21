@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: jenkins-gitee
-  annotations:
-    scheduler.alpha.kubernetes.io/defaultTolerations:
-      '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated",
-      "value": "test-infra"}]'
-    scheduler.alpha.kubernetes.io/node-selector: enable-ci=true,private-ci=true

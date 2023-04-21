@@ -4,7 +4,7 @@ resources:
   - ../_base
   - namespace.yaml
   - jenkins
-  - jenkins-gitee
+  - jenkins-gitee.yaml
   - mongodb
   - greenhouse
   - ats
