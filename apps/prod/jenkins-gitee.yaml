@@ -1,0 +1,31 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: gitee-ci-ops
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  ref:
+    branch: master
+  secretRef:
+    name: gitee-ci-ops
+  timeout: 60s
+  url: ssh://git@gitee.com/pingcap_enterprise/ci-ops.git
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: jenkins-gitee
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  path: ./apps/prod/jenkins-gitee
+  prune: true
+  wait: true
+  sourceRef:
+    kind: GitRepository
+    name: gitee-ci-ops
+    namespace: flux-system
+  postBuild:
+    substitute:
+      SELF_GIT_SOURCE_NAME: gitee-ci-ops
