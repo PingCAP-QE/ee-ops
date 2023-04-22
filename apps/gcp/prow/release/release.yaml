@@ -72,6 +72,7 @@ spec:
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
       githubOrg: ""
+      jobs: {}
     deck:
       ingress:
         enabled: false
