@@ -4,3 +4,10 @@ resources:
   - release.yaml
   - frontend-config.yaml
   # - gce-ingress.yaml
+configMapGenerator:
+  - name: prow-external-plugins-config
+    namespace: apps
+    behavior: create
+    options:
+      disableNameSuffixHash: true
+    files: []
