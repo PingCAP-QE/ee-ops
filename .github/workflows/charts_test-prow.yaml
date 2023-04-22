@@ -78,6 +78,7 @@ jobs:
           yq -i e '.jenkinsOperator.dryRun = false' ct-values.yaml
       - name: Run chart-testing (install)
         run: |
+          kubectl create -f https://raw.githubusercontent.com/kubernetes/test-infra/master/config/prow/cluster/prowjob-crd/prowjob_customresourcedefinition.yaml
           ct install \
             --charts charts/prow \
             --chart-repos "bitnami=https://charts.bitnami.com/bitnami" \

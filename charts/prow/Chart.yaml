@@ -21,7 +21,7 @@ type: application
 # time you make changes to the chart and its templates,
 # including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: "0.7.5"
+version: "0.8.0"
 
 # This is the version number of the application being deployed.
 # This version number should be incremented each time you make changes to the
@@ -30,8 +30,3 @@ version: "0.7.5"
 # It is recommended to use it with quotes.
 # renovate: datasource=docker registryUrl=gcr.io depName=k8s-prow/tide
 appVersion: v20230418-23b5d25059
-
-dependencies:
-  - name: prow-crd
-    repository: https://pingcap-qe.github.io/ee-ops
-    version: "0.1.0"
