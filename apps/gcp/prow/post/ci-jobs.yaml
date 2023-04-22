@@ -5,9 +5,6 @@ metadata:
   name: prow-post-ci-jobs
   namespace: apps
 spec:
-  dependsOn:
-    - name: prow-post
-      namespace: flux-system
   interval: 1m0s
   sourceRef:
     kind: GitRepository
