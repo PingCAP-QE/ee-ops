@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - jenkins
   - tekton
+  - prow-crd.yaml
   - prow
   - mongodb
   - greenhouse
