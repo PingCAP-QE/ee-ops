@@ -4,4 +4,3 @@ resources:
   - release.yaml
   - frontend-config.yaml
   # - gce-ingress.yaml
-
