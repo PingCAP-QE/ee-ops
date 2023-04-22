@@ -8,6 +8,4 @@ spec:
   interval: 5m0s
   ref:
     branch: main
-  secretRef:
-    name: flux-system
-  url: ssh://git@github.com/ti-community-infra/configs
+  url: https://github.com/ti-community-infra/configs.git
