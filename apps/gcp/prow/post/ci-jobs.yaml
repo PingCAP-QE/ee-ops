@@ -8,7 +8,7 @@ spec:
   dependsOn:
     - name: prow-post
       namespace: flux-system
-  interval: 5m0s
+  interval: 1m0s
   sourceRef:
     kind: GitRepository
     name: ci
