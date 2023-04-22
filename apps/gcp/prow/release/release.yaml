@@ -71,7 +71,7 @@ spec:
   values:
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
-      githubOrg: ti-community-infra
+      githubOrg: ""
     deck:
       ingress:
         enabled: false
