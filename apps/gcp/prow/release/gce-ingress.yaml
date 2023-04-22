@@ -1,0 +1,52 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.allow-http: "true"
+    kubernetes.io/ingress.class: gce
+    kubernetes.io/ingress.global-static-ip-name: prow-tidb-net-ip
+    networking.gke.io/v1beta1.FrontendConfig: prow-ingress-security-config
+  labels:
+    app: prow
+    app.kubernetes.io/instance: prow
+    app.kubernetes.io/part-of: prow
+    app.kubernetes.io/version: v20221216-06fc803e5c
+  name: prow
+  namespace: apps
+spec:
+  rules:
+  - host: prow.tidb.net
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: prow-deck
+            port:
+              name: http
+      - path: /hook
+        pathType: Prefix
+        backend:
+          service:
+            name: prow-hook
+            port:
+              name: http
+      - path: /ti-community-owners
+        pathType: Prefix
+        backend:
+          service:
+            name: prow-ti-community-owners
+            port:
+              name: http
+      - path: /tichi
+        pathType: Prefix
+        backend:
+          service:
+            name: prow-tichi-web
+            port:
+              name: http
+  tls:
+  - hosts:
+    - '*.tidb.net'
+    secretName: prow-tls
