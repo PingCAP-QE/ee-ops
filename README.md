@@ -5,7 +5,6 @@ GitOps everything for Efficiency Engineering
 ## How to Setup it in you k8s cluster
 
 Before all please fork it into you personal account or organization.
-<!-- test -->
 
 ### Pre require
 
