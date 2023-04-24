@@ -8,7 +8,7 @@ spec:
   dependsOn:
     - name: prow-release
       namespace: flux-system
-  interval: 5m0s
+  interval: 1m0s
   sourceRef:
     kind: GitRepository
     name: ti-community-infra-configs
