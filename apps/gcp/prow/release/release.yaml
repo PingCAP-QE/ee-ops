@@ -99,11 +99,10 @@ spec:
         tag: latest
     jenkinsOperator:
       enabled: true
-      skipReport: true
-      dryRun: false
       image:
         repository: ticommunityinfra/jenkins-operator
         tag: v20230323-3ade632
+      dryRun: false
       jenkinsUrl: ${JENKINS_BASE_URL}
       auth:
         secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
