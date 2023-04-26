@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.8.0
+      version: 0.8.1
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -168,7 +168,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-autoresponder-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -198,7 +198,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-blunderbuss-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -228,7 +228,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-cherrypicker-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-token-path=/etc/github/oauth
@@ -257,7 +257,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-contribution-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -287,7 +287,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-format-checker-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -317,7 +317,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-issue-triage-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -347,7 +347,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-label-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -377,7 +377,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-label-blocker-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -407,7 +407,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-lgtm-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -437,7 +437,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-merge-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -467,7 +467,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-owners-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -497,7 +497,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-tars-plugin
-          tag: v2.4.0
+          tag: v2.4.2
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -525,7 +525,7 @@ spec:
           http: 3000
         image:
           repository: ticommunityinfra/tichi-web
-          tag: v2.4.0
+          tag: v2.4.2
         args: []
         env:
           - name: EXTERNAL_PLUGINS_CONFIG
