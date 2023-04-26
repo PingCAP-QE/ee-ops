@@ -47,16 +47,16 @@ prow:
   # jobs, key, value with file key and content.
   # job key should have no file extension, job content example: job-example.yaml.
   # install with `helm install prow charts/prow --set-file prow.jobs.example=job-example.yaml`
-  jobs:
-    example: |
-      periodics:
-        - interval: 10m
-          agent: kubernetes
-          name: echo-test
-          spec:
-            containers:
-              - image: alpine
-                command: ["/bin/date"]
+  #   jobs:
+  #     example: |
+  #       periodics:
+  #         - interval: 10m
+  #           agent: kubernetes
+  #           name: echo-test
+  #           spec:
+  #             containers:
+  #               - image: alpine
+  #                 command: ["/bin/date"]
 
 persistent:
   type: mem    # s3|gcs|mem, file is not ready yet.
