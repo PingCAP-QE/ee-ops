@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sec-redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sec-redis
+  template:
+    metadata:
+      labels:
+        app: sec-redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:latest
+          command:
+          - redis-server
+          - "--requirepass"  
+          - $(REDIS_PASSWORD) 
+          - "--appendonly"  #开启数据持久化
+          - "yes"  
+          ports:
+            - containerPort: 6379
+          volumeMounts:
+            - name: sec-redis-data
+              mountPath: /data
+          env:
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sec-redis-password
+                  key: password
+      volumes:
+        - name: sec-redis-data
+          persistentVolumeClaim:
+            claimName: sec-redis-data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: sec-redis-data
+  namespace: apps-sec
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
