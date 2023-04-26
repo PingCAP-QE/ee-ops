@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sec-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sec-agent
+  template:
+    metadata:
+      labels:
+        app: sec-agent
+    spec:
+      serviceAccountName: sec
+      imagePullSecrets:
+        - name: ${IMAGE_PULL_SECRET}
+      volumes:
+        - name: redis-cred
+          secret:
+            secretName: redis
+        - name: db-cred
+          secret:
+            secretName: db
+        - name: bucket-cred
+          secret:
+            secretName: bucket
+        - name: system-cred
+          secret:
+            secretName: system
+      containers:
+        - name: sec-server-container
+          image: screw111/test-sec-agent:a2.0
+          env:
+            - name: APP_ENV
+              value: "staging"
+          resources:
+            limits:
+              cpu: '2'
+              memory: 8Gi
+            requests:
+              cpu: '1'
+              memory: 2Gi
+          volumeMounts:
+            - name: redis-cred
+              mountPath: /etc/redis
+            - name: db-cred
+              mountPath: /etc/db
+            - name: bucket-cred
+              mountPath: /etc/bucket
+            - name: system-cred
+              mountPath: /etc/system
