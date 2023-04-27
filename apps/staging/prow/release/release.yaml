@@ -102,7 +102,7 @@ spec:
           - --openai-config-file=/etc/openai/config.yaml
           - --openai-tasks-file=/etc/openai/tasks.yaml
           - --openai-model="gpt-3.5-turbo"
-          - --issue-comment-command='review'
+          - --issue-comment-command=review
         env:
           - name: GITHUB_APP_ID
             valueFrom:
