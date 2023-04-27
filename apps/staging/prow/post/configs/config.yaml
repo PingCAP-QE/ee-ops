@@ -52,17 +52,32 @@ prowjob_namespace: apps
 tide:
   target_url: https://${DOMAIN_NAME}/tide
   merge_method:
+    PingCAP-QE/artifacts: squash
+    PingCAP-QE/ee-apps: squash
     PingCAP-QE/ee-ops: squash
   queries:
+    - repos:
+       - PingCAP-QE/artifacts
+       - PingCAP-QE/ee-apps
+      labels:
+        - lgtm
+        - approved
+      missingLabels:
+        - do-not-merge
+        - do-not-merge/hold
+        - do-not-merge/invalid-owners-file    
+        - do-not-merge/work-in-progress
+        - needs-rebase
     - repos:
        - PingCAP-QE/ee-ops
       labels:
         - approved
       missingLabels:
-        - needs-rebase
+        - do-not-merge
         - do-not-merge/hold
-        - do-not-merge/work-in-progress
         - do-not-merge/invalid-owners-file
+        - do-not-merge/work-in-progress
+        - needs-rebase
 
 # for jenkins operator component.
 jenkins_operators:
