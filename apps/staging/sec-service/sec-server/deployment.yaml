@@ -18,16 +18,16 @@ spec:
       volumes:
         - name: redis-cred
           secret:
-            secretName: redis
+            secretName: ${REDIS_SECRET_NAME}
         - name: db-cred
           secret:
-            secretName: db
+            secretName: ${DB_SECRET_NAME}
         - name: bucket-cred
           secret:
-            secretName: bucket
+            secretName: ${BUCKET_SECRET_NAME}
         - name: system-cred
           secret:
-            secretName: system
+            secretName: ${SYSTEM_SECRET_NAME}
       containers:
         - name: sec-server-container
           image: screw111/test-sec-agent:s3.3
