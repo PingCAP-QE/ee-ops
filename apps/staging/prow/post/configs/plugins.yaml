@@ -2,36 +2,49 @@
 plugins:
   PingCAP-QE/artifacts:
     plugins:
+      - approve # Allow OWNERS to /approve
+      - assign # Allow /assign and /cc
+      - blunderbuss  # Auto-assign people
+      - heart 
+      - help # Support /help and /good-first-issue
+      - hold # Support /hold to delay merge
+      - invalidcommitmsg
+      - label
+      - lgtm # Allow /lgtm
+      - size # Label the size label for pr changes
+      - trigger # Allow people to configure CI jobs to /test
+      - verify-owners # Validates OWNERS file changes in PRs.
+      - wip # Auto-hold PRs with WIP in title
+  PingCAP-QE/ee-apps:
+    plugins:
       - approve
       - assign
       - blunderbuss
-      - cat
-      - dog
-      - help
       - heart
+      - help
       - hold
+      - invalidcommitmsg
       - label
       - lgtm
+      - size
       - trigger
       - verify-owners
-      - wip
-      - yuks
+      - wip      
   PingCAP-QE/ee-ops:
     plugins:
       - approve
       - assign
       - blunderbuss
-      - cat
-      - dog
-      - help
       - heart
+      - help
       - hold
+      - invalidcommitmsg
       - label
       - lgtm
+      - size
       - trigger
       - verify-owners
       - wip
-      - yuks
 
 # configuration of plugin `label`
 label:

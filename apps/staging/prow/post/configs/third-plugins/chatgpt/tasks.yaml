@@ -1,0 +1,19 @@
+---
+# ORG:
+# ---- or ---
+# ORG/repo:
+PingCAP-QE:  
+  review-pull-request:
+    name: review summary
+    system_message: |
+      You are an experienced software developer. You will act as a reviewer for a GitHub Pull Request, and you should answer by markdown format.
+    user_prompt: |
+      Please help me to review the github pull request: summarize the key changes and identify potential problems, then give some fixing suggestions, all you output should be markdown.
+    patch_introduce_prompt: |
+      This is the diff for the pull request:
+    output_static_head_note: |-
+      > **I have already done a preliminary review for you, and I hope to help you do a better job.**
+    external_contexts: []
+      # - prompt_tpl: |
+      #     This the context about context A: %s
+      #   res_url: https://external.site/resource.html
