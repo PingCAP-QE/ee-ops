@@ -20,4 +20,5 @@ spec:
       DB_SECRET_NAME: db
       BUCKET_SECRET_NAME: bucket
       SYSTEM_SECRET_NAME: system
+      IMAGE_PULL_SECRET: sec-registry-cred
 
