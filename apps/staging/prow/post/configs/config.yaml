@@ -57,19 +57,19 @@ tide:
     PingCAP-QE/ee-ops: squash
   queries:
     - repos:
-       - PingCAP-QE/artifacts
-       - PingCAP-QE/ee-apps
+        - PingCAP-QE/artifacts
+        - PingCAP-QE/ee-apps
       labels:
         - lgtm
         - approved
       missingLabels:
         - do-not-merge
         - do-not-merge/hold
-        - do-not-merge/invalid-owners-file    
+        - do-not-merge/invalid-owners-file
         - do-not-merge/work-in-progress
         - needs-rebase
     - repos:
-       - PingCAP-QE/ee-ops
+        - PingCAP-QE/ee-ops
       labels:
         - approved
       missingLabels:
@@ -84,8 +84,8 @@ jenkins_operators:
   - max_concurrency: 20
     max_goroutines: 20
     job_url_template:
-      'https://${DOMAIN_NAME}/view/s3/${BUCKET_NAME}/prow-logs/{{if eq .Spec.Type
-      "presubmit"}}pr-logs/pull{{else if eq .Spec.Type
+      'https://${DOMAIN_NAME}/view/s3/${BUCKET_NAME}/prow-logs/{{if eq
+      .Spec.Type "presubmit"}}pr-logs/pull{{else if eq .Spec.Type
       "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo
       "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type
       "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if
