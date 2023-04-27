@@ -4,3 +4,11 @@ resources:
   - namespace-test-pods.yaml
   - rbac-test-pods-k8s-pod-full.yaml
   - obc.yaml
+configMapGenerator:
+  - name: prow-openai
+    namespace: apps
+    behavior: create
+    options:
+      disableNameSuffixHash: true
+    files:
+      - chatgpt/tasks.yaml
