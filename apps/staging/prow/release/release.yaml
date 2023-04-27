@@ -100,7 +100,9 @@ spec:
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --openai-config-file=/etc/openai/config.yaml
+          - --openai-tasks-file=/etc/openai/tasks.yaml
           - --openai-model="gpt-3.5-turbo"
+          - --issue-comment-command='review'
         env:
           - name: GITHUB_APP_ID
             valueFrom:
@@ -113,9 +115,19 @@ spec:
             readOnly: true
         volumes:
           - name: openai-config
-            secret:
-              secretName: prow-openai
-              optional: true    
+            projected:
+              sources:
+                - secret:
+                    name: prow-openai
+                    optional: true
+                    items:
+                      - key: config.yaml
+                        path: config.yaml
+                - configMap:
+                    name: prow-openai
+                    items:
+                      - key: tasks.yaml
+                        path: tasks.yaml
       needs-rebase:
         replicaCount: 1
         image:
