@@ -3,7 +3,7 @@ kind: Kustomization
 configMapGenerator:
   - name: prow-openai
     namespace: apps
-    behavior: create
+    behavior: replace
     options:
       disableNameSuffixHash: true
     files:
