@@ -22,7 +22,8 @@ spec:
           - "--appendonly"  #开启数据持久化
           - "yes"  
           ports:
-            - containerPort: 6379
+            - name: redis
+              containerPort: 6379
           volumeMounts:
             - name: sec-redis-data
               mountPath: /data
@@ -32,20 +33,16 @@ spec:
                 secretKeyRef:
                   name: sec-redis-password
                   key: password
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1Gi
+            requests:
+              cpu: '500m'
+              memory: 512Mi        
       volumes:
         - name: sec-redis-data
           persistentVolumeClaim:
             claimName: sec-redis-data
 
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: sec-redis-data
-  namespace: apps-sec
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
+
