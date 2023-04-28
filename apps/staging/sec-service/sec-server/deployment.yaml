@@ -30,7 +30,7 @@ spec:
             secretName: ${SYSTEM_SECRET_NAME}
       containers:
         - name: sec-server-container
-          image: screw111/test-sec-agent:s3.3
+          image: hub-new.pingcap.net/sec-scan/sec-server:latest
           ports:
             - name: http
               containerPort: 8888
