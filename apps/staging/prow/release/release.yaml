@@ -76,6 +76,7 @@ spec:
         tag: latest
     jenkinsOperator:
       enabled: true
+      skipReport: true
       dryRun: false
       jenkinsUrl: http://jenkins:8080/jenkins/
       auth:
@@ -89,8 +90,7 @@ spec:
         replicaCount: 1
         image:
           repository: ticommunityinfra/chatgpt
-          tag: latest
-          pullPolicy: Always
+          tag: v20230428-10c1653
         ports:
           http: 8888
         args:
