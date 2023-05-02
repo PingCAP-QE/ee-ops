@@ -9,7 +9,7 @@ spec:
     nodeSelector: {}
     tolerations: []
   pipeline:
-    disable-affinity-assistant: false
+    disable-affinity-assistant: true
     disable-creds-init: false
     # disable-home-env-overwrite: true
     # disable-working-directory-overwrite: true
@@ -38,7 +38,7 @@ spec:
     resources:
       - taskrun
       - pipelinerun
-    keep: 10
+    keep: 100
     schedule: "0 * * * *" # hourly
   hub:
     params:
