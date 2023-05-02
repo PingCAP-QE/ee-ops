@@ -116,7 +116,7 @@ spec:
         replicaCount: 1
         image:
           repository: ticommunityinfra/chatgpt
-          tag: v20230427-1daa6c8
+          tag: v20230428-10c1653
         ports:
           http: 8888
         args:
@@ -154,7 +154,6 @@ spec:
                     items:
                       - key: tasks.yaml
                         path: tasks.yaml
-          
       needs-rebase:
         replicaCount: 1
         image:
