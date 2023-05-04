@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1beta1
+kind: ClusterTask
+metadata:
+  name: codescan-security-prow
+spec:
+  params:
+    - name: prow-job-spec
+      type: string
+    - name: server-base-url
+      type: string
+    - name: token-secret-name
+      type: string
+      default: security-server-api-token
+    - name: token-secret-key
+      type: string
+      default: token
+  results:
+    - name: task
+      description: scan task id
+    - name: report
+      description: scan report
+  workspaces:
+    - name: out
+  steps:
+    - name: create-and-wait
+      image: denoland/deno
+      env:
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: $(params.token-secret-name)
+              key: $(params.token-secret-key)
+      workingDir: $(workspaces.out.path)
+      args:
+        - run
+        - --allow-net
+        - --allow-write
+        - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/security-scan-prow.ts
+        - --jobSpec
+        - '$(params.prow-job-spec)'
+        - --serverBaseUrl
+        - $(params.server-base-url)
+        - --token
+        - $(TOKEN)
+        - --taskIdSaveFile
+        - $(results.task.path)
+        - --reportSaveFile
+        - $(results.report.path)
