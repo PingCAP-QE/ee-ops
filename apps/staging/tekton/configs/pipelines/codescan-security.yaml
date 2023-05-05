@@ -15,6 +15,7 @@ spec:
   tasks:
     - name: codescan-security
       taskRef:
+        kind: ClusterTask
         name: codescan-security
       params:
         - name: git-refs
