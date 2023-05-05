@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buildfarm-server
+  labels:
+    name: buildfarm-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: buildfarm-server
+  template:
+    metadata:
+      labels:
+        name: buildfarm-server
+    spec:
+      containers:
+        - name: server
+          image: bazelbuild/buildfarm-server:latest
+          args:
+            - /etc/buildfarm/config.yaml
+          ports:
+            - containerPort: 8980
+              name: comm
+            - containerPort: 9090
+              name: metrics
+          env:
+            - name: REDIS_URI
+              value: "redis://buildfarm-redis-cluster-service:6379"
+          volumeMounts:
+            - mountPath: /etc/buildfarm
+              name: config
+          resources:
+            limits:
+              cpu: "8"
+              memory: 8Gi
+      volumes:
+        - name: config
+          configMap:
+            name: buildfarm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: buildfarm-server-service
+spec:
+  selector:
+    name: buildfarm-server
+  ports:
+    - name: "communication"
+      protocol: TCP
+      port: 8980
+      targetPort: comm
+    - name: "metrics"
+      protocol: TCP
+      port: 9090
+      targetPort: metrics
