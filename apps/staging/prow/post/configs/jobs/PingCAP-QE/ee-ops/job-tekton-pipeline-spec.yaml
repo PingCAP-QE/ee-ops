@@ -14,7 +14,7 @@ presubmits:
                   name: codescan-security-prow
                 params:
                   - name: job-spec
-                    value: $(params.JOB_SPEC)
+                    value: '$(params.JOB_SPEC)'
                   - name: server-base-url
                     value: http://sec-server.apps-sec.svc
                 
