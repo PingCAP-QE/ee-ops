@@ -19,7 +19,7 @@ spec:
           - redis-server
           - "--requirepass"  
           - $(REDIS_PASSWORD) 
-          - "--appendonly"  #开启数据持久化
+          - "--appendonly"  #Enable data persistence
           - "yes"  
           ports:
             - name: redis
