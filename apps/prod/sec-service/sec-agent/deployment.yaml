@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sec-agent
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sec-agent
+  template:
+    metadata:
+      labels:
+        app: sec-agent
+    spec:
+      serviceAccountName: sec
+      imagePullSecrets:
+        - name: ${IMAGE_PULL_SECRET}
+      volumes:
+        - name: redis-cred
+          secret:
+            secretName: ${REDIS_SECRET_NAME}
+        - name: db-cred
+          secret:
+            secretName: ${DB_SECRET_NAME}
+        - name: bucket-cred
+          secret:
+            secretName: ${BUCKET_SECRET_NAME}
+        - name: system-cred
+          secret:
+            secretName: ${SYSTEM_SECRET_NAME}
+      containers:
+        - name: sec-server-container
+          image: hub.pingcap.net/sec-scan/sec-agent:latest
+          env:
+            - name: APP_ENV
+              value: "prod"
+          resources:
+            limits:
+              cpu: '2'
+              memory: 8Gi
+            requests:
+              cpu: '2'
+              memory: 8Gi
+          volumeMounts:
+            - name: redis-cred
+              mountPath: /etc/redis
+            - name: db-cred
+              mountPath: /etc/db
+            - name: bucket-cred
+              mountPath: /etc/bucket
+            - name: system-cred
+              mountPath: /etc/system
