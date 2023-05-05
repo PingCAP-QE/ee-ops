@@ -6,4 +6,4 @@ presubmits:
       spec:
         containers:
           - image: alpine
-            command: ["/bin/date"]      
+            command: ["/bin/date"]
