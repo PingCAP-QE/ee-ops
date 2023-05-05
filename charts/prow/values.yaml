@@ -466,7 +466,7 @@ thirdPlugins: {}
   #     repository: gcr.io/k8s-prow/needs-rebase
   #     pullPolicy: Always
   #   ports:
-  #     http: 80
+  #     http: 8888
   #   resources: {}
   #   service: true   # or
   #   service:
