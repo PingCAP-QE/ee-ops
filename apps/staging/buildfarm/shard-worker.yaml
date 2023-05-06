@@ -5,7 +5,7 @@ metadata:
   labels:
     name: buildfarm-shard-worker
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       name: buildfarm-shard-worker
@@ -30,7 +30,7 @@ spec:
             - containerPort: 8980
               name: comm
             - containerPort: 9090
-              name: metrics
+              name: metr
           env:
             - name: REDIS_URI
               value: "redis://buildfarm-redis-cluster-service:6379"
@@ -54,4 +54,4 @@ spec:
     - name: metrics
       protocol: TCP
       port: 9090
-      targetPort: metrics
+      targetPort: metr
