@@ -33,7 +33,7 @@ spec:
               name: metr
           env:
             - name: REDIS_URI
-              value: "redis://buildfarm-redis-cluster-service:6379"
+              value: "redis://buildfarm-redis-cluster:6379"
       volumes:
         - name: config
           configMap:
