@@ -5,7 +5,7 @@ metadata:
   labels:
     name: buildfarm-shard-worker
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       name: buildfarm-shard-worker
