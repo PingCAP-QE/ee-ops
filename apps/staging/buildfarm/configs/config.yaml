@@ -36,7 +36,7 @@ server:
     recentServedExecutionsCacheMaxEntries: 64000
   admin:
     deploymentEnvironment: AWS
-    clusterEndpoint: "grpc://buildfarm-server-service:8980"
+    clusterEndpoint: "grpc://buildfarm-server:8980"
     enableGracefulShutdown: false
   metrics:
     publisher: LOG
@@ -89,7 +89,7 @@ backplane:
           value: "*"
 worker:
   port: 8980
-  publicName: "buildfarm-shard-worker-service:8980"
+  publicName: "buildfarm-shard-worker:8980"
   grpcMetrics:
     enabled: false
     provideLatencyHistograms: false
