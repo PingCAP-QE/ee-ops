@@ -24,8 +24,8 @@ spec:
               name: config
           resources:
             limits:
-              cpu: "2"
-              memory: 4Gi
+              cpu: "8"
+              memory: 16Gi
           ports:
             - containerPort: 8980
               name: comm
