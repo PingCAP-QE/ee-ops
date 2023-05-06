@@ -42,7 +42,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: buildfarm-shard-worker-service
+  name: buildfarm-shard-worker
 spec:
   selector:
     name: buildfarm-shard-worker
