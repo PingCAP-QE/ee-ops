@@ -24,8 +24,8 @@ spec:
               name: config
           resources:
             limits:
-              cpu: "2"
-              memory: 4Gi
+              cpu: "8"
+              memory: 16Gi
           ports:
             - containerPort: 8980
               name: comm
@@ -33,7 +33,7 @@ spec:
               name: metr
           env:
             - name: REDIS_URI
-              value: "redis://buildfarm-redis-cluster-service:6379"
+              value: "redis://buildfarm-redis-cluster:6379"
       volumes:
         - name: config
           configMap:
