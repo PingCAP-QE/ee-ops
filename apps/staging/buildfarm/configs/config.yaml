@@ -26,14 +26,14 @@ server:
   useDenyList: true
   grpcTimeout: 3600
   executeKeepaliveAfterSeconds: 60
-  recordBesEvents: false
-  clusterId: local
-  cloudRegion: us-east-1
+  recordBesEvents: true
+  clusterId: staging
+  cloudRegion: idc
   caches:
-    directoryCacheMaxEntries: 10000
-    commandCacheMaxEntries: 10000
-    digestToActionCacheMaxEntries: 10000
-    recentServedExecutionsCacheMaxEntries: 10000
+    directoryCacheMaxEntries: 64000
+    commandCacheMaxEntries: 64000
+    digestToActionCacheMaxEntries: 64000
+    recentServedExecutionsCacheMaxEntries: 64000
   admin:
     deploymentEnvironment: AWS
     clusterEndpoint: "grpc://buildfarm-server-service:8980"
@@ -78,7 +78,7 @@ backplane:
   priorityPollIntervalMillis: 100
   timeout: 10000
   maxAttempts: 20
-  cacheCas: false
+  cacheCas: true
   queues:
     - name: "cpu"
       allowUnmatched: true
@@ -105,7 +105,7 @@ worker:
   storages:
     - type: FILESYSTEM
       path: "cache"
-      maxSizeBytes: 21474836480 # 2 * 1024 * 1024 * 1024
+      maxSizeBytes: 214748364800 # 20 * 1024 * 1024 * 1024
       fileDirectoriesIndexInMemory: false
       skipLoad: false
       hexBucketLevels: 0
