@@ -46,7 +46,7 @@ server:
     secretName: test
 backplane:
   type: SHARD
-  redisUri: "redis://buildfarm-redis-cluster-service:6379"
+  redisUri: "redis://buildfarm-redis-cluster:6379"
   redisPassword:
   redisNodes:
   jedisPoolMaxTotal: 4000
