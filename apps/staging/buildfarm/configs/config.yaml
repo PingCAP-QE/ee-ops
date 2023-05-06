@@ -78,7 +78,7 @@ backplane:
   priorityPollIntervalMillis: 100
   timeout: 10000
   maxAttempts: 20
-  cacheCas: true
+  cacheCas: false
   queues:
     - name: "cpu"
       allowUnmatched: true
