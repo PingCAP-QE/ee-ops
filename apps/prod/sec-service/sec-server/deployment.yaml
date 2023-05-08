@@ -30,7 +30,7 @@ spec:
             secretName: ${SYSTEM_SECRET_NAME}
       containers:
         - name: sec-server-container
-          image: hub.pingcap.net/sec-scan/sec-server:latest
+          image: hub.pingcap.net/sec-scan/sec-server:v1.0.0
           ports:
             - name: http
               containerPort: 8888
