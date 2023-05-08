@@ -36,13 +36,13 @@ spec:
         - --allow-net
         - --allow-write
         - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/security-scan.ts
-        - --gitRefs
+        - --git_refs
         - '$(params.git-refs)'
-        - --serverBaseUrl
+        - --base_url
         - $(params.server-base-url)
         - --token
         - $(TOKEN)
-        - --taskIdSaveFile
+        - --save_task_id_to
         - $(results.task.path)
-        - --reportSaveFile
+        - --save_report_to
         - $(results.report.path)
