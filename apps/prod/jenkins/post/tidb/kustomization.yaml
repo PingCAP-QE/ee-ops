@@ -11,5 +11,12 @@ secretGenerator:
     options:
       disableNameSuffixHash: true
     files:
-      - "files/bazel"
-      - "files/bazel-prepare-in-container.sh"
+      - files/bazel
+      - files/bazel-prepare-in-container.sh
+configMapGenerator:
+  - name: bazel-rc
+    options:
+      disableNameSuffixHash: true
+    files:
+      - files/bazel
+      - files/bazel-prepare-in-container.sh
