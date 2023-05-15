@@ -127,7 +127,9 @@ spec:
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --openai-config-file=/etc/openai/config.yaml
           - --openai-tasks-file=/etc/openai/tasks.yaml
-          - --openai-model="gpt-3.5-turbo"
+          - --openai-model="gpt-4-32k"
+          - --openai-max-message-item-len=120000
+          - --openai-max-message-total-len=240000
           - --issue-comment-command=review
         env:
           - name: GITHUB_APP_ID
@@ -147,7 +149,7 @@ spec:
                     name: prow-openai
                     optional: true
                     items:
-                      - key: config.yaml
+                      - key: config4.yaml
                         path: config.yaml
                 - configMap:
                     name: prow-openai
