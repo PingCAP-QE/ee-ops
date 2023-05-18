@@ -7,3 +7,4 @@ resources:
   - ti-pipeline
   - cd
   - pd
+  - tiflash-schrodinger
