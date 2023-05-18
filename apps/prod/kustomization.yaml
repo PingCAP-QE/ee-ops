@@ -10,4 +10,3 @@ resources:
   - ats
   - goproxy
   - sec-service.yaml
-  - buildfarm
