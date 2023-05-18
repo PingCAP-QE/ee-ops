@@ -1,3 +1,4 @@
+# Ref: https://bazelbuild.github.io/bazel-buildfarm/docs/configuration/configuration/
 digestFunction: SHA256
 defaultActionTimeout: 600
 maximumActionTimeout: 3600

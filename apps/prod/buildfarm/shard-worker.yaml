@@ -37,7 +37,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: buildfarm
+            name: buildfarm        
 ---
 apiVersion: v1
 kind: Service
