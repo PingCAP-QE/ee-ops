@@ -30,6 +30,8 @@ spec:
           volumeMounts:
             - mountPath: /etc/buildfarm
               name: config
+            - mountPath: /cache
+              name: cache              
           resources:
             limits:
               cpu: "8"
@@ -38,6 +40,9 @@ spec:
         - name: config
           configMap:
             name: buildfarm
+        - name: cache
+          persistentVolumeClaim:
+            claimName: buildfarn               
 ---
 apiVersion: v1
 kind: Service

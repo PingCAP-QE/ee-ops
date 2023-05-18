@@ -13,4 +13,3 @@ resources:
   - goproxy
   - harbor
   - sec-service.yaml
-  - buildfarm
