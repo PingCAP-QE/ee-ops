@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: codescan-security
+spec:
+  workspaces:
+    - name: git-source
+  params:
+    - name: REFS
+      type: string
+      default: "{}"
+    - name: security-server-base-url
+      type: string
+      default: https://sec-server.apps-sec.svc
+  tasks:
+    - name: codescan-security
+      taskRef:
+        kind: ClusterTask
+        name: codescan-security
+      params:
+        - name: git-refs
+          value: "$(params.REFS)"
+        - name: server-base-url
+          value: "$(params.security-server-base-url)"
+
+

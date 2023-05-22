@@ -1,0 +1,11 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: trigger
+  labels:
+    type: github-pr
+spec:
+  bindings:
+    - ref: github-pr
+  template:
+    ref: github-pr-public

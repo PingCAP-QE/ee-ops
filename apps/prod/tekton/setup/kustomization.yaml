@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yaml
+  # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
+  - https://github.com/tektoncd/operator/releases/download/v0.55.1/release.yaml
+  - operator-config.yaml
+  - ingress-dashboard.yaml
