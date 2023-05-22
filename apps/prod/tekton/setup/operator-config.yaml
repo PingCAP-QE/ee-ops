@@ -31,6 +31,14 @@ spec:
     # default empty dir, can not be shared between tasks.
     default-task-run-workspace-binding: >
       emptyDir: {}
+    default-pod-template:
+      nodeSelector:
+        enable-ci: "true"
+      tolerations:
+        - effect: NoSchedule
+          key: dedicated
+          operator: Equal
+          value: test-infra
   trigger:
     default-service-account: "default"
     enable-api-fields: alpha # stable | alpha
