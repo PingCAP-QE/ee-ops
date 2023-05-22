@@ -33,7 +33,7 @@ spec:
       emptyDir: {}
   trigger:
     default-service-account: "default"
-    enable-api-fields: stable
+    enable-api-fields: alpha # stable | alpha
   pruner:
     resources:
       - taskrun
