@@ -1,0 +1,32 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: buildbarn
+  namespace: flux-system
+spec:
+  releaseName: buildbarn
+  targetNamespace: apps
+  chart:
+    spec:
+      chart: buildbarn      
+      version: 0.0.2
+      sourceRef:
+        kind: HelmRepository
+        name: ee-ops
+        namespace: flux-system
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+  test:
+    enable: true
+    ignoreFailures: false
+  valuesFrom:
+    - kind: ConfigMap
+      name: buildbarn-config
+      valuesKey: common.jsonnet
+      targetPath: commonConf
+
+    

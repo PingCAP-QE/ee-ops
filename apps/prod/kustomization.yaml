@@ -11,3 +11,4 @@ resources:
   - goproxy
   - sec-service.yaml
   - tekton
+  - buildbarn
