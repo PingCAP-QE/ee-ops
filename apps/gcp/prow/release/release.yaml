@@ -116,7 +116,7 @@ spec:
         replicaCount: 1
         image:
           repository: ticommunityinfra/chatgpt
-          tag: v20230511-83c30cb
+          tag: v20230522-8243faf
         ports:
           http: 8888
         args:
@@ -126,10 +126,10 @@ spec:
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --openai-config-file=/etc/openai/config.yaml
+          - --openai-config-file-large=/etc/openai/config4.yaml
           - --openai-tasks-file=/etc/openai/tasks.yaml
-          - --openai-model="gpt-4-32k"
-          - --openai-max-message-item-len=100000
-          - --openai-max-message-total-len=100000
+          - --large-down-threshold=12288
+          - --max-accept-diff-size=80000
           - --issue-comment-command=review
         env:
           - name: GITHUB_APP_ID
@@ -146,11 +146,8 @@ spec:
             projected:
               sources:
                 - secret:
-                    name: prow-openai
+                    name: prow-openai-new
                     optional: true
-                    items:
-                      - key: config4.yaml
-                        path: config.yaml
                 - configMap:
                     name: prow-openai
                     items:
