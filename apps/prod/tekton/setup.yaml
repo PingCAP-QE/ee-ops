@@ -10,7 +10,7 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/staging/tekton/setup
+  path: ./apps/prod/tekton/setup
   patches:
     - target:
         kind: Namespace  
