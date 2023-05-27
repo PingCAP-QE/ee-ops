@@ -30,7 +30,7 @@ spec:
             secretName: ${SYSTEM_SECRET_NAME}
       containers:
         - name: sec-server-container
-          image: hub.pingcap.net/sec-scan/sec-agent:v1.0.2
+          image: hub.pingcap.net/sec-scan/sec-agent:v1.0.3
           env:
             - name: APP_ENV
               value: "prod"
