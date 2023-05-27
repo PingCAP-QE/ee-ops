@@ -33,6 +33,7 @@ spec:
           operator: Equal
           value: test-infra
           effect: NoSchedule
+    disableAdmissionController: true # https://github.com/rook/rook/issues/10719
     logLevel: INFO
     monitoring:
       enabled: true
