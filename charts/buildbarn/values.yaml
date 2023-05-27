@@ -171,6 +171,24 @@ frontend:
       # frontend.service.grpc.port -- grpc service port
       port: 8980
 
+  ingress:
+    # scheduler.ingress.enabled -- enables Ingress
+    enabled: false
+    # scheduler.ingress.annotations -- ingress annotations
+    annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+
+    # scheduler.ingress.hosts -- ingress accepted hostnames
+    hosts: []
+    #  - host: chart-example.local
+    #    paths: []
+    # scheduler.ingress.tls -- ingress TLS configuration
+    tls: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
+
   # frontend.resources -- custom resource configuration
   resources: {}
     # limits:
@@ -309,25 +327,6 @@ scheduler:
       name: grpc-worker
       # scheduler.service.grpcWorker.port -- grpc worker service port
       port: 8983
-
-  ingress:
-    # scheduler.ingress.enabled -- enables Ingress
-    enabled: false
-    # scheduler.ingress.annotations -- ingress annotations
-    annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-
-    # scheduler.ingress.hosts -- ingress accepted hostnames
-    hosts: []
-    #  - host: chart-example.local
-    #    paths: []
-    # scheduler.ingress.tls -- ingress TLS configuration
-    tls: []
-    #  - secretName: chart-example-tls
-    #    hosts:
-    #      - chart-example.local
-
 
   # scheduler.resources -- custom resource configuration
   resources: {}
