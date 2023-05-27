@@ -71,10 +71,10 @@ spec:
             - -c
             - mkdir -m 0700 -p /storage-cas/persistent_state /storage-ac/persistent_state
           volumeMounts:
-          - mountPath: /storage-cas
-            name: {{ include "buildbarn.fullname" (list . "storage-cas") }}
-          - mountPath: /storage-ac
-            name: {{ include "buildbarn.fullname" (list . "storage-ac") }}
+            - name: {{ include "buildbarn.fullname" (list . "storage-cas") }}
+              mountPath: /storage-cas
+            - name: {{ include "buildbarn.fullname" (list . "storage-ac") }}
+              mountPath: /storage-ac
       volumes:
         - name: {{ include "buildbarn.fullname" (list . "storage") }}
           projected:
