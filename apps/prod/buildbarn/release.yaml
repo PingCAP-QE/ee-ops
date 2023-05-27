@@ -24,22 +24,6 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    storage:
-      volumeClaims:
-        cas:
-          accessModes:
-            - ReadWriteOnce
-          storageClassName: ceph-block
-          resources:
-            requests:
-              storage: 12Gi
-        ac:
-          accessModes:
-            - ReadWriteOnce
-          storageClassName: ceph-block
-          resources:
-            requests:
-              storage: 12Gi
     commonConf: |-
       {
         global: {
@@ -68,7 +52,7 @@ spec:
                       weight: 1,
                     },
                   ],
-                },
+                },          
             },
           actionCache: {
             completenessChecking: {
