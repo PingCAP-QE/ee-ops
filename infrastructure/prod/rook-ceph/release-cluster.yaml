@@ -74,7 +74,7 @@ spec:
           osdsPerDevice: "5"
         deviceFilter: ^nvme[23]n1
         nodes:
-          - name: 10.2.12.10
+          - name: 10.2.12.96
           - name: 10.2.12.11
           - name: 10.2.12.12
           - name: 10.2.12.13
