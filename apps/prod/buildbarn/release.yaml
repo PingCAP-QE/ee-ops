@@ -48,7 +48,7 @@ spec:
               backend: common.blobstore.contentAddressableStorage,
               getAuthorizer: { allow: {} },
               putAuthorizer: { allow: {} },
-              // findMissingAuthorizer: { allow: {} },
+              findMissingAuthorizer: { deny: {} },
             },
             actionCache: {
               backend: common.blobstore.actionCache,
