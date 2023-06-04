@@ -19,11 +19,29 @@ spec:
     remediation:
       retries: 3
   upgrade:
+    force: true
     cleanupOnFail: true
   test:
     enable: true
     ignoreFailures: false
   values:
+    storage:
+      volumeClaims:
+        # storage.volumeClaims.cas -- cas volume claim spec
+        cas:
+          storageClassName: ceph-block
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 100Gi
+        ac:
+          storageClassName: ceph-block
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
     commonConf: |-
       {
         global: {
