@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: brc
+  namespace: flux-system
+spec:
+  releaseName: brc
+  targetNamespace: apps
+  chart:
+    spec:
+      chart: bazel-remote
+      version: 0.0.3
+      sourceRef:
+        kind: HelmRepository
+        name: ee-ops
+        namespace: flux-system
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    image:
+      repository: buchgr/bazel-remote-cache
+      tag: v2.4.1
+    podSecurityContext:
+      fsGroup: 1000
+    conf: |-
+      # https://github.com/buchgr/bazel-remote#example-configuration-file
+      dir: /data
+      max_size: 1000
+      experimental_remote_asset_api: true
+      access_log_level: all
+      port: 8080
+      grpc_port: 9092
+    replicaCount: 1
+    volumeMounts:
+    - mountPath: /data
+      name: brc-cache
+    volumes:
+      - name: brc-cache
+        persistentVolumeClaim:
+          claimName: brc
