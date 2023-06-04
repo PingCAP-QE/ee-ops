@@ -40,6 +40,8 @@ spec:
         },
         blobstore: {
           contentAddressableStorage: {        
+            readCaching: {
+              fast: {
                 sharding: {
                   hashInitialization: 11946695773637837490,
                   shards: [
@@ -52,8 +54,21 @@ spec:
                       weight: 1,
                     },
                   ],
-                },          
+                },
+              },
+              slow: { grpc: { address: 'brc-bazel-remote.apps.svc:9092' } },
+              replicator: {
+                queued: {
+                  base: { 'local': {} },
+                  existenceCache: {
+                    cacheSize: 1024 * 1024 * 1024,
+                    cacheDuration: '600s',
+                    cacheReplacementPolicy: 'LEAST_RECENTLY_USED',
+                  },
+                },
+              },
             },
+          },
           actionCache: {
             completenessChecking: {
               backend: {
@@ -73,13 +88,13 @@ spec:
                       ],
                     },
                   },
-                  slow: { http: { address: 'http://greenhouse.apps.svc/tidb' } },
+                  slow: { grpc: { address: 'brc-bazel-remote.apps.svc:9092' } },
                   replicator: {
                     queued: {
                       base: { 'local': {} },
                       existenceCache: {
                         cacheSize: 1024 * 1024,
-                        cacheDuration: '60s',
+                        cacheDuration: '600s',
                         cacheReplacementPolicy: 'LEAST_RECENTLY_USED',
                       },
                     },
