@@ -1,0 +1,1 @@
+build --remote_cache=grpc://buildbarn-frontend.apps.svc:8980 --remote_timeout="10s" --remote_instance=remote-execution
