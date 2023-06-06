@@ -20,3 +20,6 @@ configMapGenerator:
     files:
       - files/bazel
       - files/bazel-prepare-in-container.sh
+      - files/canary-bazel
+      - files/canary-bazel-prepare-in-container.sh
+      
