@@ -92,7 +92,7 @@ spec:
         enabled: false
       image:
         repository: ticommunityinfra/hook
-        tag: latest
+        tag: v20230608-bd4b41b
     pipeline:
       image:
         repository: ticommunityinfra/pipeline
