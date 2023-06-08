@@ -37,7 +37,7 @@ spec:
           imagePullPolicy: {{ .Values.pipeline.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --all-contexts
-            - --config=/etc/config/config.yaml
+            - --config=/etc/prow-config/config.yaml
           env:
           # Use KUBECONFIG envvar rather than --kubeconfig flag in order to provide multiple configs to merge.
           - name: KUBECONFIG
@@ -48,9 +48,9 @@ spec:
               name: kubeconfig
               readOnly: true
             {{- end }}
-            - name: config
+            - name: prow-config
               mountPath: /etc/config
-              readOnly: true            
+              readOnly: true
           resources:
             {{- toYaml .Values.pipeline.resources | nindent 12 }}
       volumes:
@@ -61,9 +61,9 @@ spec:
             # todo: setup secret.
             secretName: {{ . }}
         {{- end }}
-        - name: config
+        - name: prow-config
           configMap:
-            name: {{ include "prow.fullname" . }}-config          
+            name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

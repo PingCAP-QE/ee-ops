@@ -37,35 +37,35 @@ spec:
           args:
             - --dry-run=false
             - --continue-on-error=true
-            - --config-path=/etc/config/config.yaml
-            - --plugin-config=/etc/plugins/plugins.yaml
-            - --job-config-path=/etc/job-config
+            - --config-path=/etc/prow-config/config.yaml
+            - --plugin-config=/etc/prow-plugin/plugins.yaml
+            - --job-config-path=/etc/prow-jobs
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert
+            - --github-app-private-key-path=/etc/github/app-private-key
             - --status-path={{ include "prow.persistent.baseUrl" . }}/status-reconciler/status-reconciler-status
             {{- if include "prow.persistent.needCredentials" . }}
-            - --{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json
+            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credential.secretKey }}"
             {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "prow.fullname" . }}-github-token
-                  key: appid
+                  name: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+                  key: app-id
           volumeMounts:
-            - name: github-token
+            - name: github
               mountPath: /etc/github
               readOnly: true
-            - name: config
+            - name: prow-config
               mountPath: /etc/config
               readOnly: true
-            - name: plugins
-              mountPath: /etc/plugins
+            - name: prow-plugin
+              mountPath: /etc/prow-plugin
               readOnly: true
-            - name: job-config
-              mountPath: /etc/job-config
-              readOnly: true              
+            - name: prow-jobs
+              mountPath: /etc/prow-jobs
+              readOnly: true
             {{- if include "prow.persistent.needCredentials" . }}
             - name: persistent-credentials
               mountPath: /etc/persistent-credentials
@@ -74,22 +74,26 @@ spec:
           resources:
             {{- toYaml .Values.statusReconciler.resources | nindent 12 }}
       volumes:
-      - name: github-token
+      - name: github
         secret:
-          secretName: {{ include "prow.fullname" . }}-github-token
-      - name: config
+          secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+      - name: prow-config
         configMap:
-          name: {{ include "prow.fullname" . }}-config
-      - name: plugins
+          name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+      - name: prow-plugin
         configMap:
-          name: {{ include "prow.fullname" . }}-plugins
-      - name: job-config
+          name: {{ default (printf "%s-plugin" (include "prow.fullname" .)) .Values.prow.configs.plugin.configMapName }}
+      - name: prow-jobs
         configMap:
-          name: {{ include "prow.fullname" . }}-job-config          
+          name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
       {{- if include "prow.persistent.needCredentials" . }}
       - name: persistent-credentials
         secret:
+          {{- if .Values.persistent.credential.secretName }}
+          secretName: {{ .Values.persistent.credential.secretName }}
+          {{- else }}
           secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
+          {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

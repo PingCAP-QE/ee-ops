@@ -1,5 +1,5 @@
 apiVersion: v2
-appVersion: 2023-02-13
+appVersion: "2023-02-13"
 description: Helm chart to deploy [buildbarn](https://github.com/buildbarn), forked from https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
 home: https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
 icon: https://avatars.githubusercontent.com/u/47299502?s=200&v=4

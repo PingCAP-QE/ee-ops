@@ -35,31 +35,31 @@ spec:
           image: "{{ .Values.crier.image.repository }}:{{ .Values.crier.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.crier.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
-            - --config-path=/etc/config/config.yaml
-            - --job-config-path=/etc/job-config
+            - --config-path=/etc/prow-config/config.yaml
+            - --job-config-path=/etc/prow-jobs
             - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert            
+            - --github-app-private-key-path=/etc/github/app-private-key
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-workers=10
             - --blob-storage-workers=10
             - --kubernetes-blob-storage-workers=10
             {{- if include "prow.persistent.needCredentials" . }}
-            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
+            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credential.secretKey }}"
             {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "prow.fullname" . }}-github-token
-                  key: appid
+                  name: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+                  key: app-id
           volumeMounts:
-            - name: config
-              mountPath: /etc/config
+            - name: prow-config
+              mountPath: /etc/prow-config
               readOnly: true
-            - name: job-config
-              mountPath: /etc/job-config
+            - name: prow-jobs
+              mountPath: /etc/prow-jobs
               readOnly: true
-            - name: github-token
+            - name: github
               mountPath: /etc/github
               readOnly: true
             {{- if include "prow.persistent.needCredentials" . }}
@@ -71,19 +71,23 @@ spec:
             {{- toYaml .Values.crier.resources | nindent 12 }}
 
       volumes:
-      - name: config
+      - name: prow-config
         configMap:
-          name: {{ include "prow.fullname" . }}-config
-      - name: job-config
+            name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+      - name: prow-jobs
         configMap:
-          name: {{ include "prow.fullname" . }}-job-config
-      - name: github-token
+            name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
+      - name: github
         secret:
-          secretName: {{ include "prow.fullname" . }}-github-token
+          secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
       {{- if include "prow.persistent.needCredentials" . }}
       - name: persistent-credentials
         secret:
+          {{- if .Values.persistent.credential.secretName }}
+          secretName: {{ .Values.persistent.credential.secretName }}
+          {{- else }}
           secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
+          {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

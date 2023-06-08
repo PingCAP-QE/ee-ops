@@ -55,10 +55,10 @@ spec:
           {{- else }}
           args:
             - --dry-run=false
-            - --config-path=/etc/config/config.yaml
-            - --job-config-path=/etc/job-config            
+            - --config-path=/etc/prow-config/config.yaml
+            - --job-config-path=/etc/prow-jobs            
             - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert
+            - --github-app-private-key-path=/etc/github/app-private-key
             # - --github-token-path=/etc/github/token
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}/graphql
@@ -79,20 +79,20 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           volumeMounts:
-            - name: github-token
+            - name: github
               mountPath: /etc/github
               readOnly: true   
-            - name: hmac
+            - name: webhook
               mountPath: /etc/webhook
               readOnly: true              
-            - name: config
+            - name: prow-config
               mountPath: /etc/config
               readOnly: true
-            - name: job-config
-              mountPath: /etc/job-config
+            - name: prow-jobs
+              mountPath: /etc/prow-jobs
               readOnly: true
-            - name: plugins
-              mountPath: /etc/plugins
+            - name: prow-plugin
+              mountPath: /etc/prow-plugin
               readOnly: true
             {{- with $val.volumeMounts }}
             {{- toYaml . | nindent 12 }}
@@ -118,21 +118,41 @@ spec:
             periodSeconds: 3
           {{- end }}
       volumes:
-        - name: github-token
+        - name: github
           secret:
-            secretName: {{ include "prow.fullname" $root }}-github-token      
-        - name: hmac
+            {{- with $root.Values.prow.github.secretName }}
+            secretName: {{ . }}
+            {{- else }}
+            secretName: {{ include "prow.fullname" $root }}-github
+            {{- end }}                
+        - name: webhook
           secret:
-            secretName: {{ include "prow.fullname" $root }}-hmac-token
-        - name: config
+            {{- with $root.Values.prow.webhook.secretName }}
+            secretName: {{ . }}
+            {{- else }}
+            secretName: {{ include "prow.fullname" $root }}-webhook
+            {{- end }}
+        - name: prow-config
           configMap:
+            {{- with $root.Values.prow.configs.prow.configMapName }}
+            name: {{ . }}
+            {{- else }}
             name: {{ include "prow.fullname" $root }}-config
-        - name: job-config
+            {{- end }}
+        - name: prow-jobs
           configMap:
-            name: {{ include "prow.fullname" $root }}-job-config
-        - name: plugins
+            {{- with $root.Values.prow.configs.job.configMapName }}
+            name: {{ . }}
+            {{- else }}
+            name: {{ include "prow.fullname" $root }}-job
+            {{- end }}
+        - name: prow-plugin
           configMap:
-            name: {{ include "prow.fullname" $root }}-plugins
+            {{- with $root.Values.prow.configs.plugin.configMapName }}
+            name: {{ . }}
+            {{- else }}
+            name: {{ include "prow.fullname" $root }}-plugin
+            {{- end }}          
         # other external volumes
         {{- with $val.volumes }}
         {{- toYaml . | nindent 8 }}
