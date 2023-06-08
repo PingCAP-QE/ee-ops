@@ -6,4 +6,4 @@ metadata:
     scheduler.alpha.kubernetes.io/defaultTolerations:
       '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated",
       "value": "test-infra"}]'
-    scheduler.alpha.kubernetes.io/node-selector: enable-ci=true
+    scheduler.alpha.kubernetes.io/node-selector: enable-ci=true,ci-nvme-high-performance=true
