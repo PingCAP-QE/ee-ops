@@ -53,12 +53,12 @@ prow:
   configs:
     # global prow config. it call override the default content with merging strategy.
     prow:
-      configMapName: ""
+      configMapName: prow-config
       configMapKey: config.yaml
 
     # prow plugin configs. it call override the default content with merging strategy.
     plugin:
-      configMapName: "prow-plugin"
+      configMapName: prow-plugin
       configMapkey: plugins.yaml
 
     # prow job configuration
@@ -73,7 +73,7 @@ prow:
       #           containers:
       #             - image: alpine
       #               command: ["/bin/date"]
-      configMapName: "prow-job"
+      configMapName: prow-job
 
 persistent:
   type: mem    # s3|gcs|mem, file is not ready yet.

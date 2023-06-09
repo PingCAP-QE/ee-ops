@@ -1,0 +1,7 @@
+prow:
+  domainName: prow.test.io
+jenkinsOperator:
+  enabled: true
+  dryRun: false
+  auth:
+    secretName: prow-jenkins
