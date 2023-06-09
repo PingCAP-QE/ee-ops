@@ -122,7 +122,7 @@ browser:
     # browser.podMonitor.enabled -- PodMonitor CRD is created for a prometheus operator
     enabled: false
     # browser.podMonitor.additionalLabels -- additional labels for pod monitor
-    additionalLabels: { }
+    additionalLabels: {}
 
   # browser.conf -- config https://github.com/buildbarn/bb-browser/blob/547095cf8540c671b0f2291b1e6f76081e47a9fc/pkg/proto/configuration/bb_browser/bb_browser.proto
   conf: |-
@@ -240,7 +240,7 @@ frontend:
     # frontend.podMonitor.enabled -- PodMonitor CRD is created for a prometheus operator
     enabled: false
     # frontend.podMonitor.additionalLabels -- additional labels for pod monitor
-    additionalLabels: { }
+    additionalLabels: {}
 
   # frontend.conf -- config https://github.com/buildbarn/bb-storage/blob/e5ee29d82ea7f458ad720a6ade4480e5838ab495/pkg/proto/configuration/bb_storage/bb_storage.proto
   conf: |-
@@ -252,13 +252,13 @@ frontend:
         authenticationPolicy: { allow: {} },
       }],
       schedulers: {
-        '': { 
-          endpoint: { 
+        '': {
+          endpoint: {
             address: 'buildbarn-scheduler:8982',
             addMetadataJmespathExpression: '{
               "build.bazel.remote.execution.v2.requestmetadata-bin": incomingGRPCMetadata."build.bazel.remote.execution.v2.requestmetadata-bin"
             }',
-          } 
+          }
         },
       },
       maximumMessageSizeBytes: common.maximumMessageSizeBytes,
@@ -379,7 +379,7 @@ scheduler:
     # scheduler.podMonitor.enabled -- PodMonitor CRD is created for a prometheus operator
     enabled: false
     # scheduler.podMonitor.additionalLabels -- additional labels for pod monitor
-    additionalLabels: { }
+    additionalLabels: {}
 
   # scheduler.conf -- config https://github.com/buildbarn/bb-remote-execution/blob/74b54e3e72c8ae507bbee1efe18aad1fbbe8de9e/pkg/proto/configuration/bb_scheduler/bb_scheduler.proto
   conf: |-
@@ -413,7 +413,7 @@ scheduler:
           },
         },
       },
-      platformQueueWithNoWorkersTimeout: '900s', 
+      platformQueueWithNoWorkersTimeout: '900s',
     }
 
 worker:
@@ -449,7 +449,7 @@ worker:
       # worker.workerContainer.image.tag -- image tag
       tag: 20230213T172655Z-e0ae60c
     # worker.workerContainer.securityContext -- specifies security settings for a container
-    securityContext: { }
+    securityContext: {}
       # capabilities:
     #   drop:
     #   - ALL
@@ -472,7 +472,7 @@ worker:
         port: http-metrics
 
     # worker.workerContainer.resources -- custom resource configuration
-    resources: { }
+    resources: {}
       # limits:
     #   cpu: 100m
     #   memory: 128Mi
@@ -494,7 +494,7 @@ worker:
       allowPrivilegeEscalation: false
 
     # worker.runnerContainer.resources -- custom resource configuration
-    resources: { }
+    resources: {}
     # limits:
     #   cpu: 100m
     #   memory: 128Mi
@@ -534,7 +534,7 @@ worker:
     # worker.podMonitor.enabled -- PodMonitor CRD is created for a prometheus operator
     enabled: false
     # worker.podMonitor.additionalLabels -- additional labels for pod monitor
-    additionalLabels: { }
+    additionalLabels: {}
 
   # worker.workerConf -- config https://github.com/buildbarn/bb-remote-execution/blob/74b54e3e72c8ae507bbee1efe18aad1fbbe8de9e/pkg/proto/configuration/bb_worker/bb_worker.proto
   workerConf: |-
@@ -693,7 +693,7 @@ storage:
     # storage.podMonitor.enabled -- PodMonitor CRD is created for a prometheus operator
     enabled: false
     # storage.podMonitor.additionalLabels -- additional labels for pod monitor
-    additionalLabels: { }
+    additionalLabels: {}
 
   # storage.conf -- config https://github.com/buildbarn/bb-storage/blob/e5ee29d82ea7f458ad720a6ade4480e5838ab495/pkg/proto/configuration/bb_storage/bb_storage.proto
   conf: |-
