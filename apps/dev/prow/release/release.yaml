@@ -450,6 +450,7 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
+          - --plugin-config=/etc/prow-plugin/plugins.yaml
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
