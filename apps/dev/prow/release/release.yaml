@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.9.1
+      version: 0.9.2
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -68,6 +68,11 @@ spec:
       image:
         repository: ticommunityinfra/hook
         tag: v20230608-bd4b41b
+      additionalEnv:
+        - name: STICKY_REPOS
+          value: >-
+            ti-community-infra/test-dev
+            ti-community-infra/test-prod
     pipeline:
       image:
         repository: ticommunityinfra/pipeline
@@ -100,12 +105,6 @@ spec:
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --update-period=5m
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         service:
           type: ClusterIP
       ti-community-autoresponder:
@@ -124,12 +123,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -154,12 +147,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -183,12 +170,6 @@ spec:
           - --github-token-path=/etc/github/token
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -213,12 +194,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -243,12 +218,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -273,12 +242,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -303,12 +266,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -333,12 +290,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -363,12 +314,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -393,12 +338,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -423,12 +362,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -454,12 +387,6 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
-                name: prow-github
-                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -477,7 +404,7 @@ spec:
           repository: ticommunityinfra/tichi-web
           tag: v2.4.2
         args: []
-        env:
+        additionalEnv:
           - name: EXTERNAL_PLUGINS_CONFIG
             value: /etc/external_plugins_config/external_plugins_config.yaml
         volumes:
