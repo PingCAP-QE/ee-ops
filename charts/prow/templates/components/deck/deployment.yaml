@@ -53,7 +53,7 @@ spec:
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" . }}/graphql
             - --spyglass=true
             {{- if include "prow.persistent.needCredentials" . }}
-            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credential.secretKey }}"
+            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credentials.secretKey }}"
             {{- end }}
           env:
             - name: GITHUB_APP_ID
@@ -119,11 +119,7 @@ spec:
       {{- if include "prow.persistent.needCredentials" . }}
       - name: persistent-credentials
         secret:
-          {{- if .Values.persistent.credential.secretName }}
-          secretName: {{ .Values.persistent.credential.secretName }}
-          {{- else }}
-          secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
-          {{- end }}
+          secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
