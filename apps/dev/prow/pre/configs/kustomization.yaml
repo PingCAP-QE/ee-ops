@@ -7,7 +7,7 @@ configMapGenerator:
       disableNameSuffixHash: true
     files:
       - config.yaml
-  - name: prow-plugins
+  - name: prow-plugin
     namespace: apps
     options:
       disableNameSuffixHash: true
@@ -19,7 +19,7 @@ configMapGenerator:
       disableNameSuffixHash: true
     files:
       - labels.yaml
-  - name: prow-jobs
+  - name: prow-job
     namespace: apps
     options:
       disableNameSuffixHash: true
