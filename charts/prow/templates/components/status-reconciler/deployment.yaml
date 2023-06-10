@@ -58,7 +58,7 @@ spec:
               mountPath: /etc/github
               readOnly: true
             - name: prow-config
-              mountPath: /etc/config
+              mountPath: /etc/prow-config
               readOnly: true
             - name: prow-plugin
               mountPath: /etc/prow-plugin

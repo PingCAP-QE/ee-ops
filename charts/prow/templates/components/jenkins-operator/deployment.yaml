@@ -106,7 +106,7 @@ spec:
             {{- end }}{{- end }}
           volumeMounts:
             - name: prow-config
-              mountPath: /etc/config
+              mountPath: /etc/prow-config
               readOnly: true
             - name: github
               mountPath: /etc/github

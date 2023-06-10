@@ -46,7 +46,7 @@ spec:
               protocol: TCP
           volumeMounts:
           - name: prow-config
-            mountPath: /etc/config
+            mountPath: /etc/prow-config
             readOnly: true
           - name: prow-jobs
             mountPath: /etc/prow-jobs

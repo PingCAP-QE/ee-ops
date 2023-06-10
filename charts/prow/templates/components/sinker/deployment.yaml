@@ -39,7 +39,7 @@ spec:
             - --job-config-path=/etc/prow-jobs
           volumeMounts:
             - name: prow-config
-              mountPath: /etc/config
+              mountPath: /etc/prow-config
               readOnly: true
             - name: prow-jobs
               mountPath: /etc/prow-jobs
