@@ -19,6 +19,22 @@ entries:
   buildbarn:
   - apiVersion: v2
     appVersion: "2023-02-13"
+    created: "2023-06-10T04:29:03.339742283Z"
+    description: Helm chart to deploy [buildbarn](https://github.com/buildbarn), forked
+      from https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
+    digest: 0a039d2bb9faacd98e9bc8bc51913c19fa05c63a4aede0dd30dd1ac1db46a064
+    home: https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
+    icon: https://avatars.githubusercontent.com/u/47299502?s=200&v=4
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: buildbarn
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/buildbarn-0.0.4/buildbarn-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
+    appVersion: "2023-02-13"
     created: "2023-05-27T02:55:00.28052031Z"
     description: Helm chart to deploy [buildbarn](https://github.com/buildbarn), forked
       from https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
@@ -87,6 +103,19 @@ entries:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/jenkins-4.1.21/jenkins-4.1.21.tgz
     version: 4.1.21
   prow:
+  - apiVersion: v2
+    appVersion: v20230418-23b5d25059
+    created: "2023-06-10T04:29:03.481073022Z"
+    description: 'A Helm chart for deploying Prow in self kubernetes cluster. '
+    digest: a4428ff43bd51e86dc2c336f0c155eb0f7d93e001d5b84ab7ef437eb79ad6ff8
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: prow
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-0.9.0/prow-0.9.0.tgz
+    version: 0.9.0
   - apiVersion: v2
     appVersion: v20230418-23b5d25059
     created: "2023-05-22T10:41:36.927602449Z"
@@ -483,4 +512,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2023-05-27T02:55:00.280568811Z"
+generated: "2023-06-10T04:29:03.481261224Z"
