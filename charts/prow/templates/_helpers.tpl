@@ -529,9 +529,7 @@ Create the name of the role binding
 {{- end }}
 
 {{- define "prow.persistent.needCredentials" -}}
-{{- if contains .Values.persistent.type "gcs s3" }}
-{{- if or .Values.persistent.credentialsBase64 .Values.persistent.credentials }}
+{{- if and (contains .Values.persistent.type "gcs s3") .Values.persistent.credentials }}
 true
-{{- end}}
 {{- end }}
 {{- end }}
