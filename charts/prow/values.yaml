@@ -35,7 +35,7 @@ prow:
     #   - client_id
     #   - client_secret
     #   - redirect_url
-    #   final_redirect_url
+    #   - final_redirect_url
     secretName: "prow-github"
 
   webhook:

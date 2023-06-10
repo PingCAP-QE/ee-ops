@@ -1,4 +1,3 @@
-
 periodics:
   - interval: 1m
     agent: kubernetes

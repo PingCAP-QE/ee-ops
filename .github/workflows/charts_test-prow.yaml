@@ -71,14 +71,20 @@ jobs:
           metadata:
             name: prow-github
           stringData:
-            app-id: "${{ secrets.PROW_APP_ID }}"
+            app-id: ""
             app-private-key: ""
-            token: "${{ secrets.GITHUB_TOKEN }}"
-            secret: "{}"
-          EOF
-          yq -i e '.stringData["app-private-key"] = "${{ secrets.PROW_APP_CERT }}"' prow-github.yaml
-          kubectl -n $ns apply -f prow-github.yaml && rm prow-github.yaml
+            token: ""
+            secret: |
+              client_id: fake-client-id
+              client_secret: fake-client-secret
+              redirect_url: https://prow.test.io/github-login/redirect
+              final_redirect_url: https://prow.test.io/pr
 
+          EOF
+          yq -i e '.stringData["app-id"] = "${{ secrets.PROW_APP_ID }}"' prow-github.yaml
+          yq -i e '.stringData["app-private-key"] = "${{ secrets.PROW_APP_CERT }}"' prow-github.yaml
+          yq -i e '.stringData["token"] = "${{ secrets.GITHUB_TOKEN }}"' prow-github.yaml
+          kubectl -n $ns apply -f prow-github.yaml && rm prow-github.yaml
           # prow-webhook secret
           kubectl -n $ns create secret generic prow-webhook --from-literal hmac="${{ secrets.PROW_HMAC_TOKEN }}"
 
@@ -86,18 +92,21 @@ jobs:
           kubectl -n $ns create secret generic prow-oauth-cookie --from-literal secret="$(openssl rand -base64 32)"
 
           # setup configMaps
+          orgName=${{ github.event.repository.owner.login }}
+          sed -iE "s/exampleOrg/${orgName}/g" .github/workflows/test-data/prow/configs/config.yaml
+          sed -iE "s/exampleOrg/${orgName}/g" .github/workflows/test-data/prow/configs/plugins.yaml
           kubectl -n $ns create cm prow-config --from-file .github/workflows/test-data/prow/configs/config.yaml
           kubectl -n $ns create cm prow-plugin --from-file .github/workflows/test-data/prow/configs/plugins.yaml
           kubectl -n $ns create cm prow-job --from-file .github/workflows/test-data/prow/configs/job-1.yaml
 
+          kubectl -n prow get cm
+          kubectl -n prow get secrets
       - name: Setup prow CRD
         run: |
           kubectl create -f https://raw.githubusercontent.com/kubernetes/test-infra/master/config/prow/cluster/prowjob-crd/prowjob_customresourcedefinition.yaml
 
       - name: Run chart-testing (install)
         run: |
-          kubectl -n prow get cm
-          kubectl -n prow get secrets
           ct install \
             --charts charts/prow \
             --chart-repos "bitnami=https://charts.bitnami.com/bitnami" \
