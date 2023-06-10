@@ -14,8 +14,8 @@ spec:
         kind: HelmRepository
         name: ee-ops
         namespace: flux-system
-  interval: 5m
-  timeout: 5m
+  interval: 15m
+  timeout: 10m
   install:
     crds: CreateReplace
     remediation:
