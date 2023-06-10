@@ -37,13 +37,13 @@ spec:
           image: "{{ .Values.jenkinsOperator.image.repository }}:{{ .Values.jenkinsOperator.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.jenkinsOperator.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
-            - --github-token-path=/etc/github/oauth
+            - --github-token-path=/etc/github/token
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --skip-report={{ .Values.jenkinsOperator.skipReport }}
             - --dry-run={{ .Values.jenkinsOperator.dryRun }}
             - --csrf-protect={{ .Values.jenkinsOperator.csrfProtect }}
             - --jenkins-url={{ .Values.jenkinsOperator.jenkinsUrl }}
-            - --config-path=/etc/config/config.yaml
+            - --config-path=/etc/prow-config/config.yaml
             {{- with .Values.jenkinsOperator.auth }}{{- if .secretName }}
 
             {{/* basic auth */}}
@@ -55,13 +55,13 @@ spec:
             {{- end }}
 
             {{/* bearer token auth */}}
-            {{- if .secretKeyJenkinsBearerToken }}            
+            {{- if .secretKeyJenkinsBearerToken }}
             - --jenkins-bearer-token-file="$(JENKINS_AUTH_BEARER_TOKEN_FILE)"
             {{- end }}
-                     
+
             {{/* cert auth */}}
             {{- if .secretKeyCert }}
-            - --cert-file="$(JENKINS_AUTH_CERT_FILE)" 
+            - --cert-file="$(JENKINS_AUTH_CERT_FILE)"
             {{- end }}
             {{- if .secretKeyKey }}
             - --key-file="$(JENKINS_AUTH_KEY_FIEL)"
@@ -105,10 +105,10 @@ spec:
             {{- end }}
             {{- end }}{{- end }}
           volumeMounts:
-            - name: config
-              mountPath: /etc/config
+            - name: prow-config
+              mountPath: /etc/prow-config
               readOnly: true
-            - name: github-token
+            - name: github
               mountPath: /etc/github
               readOnly: true
             {{- if .Values.jenkinsOperator.auth.secretName }}
@@ -119,12 +119,12 @@ spec:
           resources:
             {{- toYaml .Values.jenkinsOperator.resources | nindent 12 }}
       volumes:
-        - name: config
+        - name: prow-config
           configMap:
-            name: {{ include "prow.fullname" . }}-config
-        - name: github-token
+            name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+        - name: github
           secret:
-            secretName: {{ include "prow.fullname" . }}-github-token
+            secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
         {{- with .Values.jenkinsOperator.auth.secretName }}
         - name: jenkins-auth
           secret:

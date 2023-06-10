@@ -40,27 +40,27 @@ spec:
           image: "{{ .Values.deck.image.repository }}:{{ .Values.deck.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.deck.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
-            - --config-path=/etc/config/config.yaml
-            - --plugin-config=/etc/plugins/plugins.yaml
-            - --job-config-path=/etc/job-config
+            - --config-path=/etc/prow-config/config.yaml
+            - --plugin-config=/etc/prow-plugin/plugins.yaml
+            - --job-config-path=/etc/prow-jobs
             - --tide-url=http://{{ include "prow.fullname.tide" . }}/
             - --hook-url=http://{{ include "prow.fullname.hook" . }}/plugin-help
-            - --oauth-url=/github-login
-            - --cookie-secret=/etc/github/oauth-cookie-secret
+            - --oauth-url={{ default "/github-login" .Values.prow.oauth.path }}
+            - --cookie-secret=/etc/oauth-cookie/{{ default "secret" .Values.prow.oauth.cookie.secretKey }}
             - --github-app-id=$(GITHUB_APP_ID)
-            - --github-app-private-key-path=/etc/github/cert            
+            - --github-app-private-key-path=/etc/github/app-private-key
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" . }}/graphql
             - --spyglass=true
             {{- if include "prow.persistent.needCredentials" . }}
-            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/service-account.json"
+            - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credential.secretKey }}"
             {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "prow.fullname" . }}-github-token
-                  key: appid
+                  name: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+                  key: app-id
           ports:
             - name: http
               containerPort: 8080
@@ -68,18 +68,20 @@ spec:
           resources:
             {{- toYaml .Values.deck.resources | nindent 12 }}
           volumeMounts:
-            - name: config
-              mountPath: /etc/config
+            - name: prow-config
+              mountPath: /etc/prow-config
               readOnly: true
-            - name: plugins
-              mountPath: /etc/plugins
-              readOnly: true            
-            - name: job-config
-              mountPath: /etc/job-config
-              readOnly: true            
-            - name: github-token
+            - name: prow-plugin
+              mountPath: /etc/prow-plugin
+              readOnly: true
+            - name: prow-jobs
+              mountPath: /etc/prow-jobs
+              readOnly: true
+            - name: github
               mountPath: /etc/github
               readOnly: true
+            - name: oauth-cookie
+              mountPath: /etc/oauth-cookie
             {{- if include "prow.persistent.needCredentials" . }}
             - name: persistent-credentials
               mountPath: /etc/persistent-credentials
@@ -99,22 +101,29 @@ spec:
             periodSeconds: 3
             timeoutSeconds: 600
       volumes:
-      - name: config
+      - name: prow-config
         configMap:
-          name: {{ include "prow.fullname" . }}-config
-      - name: plugins
+          name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+      - name: prow-plugin
         configMap:
-          name: {{ include "prow.fullname" . }}-plugins
-      - name: job-config
+          name: {{ default (printf "%s-plugin" (include "prow.fullname" .)) .Values.prow.configs.plugin.configMapName }}
+      - name: prow-jobs
         configMap:
-          name: {{ include "prow.fullname" . }}-job-config          
-      - name: github-token
+          name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
+      - name: github
         secret:
-          secretName: {{ include "prow.fullname" . }}-github-token
+          secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+      - name: oauth-cookie
+        secret:
+          secretName: {{ default (printf "%s-oauth-cookie" (include "prow.fullname" .)) .Values.prow.oauth.cookie.secretName }}
       {{- if include "prow.persistent.needCredentials" . }}
       - name: persistent-credentials
         secret:
+          {{- if .Values.persistent.credential.secretName }}
+          secretName: {{ .Values.persistent.credential.secretName }}
+          {{- else }}
           secretName: "{{ include "prow.fullname" . }}-{{ .Values.persistent.type }}-credentials"
+          {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

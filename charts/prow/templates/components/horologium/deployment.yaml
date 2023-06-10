@@ -38,28 +38,28 @@ spec:
           imagePullPolicy: {{ .Values.horologium.image.pullPolicy | default .Values.imagePullPolicy }}
           args:
             - --dry-run=false
-            - --config-path=/etc/config/config.yaml
-            - --job-config-path=/etc/job-config
+            - --config-path=/etc/prow-config/config.yaml
+            - --job-config-path=/etc/prow-jobs
           ports:
             - name: http
               containerPort: 80
               protocol: TCP
           volumeMounts:
-          - name: config
-            mountPath: /etc/config
+          - name: prow-config
+            mountPath: /etc/prow-config
             readOnly: true
-          - name: job-config
-            mountPath: /etc/job-config
-            readOnly: true            
+          - name: prow-jobs
+            mountPath: /etc/prow-jobs
+            readOnly: true
           resources:
             {{- toYaml .Values.horologium.resources | nindent 12 }}
       volumes:
-        - name: config
+        - name: prow-config
           configMap:
-            name: {{ include "prow.fullname" . }}-config
-        - name: job-config
+            name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+        - name: prow-jobs
           configMap:
-            name: {{ include "prow.fullname" . }}-job-config
+            name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
