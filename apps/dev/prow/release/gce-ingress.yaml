@@ -4,18 +4,17 @@ metadata:
   annotations:
     kubernetes.io/ingress.allow-http: "true"
     kubernetes.io/ingress.class: gce
-    kubernetes.io/ingress.global-static-ip-name: prow-dev-tidb-net-ip
+    kubernetes.io/ingress.global-static-ip-name: ${INGRESS_STATIC_IP_NAME}
     networking.gke.io/v1beta1.FrontendConfig: prow-ingress-security-config
   labels:
     app: prow
     app.kubernetes.io/instance: prow
     app.kubernetes.io/part-of: prow
-    app.kubernetes.io/version: v20221216-06fc803e5c
   name: prow
   namespace: apps
 spec:
   rules:
-  - host: prow-dev.tidb.net
+  - host: ${DOMAIN_NAME}
     http:
       paths:
       - path: /
@@ -48,5 +47,5 @@ spec:
               name: http
   tls:
   - hosts:
-    - '*.tidb.net'
+    - ${DOMAIN_NAME}
     secretName: prow-tls

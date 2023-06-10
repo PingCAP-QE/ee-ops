@@ -15,12 +15,3 @@ spec:
     namespace: flux-system
   path: ./apps/dev/prow/post
   prune: true
-  postBuild:  
-    substitute:
-      TEST_PODS_NAMESPACE: prow-test-pods
-      BUCKET_NAME: prow-dev-tidb-logs
-    substituteFrom:
-      ### need secret `prow` with keys:
-      # - DOMAIN_NAME
-      - kind: Secret
-        name: prow

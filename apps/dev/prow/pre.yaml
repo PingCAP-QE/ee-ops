@@ -15,3 +15,5 @@ spec:
   postBuild:
     substitute:
       TEST_PODS_NAMESPACE: prow-test-pods
+      BUCKET_NAME: prow-dev-tidb-logs
+      DOMAIN_NAME: prow-dev.tidb.net
