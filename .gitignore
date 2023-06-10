@@ -17,3 +17,6 @@
 # helm chart
 Chart.lock
 /charts/**/*.tgz
+
+# IDEs
+/.vscode

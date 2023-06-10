@@ -46,9 +46,9 @@ spec:
         prow:
           configMapName: prow-config
         plugin:
-          configMapName: prow-plugin
+          configMapName: prow-plugins
         job:
-          configMapName: prow-job
+          configMapName: prow-jobs
     deck:
       ingress:
         enabled: false

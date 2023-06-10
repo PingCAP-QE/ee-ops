@@ -42,4 +42,4 @@ spec:
                 secretName: prow-github
             - name: config
               configMap:
-                name: prow-labels-config
+                name: prow-labels
