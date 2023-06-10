@@ -15,3 +15,8 @@ spec:
   postBuild:
     substitute:
       TEST_PODS_NAMESPACE: prow-test-pods
+      BUCKET_NAME: prow-tidb-logs
+      DOMAIN_NAME: prow.tidb.net
+    substituteFrom:
+      - kind: Secret
+        name: prow

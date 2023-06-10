@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.8.1
+      version: 0.9.1
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -31,48 +31,24 @@ spec:
   test:
     enable: true
     ignoreFailures: false
-  valuesFrom:
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: GITHUB_APP_ID
-      targetPath: prow.githubAppId
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: GITHUB_APP_CERT
-      targetPath: prow.githubAppCert
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: GITHUB_APP_WEBHOOK_HMAC
-      targetPath: prow.githubHmacToken
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: GITHUB_TOKEN
-      targetPath: prow.githubOauthToken
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: DOMAIN_NAME
-      targetPath: prow.domainName
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: GITHUB_APP_CLIENT_ID
-      targetPath: prow.githubAppClientId
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: GITHUB_APP_CLIENT_SECRET
-      targetPath: prow.githubAppClientSecret
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: OAUTH_COOKIE_SECRET
-      targetPath: prow.githubOauthCookieSecret
-    - kind: Secret
-      name: ${PROW_SECRET_NAME}
-      valuesKey: GCS_CREDENTIALS_BASE64
-      targetPath: persistent.credentialsBase64
   values:
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
-      githubOrg: pingcap
-      jobs: {}
+      domainName: ${DOMAIN_NAME}
+      github:
+        secretName: prow-github
+      webhook:
+        secretName: prow-webhook
+      oauth:
+        cookie:
+          secretName: prow-oauth-cookie
+      configs:
+        prow:
+          configMapName: prow-config
+        plugin:
+          configMapName: prow-plugins
+        job:
+          configMapName: prow-job-config
     crier:
       image:
         repository: ticommunityinfra/crier
@@ -83,6 +59,9 @@ spec:
       image:
         repository: ticommunityinfra/deck
         tag: v20230323-3ade632
+    ghproxy:
+      persistence:
+        size: 10Gi
     tide:
       image:
         repository: ticommunityinfra/tide
@@ -99,11 +78,11 @@ spec:
         tag: latest
     jenkinsOperator:
       enabled: true
-      skipReport: true
-      dryRun: false
       image:
         repository: ticommunityinfra/jenkins-operator
         tag: v20230323-3ade632
+      skipReport: true
+      dryRun: false
       jenkinsUrl: ${JENKINS_BASE_URL}
       auth:
         secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
@@ -122,7 +101,7 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --openai-config-file=/etc/openai/config.yaml
@@ -135,8 +114,8 @@ spec:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumeMounts:
           - name: openai-config
             mountPath: /etc/openai
@@ -166,7 +145,8 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
+          - --plugin-config=/etc/prow-plugin/plugins.yaml
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --update-period=5m
@@ -174,8 +154,8 @@ spec:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         service:
           type: ClusterIP
       ti-community-autoresponder:
@@ -191,15 +171,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -221,15 +201,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -250,15 +230,15 @@ spec:
           tag: v2.4.2
         args:
           - --dry-run=false
-          - --github-token-path=/etc/github/oauth
+          - --github-token-path=/etc/github/token
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -280,15 +260,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -310,15 +290,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -340,15 +320,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -370,15 +350,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -400,15 +380,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -430,15 +410,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -460,15 +440,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -490,15 +470,15 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -520,15 +500,16 @@ spec:
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/cert
+          - --plugin-config=/etc/prow-plugin/plugins.yaml
+          - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         env:
           - name: GITHUB_APP_ID
             valueFrom:
               secretKeyRef:
-                name: prow-github-token
-                key: appid
+                name: prow-github
+                key: app-id
         volumes:
           - name: external-plugins-config
             configMap:
@@ -573,42 +554,8 @@ spec:
           periodSeconds: 3
     persistent:
       type: gcs
+      needCredentials: true
+      credentials:
+        secretName: prow-gcs-credentials
+        secretKey: service-account.json
       bucketName: ${BUCKET_NAME}
-
-  postRenderers:
-    - kustomize:
-        patchesJson6902:
-          # for updating ConfigMaps in after release deployment.
-          - target:
-              version: v1
-              kind: ConfigMap
-              name: prow-config
-              namespace: apps
-            patch:
-              # for merging configmap
-              # TODO(wuhuizuo): how to merge the inner yaml from value content.
-              - op: replace
-                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
-                value: merge
-          - target:
-              version: v1
-              kind: ConfigMap
-              name: prow-job-config
-              namespace: apps
-            patch:
-              # for merging configmap
-              # TODO(wuhuizuo): how to merge the inner yaml from value content.
-              - op: replace
-                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
-                value: merge
-          - target:
-              version: v1
-              kind: ConfigMap
-              name: prow-plugins
-              namespace: apps
-            patch:
-              # for merging configmap
-              # TODO(wuhuizuo): how to merge the inner yaml from value content.
-              - op: replace
-                path: /metadata/annotations.kustomize.toolkit.fluxcd.io/ssa
-                value: merge
