@@ -55,6 +55,9 @@ spec:
       image:
         repository: ticommunityinfra/deck
         tag: v20230323-3ade632
+    ghproxy:
+      persistence:
+        size: 1Gi
     tide:
       image:
         repository: ticommunityinfra/tide
