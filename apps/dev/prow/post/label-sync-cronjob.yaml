@@ -20,16 +20,16 @@ spec:
                 - --config=/etc/config/labels.yaml
                 - --confirm=true
                 - --github-app-id=$(GITHUB_APP_ID)
-                - --github-app-private-key-path=/etc/github/cert
+                - --github-app-private-key-path=/etc/github/app-private-key
                 - --only=ti-community-infra/test-dev
               env:
                 - name: GITHUB_APP_ID
                   valueFrom:
                     secretKeyRef:
-                      name: prow-github-token
-                      key: appid
+                      name: prow-github
+                      key: app-id
               volumeMounts:
-                - name: github-token
+                - name: github
                   mountPath: /etc/github
                   readOnly: true
                 - name: config
@@ -37,9 +37,9 @@ spec:
                   readOnly: true
           restartPolicy: Never
           volumes:
-            - name: github-token
+            - name: github
               secret:
-                secretName: prow-github-token
+                secretName: prow-github
             - name: config
               configMap:
                 name: prow-labels-config

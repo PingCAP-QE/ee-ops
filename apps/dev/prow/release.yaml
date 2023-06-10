@@ -19,14 +19,8 @@ spec:
     substitute:
       BUCKET_NAME: prow-dev-tidb-logs
       TEST_PODS_NAMESPACE: prow-test-pods
-
-      ### need secret `prow` with keys:
-      # - GITHUB_APP_ID
-      # - GITHUB_APP_CERT
-      # - GITHUB_APP_WEBHOOK_HMAC
-      # - GITHUB_TOKEN
-      # - DOMAIN_NAME
-      PROW_SECRET_NAME: prow
+      DOMAIN_NAME: prow-dev.tidb.net
+      INGRESS_STATIC_IP_NAME: prow-dev-tidb-net-ip
 
       ### need secret `prow-jenkins-operator-auth` with keys:
       # - user
