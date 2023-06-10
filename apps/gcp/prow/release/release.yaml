@@ -107,7 +107,6 @@ spec:
           - --openai-config-file=/etc/openai/config.yaml
           - --openai-config-file-large=/etc/openai/config4.yaml
           - --openai-tasks-file=/etc/openai/tasks.yaml
-          - --openai-model="gpt-4-32k"
           - --large-down-threshold=12288
           - --max-accept-diff-size=80000
           - --issue-comment-command=review
