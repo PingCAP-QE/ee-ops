@@ -11,8 +11,6 @@ spec:
   selector:
     matchLabels:
       {{- include "prow.selectorLabels.ghproxy" . | nindent 6 }}
-  strategy:
-    type: Recreate
   template:
     metadata:
       {{- with .Values.podAnnotations }}

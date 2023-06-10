@@ -8,11 +8,6 @@ spec:
   {{- if not .Values.hook.autoscaling.enabled }}
   replicas: {{ .Values.hook.replicaCount }}
   {{- end }}
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
   selector:
     matchLabels:
       {{- include "prow.selectorLabels.hook" . | nindent 6 }}

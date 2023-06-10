@@ -17,8 +17,6 @@ spec:
   {{- else }}
   replicas: {{ $val.replicaCount }}
   {{- end }}
-  strategy:
-    type: Recreate  
   selector:
     matchLabels:
       {{- include "prow.selectorLabels" $root | nindent 6 }}

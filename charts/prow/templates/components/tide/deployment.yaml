@@ -6,7 +6,7 @@ metadata:
     {{- include "prow.labels.tide" . | nindent 4 }}
 spec:
   {{- if not .Values.tide.autoscaling.enabled }}
-  replicas: {{ .Values.tide.replicaCount }}
+  replicas: {{ .Values.tide.replicaCount }}  # Do not scale up.
   {{- end }}
   strategy:
     type: Recreate
