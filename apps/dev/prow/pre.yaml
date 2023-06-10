@@ -17,3 +17,6 @@ spec:
       TEST_PODS_NAMESPACE: prow-test-pods
       BUCKET_NAME: prow-dev-tidb-logs
       DOMAIN_NAME: prow-dev.tidb.net
+    substituteFrom:
+      - kind: Secret
+        name: prow
