@@ -5,3 +5,28 @@ jenkinsOperator:
   dryRun: false
   auth:
     secretName: prow-jenkins
+hook:
+  additionalEnv:
+    - name: FOO
+      value: BAR
+thirdPlugins:
+  needs-rebase:
+    additionalEnv:
+      - name: FOO
+        value: BAR
+    args:
+      - --dry-run=false
+      - --github-app-id=$(GITHUB_APP_ID)
+      - --github-app-private-key-path=/etc/github/app-private-key
+      - --plugin-config=/etc/prow-plugin/plugins.yaml
+      - --github-endpoint=http://prow-ghproxy
+      - --github-graphql-endpoint=http://prow-ghproxy/graphql
+      - --update-period=5m
+    image:
+      repository: gcr.io/k8s-prow/needs-rebase
+      pullPolicy: Always
+    ports:
+      http: 8888
+    service:
+      type: ClusterIP
+      port: 80

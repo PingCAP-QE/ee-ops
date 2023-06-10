@@ -8,11 +8,6 @@ spec:
   {{- if not .Values.deck.autoscaling.enabled }}
   replicas: {{ .Values.deck.replicaCount }}
   {{- end }}
-  strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
   selector:
     matchLabels:
       {{- include "prow.selectorLabels.deck" . | nindent 6 }}
