@@ -185,6 +185,9 @@ hook:
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
     tag: ""
+  additionalEnv: []
+    # - name: <env name>
+    #   value: <env value>
   replicaCount: 1
   autoscaling:
     enabled: false
@@ -521,7 +524,7 @@ thirdPlugins: {}
   #   args: []
   #   ports:
   #     http: 3000
-  #   env:
+  #   additionalEnv:
   #     - name: EXTERNAL_PLUGINS_CONFIG
   #       value: /etc/external_plugins_config/external_plugins_config.yaml
   #   livenessProbe:

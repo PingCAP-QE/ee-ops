@@ -61,10 +61,15 @@ spec:
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}/graphql
           {{- end }}
-          {{- if $val.env }}
           env:
-            {{- toYaml $val.env | nindent 12 }}
-          {{- end }}
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
+                  name: {{ default (printf "%s-github" (include "prow.fullname" $root)) $root.Values.prow.github.secretName }}
+                  key: app-id
+            {{- with $val.additionalEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           {{- with $val.ports }}
           ports:
             {{- range $pn, $pv := . }}

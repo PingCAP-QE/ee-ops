@@ -49,6 +49,9 @@ spec:
                 secretKeyRef:
                   name: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
                   key: app-id
+            {{- with .Values.hook.additionalEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 8888

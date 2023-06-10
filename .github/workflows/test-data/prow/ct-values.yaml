@@ -5,3 +5,20 @@ jenkinsOperator:
   dryRun: false
   auth:
     secretName: prow-jenkins
+hook:
+  additionalEnv:
+    - name: FOO
+      value: BAR
+thirdPlugins:
+  needs-rebase:
+    additionalEnv:
+      - name: FOO
+        value: BAR
+    image:
+      repository: gcr.io/k8s-prow/needs-rebase
+      pullPolicy: Always
+    ports:
+      http: 8888
+    service:
+      type: ClusterIP
+      port: 80
