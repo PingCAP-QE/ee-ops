@@ -6,7 +6,7 @@ metadata:
     {{- include "prow.labels.horologium" . | nindent 4 }}
 spec:
   {{- if not .Values.horologium.autoscaling.enabled }}
-  replicas: {{ .Values.horologium.replicaCount }}
+  replicas: {{ .Values.horologium.replicaCount }} # Do not scale up.
   {{- end }}
   strategy:
     type: Recreate
