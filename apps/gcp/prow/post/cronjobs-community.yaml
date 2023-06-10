@@ -2,19 +2,21 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: prow-configs
+  name: prow-post-cronjobs-community
   namespace: flux-system
 spec:
-  interval: 1m0s
+  interval: 5m0s
+  dependsOn:
+    - name: prow-release
+      namespace: flux-system
   sourceRef:
     kind: GitRepository
     name: ti-community-infra-configs
     namespace: flux-system
-  path: prow
+  path: prow/cronjobs
   prune: true
   postBuild:
     substitute:
-      PROW_NAMESPACE: apps
       PROWJOB_NAMESPACE: apps
       TEST_PODS_NAMESPACE: prow-test-pods
       BUCKET_NAME: prow-tidb-logs
