@@ -78,7 +78,7 @@ prow:
 persistent:
   type: mem    # s3|gcs|mem, file is not ready yet.
   bucketName: prow
-  credential:
+  credentials:
     secretName: ""
     secretKey: "service-account.json"
 
