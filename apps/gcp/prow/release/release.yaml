@@ -76,6 +76,10 @@ spec:
         - name: STICKY_REPOS
           value: >-
             pingcap/tiflash
+            pingcap/tiflow
+            pingcap/docs
+            pingcap/docs-cn
+            pingcap/docs-tidb-operator
     pipeline:
       image:
         repository: ticommunityinfra/pipeline
