@@ -34,14 +34,14 @@ spec:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 100Gi
+              storage: 500Gi
         ac:
           storageClassName: ceph-block
           accessModes:
             - ReadWriteOnce
           resources:
             requests:
-              storage: 5Gi
+              storage: 5Gi # ac:cas >= 1:1000
       conf: |-
         local common = import 'common.libsonnet';
 
@@ -70,7 +70,7 @@ spec:
                   source: {
                     file: {
                       path: '/storage-cas/blocks',
-                      sizeBytes: 960 * 1024 * 1024 * 1024,
+                      sizeBytes: 480 * 1024 * 1024 * 1024,
                     },
                   },
                   spareBlocks: 3,
