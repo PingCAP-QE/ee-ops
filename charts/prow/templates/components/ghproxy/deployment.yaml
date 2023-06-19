@@ -36,6 +36,9 @@ spec:
             - --cache-dir=/cache
             - --cache-sizeGB=99
             - --serve-metrics=true
+            {{- with .Values.ghproxy.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}              
           ports:
             - name: http
               containerPort: 8888

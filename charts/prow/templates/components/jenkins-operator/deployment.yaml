@@ -44,6 +44,9 @@ spec:
             - --csrf-protect={{ .Values.jenkinsOperator.csrfProtect }}
             - --jenkins-url={{ .Values.jenkinsOperator.jenkinsUrl }}
             - --config-path=/etc/prow-config/config.yaml
+            {{- with .Values.jenkinsOperator.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
             {{- with .Values.jenkinsOperator.auth }}{{- if .secretName }}
 
             {{/* basic auth */}}

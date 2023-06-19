@@ -40,6 +40,9 @@ spec:
             - --dry-run=false
             - --config-path=/etc/prow-config/config.yaml
             - --job-config-path=/etc/prow-jobs
+            {{- with .Values.horologium.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 80

@@ -54,10 +54,9 @@ spec:
           args:
             - --dry-run=false
             - --config-path=/etc/prow-config/config.yaml
-            - --job-config-path=/etc/prow-jobs            
+            - --job-config-path=/etc/prow-jobs
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/app-private-key
-            # - --github-token-path=/etc/github/token
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" $root }}/graphql
           {{- end }}
@@ -84,10 +83,10 @@ spec:
           volumeMounts:
             - name: github
               mountPath: /etc/github
-              readOnly: true   
+              readOnly: true
             - name: webhook
               mountPath: /etc/webhook
-              readOnly: true              
+              readOnly: true
             - name: prow-config
               mountPath: /etc/prow-config
               readOnly: true
@@ -127,7 +126,7 @@ spec:
             secretName: {{ . }}
             {{- else }}
             secretName: {{ include "prow.fullname" $root }}-github
-            {{- end }}                
+            {{- end }}
         - name: webhook
           secret:
             {{- with $root.Values.prow.webhook.secretName }}
@@ -155,7 +154,7 @@ spec:
             name: {{ . }}
             {{- else }}
             name: {{ include "prow.fullname" $root }}-plugin
-            {{- end }}          
+            {{- end }}
         # other external volumes
         {{- with $val.volumes }}
         {{- toYaml . | nindent 8 }}

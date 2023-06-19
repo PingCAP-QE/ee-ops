@@ -38,6 +38,9 @@ spec:
           args:
             - --all-contexts
             - --config=/etc/prow-config/config.yaml
+            {{- with .Values.pipeline.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
           # Use KUBECONFIG envvar rather than --kubeconfig flag in order to provide multiple configs to merge.
           - name: KUBECONFIG

@@ -41,6 +41,9 @@ spec:
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/app-private-key
+            {{- with .Values.pcm.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
           - name: GITHUB_APP_ID
             valueFrom:
@@ -56,7 +59,7 @@ spec:
             readOnly: true
           - name: prow-jobs
             mountPath: /etc/prow-jobs
-            readOnly: true            
+            readOnly: true
           resources:
             {{- toYaml .Values.pcm.resources | nindent 12 }}
       volumes:

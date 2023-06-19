@@ -86,6 +86,8 @@ persistent:
 # Configuration for prow components    #
 ########################################
 crier:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/crier
     pullPolicy: IfNotPresent
@@ -113,6 +115,8 @@ crier:
   resources: {}
 
 deck:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/deck
     pullPolicy: IfNotPresent
@@ -160,6 +164,8 @@ deck:
     #      - << REPLACE >>
 
 ghproxy:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/ghproxy
     pullPolicy: IfNotPresent
@@ -180,6 +186,8 @@ ghproxy:
     size: 10Gi
 
 hook:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/hook
     pullPolicy: IfNotPresent
@@ -230,6 +238,8 @@ hook:
     #      - << REPLACE >>
 
 horologium:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/horologium
     pullPolicy: IfNotPresent
@@ -258,6 +268,8 @@ horologium:
   resources: {}
 
 pcm:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/prow-controller-manager
     pullPolicy: IfNotPresent
@@ -285,6 +297,8 @@ pcm:
   resources: {}
 
 sinker:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/sinker
     pullPolicy: IfNotPresent
@@ -312,6 +326,8 @@ sinker:
   resources: {}
 
 statusReconciler:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/status-reconciler
     pullPolicy: IfNotPresent
@@ -339,6 +355,8 @@ statusReconciler:
   resources: {}
 
 tide:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/tide
     pullPolicy: IfNotPresent
@@ -370,6 +388,8 @@ tide:
   resources: {}
 
 pipeline:
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/pipeline
     pullPolicy: IfNotPresent
@@ -401,6 +421,8 @@ pipeline:
 
 jenkinsOperator:
   enabled: false
+  additionalArgs: []
+    # - --options-arg=val
   image:
     repository: gcr.io/k8s-prow/jenkins-operator
     pullPolicy: IfNotPresent
