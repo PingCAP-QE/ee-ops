@@ -43,6 +43,9 @@ spec:
             - --github-app-id=$(GITHUB_APP_ID)
             - --github-app-private-key-path=/etc/github/app-private-key
             - --webhook-path={{ default "/hook" .Values.prow.webhook.path }}
+            {{- with .Values.hook.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
