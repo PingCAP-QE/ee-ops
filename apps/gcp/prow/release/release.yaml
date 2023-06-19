@@ -77,6 +77,7 @@ spec:
           value: >-
             pingcap/tiflash
             pingcap/tiflow
+            pingcap/tidb
             pingcap/docs
             pingcap/docs-cn
             pingcap/docs-tidb-operator
