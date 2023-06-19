@@ -37,13 +37,16 @@ spec:
             - --dry-run=false
             - --config-path=/etc/prow-config/config.yaml
             - --job-config-path=/etc/prow-jobs
+            {{- with .Values.sinker.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           volumeMounts:
             - name: prow-config
               mountPath: /etc/prow-config
               readOnly: true
             - name: prow-jobs
               mountPath: /etc/prow-jobs
-              readOnly: true              
+              readOnly: true
           resources:
             {{- toYaml .Values.sinker.resources | nindent 12 }}
       volumes:
@@ -52,7 +55,7 @@ spec:
             name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
         - name: prow-jobs
           configMap:
-            name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}         
+            name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

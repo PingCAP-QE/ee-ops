@@ -47,6 +47,9 @@ spec:
             {{- if include "prow.persistent.needCredentials" . }}
             - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credentials.secretKey }}"
             {{- end }}
+            {{- with .Values.statusReconciler.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:

@@ -48,6 +48,9 @@ spec:
             {{- if include "prow.persistent.needCredentials" . }}
             - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credentials.secretKey }}"
             {{- end }}
+            {{- with .Values.tide.additionalArgs }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:
@@ -66,7 +69,7 @@ spec:
               readOnly: true
             - name: prow-jobs
               mountPath: /etc/prow-jobs
-              readOnly: true            
+              readOnly: true
             {{- if include "prow.persistent.needCredentials" . }}
             - name: persistent-credentials
               mountPath: /etc/persistent-credentials
@@ -86,8 +89,8 @@ spec:
             name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
         {{- if include "prow.persistent.needCredentials" . }}
         - name: persistent-credentials
-          secret: 
-            secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}        
+          secret:
+            secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
