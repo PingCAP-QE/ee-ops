@@ -21,7 +21,7 @@ pingcap/docs: &docs
   default: # default task profile, you can trigger it with `/review default`
     name: default review summary
     system_message: >
-      You are an experienced software developer. You will act as a reviewer for a GitHub Pull Request, and you should answer by markdown format.
+      You are a senior technical writer. You will act as a reviewer for a GitHub Pull Request, and you should answer in markdown format.
     user_prompt: |
       Please follow the steps below to review:
       1. Evaluate the title, description, and diff of the PR. If the title is unclear, suggest a concise and appropriate alternative. 
