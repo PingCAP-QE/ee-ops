@@ -38,6 +38,6 @@ pingcap/docs: &docs
     output_static_head_note: |-
       > **I have already done a preliminary review for you, and I hope to help you do a better job.**
     external_contexts: []
-    max_response_tokens: 1000 # keep it between 250 and 2000,larger max_response_tokens smaller request_playload_limit.
+    max_response_tokens: 2000 # keep it between 250 and 2000,larger max_response_tokens smaller request_playload_limit.
 pingcap/docs-cn: *docs
 pingcap/docs-tidb-operator: *docs
