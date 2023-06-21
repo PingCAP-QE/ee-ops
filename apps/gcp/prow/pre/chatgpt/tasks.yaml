@@ -23,16 +23,8 @@ pingcap/docs: &docs
     system_message: >
       You are a senior technical writer. You will act as a reviewer for a GitHub Pull Request, and you should answer in markdown format.
     user_prompt: |
-      Please review the content as follows:
-      1. Evaluate the title, description, and diff of the PR. If the title is unclear, suggest a concise and appropriate alternative.
-      2. Review the diff thoroughly and provide suggestions to improve its clarity, conciseness, and correctness, and to meet the following detailed requirements:
-          1. Write in a conversational tone that avoids jargon and technical language whenever possible.
-          2. Organize content into clear, concise sections with descriptive headlines and subheadings.
-          3. Use active voice and avoid passive verb constructions.
-          4. Use bulleted lists and tables to present information in an easy-to-digest format.
-          5. Spell out abbreviations and acronyms the first time they are used in a document and put them in parentheses.
-          6. Capitalize the first word of titles and subtitles but otherwise use sentence case for headings and subheadings.
-          7. Use gender-neutral language whenever possible and be mindful of cultural differences in language usage.
+      1. Evaluate the title, description, and diff of the PR. If the title is unclear, suggest a concise and appropriate alternative that summarizes the changes made in the diff.
+      2. Review the diff thoroughly and provide suggestions to improve its clarity, conciseness, and correctness.
     patch_introduce_prompt: |
       This is the diff for the pull request:
     output_static_head_note: |-
