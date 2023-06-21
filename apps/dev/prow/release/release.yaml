@@ -54,7 +54,7 @@ spec:
         enabled: false
       image:
         repository: ticommunityinfra/deck
-        tag: v20230323-3ade632
+        tag: v20230323-3ade632 # renovate: datasource=docker depName=ticommunityinfra/deck
     ghproxy:
       persistence:
         size: 1Gi
@@ -116,7 +116,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-autoresponder-plugin
-          tag: v2.4.2
+          tag: v2.4.2 # renovate: datasource=docker depName=ticommunityinfra/tichi-autoresponder-plugin
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
