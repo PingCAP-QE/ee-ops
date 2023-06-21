@@ -10,6 +10,7 @@ spec:
       interceptors:
         - name: "filter on eventType"
           ref:
+            # name of the clusterinterceptor
             name: github
           params:
             # - name: secretRef

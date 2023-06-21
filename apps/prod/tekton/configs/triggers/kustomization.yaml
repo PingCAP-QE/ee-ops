@@ -7,3 +7,4 @@ resources:
   - triggers
   - rbac.yaml
   - event-listener.yaml
+  - ingress-event-listener.yaml
