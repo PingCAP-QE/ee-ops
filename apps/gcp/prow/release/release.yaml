@@ -104,7 +104,7 @@ spec:
         replicaCount: 1
         image:
           repository: ticommunityinfra/chatgpt
-          tag: v20230522-8243faf
+          tag: v20230621-df5abce
         ports:
           http: 8888
         args:

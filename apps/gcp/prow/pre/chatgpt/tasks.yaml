@@ -3,7 +3,7 @@
 # ---- or ---
 # ORG/repo:
 PingCAP-QE/test-infra:
-  review-pull-request:
+  default:
     name: review summary
     system_message: |
       You are an experienced software developer. You will act as a reviewer for a GitHub Pull Request, and you should answer by markdown format.
@@ -31,5 +31,11 @@ pingcap/docs: &docs
       > **I have already done a preliminary review for you, and I hope to help you do a better job.**
     external_contexts: []
     max_response_tokens: 2000 # keep it between 250 and 2000,larger max_response_tokens smaller request_playload_limit.
+    skip_authors: 
+      - ti-chi-bot
+      - ti-chi-bot[bot]
+    skip_label_regs:
+      - ^do-not-merge/
+
 pingcap/docs-cn: *docs
 pingcap/docs-tidb-operator: *docs
