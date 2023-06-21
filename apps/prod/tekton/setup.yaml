@@ -13,14 +13,14 @@ spec:
   path: ./apps/prod/tekton/setup
   patches:
     - target:
-        kind: Namespace  
+        kind: Namespace
       patch: |
         - op: add
           path: /metadata/annotations
-          value: 
+          value:
             scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated", "value": "test-infra"}]'
             scheduler.alpha.kubernetes.io/node-selector: enable-ci=true
-                 
+
   prune: true
   healthChecks:
     - apiVersion: apps/v1

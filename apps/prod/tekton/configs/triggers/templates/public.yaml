@@ -8,7 +8,7 @@ spec:
       description: The git repository full url
     - name: git-revision
       description: The git revision
-      default: main
+      default: main  
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
