@@ -19,6 +19,22 @@ entries:
   buildbarn:
   - apiVersion: v2
     appVersion: "2023-02-13"
+    created: "2023-06-25T08:31:24.701667375Z"
+    description: Helm chart to deploy [buildbarn](https://github.com/buildbarn), forked
+      from https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
+    digest: 45199876e51187f06d9fd3fb4dcad10692f7dc1284d178d7aa4dc2b68dcfac54
+    home: https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
+    icon: https://avatars.githubusercontent.com/u/47299502?s=200&v=4
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: buildbarn
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/buildbarn-0.0.5/buildbarn-0.0.5.tgz
+    version: 0.0.5
+  - apiVersion: v2
+    appVersion: "2023-02-13"
     created: "2023-06-10T04:29:03.339742283Z"
     description: Helm chart to deploy [buildbarn](https://github.com/buildbarn), forked
       from https://github.com/slamdev/helm-charts/tree/master/charts/buildbarn
@@ -551,4 +567,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2023-06-19T12:30:00.102817851Z"
+generated: "2023-06-25T08:31:24.701768876Z"
