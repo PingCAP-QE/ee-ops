@@ -13,7 +13,7 @@ serviceAccount:
   # serviceAccount.name -- the name of the service account to use; if not set and create is true, a name is generated using the fullname template
   name:
 
-# browser.containerMetricsPort -- metrics port exposed by container
+# containerMetricsPort -- metrics port exposed by container
 containerMetricsPort: 8080
 
 browser:
@@ -157,8 +157,6 @@ frontend:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-  # frontend.containerHttpPort -- http port exposed by container
-  containerHttpPort: 80
   # frontend.containerGrpcPort -- grpc port exposed by container
   containerGrpcPort: 8980
 
@@ -172,18 +170,18 @@ frontend:
       port: 8980
 
   ingress:
-    # scheduler.ingress.enabled -- enables Ingress
+    # frontend.ingress.enabled -- enables Ingress
     enabled: false
-    # scheduler.ingress.annotations -- ingress annotations
+    # frontend.ingress.annotations -- ingress annotations
     annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
 
-    # scheduler.ingress.hosts -- ingress accepted hostnames
+    # frontend.ingress.hosts -- ingress accepted hostnames
     hosts: []
     #  - host: chart-example.local
     #    paths: []
-    # scheduler.ingress.tls -- ingress TLS configuration
+    # frontend.ingress.tls -- ingress TLS configuration
     tls: []
     #  - secretName: chart-example-tls
     #    hosts:
