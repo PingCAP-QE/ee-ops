@@ -8,7 +8,7 @@ spec:
   targetNamespace: apps
   chart:
     spec:
-      chart: buildbarn      
+      chart: buildbarn
       version: 0.0.3
       sourceRef:
         kind: HelmRepository
@@ -25,6 +25,40 @@ spec:
     enable: true
     ignoreFailures: false
   values:
+    browser:
+      ingress:
+        enabled: true
+        annotations:
+          kubernetes.io/ingress.class: nginx
+          nginx.ingress.kubernetes.io/use-regex: "true"
+          nginx.ingress.kubernetes.io/rewrite-target: /$2
+        hosts:
+          - host: internal.do.pingcap.net
+            paths:
+              - path: /bb(/|$)(.*)
+                pathType: Prefix
+    frontend:
+      ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/ssl-redirect: "true"
+          nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+          kubernetes.io/ingress.class: nginx
+          kubernetes.io/tls-acme: "true"
+          nginx.ingress.kubernetes.io/use-regex: "true"
+          nginx.ingress.kubernetes.io/rewrite-target: /$2
+        hosts:
+          - host: internal.do.pingcap.net
+            paths:
+              - path: /bf(/|$)(.*)
+                pathType: Prefix
+        tls:
+          # generatioin:
+          #   openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=nginxsvc/O=nginxsvc"
+          #   kubectl create secret tls internal-do-tls --key tls.key --cert tls.crt
+          - secretName: internal-do-tls
+            hosts:
+              - internal.do.pingcap.net
     storage:
       volumeClaims:
         # storage.volumeClaims.cas -- cas volume claim spec
@@ -134,7 +168,7 @@ spec:
           allow: {},
         },
         blobstore: {
-          contentAddressableStorage: {        
+          contentAddressableStorage: {
             readCaching: {
               fast: {
                 sharding: {
@@ -207,4 +241,3 @@ spec:
       }
 
 
-    
