@@ -103,6 +103,8 @@ browser:
   ingress:
     # browser.ingress.enabled -- enables Ingress
     enabled: false
+    # browser.ingress.className -- ingress class name
+    className: ""
     # browser.ingress.annotations -- ingress annotations
     annotations: {}
     # kubernetes.io/ingress.class: nginx
@@ -111,7 +113,9 @@ browser:
     # browser.ingress.hosts -- ingress accepted hostnames
     hosts: []
     #  - host: chart-example.local
-    #    paths: []
+    #    paths:
+    #     - path: /
+    #       pathType: ImplementationSpecific
     # browser.ingress.tls -- ingress TLS configuration
     tls: []
     #  - secretName: chart-example-tls
@@ -172,15 +176,18 @@ frontend:
   ingress:
     # frontend.ingress.enabled -- enables Ingress
     enabled: false
+    # frontend.ingress.className -- ingress class name
+    className: ""
     # frontend.ingress.annotations -- ingress annotations
     annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
-
     # frontend.ingress.hosts -- ingress accepted hostnames
     hosts: []
     #  - host: chart-example.local
-    #    paths: []
+    #    paths:
+    #     - path: /
+    #       pathType: ImplementationSpecific
     # frontend.ingress.tls -- ingress TLS configuration
     tls: []
     #  - secretName: chart-example-tls
