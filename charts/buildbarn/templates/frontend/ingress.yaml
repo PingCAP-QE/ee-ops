@@ -2,6 +2,7 @@
 {{- $fullName := include "buildbarn.fullname" (list . "frontend") -}}
 {{- $svcPort := .Values.frontend.service.port -}}
 apiVersion: networking.k8s.io/v1
+kind: Ingress
 metadata:
   name: {{ include "buildbarn.fullname" (list . "frontend") }}
   namespace: {{ .Release.Namespace }}
