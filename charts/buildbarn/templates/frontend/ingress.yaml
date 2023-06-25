@@ -1,6 +1,6 @@
 {{- if and .Values.frontend.enabled .Values.frontend.ingress.enabled -}}
 {{- $fullName := include "buildbarn.fullname" (list . "frontend") -}}
-{{- $svcPort := .Values.frontend.service.port -}}
+{{- $svcPort := .Values.frontend.service.grpc.port -}}
 {{- if and .Values.frontend.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.frontend.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.frontend.ingress.annotations "kubernetes.io/ingress.class" .Values.frontend.ingress.className}}
