@@ -67,7 +67,7 @@ spec:
         enabled: false
       image:
         repository: ticommunityinfra/hook
-        tag: v20230608-bd4b41b
+        tag: v20230627-6810132
       additionalEnv:
         - name: STICKY_REPOS
           value: >-
