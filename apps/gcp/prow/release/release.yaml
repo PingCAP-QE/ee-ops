@@ -90,7 +90,7 @@ spec:
       image:
         repository: ticommunityinfra/jenkins-operator
         tag: v20230323-3ade632
-      skipReport: true
+      skipReport: false
       dryRun: false
       jenkinsUrl: ${JENKINS_BASE_URL}
       auth:
