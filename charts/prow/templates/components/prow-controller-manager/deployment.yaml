@@ -45,9 +45,9 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           env:
-          - name: GITHUB_APP_ID
-            valueFrom:
-              secretKeyRef:
+            - name: GITHUB_APP_ID
+              valueFrom:
+                secretKeyRef:
                   name: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
                   key: app-id
           volumeMounts:
@@ -68,16 +68,16 @@ spec:
           resources:
             {{- toYaml .Values.pcm.resources | nindent 12 }}
       volumes:
-      - name: github
-        secret:
+        - name: github
+          secret:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
-      - name: prow-config
-        configMap:
+        - name: prow-config
+          configMap:
             name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
-      - name: prow-jobs
-        configMap:
+        - name: prow-jobs
+          configMap:
             name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
-        {{- with .Values.pcm.kubeconfigSecret }}
+          {{- with .Values.pcm.kubeconfigSecret }}
         - name: kubeconfig
           secret:
             secretName: {{ . }}

@@ -81,10 +81,10 @@ spec:
       volumes:
         - name: prow-config
           configMap:
-              name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+            name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
         - name: prow-jobs
           configMap:
-              name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
+            name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
         - name: github
           secret:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
