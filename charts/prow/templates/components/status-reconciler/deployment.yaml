@@ -74,26 +74,37 @@ spec:
               mountPath: /etc/persistent-credentials
               readOnly: true
             {{- end }}
+            {{- if .Values.statusReconciler.kubeconfigSecret }}
+            - mountPath: /etc/kubeconfig
+              name: kubeconfig
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.statusReconciler.resources | nindent 12 }}
       volumes:
-      - name: github
-        secret:
-          secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
-      - name: prow-config
-        configMap:
-          name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
-      - name: prow-plugin
-        configMap:
-          name: {{ default (printf "%s-plugin" (include "prow.fullname" .)) .Values.prow.configs.plugin.configMapName }}
-      - name: prow-jobs
-        configMap:
-          name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
-      {{- if include "prow.persistent.needCredentials" . }}
-      - name: persistent-credentials
-        secret:
-          secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
-      {{- end }}
+        - name: github
+          secret:
+            secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+        - name: prow-config
+          configMap:
+            name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+        - name: prow-plugin
+          configMap:
+            name: {{ default (printf "%s-plugin" (include "prow.fullname" .)) .Values.prow.configs.plugin.configMapName }}
+        - name: prow-jobs
+          configMap:
+            name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
+        {{- if include "prow.persistent.needCredentials" . }}
+        - name: persistent-credentials
+          secret:
+            secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
+        {{- end }}
+        {{- with .Values.statusReconciler.kubeconfigSecret }}
+        - name: kubeconfig
+          secret:
+            secretName: {{ . }}
+            optional: true
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

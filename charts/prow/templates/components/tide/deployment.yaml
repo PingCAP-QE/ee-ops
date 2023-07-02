@@ -75,6 +75,11 @@ spec:
               mountPath: /etc/persistent-credentials
               readOnly: true
             {{- end }}
+            {{- if .Values.tide.kubeconfigSecret }}
+            - mountPath: /etc/kubeconfig
+              name: kubeconfig
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.tide.resources | nindent 12 }}
       volumes:
@@ -91,6 +96,12 @@ spec:
         - name: persistent-credentials
           secret:
             secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
+        {{- end }}
+        {{- with .Values.tide.kubeconfigSecret }}
+        - name: kubeconfig
+          secret:
+            secretName: {{ . }}
+            optional: true
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
