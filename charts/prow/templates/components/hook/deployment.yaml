@@ -74,6 +74,11 @@ spec:
             - name: prow-jobs
               mountPath: /etc/prow-jobs
               readOnly: true
+            {{- if .Values.hook.kubeconfigSecret }}
+            - mountPath: /etc/kubeconfig
+              name: kubeconfig
+              readOnly: true
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -105,6 +110,12 @@ spec:
         - name: prow-jobs
           configMap:
             name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
+        {{- with .Values.hook.kubeconfigSecret }}
+        - name: kubeconfig
+          secret:
+            secretName: {{ . }}
+            optional: true
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

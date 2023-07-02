@@ -47,6 +47,11 @@ spec:
             - name: prow-jobs
               mountPath: /etc/prow-jobs
               readOnly: true
+            {{- if .Values.sinker.kubeconfigSecret }}
+            - mountPath: /etc/kubeconfig
+              name: kubeconfig
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.sinker.resources | nindent 12 }}
       volumes:
@@ -56,6 +61,12 @@ spec:
         - name: prow-jobs
           configMap:
             name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
+        {{- with .Values.sinker.kubeconfigSecret }}
+        - name: kubeconfig
+          secret:
+            secretName: {{ . }}
+            optional: true
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

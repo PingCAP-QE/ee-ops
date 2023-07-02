@@ -119,6 +119,11 @@ spec:
               mountPath: /etc/jenkins
               readOnly: true
             {{- end }}
+            {{- if .Values.jenkinsOperator.kubeconfigSecret }}
+            - mountPath: /etc/kubeconfig
+              name: kubeconfig
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.jenkinsOperator.resources | nindent 12 }}
       volumes:
@@ -130,6 +135,12 @@ spec:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
         {{- with .Values.jenkinsOperator.auth.secretName }}
         - name: jenkins-auth
+          secret:
+            secretName: {{ . }}
+            optional: true
+        {{- end }}
+        {{- with .Values.jenkinsOperator.kubeconfigSecret }}
+        - name: kubeconfig
           secret:
             secretName: {{ . }}
             optional: true
