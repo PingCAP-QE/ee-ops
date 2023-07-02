@@ -153,6 +153,19 @@ entries:
   prow:
   - apiVersion: v2
     appVersion: v20230418-23b5d25059
+    created: "2023-07-02T09:14:32.599415779Z"
+    description: 'A Helm chart for deploying Prow in self kubernetes cluster. '
+    digest: 97d8aa833b557562e766463a5dc2462a4e3251f4d038240b99b4559fc35ba4a1
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: prow
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-0.9.4/prow-0.9.4.tgz
+    version: 0.9.4
+  - apiVersion: v2
+    appVersion: v20230418-23b5d25059
     created: "2023-06-19T12:30:00.102369154Z"
     description: 'A Helm chart for deploying Prow in self kubernetes cluster. '
     digest: 2e23ba6f8bc088a4a148e1e94871223edc45c0b4ea24ac02923bd1b028e32534
@@ -599,4 +612,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2023-06-25T09:20:49.757556906Z"
+generated: "2023-07-02T09:14:32.599603779Z"
