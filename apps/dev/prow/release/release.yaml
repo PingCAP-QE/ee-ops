@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.9.3
+      version: 0.9.4
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -49,6 +49,13 @@ spec:
           configMapName: prow-plugin
         job:
           configMapName: prow-job
+    persistent:
+      type: gcs
+      needCredentials: true
+      credentials:
+        secretName: prow-gcs-credentials
+        secretKey: service-account.json
+      bucketName: ${BUCKET_NAME}
     deck:
       ingress:
         enabled: false
@@ -62,6 +69,7 @@ spec:
       image:
         repository: ticommunityinfra/tide
         tag: v20230323-3ade632
+      kubeconfigSecret: prow-kubeconfig
     hook:
       ingress:
         enabled: false
@@ -73,10 +81,16 @@ spec:
           value: >-
             ti-community-infra/test-dev
             ti-community-infra/test-prod
+      kubeconfigSecret: prow-kubeconfig
+    pcm:
+      kubeconfigSecret: prow-kubeconfig
+      additionalArgs:
+        - --kubeconfig=/etc/kubeconfig/config
     pipeline:
       image:
         repository: ticommunityinfra/pipeline
         tag: v20230621-df5abce
+      kubeconfigSecret: prow-kubeconfig
     jenkinsOperator:
       enabled: true
       image:
@@ -89,6 +103,7 @@ spec:
         secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
         secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
         secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
+      kubeconfigSecret: prow-kubeconfig
     thirdPlugins:
       needs-rebase:
         replicaCount: 1
@@ -116,7 +131,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-autoresponder-plugin
-          tag: v2.4.2 # renovate: datasource=docker depName=ticommunityinfra/tichi-autoresponder-plugin
+          tag: v2.4.3 # renovate: datasource=docker depName=ticommunityinfra/tichi-autoresponder-plugin
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -140,7 +155,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-blunderbuss-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -164,7 +179,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-cherrypicker-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-token-path=/etc/github/token
@@ -187,7 +202,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-contribution-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -211,7 +226,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-format-checker-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -259,7 +274,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-label-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -283,7 +298,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-label-blocker-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -307,7 +322,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-lgtm-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -331,7 +346,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-merge-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -355,7 +370,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-owners-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -379,7 +394,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-tars-plugin
-          tag: v2.4.2
+          tag: v2.4.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
@@ -402,7 +417,7 @@ spec:
           http: 3000
         image:
           repository: ticommunityinfra/tichi-web
-          tag: v2.4.2
+          tag: v2.4.3
         args: []
         additionalEnv:
           - name: EXTERNAL_PLUGINS_CONFIG
@@ -429,10 +444,5 @@ spec:
             scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 3
-    persistent:
-      type: gcs
-      needCredentials: true
-      credentials:
-        secretName: prow-gcs-credentials
-        secretKey: service-account.json
-      bucketName: ${BUCKET_NAME}
+
+
