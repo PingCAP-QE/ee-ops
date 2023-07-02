@@ -51,15 +51,15 @@ spec:
                   name: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
                   key: app-id
           volumeMounts:
-          - name: github
-            mountPath: /etc/github
-            readOnly: true
-          - name: prow-config
-            mountPath: /etc/prow-config
-            readOnly: true
-          - name: prow-jobs
-            mountPath: /etc/prow-jobs
-            readOnly: true
+            - name: github
+              mountPath: /etc/github
+              readOnly: true
+            - name: prow-config
+              mountPath: /etc/prow-config
+              readOnly: true
+            - name: prow-jobs
+              mountPath: /etc/prow-jobs
+              readOnly: true
             {{- if .Values.pcm.kubeconfigSecret }}
             - mountPath: /etc/kubeconfig
               name: kubeconfig
