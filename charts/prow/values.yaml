@@ -113,6 +113,7 @@ crier:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
 
 deck:
   additionalArgs: []
@@ -146,6 +147,7 @@ deck:
       name: ""
 
   resources: {}
+  kubeconfigSecret: ""
   ingress:
     enabled: true
     className: ""
@@ -219,6 +221,7 @@ hook:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
   ingress:
     enabled: true
     className: ""
@@ -266,6 +269,7 @@ horologium:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
 
 pcm:
   additionalArgs: []
@@ -295,6 +299,7 @@ pcm:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
 
 sinker:
   additionalArgs: []
@@ -324,6 +329,7 @@ sinker:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
 
 statusReconciler:
   additionalArgs: []
@@ -353,6 +359,7 @@ statusReconciler:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
 
 tide:
   additionalArgs: []
@@ -386,6 +393,7 @@ tide:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
 
 pipeline:
   additionalArgs: []
@@ -451,6 +459,7 @@ jenkinsOperator:
       create: true
       name: ""
   resources: {}
+  kubeconfigSecret: ""
 
   # Whether or not to make mutating API calls to GitHub/Kubernetes/Jenkins.
   dryRun: true

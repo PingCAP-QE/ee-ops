@@ -70,24 +70,35 @@ spec:
               mountPath: /etc/persistent-credentials
               readOnly: true
             {{- end }}
+            {{- if .Values.crier.kubeconfigSecret }}
+            - mountPath: /etc/kubeconfig
+              name: kubeconfig
+              readOnly: true
+            {{- end }}
           resources:
             {{- toYaml .Values.crier.resources | nindent 12 }}
 
       volumes:
-      - name: prow-config
-        configMap:
-            name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
-      - name: prow-jobs
-        configMap:
-            name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
-      - name: github
-        secret:
-          secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
-      {{- if include "prow.persistent.needCredentials" . }}
-      - name: persistent-credentials
-        secret:
-          secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
-      {{- end }}
+        - name: prow-config
+          configMap:
+              name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
+        - name: prow-jobs
+          configMap:
+              name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
+        - name: github
+          secret:
+            secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+        {{- if include "prow.persistent.needCredentials" . }}
+        - name: persistent-credentials
+          secret:
+            secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
+        {{- end }}
+        {{- with .Values.crier.kubeconfigSecret }}
+        - name: kubeconfig
+          secret:
+            secretName: {{ . }}
+            optional: true
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
