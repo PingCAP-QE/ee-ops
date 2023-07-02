@@ -77,7 +77,7 @@ spec:
         - name: prow-jobs
           configMap:
             name: {{ default (printf "%s-job" (include "prow.fullname" .)) .Values.prow.configs.job.configMapName }}
-          {{- with .Values.pcm.kubeconfigSecret }}
+        {{- with .Values.pcm.kubeconfigSecret }}
         - name: kubeconfig
           secret:
             secretName: {{ . }}
