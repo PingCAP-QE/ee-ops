@@ -4,5 +4,6 @@ resources:
   - namespace-test-pods.yaml
   - rbac-test-pods-k8s-pod-full.yaml
   - secrets.yaml
+  - secrets-test-pods.yaml
   - prow-configs.yaml
   - prow-jobs.yaml
