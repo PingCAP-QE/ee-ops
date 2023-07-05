@@ -13,4 +13,4 @@ resources:
   - tekton
   - brc
   - buildbarn
-
+  - prow-worker
