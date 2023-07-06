@@ -71,7 +71,7 @@ spec:
     tide:
       image:
         repository: ticommunityinfra/tide
-        tag: v20230323-3ade632
+        tag: v20230706-5546ede
       kubeconfigSecret: prow-kubeconfig
     hook:
       ingress:
