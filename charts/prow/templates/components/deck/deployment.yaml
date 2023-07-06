@@ -52,7 +52,7 @@ spec:
             {{- end }}
             {{- with .Values.deck.additionalArgs }}
             {{- toYaml . | nindent 12 }}
-            {{- end }}            
+            {{- end }}
           env:
             - name: GITHUB_APP_ID
               valueFrom:

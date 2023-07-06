@@ -80,6 +80,19 @@ spec:
               name: kubeconfig
               readOnly: true
             {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /healthz/ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 3
+            timeoutSeconds: 600
           resources:
             {{- toYaml .Values.tide.resources | nindent 12 }}
       volumes:
