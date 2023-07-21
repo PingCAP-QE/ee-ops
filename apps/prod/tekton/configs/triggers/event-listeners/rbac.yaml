@@ -27,31 +27,4 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: tekton-triggers-eventlistener-clusterroles # created by tekton operator
----
-# custom rights
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: k8s-pod-full
-rules:
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - delete
-      - list
-      - get
-      - watch
-      - create
-      - patch
 
----
-kind: RoleBinding
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  name: k8s-pod-full
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: k8s-pod-full
