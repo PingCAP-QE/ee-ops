@@ -55,9 +55,4 @@ spec:
       kind: Deployment
       name: tekton-dashboard
       namespace: tekton-pipelines
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: tekton-ingress # should manual created in namespace `apps`
-        optional: true
   timeout: 5m0s

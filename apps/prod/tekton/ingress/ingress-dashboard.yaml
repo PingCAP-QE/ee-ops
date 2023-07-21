@@ -25,3 +25,4 @@ spec:
                 name: tekton-dashboard
                 port:
                   name: http
+
