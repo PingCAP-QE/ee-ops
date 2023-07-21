@@ -5,6 +5,4 @@ resources:
   - templates
   - bindings
   - triggers
-  - rbac.yaml
-  - event-listener.yaml
-  - ingress-event-listener.yaml
+  - event-listeners

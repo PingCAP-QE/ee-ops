@@ -24,8 +24,3 @@ spec:
           value:
             scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated", "value": "test-infra"}]'
             scheduler.alpha.kubernetes.io/node-selector: enable-ci=true
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: tekton-ingress # should manual created in namespace `apps`
-        optional: true
