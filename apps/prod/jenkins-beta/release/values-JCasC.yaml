@@ -13,11 +13,11 @@ controller:
     - { name: github, keyName: pr-diff-token }
 
     # for ci cache, no need create manually.
-    - { name: jenkins-cache, keyName: region }
-    - { name: jenkins-cache, keyName: bucket }
-    - { name: jenkins-cache, keyName: endpoint }
-    - { name: jenkins-cache, keyName: access-key }
-    - { name: jenkins-cache, keyName: access-secret }
+    - { name: jenkins-beta-cache, keyName: region }
+    - { name: jenkins-beta-cache, keyName: bucket }
+    - { name: jenkins-beta-cache, keyName: endpoint }
+    - { name: jenkins-beta-cache, keyName: access-key }
+    - { name: jenkins-beta-cache, keyName: access-secret }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
     - { name: mongodb, keyName: mongodb-root-password }
 
