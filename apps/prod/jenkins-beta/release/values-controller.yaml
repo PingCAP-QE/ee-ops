@@ -1,6 +1,6 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  image: "hub.pingcap.net/wulifu/jenkins-with-plugins"
+  image: "hub.pingcap.net/jenkins/jenkins-with-plugins"
   tag: "2.387.3-jdk11"
   resources:
     requests:
