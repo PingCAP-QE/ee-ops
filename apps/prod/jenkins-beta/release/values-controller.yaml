@@ -4,11 +4,11 @@ controller:
   tag: "2.387.3-jdk11"
   resources:
     requests:
-      cpu: "16"
-      memory: 80Gi
+      cpu: "4"
+      memory: 16Gi
     limits:
-      cpu: "16"
-      memory: 80Gi
+      cpu: "8"
+      memory: 32Gi
 
   # all plugins are installed in the image already
   installPlugins: false
