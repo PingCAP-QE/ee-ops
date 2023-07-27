@@ -1,0 +1,4 @@
+resources:
+- platforms/linux-amd64
+- platforms/linux-arm64
+namespace: jenkins-cd
