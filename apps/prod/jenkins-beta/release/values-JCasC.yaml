@@ -1,0 +1,211 @@
+controller:
+  # 'name' is a name of an existing secret in same namespace as jenkins,
+  # 'keyName' is the name of one of the keys inside current secret.
+  # the 'name' and 'keyName' are concatenated with a '-' in between, so for example:
+  # an existing secret "secret-credentials" and a key inside it named "github-password" should be used in Jcasc as ${secret-credentials-github-password}
+  # 'name' and 'keyName' must be lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-',
+  # and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc')
+  additionalExistingSecrets:
+    # for git clone for private repo.
+    - { name: github, keyName: git-private-key }
+    - { name: github, keyName: git-username }
+    - { name: github, keyName: bot-token }
+    - { name: github, keyName: pr-diff-token }
+
+    # for ci cache, no need create manually.
+    - { name: jenkins-beta-cache, keyName: region }
+    - { name: jenkins-beta-cache, keyName: bucket }
+    - { name: jenkins-beta-cache, keyName: endpoint }
+    - { name: jenkins-beta-cache, keyName: access-key }
+    - { name: jenkins-beta-cache, keyName: access-secret }
+    # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
+    - { name: mongodb, keyName: mongodb-root-password }
+
+
+  additionalSecrets: []
+  #  - name: nameOfSecret
+  #    value: secretText
+
+  JCasC:
+    defaultConfig: true
+    # Ignored if authorizationStrategy is defined in controller.JCasC.configScripts
+    authorizationStrategy: |-
+      loggedInUsersCanDoAnything:
+        allowAnonymousRead: true # allow users to read builds logs without logging in.
+
+    # for security.
+    security:
+      globalJobDslSecurityConfiguration:
+        useScriptSecurity: false
+
+    securityRealm: |-
+      local:
+        allowsSignup: false
+        enableCaptcha: false
+        users:
+        - id: "${chart-admin-username}"
+          name: "Jenkins Admin"
+          password: "${chart-admin-password}"
+
+    # REF Doc: https://github.com/PingCAP-QE/ee-ops/blob/main/charts/jenkins/README.md
+    #
+    # Notable: if you want delete some key, first please delete the conetnt but keep the key.
+    #   after deployed, then create other commit and push to delete the key.
+    configScripts:
+      #  welcome-message: |
+      #    jenkins:
+      #      systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+      # Ignored if securityRealm is defined in controller.JCasC.configScripts and
+      # ignored if controller.enableXmlConfig=true as controller.securityRealm takes precedence
+      # securityRealm: |
+      #   jenkins:
+      #     securityRealm:
+      #       googleOAuth2:
+      #         # will read from key `client-id` from secret `google-oauth2`
+      #         clientId: "${google-oauth2-client-id}"
+      #         # will read from key `client-secret` from secret `google-oauth2`
+      #         clientSecret: "${google-oauth2-client-secret}"
+
+      # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
+      credentials: |
+        credentials:
+          system:
+            domainCredentials:
+              - domain:
+                  name: github.com
+                  description: github ssh and open api
+                credentials:
+                  - basicSSHUserPrivateKey:
+                      id: github-sre-bot-ssh # TODO: change the id.
+                      privateKeySource:
+                        directEntry:
+                          privateKey: ${github-git-private-key}
+                      scope: GLOBAL
+                      username: ${github-git-username}
+                      usernameSecret: true
+                  - string:
+                      id: github-bot-token
+                      description: github private token to call api.
+                      scope: GLOBAL
+                      secret: ${github-bot-token}
+                  - string:
+                      id: github-pr-diff-token
+                      description: github token to list pr diff files.
+                      scope: GLOBAL
+                      secret: ${github-pr-diff-token}
+      # for jobs.
+      jobs-dsl: |
+        jobs:
+          - script: |
+              job('seed') {
+                description('''
+                    Jenkins jobs As Code
+                    No need to configure job on Jenkins Web UI anymore.
+                ''')
+                scm {
+                  git {
+                    remote {
+                      github('PingCAP-QE/ci', 'https')
+                    }
+                    branch('main')
+                  }
+                }
+                triggers {
+                  githubPush()
+                }
+                steps {
+                  jobDsl {
+                    targets('jobs/**/*.groovy')
+                    failOnMissingPlugin(false)
+                    ignoreMissingFiles(true)
+                    ignoreExisting(false)
+                    removedJobAction('DELETE')
+                    removedConfigFilesAction('DELETE')
+                    removedViewAction('DELETE')
+                    lookupStrategy('SEED_JOB')
+                    sandbox(false)
+                  }
+                }
+              }
+
+              queue('seed')
+      github-pull-request-builder-trigger: |
+        unclassified:
+          ghprbTrigger:
+            autoCloseFailedPullRequests: false
+            cron: "H/5 * * * *"
+            extensions:
+              - ghprbSimpleStatus:
+                  addTestResults: false
+                  completedStatus:
+                    - message: "Build passed"
+                      result: SUCCESS
+                    - message: "Build failed"
+                      result: FAILURE
+                    - message: "Build error"
+                      result: ERROR
+                  showMatrixStatus: false
+                  startedStatus: "Build started"
+                  triggeredStatus: "Build triggered"
+            githubAuth:
+              - credentialsId: github-bot-token
+                description: "ti-chi-bot"
+                secret: ""
+                serverAPIUrl: "https://api.github.com" # replace with github proxy.
+            manageWebhooks: true
+            okToTestPhrase: ".*ok\\W+to\\W+test.*"
+            requestForTestingPhrase: "Can one of the admins verify this patch?"
+            retestPhrase: ".*test\\W+this\\W+please.*"
+            skipBuildPhrase: ".*\\[skip\\W+ci\\].*"
+            useComments: false
+            useDetailedComments: false
+            whitelistPhrase: ".*add\\W+to\\W+whitelist.*"
+      github-plugin-config: |
+        unclassified:
+          gitHubConfiguration:
+            apiRateLimitChecker: ThrottleOnOver
+          gitHubPluginConfig:
+            hookUrl: "http://internal.do.pingcap.net:30080/jenkins/github-webhook/"
+      pipeline-cache: |
+        unclassified:
+          pipeline-cache:
+            region: ${jenkins-cache-region}
+            bucket: ${jenkins-cache-bucket}
+            endpoint: ${jenkins-cache-endpoint}
+            username: ${jenkins-cache-access-key}
+            password: ${jenkins-cache-access-secret}
+            threshold: 400000 # limit to 400GiB
+      # for global env variables
+      env-vars: |
+        jenkins:
+          globalNodeProperties:
+            - envVars:
+                env:
+                  - key: "GOPROXY"
+                    value: "http://goproxy.apps.svc,https://proxy.golang.org,direct"
+      build-failure-analyzer: |
+        unclassified:
+          buildFailureAnalyzer:
+            doNotAnalyzeAbortedJob: true
+            gerritTriggerEnabled: false
+            globalEnabled: true
+            graphsEnabled: false
+            knowledgeBase:
+              mongoDB:
+                dbName: jenkins-failure-pattern
+                enableStatistics: true
+                host: mongodb.apps.svc
+                password: "${mongodb-mongodb-root-password}"
+                port: 27017
+                successfulLogging: true
+                userName: root
+            maxLogSize: 0
+            metricSquashingEnabled: true
+            noCausesEnabled: true
+            noCausesMessage: >-
+              No problems were identified. If you know why this problem occurred,
+              please add a suitable Cause in https://pingcap.feishu.cn/wiki/wikcno79XYpVsvJeiRsMm38b5eh, add a config it.
+            nrOfScanThreads: 3
+            testResultParsingEnabled: false
+            testResultCategories: "UT"
+            fallbackCategoriesAsString: unknown

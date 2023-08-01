@@ -1,0 +1,47 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+controller:
+  initContainerEnv:
+    - name: JENKINS_UC
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  containerEnv:
+    - name: JENKINS_UC
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+
+  # for plugin build-failure-analyzer
+  #   Exporting to prometheus
+  #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
+  prometheus:
+    metricRelabelings:
+      # add label: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_category_(.*)
+        targetLabel: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:.*:_:(.*)
+        targetLabel: category
+
+      # add label: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_cause_(.*)
+        targetLabel: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:.*:_:(.*)
+        targetLabel: cause
+
+      # add label: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:(.*):_:.*
+        targetLabel: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:(.*):_:.*
+        targetLabel: jobname
+
+      # aggerate to uniq metric: jenkins_bfa
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_(.*)_(.*)
+        replacement: jenkins_bfa
+        targetLabel: __name__
