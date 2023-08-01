@@ -7,4 +7,3 @@ agent:
   tag: "4.11-1"
   command: ""
   args: ""
-  nodeSelector: "kubernetes.io/arch=amd64"
