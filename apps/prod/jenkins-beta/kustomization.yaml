@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - pre.yaml
   - release.yaml
-  - post.yaml
+
