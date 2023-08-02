@@ -13,6 +13,20 @@ controller:
   # all plugins are installed in the image already
   installPlugins: false
 
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                  - amd64
+              - key: ee-infra-service
+                operator: In
+                values:
+                  - "true"
+
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # current jenkins using java-11.
   # Set min/max heap here if needed with:
