@@ -17,7 +17,7 @@ spec:
   {{- end }}
   initContainers:
     - name: "test-framework"
-      image: "bats/bats:1.2.1"
+      image: "bats/bats:1.10.0"
       command:
         - "bash"
         - "-c"
