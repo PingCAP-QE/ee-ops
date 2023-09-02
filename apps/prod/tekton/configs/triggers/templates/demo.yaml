@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: github-pr-public
+  name: github-pr-demo
 spec:
   params:
     - name: git-url
@@ -23,7 +23,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: demo-pipeline1
+          name: demo
         params:
           - name: git-url
             value: $(tt.params.git-url)
