@@ -32,6 +32,3 @@ spec:
               echo hello
       runAfter:
         - fetch-from-git
-      workspaces:
-        - name: source
-          workspace: git-source
