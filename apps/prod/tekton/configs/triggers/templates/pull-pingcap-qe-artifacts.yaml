@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: github-pr-demo
+  name: pull-pingcap-qe-artifacts
 spec:
   params:
     - name: git-url
@@ -13,7 +13,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: demo-pipeline1-run-
+        generateName: pull-pingcap-qe-artifacts-build-image-run-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-context": "demo-pipeline1"
@@ -23,7 +23,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: demo
+          name: pull-pingcap-qe-artifacts-build-image
         params:
           - name: git-url
             value: $(tt.params.git-url)

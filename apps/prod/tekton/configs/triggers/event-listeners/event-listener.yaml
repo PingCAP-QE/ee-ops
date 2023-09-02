@@ -21,14 +21,10 @@ spec:
               value: ["pull_request"]
         - name: "validate PR state and add field"
           ref:
-            name: "cel"
+            name: cel
           params:
-            - name: "filter"
-              value: "body.action in ['opened', 'synchronize', 'reopened']"
-            - name: "overlays"
-              value:
-                - key: truncated_sha
-                  expression: body.pull_request.head.sha.truncate(7)
+            - name: filter
+              value: body.action in ['opened', 'synchronize', 'reopened']
       triggerSelector:
         namespaceSelector:
           matchNames:
