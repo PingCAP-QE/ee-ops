@@ -8,4 +8,4 @@ spec:
   bindings:
     - ref: github-pr
   template:
-    ref: github-pr-public
+    ref: github-pr-demo
