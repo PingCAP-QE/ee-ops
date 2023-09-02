@@ -5,4 +5,4 @@ resources:
   - kaniko-build.yaml
   - codescan-security.yaml
   - ko-build-test-infra.yaml
-  - pipeline1.yaml
+  - pull-pingcap-qe-artifacts-build-image.yaml
