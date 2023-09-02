@@ -1,0 +1,36 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: pull-pingcap-qe-artifacts
+  labels:
+    type: github-pr
+    github-owner: PingCAP-QE
+    github-repo: artifacts
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          # value: body.repository.name == 'artifacts'
+          value: >-
+            body.organization.login == 'PingCAP-QE'  && body.repository.name ==
+            'artifacts'
+    # - name: add change files to extensions
+    #   ref:
+    #     name: github
+    #   params:
+    #     - name: "addChangedFiles" # TODO: upgrade tekton
+    #       value:
+    #         enabled: true
+    # - name: execute only when Dockerfile changed
+    #   ref:
+    #     name: cel
+    #   params:
+    #     - name: filter
+    #       value: extensions.changed_files.matches('Dockerfile')
+  bindings:
+    - ref: github-pr
+  template:
+    ref: pull-pingcap-qe-artifacts
