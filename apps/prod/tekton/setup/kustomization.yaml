@@ -8,3 +8,4 @@ resources:
   #   gcr.io/tekton-releases/dogfooding/tkn
   - operator-release.yaml 
   - operator-config.yaml
+  - pip-release.yaml
