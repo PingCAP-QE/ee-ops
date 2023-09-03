@@ -6,3 +6,4 @@ resources:
   - https://github.com/tektoncd/operator/releases/download/v0.65.1/release.yaml
   - operator-config.yaml
   - ingress-dashboard.yaml
+  - pip-release.yaml
