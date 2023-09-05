@@ -29,11 +29,26 @@ spec:
             value: $(tt.params.git-url)
           - name: git-revision
             value: $(tt.params.git-revision)
+          - name: EXTRA_ARGS
+            value: [--cache=true]
+        taskRunSpecs:
+          - pipelineTaskName: build-ci-base-arm64
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: arm64
+          - pipelineTaskName: build-ci-base-amd64
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
         workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
           - name: git-source
             volumeClaimTemplate:
               spec:
-                accessModes: [ReadWriteOnce]
+                storageClassName: ceph-filesystem
+                accessModes: [ReadWriteMany]
                 resources:
                   requests:
                     storage: 1Gi
