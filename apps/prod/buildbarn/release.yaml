@@ -26,6 +26,8 @@ spec:
     ignoreFailures: false
   values:
     browser:
+      nodeSelector:
+        kubernetes.io/arch: "amd64"
       ingress:
         enabled: true
         className: nginx
@@ -38,6 +40,8 @@ spec:
               - path: /bb(/|$)(.*)
                 pathType: Prefix
     frontend:
+      nodeSelector:
+        kubernetes.io/arch: "amd64"
       ingress:
         enabled: true
         className: nginx
@@ -60,6 +64,8 @@ spec:
             hosts:
               - internal.do.pingcap.net
     storage:
+      nodeSelector:
+        kubernetes.io/arch: "amd64"    
       volumeClaims:
         # storage.volumeClaims.cas -- cas volume claim spec
         cas:
@@ -152,7 +158,13 @@ spec:
             putAuthorizer: { allow: {} },
           },
         }
-
+    scheduler:
+      enabled: true
+      nodeSelector:
+        kubernetes.io/arch: "amd64"
+    worker:
+      nodeSelector:
+        kubernetes.io/arch: "amd64"
     commonConf: |-
       {
         global: {
