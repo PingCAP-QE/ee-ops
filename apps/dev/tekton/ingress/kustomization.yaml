@@ -1,8 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../_base
-  - namespace.yaml
-  - prow-crd.yaml
-  - prow
-  - tekton
+- ingress-dashboard.yaml
+- ingress-event-listener.yaml

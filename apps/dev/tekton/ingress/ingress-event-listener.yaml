@@ -1,0 +1,21 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: trigger-groups-listener
+  namespace: ee-cd
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "${domain}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "${path_for_hook}(/|$)(.*)"
+            backend:
+              service:
+                name: el-trigger-groups-listener
+                port:
+                  name: http-listener

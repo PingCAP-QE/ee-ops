@@ -2,7 +2,7 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: tekton-configs
+  name: tekton-ingress
   namespace: apps
 spec:
   interval: 1m0s
@@ -10,8 +10,15 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/dev/tekton/configs
+  path: ./apps/dev/tekton/ingress
   dependsOn:
     - name: tekton-setup
       namespace: apps
+    - name: tekton-configs
+      namespace: apps
   prune: true
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: tekton-ingress # should manual created in namespace `apps`
+        optional: true
