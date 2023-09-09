@@ -30,7 +30,7 @@ spec:
       triggerSelector:
         namespaceSelector:
           matchNames:
-            - ci-demo
+            - ee-cd
         labelSelector:
           matchLabels:
             type: github-pr-setup
@@ -54,7 +54,7 @@ spec:
       triggerSelector:
         namespaceSelector:
           matchNames:
-            - ci-demo
+            - ee-cd
         labelSelector:
           matchLabels:
             type: github-pr-teardown
@@ -83,7 +83,7 @@ spec:
       triggerSelector:
         namespaceSelector:
           matchNames:
-            - ci-demo
+            - ee-cd
         labelSelector:
           matchLabels:
             type: github-pr
