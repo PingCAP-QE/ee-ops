@@ -10,8 +10,9 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/staging/tekton/setup
+  path: ./apps/dev/tekton/setup
   prune: true
+  wait: true
   healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
@@ -51,3 +52,33 @@ spec:
         name: tekton-ingress # should manual created in namespace `apps`
         optional: true
   timeout: 5m0s
+  images:
+  - name: gcr.io/tekton-nightly/github.com/tektoncd/experimental/pipelines-in-pipelines/cmd/controller
+    newTag: v20230909-ee13de632e
+  patches:
+    # replace namespace
+    - target:
+        kind: Namespace
+        labelSelector: app.kubernetes.io/part-of=tekton-pip-run
+      patch: |
+        - op: replace
+          path: /metadata/name
+          value: tekton-pipelines
+    - target:
+        labelSelector: app.kubernetes.io/part-of=tekton-pip-run
+        namespace: tekton-pip-run
+      patch: |
+        - op: replace
+          path: /metadata/namespace
+          value: tekton-pip-run
+    # add container resources
+    - target:
+        kind: Deployment
+        labelSelector: app.kubernetes.io/part-of=tekton-pip-run
+      patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/resources
+          value:
+              requests:
+                cpu: "100m"
+                memory: 200Mi
