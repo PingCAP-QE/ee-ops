@@ -63,7 +63,7 @@ spec:
       patch: |
         - op: replace
           path: /metadata/namespace
-          value: tekton-pip-run
+          value: tekton-pipelines
     # add container resources
     - target:
         kind: Deployment
