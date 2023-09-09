@@ -60,5 +60,5 @@ spec:
         value: "true"
   dashboard:
     readonly: true
-  chain:
-    disabled: true #  if the value set as `true`, chains feature will be disabled (default: `false`)
+  # chain:
+  #   disabled: true #  if the value set as `true`, chains feature will be disabled (default: `false`)
