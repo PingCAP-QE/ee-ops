@@ -1,0 +1,41 @@
+# Ref: https://cloud.google.com/kubernetes-engine/docs/how-to/deploying-gateways
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: tekton
+  namespace: apps
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: apps
+  hostnames:
+    - "${domain}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: "${path_for_hook}(/|$)(.*)"
+      backendRefs:
+        - name: el-trigger-groups-listener
+          port: 8080
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /$2
+    - name: dashboard
+      matches:
+        - path:
+            type: PathPrefix
+            value: "${path_for_dashboard}(/|$)(.*)"
+      backendRefs:
+        - name: tekton-dashboard
+          port: 8080
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /$2
