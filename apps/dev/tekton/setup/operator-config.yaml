@@ -6,8 +6,10 @@ spec:
   targetNamespace: tekton-pipelines
   profile: all
   config:
-    nodeSelector: {}
-    tolerations: []
+    nodeSelector:
+      # write a node selector to use amd64 arch nodes
+      kubenertes.io/arch: amd64
+
   pipeline:
     disable-affinity-assistant: true
     disable-creds-init: false
