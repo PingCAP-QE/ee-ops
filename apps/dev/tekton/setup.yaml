@@ -58,13 +58,6 @@ spec:
   patches:
     # replace namespace
     - target:
-        kind: Namespace
-        labelSelector: app.kubernetes.io/part-of=tekton-pip-run
-      patch: |
-        - op: replace
-          path: /metadata/name
-          value: tekton-pipelines
-    - target:
         labelSelector: app.kubernetes.io/part-of=tekton-pip-run
         namespace: tekton-pip-run
       patch: |
