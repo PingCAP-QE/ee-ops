@@ -12,7 +12,7 @@ spec:
   path: ./apps/dev/tekton/setup
   interval: 1m0s
   prune: true
-  wait: true
+  wait: false
   timeout: 5m0s
   healthChecks:
     - apiVersion: apps/v1
