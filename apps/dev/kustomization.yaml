@@ -5,4 +5,4 @@ resources:
   - namespace.yaml
   - prow-crd.yaml
   - prow
-  # - tekton
+  - tekton
