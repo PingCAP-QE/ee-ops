@@ -39,12 +39,12 @@ spec:
     default-task-run-workspace-binding: >
       emptyDir: {}
 
-    performance:
-      disable-ha: true
-      buckets: 1
-      threads-per-controller: 2
-      kube-api-qps: 5.0
-      kube-api-burst: 10
+    # performance:
+    #   disable-ha: true
+    #   buckets: 1
+    #   threads-per-controller: 2
+    #   kube-api-qps: 5.0
+    #   kube-api-burst: 10
   trigger:
     default-service-account: "default"
     enable-api-fields: stable
