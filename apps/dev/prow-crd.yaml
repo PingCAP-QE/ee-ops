@@ -10,6 +10,6 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/_crds/prow
+  path: ./apps/_crds/prow/hacked
   prune: true
   force: true
