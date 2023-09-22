@@ -64,7 +64,7 @@ plank:
       gcs_configuration:
         bucket: gs://${BUCKET_NAME}
         path_strategy: explicit
-      gcs_credentials_secret: prow-gcs-credentials
+      gcs_credentials_secret: gcs-credentials
       utility_images:
         clonerefs: gcr.io/k8s-prow/clonerefs:v20221205-a1b0b85d88
         entrypoint: gcr.io/k8s-prow/entrypoint:v20221205-a1b0b85d88
