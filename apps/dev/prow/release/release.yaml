@@ -95,7 +95,7 @@ spec:
         enabled: false
       image:
         repository: ticommunityinfra/hook
-        tag: v20230922-c60c561dfe
+        tag: v20230927-01102e9c12
       resources:
         requests:
           cpu: "100m"
