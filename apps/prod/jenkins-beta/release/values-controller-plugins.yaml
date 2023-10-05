@@ -75,7 +75,7 @@ controller:
     - artifactId: ssh-agent
       source:
         # renovate: datasource=jenkins-plugins depName=ssh-agent
-        version: 333.v878b_53c89511
+        version: 327.v230ecd01f86f
     - artifactId: cloudevents
       source:
         # renovate: datasource=jenkins-plugins depName=cloudevents
