@@ -16,3 +16,4 @@ resources:
   - prow-worker
   - ccache-pvc
   - jenkins-beta
+  - cloudevents-server
