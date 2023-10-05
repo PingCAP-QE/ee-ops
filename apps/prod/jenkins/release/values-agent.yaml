@@ -4,6 +4,6 @@ agent:
   podRetention: Never
   containerCap: 200
   image: "jenkins/inbound-agent"
-  tag: "4.11-1"
+  tag: 3148.v532a_7e715ee3-10
   command: ""
   args: ""

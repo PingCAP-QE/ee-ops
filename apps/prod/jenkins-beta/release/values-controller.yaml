@@ -9,9 +9,6 @@ controller:
       cpu: "8"
       memory: 32Gi
 
-  # all plugins are installed in the image already
-  installPlugins: false
-
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

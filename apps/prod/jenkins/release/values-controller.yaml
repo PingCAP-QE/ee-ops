@@ -1,6 +1,6 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  tag: "2.387.1"
+  tag: 2.414.2
   resources:
     requests:
       cpu: "16"
@@ -8,6 +8,16 @@ controller:
     limits:
       cpu: "16"
       memory: 80Gi
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                  - amd64
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # current jenkins using java-11.
