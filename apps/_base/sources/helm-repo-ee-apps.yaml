@@ -1,0 +1,10 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: ee-apps
+  namespace: flux-system
+spec:
+  interval: 30m
+  type: oci
+  url: oci://ghcr.io/pingcap-qe/ee-apps/charts
