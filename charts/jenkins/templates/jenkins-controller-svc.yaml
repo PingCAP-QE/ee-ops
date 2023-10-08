@@ -35,25 +35,22 @@ spec:
 {{- range $index, $port := .Values.controller.extraPorts }}
     - port: {{ $port.port }}
       name: {{ $port.name }}
+      {{- if $port.targetPort }}
+      targetPort: {{ $port.targetPort }}
+      {{- else }}
       targetPort: {{ $port.port }}
+      {{- end -}}
 {{- end }}
   selector:
     "app.kubernetes.io/component": "{{ .Values.controller.componentName }}"
     "app.kubernetes.io/instance": "{{ .Release.Name }}"
   type: {{.Values.controller.serviceType}}
-  {{- with .Values.controller.serviceSessionAffinity }}
-  sessionAffinity: {{ . }}
-  {{- end }}
-  {{- with .Values.controller.serviceSessionAffinityConfig }}
-  sessionAffinityConfig:
-{{ toYaml . | indent 4 }}
-  {{- end }}  
   {{if eq .Values.controller.serviceType "LoadBalancer"}}
 {{- if .Values.controller.loadBalancerSourceRanges }}
   loadBalancerSourceRanges:
 {{ toYaml .Values.controller.loadBalancerSourceRanges | indent 4 }}
 {{- end }}
-  {{- if .Values.controller.loadBalancerIP }}
-  loadBalancerIP: {{ .Values.controller.loadBalancerIP }}
-  {{- end }}
-  {{- end }}
+  {{if .Values.controller.loadBalancerIP}}
+  loadBalancerIP: {{.Values.controller.loadBalancerIP}}
+  {{end}}
+  {{end}}
