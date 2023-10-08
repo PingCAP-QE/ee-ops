@@ -4,4 +4,4 @@ approvers:
 reviewers:
   - lijie0123  
 labels:
-  - area/apps/prod
+  - env/prod
