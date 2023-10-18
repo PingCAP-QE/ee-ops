@@ -1,9 +1,9 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: pull-pingcap-qe-artifacts
+  name: push-pingcap-qe-artifacts
   labels:
-    type: github-pr
+    type: github-branch-push
     github-owner: PingCAP-QE
     github-repo: artifacts
 spec:
@@ -14,9 +14,9 @@ spec:
       params:
         - name: filter
           value: >-
-            body.organization.login == 'PingCAP-QE'  && body.repository.name ==
+            body.repository.owner.login == 'PingCAP-QE' && body.repository.name ==
             'artifacts'
   bindings:
-    - ref: github-pr
+    - ref: github-branch-push
   template:
-    ref: pull-pingcap-qe-artifacts
+    ref: push-pingcap-qe-artifacts
