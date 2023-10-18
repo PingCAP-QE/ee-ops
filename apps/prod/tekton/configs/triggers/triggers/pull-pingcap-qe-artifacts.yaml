@@ -13,23 +13,9 @@ spec:
         name: cel
       params:
         - name: filter
-          # value: body.repository.name == 'artifacts'
           value: >-
             body.organization.login == 'PingCAP-QE'  && body.repository.name ==
             'artifacts'
-    # - name: add change files to extensions
-    #   ref:
-    #     name: github
-    #   params:
-    #     - name: "addChangedFiles" # TODO: upgrade tekton
-    #       value:
-    #         enabled: true
-    # - name: execute only when Dockerfile changed
-    #   ref:
-    #     name: cel
-    #   params:
-    #     - name: filter
-    #       value: extensions.changed_files.matches('Dockerfile')
   bindings:
     - ref: github-pr
   template:

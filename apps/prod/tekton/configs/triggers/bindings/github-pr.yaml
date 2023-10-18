@@ -4,12 +4,16 @@ metadata:
   name: github-pr
 spec:
   params:
-    - name: git-revision
-      value: $(body.pull_request.head.sha)
     - name: git-url
       value: $(body.pull_request.head.repo.clone_url)
+    - name: git-revision
+      value: $(body.pull_request.head.sha)
     - name: pr-number
       value: $(body.pull_request.number)
+    - name: pr-title
+      value: $(body.pull_request.title)
+    - name: pr-body
+      value: $(body.pull_request.body)
     - name: pr-user
       value: $(body.pull_request.user.login)
     - name: pr-head-owner
