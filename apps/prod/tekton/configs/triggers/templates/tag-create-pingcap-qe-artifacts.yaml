@@ -50,9 +50,6 @@ spec:
               taskRef:
                 kind: Task
                 name: git-clone
-              workspaces:
-                - name: output
-                  workspace: git-source
             - name: echo-good-afternoon
               taskSpec:
                 metadata: {}
@@ -69,12 +66,3 @@ spec:
             value: $(tt.params.git-url)
           - name: git-revision
             value: $(tt.params.git-revision)
-        workspaces:
-          - name: git-source
-            volumeClaimTemplate:
-              spec:
-                storageClassName: nfs
-                accessModes: [ReadWriteMany]
-                resources:
-                  requests:
-                    storage: 1Gi
