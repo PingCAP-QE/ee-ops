@@ -10,13 +10,8 @@ spec:
       interceptors:
         - name: "filter on eventType"
           ref:
-            # name of the clusterinterceptor
             name: github
           params:
-            # - name: secretRef
-            #   value:
-            #     secretName: github-secret
-            #     secretKey: secretToken
             - name: eventTypes
               value: ["pull_request"]
         - name: "validate PR state and add field"
@@ -32,3 +27,66 @@ spec:
         labelSelector:
           matchLabels:
             type: github-pr
+    - name: github-branch-push
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["push"]
+        - name: "validate branch push"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.ref_type == 'branch'
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-branch-push
+    - name: github-branch-create
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["create"]
+        - name: "validate branch create"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.ref_type == 'branch'
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-branch-create
+    - name: github-tag-create
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["create"]
+        - name: "validate tag create"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.ref_type == 'tag'
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-tag-create
