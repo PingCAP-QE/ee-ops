@@ -703,7 +703,7 @@ exporter:
     automountServiceAccountToken: false
     image:
       repository: goharbor/harbor-exporter
-      tag: v2.3.1
+      tag: v2.9.0
     nodeSelector: {}
     tolerations: []
     affinity: {}
