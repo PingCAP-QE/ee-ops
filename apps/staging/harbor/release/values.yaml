@@ -438,7 +438,7 @@ registry:
   registry:
     image:
       repository: goharbor/registry-photon
-      tag: v2.3.1
+      tag: v2.9.0
     # resources:
     #  requests:
     #    memory: 256Mi
