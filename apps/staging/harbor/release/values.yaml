@@ -321,7 +321,7 @@ proxy:
 nginx:
   image:
     repository: goharbor/nginx-photon
-    tag: v2.3.1
+    tag: v2.9.0
   # set the service account to be used, default if left empty
   serviceAccountName: ""
   # mount the service account token
