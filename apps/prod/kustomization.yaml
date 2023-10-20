@@ -9,7 +9,6 @@ resources:
   - greenhouse
   - ats
   - goproxy
-  - sec-service.yaml
   - tekton
   - brc
   - buildbarn
