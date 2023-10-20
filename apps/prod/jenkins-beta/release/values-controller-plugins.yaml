@@ -51,7 +51,7 @@ controller:
     - artifactId: http_request
       source:
         # renovate: datasource=jenkins-plugins depName=http_request
-        version: 1.16
+        version: 1.18
     - artifactId: workflow-aggregator
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-aggregator
