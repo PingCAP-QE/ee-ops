@@ -1,6 +1,7 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  tag: 2.414.2
+  # renovate: datasource=docker depName=jenkins/jenkins versioning=docker
+  tag: 2.414.3-lts
   resources:
     requests:
       cpu: "16"
