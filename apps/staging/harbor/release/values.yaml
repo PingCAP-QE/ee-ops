@@ -663,7 +663,7 @@ redis:
     automountServiceAccountToken: false
     image:
       repository: goharbor/redis-photon
-      tag: v2.3.1
+      tag: v2.9.0
     # resources:
     #  requests:
     #    memory: 256Mi
