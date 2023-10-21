@@ -247,7 +247,7 @@ controller:
     - artifactId: kubernetes
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes
-        version: 4029.v5712230ccb_f8
+        version: 4054.v2da_8e2794884
     - artifactId: workflow-aggregator
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-aggregator
