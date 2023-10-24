@@ -7,4 +7,4 @@ spec:
     - name: git-url
       value: $(body.repository.url)
     - name: git-ref
-      value: $(body.ref.substringAfter('refs/heads/')) # "refs/heads/xxx" => "xxx"      
+      value: $(body.ref.substringAfter('refs/heads/')) # "refs/heads/xxx" => "xxx"
