@@ -5,8 +5,8 @@ metadata:
 spec:
   params:
     - name: git-url
-      value: $(body.repository.url)
+      value: $(body.repository.clone_url)
     - name: git-revision
-      value: $(body.head_commit.id)
+      value: $(body.after)
     - name: git-ref
-      value: $(body.ref)
+      value: $(body.ref.substringAfter('refs/heads/')) # "refs/heads/main" => "main"
