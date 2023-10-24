@@ -1,0 +1,36 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: branch-create-product-components-hotfix
+  labels:
+    type: github-branch-create
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'pingcap' && body.repository.name in [
+              'tidb',
+              'tiflash',
+              'tiflow',
+              'tidb-binlog',
+              'tidb-dashboard',
+              'tidb-tools'
+            ]
+    # filter git refs that match regexp: ^refs/heads/release-\d+\.\d+-\d+-v\d+\.\d+\.\d+$
+    # example values of `body.ref`:
+    #   refs/heads/release-6.5-20231020-v6.5.5
+    - name: filter on branch names
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^refs/heads/release-\\d+\\.\\d+-\\d+-v\\d+\\.\\d+\\.\\d+$')
+  bindings:
+    - ref: github-branch-create
+  template:
+    ref: branch-create-product-components-hotfix
