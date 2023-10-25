@@ -23,6 +23,7 @@ spec:
     # filter git refs that match regexp: ^refs/heads/release-\d+\.\d+-\d+-v\d+\.\d+\.\d+$
     # example values of `body.ref`:
     #   refs/heads/release-6.5-20231020-v6.5.5
+    #   refs/heads/release-6.5-20231020-v6.5.5-1
     - name: filter on branch names
       ref:
         name: cel
