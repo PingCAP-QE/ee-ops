@@ -30,7 +30,8 @@ spec:
       params:
         - name: filter
           value: >-
-            body.ref.matches('^refs/heads/release-\\d+\\.\\d+-\\d+-v\\d+\\.\\d+\\.\\d+$')
+            body.ref.matches('^refs/heads/release-\\d+\\.\\d+-\\d+-v\\d+\\.\\d+\\.\\d+(-.+)?$')
+            
   bindings:
     - ref: github-branch-create
   template:
