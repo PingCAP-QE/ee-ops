@@ -25,7 +25,7 @@ spec:
           - name: git-url
             value: $(tt.params.git-url)
           - name: branch
-            value: git-ref
+            value: $(tt.params.git-ref)
         taskRef:
           kind: Task
           name: create-pr-to-sync-owners
