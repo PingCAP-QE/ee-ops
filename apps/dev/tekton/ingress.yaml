@@ -18,7 +18,7 @@ spec:
       namespace: apps
   prune: true
   postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: tekton-ingress # should manual created in namespace `apps`
-        optional: true
+    substitute:
+      DOMAIN_NAME: prow-dev.tidb.net
+      PATH_FOR_HOOK: /tekton/hook
+      PATH_FOR_DASHBOARD: /tekton/dashboard

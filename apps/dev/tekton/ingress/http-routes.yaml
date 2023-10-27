@@ -10,12 +10,12 @@ spec:
       name: external-https
       namespace: apps
   hostnames:
-    - "${domain}"
+    - "${DOMAIN_NAME}"
   rules:
     - matches:
         - path:
             type: PathPrefix
-            value: "${path_for_hook}(/|$)(.*)"
+            value: "${PATH_FOR_HOOK}(/|$)(.*)"
       backendRefs:
         - name: el-trigger-groups-listener
           namespace: ee-cd
@@ -29,7 +29,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: "${path_for_dashboard}(/|$)(.*)"
+            value: "${PATH_FOR_DASHBOARD}(/|$)(.*)"
       backendRefs:
         - name: tekton-dashboard
           namespace: tekton-pipelines

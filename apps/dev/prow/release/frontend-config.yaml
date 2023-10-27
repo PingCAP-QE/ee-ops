@@ -1,9 +1,0 @@
-apiVersion: networking.gke.io/v1beta1
-kind: FrontendConfig
-metadata:
-  name: prow-ingress-security-config
-  namespace: apps
-spec:
-  redirectToHttps:
-    enabled: true
-    responseCodeName: PERMANENT_REDIRECT

@@ -20,7 +20,6 @@ spec:
       BUCKET_NAME: prow-dev-tidb-logs
       TEST_PODS_NAMESPACE: prow-test-pods
       DOMAIN_NAME: prow-dev.tidb.net
-      INGRESS_STATIC_IP_NAME: prow-dev-tidb-net-ip
 
       ### need secret `prow-jenkins-operator-auth` with keys:
       # - user
