@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - setup.yaml
   - configs.yaml
-  # FIXME: currently can not assign a same IP address to multi Ingress resources in GKE.
-  # - ingress.yaml
+  - ingress.yaml
