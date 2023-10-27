@@ -4,5 +4,6 @@ resources:
   - ../_base
   - namespace.yaml
   - prow-crd.yaml
+  - gateways
   - prow
   - tekton

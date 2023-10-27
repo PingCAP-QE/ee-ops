@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - release.yaml
   - frontend-config.yaml
-  - gce-ingress.yaml
+  - wip-http-routes.yaml
+  # - gce-ingress.yaml
