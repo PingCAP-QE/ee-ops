@@ -13,22 +13,10 @@ spec:
   rules:
     - backendRefs:
         - name: prow-deck
-          port: 8080
+          port: 80
     - matches:
         - path:
             value: /hook
       backendRefs:
         - name: prow-hook
-          port: 8080
-    - matches:
-        - path:
-            value: /tichi
-      backendRefs:
-        - name: prow-ti-community-owners
-          port: 8080
-    - matches:
-        - path:
-            value: /ti-community-owners
-      backendRefs:
-        - name: prow-hook
-          port: 8080
+          port: 80

@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../_base
   - namespace.yaml
+  - gateways.yaml
   - prow-crd.yaml
   - prow
   - tekton
