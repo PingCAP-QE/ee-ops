@@ -7,12 +7,12 @@ spec:
   listeners:
   - name: https
     protocol: HTTPS
-    port: 80
+    port: 443
     tls:
       mode: Terminate
       certificateRefs:
         - name: prow-tls
-          namesppace: apps
+          namespace: apps
   addresses:
   - type: NamedAddress
     value: ${INGRESS_STATIC_IP_NAME}
