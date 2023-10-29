@@ -65,7 +65,7 @@ controller:
     - artifactId: jenkins-pipeline-cache
       source:
         # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
-        url: https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.1.5/jenkins-pipeline-cache-0.1.5.hpi
+        url: https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
     - artifactId: ghprb
       source:
         # renovate: datasource=jenkins-plugins depName=ghprb
