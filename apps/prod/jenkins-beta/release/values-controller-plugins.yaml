@@ -40,7 +40,7 @@ controller:
     - artifactId: job-dsl
       source:
         # renovate: datasource=jenkins-plugins depName=job-dsl
-        version: 1.86
+        version: 1.87
     - artifactId: build-failure-analyzer
       source:
         url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
