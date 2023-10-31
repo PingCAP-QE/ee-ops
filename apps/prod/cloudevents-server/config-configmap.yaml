@@ -1,9 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: cloudevents-server-config
-data:
-  config.yaml: |
-    store:
-      driver: sqlite3
-      dsn: file:/data/ent.db?mode=rwc&_journal_mode=WAL&_fk=1
