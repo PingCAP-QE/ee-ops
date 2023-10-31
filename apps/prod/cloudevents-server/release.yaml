@@ -38,20 +38,14 @@ spec:
     nodeSelector:
       kubernetes.io/arch: amd64
     image:
-      repo: ghcr.io/pingcap-qe/ee-apps/cloudevents-server
-      tag: 9e2f4b4
+      repo: hub.pingcap.net/ee/apps/cloudevents-server
+      tag: v0.1.0-1-ga3d0cd3
     server:
       args: [--config=/config/config.yaml]
       volumeMounts:
         - name: config
           mountPath: /config
-        - name: data
-          mountPath: /data     
       volumes:
         - name: config
-          configMap:
-            name: cloudevents-server-config
-        - name: data
-          persistentVolumeClaim:
-            claimName: cloudevents-server-data
-
+          secret:
+            secretName: cloudevents-server-config
