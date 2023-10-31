@@ -48,7 +48,7 @@ spec:
         - name: CONTEXT
           value: dockerfiles/ci-runtimes/base/
         - name: DOCKERFILE
-          value: Dockerfile
+          value: ./Dockerfile
         - name: BUILDER_IMAGE
           value: "$(params.BUILDER_IMAGE)"
         - name: EXTRA_ARGS
@@ -69,7 +69,7 @@ spec:
         - name: CONTEXT
           value: dockerfiles/ci-runtimes/base/
         - name: DOCKERFILE
-          value: Dockerfile
+          value: ./Dockerfile
         - name: BUILDER_IMAGE
           value: "$(params.BUILDER_IMAGE)"
         - name: EXTRA_ARGS
