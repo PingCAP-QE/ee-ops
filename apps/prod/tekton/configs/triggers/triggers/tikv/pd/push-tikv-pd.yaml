@@ -1,0 +1,28 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: push-tikv-pd
+  labels:
+    type: github-branch-push
+    github-owner: tikv
+    github-repo: pd
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'tikv' && body.repository.name == 'pd'
+    - name: filter on branches
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^refs/heads/(master)$')
+  bindings:
+    - ref: github-branch-push
+  template:
+    ref: push-tikv-pd

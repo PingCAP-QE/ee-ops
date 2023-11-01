@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: push-pingcap-qe-artifacts
+  name: tag-create-pingcap-qe-artifacts
 spec:
   params:
     - name: git-url
@@ -13,11 +13,9 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: post-pingcap-qe-artifacts-run-
+        generateName: tag-create-pingcap-qe-artifacts-run-
         annotations:
           "tekton.dev/git-status": "true"
-          "tekton.dev/status-context": "demo-pipeline1"
-          "tekton.dev/status-description": "demo pipeline forwarded by prow"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
           "tekton.dev/git-repo": $(tt.params.git-url)
           "tekton.dev/git-revision": $(tt.params.git-revision)

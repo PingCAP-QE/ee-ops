@@ -7,6 +7,6 @@ spec:
     - name: git-url
       value: $(body.repository.clone_url)
     - name: git-ref
-      value: $(body.ref)
+      value: $(body.ref.substringAfter('refs/tags/')) # "refs/tags/vX.Y.Z" => "vX.Y.Z"
     - name: git-tag
       value: $(body.ref.substringAfter('refs/tags/')) # "refs/tags/vX.Y.Z" => "vX.Y.Z"
