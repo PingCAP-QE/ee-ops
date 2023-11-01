@@ -8,17 +8,17 @@ spec:
       type: string
     - name: git-revision
       default: main
-    # - name: IMAGE
-    #   description: Name (reference) of the image to build.
+    - name: IMAGE
+      description: Name (reference) of the image to build.
     - name: TAGS
       description: image tags to push additionally.
       default: "dev"
-    # - name: DOCKERFILE
-    #   description: Path to the Dockerfile to build.
-    #   default: ./Dockerfile
-    # - name: CONTEXT
-    #   description: The build context used by Kaniko.
-    #   default: ./
+    - name: DOCKERFILE
+      description: Path to the Dockerfile to build.
+      default: ./Dockerfile
+    - name: CONTEXT
+      description: The build context used by Kaniko.
+      default: ./
     - name: BUILDER_IMAGE
       description: The image on which builds will run.
       default: gcr.io/kaniko-project/executor:v1.9.1
@@ -37,18 +37,18 @@ spec:
       workspaces:
         - name: output
           workspace: git-source
-    - name: build-ci-base-amd64
+    - name: build-amd64
       runAfter:
         - fetch-from-git
       taskRef:
         name: kaniko
       params:
         - name: IMAGE
-          value: hub.pingcap.net/ee/ci/base
+          value: "$(params.IMAGE):building"
         - name: CONTEXT
-          value: dockerfiles/ci-runtimes/base/
+          value: "$(params.CONTEXT)"
         - name: DOCKERFILE
-          value: Dockerfile
+          value: "$(params.DOCKERFILE)"
         - name: BUILDER_IMAGE
           value: "$(params.BUILDER_IMAGE)"
         - name: EXTRA_ARGS
@@ -58,18 +58,18 @@ spec:
           workspace: git-source
         - name: dockerconfig
           workspace: dockerconfig
-    - name: build-ci-base-arm64
+    - name: build-arm64
       runAfter:
         - fetch-from-git
       taskRef:
         name: kaniko
       params:
         - name: IMAGE
-          value: hub.pingcap.net/ee/ci/base
+          value: "$(params.IMAGE):building"
         - name: CONTEXT
-          value: dockerfiles/ci-runtimes/base/
+          value: "$(params.CONTEXT)"
         - name: DOCKERFILE
-          value: Dockerfile
+          value: "$(params.DOCKERFILE)"
         - name: BUILDER_IMAGE
           value: "$(params.BUILDER_IMAGE)"
         - name: EXTRA_ARGS
@@ -81,19 +81,19 @@ spec:
           workspace: dockerconfig
     - name: mult-arch-push
       runAfter:
-        - build-ci-base-amd64
-        - build-ci-base-arm64
+        - build-amd64
+        - build-arm64
       taskRef:
         name: multi-arch-image-push
       params:
         - name: IMAGE
-          value: hub.pingcap.net/ee/ci/base
+          value: "$(params.IMAGE)"
         - name: tags
           value: "$(params.TAGS)"
         - name: platform-and-digest-list
           value:
-            - linux/amd64 => $(tasks.build-ci-base-amd64.results.IMAGE_DIGEST)
-            - linux/arm64 => $(tasks.build-ci-base-arm64.results.IMAGE_DIGEST)
+            - linux/amd64 => $(tasks.build-amd64.results.IMAGE_DIGEST)
+            - linux/arm64 => $(tasks.build-arm64.results.IMAGE_DIGEST)
       workspaces:
         - name: dockerconfig
           workspace: dockerconfig
