@@ -1,23 +1,20 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: tag-create-pingcap-qe-artifacts
+  name: push-tikv-pd
 spec:
   params:
     - name: git-url
       description: The git repository full url
     - name: git-revision
       description: The git revision
-      default: main
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: tag-create-pingcap-qe-artifacts-run-
+        generateName: push-build-tikv-pd-
         annotations:
           "tekton.dev/git-status": "true"
-          "tekton.dev/status-context": "demo-pipeline1"
-          "tekton.dev/status-description": "demo pipeline forwarded by prow"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
           "tekton.dev/git-repo": $(tt.params.git-url)
           "tekton.dev/git-revision": $(tt.params.git-revision)
@@ -30,17 +27,6 @@ spec:
               default: main
               type: string
           tasks:
-            - name: echo-good-morning
-              taskSpec:
-                metadata: {}
-                spec: null
-                steps:
-                  - image: ubuntu
-                    name: echo
-                    resources: {}
-                    script: |
-                      #!/usr/bin/env bash
-                      echo "Good Morning!"
             - name: checkout
               params:
                 - name: url
@@ -50,7 +36,7 @@ spec:
               taskRef:
                 kind: Task
                 name: git-clone
-            - name: echo-good-afternoon
+            - name: build-RC
               taskSpec:
                 metadata: {}
                 spec: null
@@ -60,7 +46,9 @@ spec:
                     resources: {}
                     script: |
                       #!/usr/bin/env bash
-                      echo "Good Afternoon!"
+
+                      echo "WIP, current not ready"
+
         params:
           - name: git-url
             value: $(tt.params.git-url)

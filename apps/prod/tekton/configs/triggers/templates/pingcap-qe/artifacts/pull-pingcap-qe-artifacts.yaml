@@ -16,8 +16,6 @@ spec:
         generateName: pull-pingcap-qe-artifacts-build-image-run-ci-base-
         annotations:
           "tekton.dev/git-status": "true"
-          "tekton.dev/status-context": "demo-pipeline1"
-          "tekton.dev/status-description": "demo pipeline forwarded by prow"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
           "tekton.dev/git-repo": $(tt.params.git-url)
           "tekton.dev/git-revision": $(tt.params.git-revision)
