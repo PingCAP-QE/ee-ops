@@ -1,0 +1,25 @@
+## You should run it firstly:
+## kubectl port-forward -n ee-cd svc/el-trigger-groups-listener 8080
+
+### tikv/pd: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "a1a1eea8dafd7918d583378790a4bb6c39a21f97",
+    "after": "01fb56b4f1eb0313e41c25ef08c1b543bd153d0e",
+    "ref_type": "branch",
+    "repository": {
+        "name": "pd",
+        "clone_url": "https://github.com/tikv/pd.git",
+        "owner": {
+            "login": "tikv"
+        }
+    }
+}
+
+### tikv/pd: create version tag
+## WIP

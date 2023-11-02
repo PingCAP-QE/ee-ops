@@ -35,12 +35,15 @@ spec:
           params:
             - name: eventTypes
               value: ["push"]
-        - name: "validate branch push"
+        # "refs/heads/main" => "main"
+        - name: shortten the git REF
           ref:
             name: cel
           params:
-            - name: filter
-              value: body.ref_type == 'branch'
+            - name: overlays
+              value:
+                - key: short-ref
+                  expression: body.ref.replace('refs/heads/', '')
       triggerSelector:
         namespaceSelector:
           matchNames:
