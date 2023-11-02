@@ -36,7 +36,7 @@ spec:
               taskRef:
                 kind: Task
                 name: git-clone
-            - name: build-RC
+            - name: build-rc
               taskSpec:
                 metadata: {}
                 spec: null
