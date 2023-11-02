@@ -9,4 +9,4 @@ spec:
     - name: git-revision
       value: $(body.after)
     - name: git-ref
-      value: $(body.ref.substringAfter('refs/heads/')) # "refs/heads/main" => "main"
+      value: $(extensions.short-ref)
