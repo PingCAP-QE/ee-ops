@@ -8,6 +8,8 @@ spec:
       description: The git repository full url
     - name: git-revision
       description: The git revision
+    - name: git-ref
+      description: The git branch 
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -19,38 +21,22 @@ spec:
           "tekton.dev/git-repo": $(tt.params.git-url)
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
-        pipelineSpec:
-          params:
-            - name: git-url
-              type: string
-            - name: git-revision
-              default: main
-              type: string
-          tasks:
-            - name: checkout
-              params:
-                - name: url
-                  value: $(params.git-url)
-                - name: revision
-                  value: $(params.git-revision)
-              taskRef:
-                kind: Task
-                name: git-clone
-            - name: build-rc
-              taskSpec:
-                metadata: {}
-                spec: null
-                steps:
-                  - image: ubuntu
-                    name: echo
-                    resources: {}
-                    script: |
-                      #!/usr/bin/env bash
-
-                      echo "WIP, current not ready"
-
+        pipelineRef:
+          name: push-tikv-pd-build
+        workspaces:
+          - name: source            
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 1Gi
         params:
           - name: git-url
             value: $(tt.params.git-url)
           - name: git-revision
             value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)

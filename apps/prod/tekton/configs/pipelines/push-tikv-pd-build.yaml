@@ -1,0 +1,99 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: push-tikv-pd-build
+spec:
+  params:
+    - name: git-url
+      type: string
+    - name: git-ref
+      type: string
+    - name: git-revision
+      default: main
+      type: string
+  workspaces:
+    - name: source
+      description: The workspace where the git repo will be cloned.
+  tasks:
+    - name: checkout
+      taskRef:
+        kind: Task
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: source
+    - name: generate-building-scripts
+      runAfter:
+        - checkout
+      matrix:
+        params:
+          - name: OS
+            value: [linux, darwin]
+          - name: ARCH
+            value:  [amd64, arm64]
+          - name: PROFILE
+            value: [release, debug]
+      params:
+        - name: REPO
+          value: $(params.repo)
+        - name: GIT_REF
+          value: $(params.git-ref)
+        - name: GIT_SHA
+          value: $(params.git-revision)
+      taskSpec:
+        params:
+          - name: REPO
+          - name: GIT_REF
+          - name: GIT_SHA
+          - name: OS
+            default: linux
+          - name: ARCH
+            default: amd64
+          - name: PROFILE
+            default: release
+        steps:
+          - name: Generate tarball building scripts
+            image: golang:1.21.3
+            script: |
+              #! /usr/bin/env bash
+
+              # set -e
+              # set -x
+
+              # git clone https://github.com/wuhuizuo/gomplate.git --branch feature/semver-functions
+              # cd gomplate
+              # go build ./cmd/gomplate
+              # install gomplate /usr/local/bin/
+              ${WORKSPACE}/scripts/pingcap/release/build-package-artifacts-with-config.sh $(params.REPO) ${params.OS} $(params.ARCH) \
+                $(git describe --tags --always --dirty) $(params.PROFILE) $(params.GIT_REF) $(params.GIT_SHA) \
+                build-package-artifacts.sh
+          - name: Generate image building scripts
+            image: golang:1.21.3
+            script: |
+              #! /usr/bin/env bash
+
+              set -e
+              set -x
+
+              git clone https://github.com/wuhuizuo/gomplate.git --branch feature/semver-functions
+              cd gomplate
+              go build ./cmd/gomplate
+              install gomplate /usr/local/bin/
+
+              ${WORKSPACE}/scripts/pingcap/release/build-package-images-with-config.sh $(params.REPO) ${params.OS} $(params.ARCH) \
+                $(git describe --tags --always --dirty) $(params.PROFILE) $(params.GIT_REF) $(params.GIT_SHA) \
+                build-package-images.sh"
+          - name: Execute tarball building script
+            image: golang:1.21.3
+            script: |
+              ./build-package-artifacts.sh ${RELEASE_WS} true
+          - name: Execute image building script
+            image: gcr.io/kaniko-project/executor:debug
+            script: |
+              # no need to run steps
+              ./build-package-images.sh ${RELEASE_WS} ${RELEASE_TAG}-$(params.PROFILE)-$(params.ARCH) /kaniko/executor false
