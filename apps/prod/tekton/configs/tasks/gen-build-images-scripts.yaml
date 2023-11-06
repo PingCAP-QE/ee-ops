@@ -1,0 +1,51 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: generate-building-scripts-for-images
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
+spec:
+  params:
+    - name: component
+    - name: os
+      default: linux
+    - name: arch
+      default: amd64
+    - name: version
+      type: string
+      description: the version to releasing.
+    - name: profile
+      type: string
+      default: release
+      description: >
+        supports: 'release' or 'debug'.
+    - name: git-ref
+    - name: git-sha
+    - name: build-image
+      default: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
+  results:
+    - name: generated-scripts
+      description: the generated build script files.
+  steps:
+    - name: fetch-artifacts-configuration
+      image: bitnami/git:2.42.1
+      workingDir: /workspace
+      script: |
+        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git
+    - name: generate-scripts
+      image: "$(params.build-image)"
+      workingDir: /workspace
+      command:
+        - /workspace/artifacts/packages/scripts/build-package-images-with-config.sh
+      args:
+        - $(params.component)
+        - $(params.os)
+        - $(params.arch)
+        - $(params.version)
+        - $(params.profile)
+        - $(params.git-ref)
+        - $(params.git-sha)
+        - /workspace/artifacts/packages/packages.yaml.tmpl
+        - $(results.generated-scripts.path)

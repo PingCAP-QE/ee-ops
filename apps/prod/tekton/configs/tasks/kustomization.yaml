@@ -4,6 +4,8 @@ namespace: ee-cd
 resources:
   - create-pr-to-sync-owners.yaml
   - echo.yaml
+  - gen-build-binaries-scripts.yaml
+  - gen-build-images-scripts.yaml
   - git-clone.yaml
   - github-set-status.yaml
   - golang-build.yaml
