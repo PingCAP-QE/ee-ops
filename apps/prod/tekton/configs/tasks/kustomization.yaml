@@ -16,3 +16,5 @@ resources:
   - ko-test-infra.yaml
   - kubernetes-actions.yaml
   - multi-arch-image-push.yaml # multi-arch-image-push task
+  - run-build-binaries-scripts.yaml
+  - run-build-images-scripts.yaml
