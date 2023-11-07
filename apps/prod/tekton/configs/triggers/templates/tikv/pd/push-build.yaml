@@ -9,7 +9,7 @@ spec:
     - name: git-revision
       description: The git revision
     - name: git-ref
-      description: The git branch 
+      description: The git branch
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -24,7 +24,7 @@ spec:
         pipelineRef:
           name: push-tikv-pd-build
         workspaces:
-          - name: source            
+          - name: source
             volumeClaimTemplate:
               spec:
                 storageClassName: ceph-block
@@ -33,6 +33,15 @@ spec:
                 resources:
                   requests:
                     storage: 1Gi
+          - name: gen-build-scripts
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 100Mi
         params:
           - name: git-url
             value: $(tt.params.git-url)

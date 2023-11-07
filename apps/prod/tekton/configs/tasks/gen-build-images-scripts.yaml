@@ -7,6 +7,8 @@ metadata:
   annotations:
     tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
+  workspaces:
+    - name: output
   params:
     - name: component
     - name: os
@@ -24,28 +26,26 @@ spec:
     - name: git-ref
     - name: git-sha
     - name: build-image
-      default: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
-  results:
-    - name: generated-scripts
-      description: the generated build script files.
+      default: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+    - name: save-file
+      default: build-package-images.sh
   steps:
-    - name: fetch-artifacts-configuration
-      image: bitnami/git:2.42.1
+    - name: generate
+      image: "$(params.build-image)"
       workingDir: /workspace
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git
-    - name: generate-scripts
-      image: "$(params.build-image)"
-      workingDir: /workspace
-      command:
-        - /workspace/artifacts/packages/scripts/build-package-images-with-config.sh
-      args:
-        - $(params.component)
-        - $(params.os)
-        - $(params.arch)
-        - $(params.version)
-        - $(params.profile)
-        - $(params.git-ref)
-        - $(params.git-sha)
-        - /workspace/artifacts/packages/packages.yaml.tmpl
-        - $(results.generated-scripts.path)
+
+        /workspace/artifacts/packages/scripts/build-package-images-with-config.sh \
+          $(params.component) \
+          $(params.os) \
+          $(params.arch) \
+          $(params.version) \
+          $(params.profile) \
+          $(params.git-ref) \
+          $(params.git-sha) \
+          /workspace/artifacts/packages/packages.yaml.tmpl \
+          $(workspaces.output.path)/$(params.save-file)
+
+        cat $(workspaces.output.path)/$(params.save-file)
+
