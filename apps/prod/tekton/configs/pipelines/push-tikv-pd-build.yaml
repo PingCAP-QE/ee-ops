@@ -12,6 +12,8 @@ spec:
       default: main
       type: string
   workspaces:
+    - name: dockerconfig
+      description: Includes a docker `config.json`
     - name: source
       description: The workspace where the git repo will be cloned.
     - name: gen-build-scripts
@@ -27,7 +29,7 @@ spec:
         - name: revision
           value: $(params.git-revision)
         - name: depth
-          value: '0'
+          value: "0"
         - name: refspec
           value: +refs/heads/$(params.git-ref):refs/remotes/origin/$(params.git-ref)
       workspaces:
@@ -115,5 +117,52 @@ spec:
           value: $(params.git-revision)
       workspaces:
         - name: output
-          workspace: gen-build-scripts          
-    # - name: builds
+          workspace: gen-build-scripts
+    - name: run-building-scripts-for-tarballs
+      taskRef:
+        # TODO: is there a sulution to push for multi platforms.
+        name: run-building-scripts-for-tarballs
+      runAfter:
+        - generate-building-scripts-for-tarballs
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      params:
+        - name: release-dir
+          value: build
+        - name: run-script-file
+          value: build-package-artifacts.sh
+        - name: need-build
+          value: "true"
+        - name: build-image
+          # value: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
+          value: ghcr.io/pingcap-qe/ci/release-build-base:v20231107-4086b32-go1.21_linux_amd64
+      workspaces:
+        - name: source
+          workspace: source
+        - name: build-scripts
+          workspace: gen-build-scripts
+    - name: run-building-scripts-for-images
+      taskRef:
+        # TODO: can we skaffold to make it simpler?
+        name: run-building-scripts-for-images
+      runAfter:
+        - generate-building-scripts-for-images
+        - run-building-scripts-for-tarballs
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      params:
+        - name: release-dir
+          value: build
+        - name: run-script-file
+          value: build-package-images.sh
+        - name: need-build
+          value: "false"
+        - name: build-image
+          value: gcr.io/kaniko-project/executor:debug
+        - name: tag
+          value: "$(tasks.get-release-ver.results.version)-release_linux_amd64"
+      workspaces:
+        - name: source
+          workspace: source
+        - name: build-scripts
+          workspace: gen-build-scripts
+        - name: dockerconfig
+          workspace: dockerconfig

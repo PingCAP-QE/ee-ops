@@ -24,6 +24,9 @@ spec:
         pipelineRef:
           name: push-tikv-pd-build
         workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
           - name: source
             volumeClaimTemplate:
               spec:
@@ -49,3 +52,8 @@ spec:
             value: $(tt.params.git-revision)
           - name: git-ref
             value: $(tt.params.git-ref)
+        taskRunSpecs:
+          - pipelineTaskName: run-building-scripts-for-tarballs
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
