@@ -446,7 +446,7 @@ registry:
   controller:
     image:
       repository: goharbor/harbor-registryctl
-      tag: v2.9.0
+      tag: v2.9.1
 
     # resources:
     #  requests:
