@@ -1,0 +1,168 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: push-tikv-pd-build
+spec:
+  params:
+    - name: git-url
+      type: string
+    - name: git-ref
+      type: string
+    - name: git-revision
+      default: main
+      type: string
+  workspaces:
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+    - name: source
+      description: The workspace where the git repo will be cloned.
+    - name: gen-build-scripts
+      description: The build scripts will be generated in this workspace.
+  tasks:
+    - name: checkout
+      taskRef:
+        kind: Task
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+        - name: depth
+          value: "0"
+        - name: refspec
+          value: +refs/heads/$(params.git-ref):refs/remotes/origin/$(params.git-ref)
+      workspaces:
+        - name: output
+          workspace: source
+    - name: get-release-ver
+      taskSpec:
+        results:
+          - name: version
+            description: The release version of the git repo
+        workspaces:
+          - name: source
+        steps:
+          - name: git-describe
+            image: alpine/git:2.40.1
+            workingDir: $(workspaces.source.path)
+            script: |
+              RESULT_VERSION="$(git describe --tags --always --dirty)"
+              printf "%s" "${RESULT_VERSION}" > $(results.version.path)
+      runAfter:
+        - checkout
+      workspaces:
+        - name: source
+          workspace: source
+    - name: generate-building-scripts-for-tarballs
+      taskRef:
+        name: generate-building-scripts-for-tarballs
+      runAfter:
+        - get-release-ver
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      # matrix:
+      #   params:
+      #     - name: os
+      #       value: [linux, darwin]
+      #     - name: arch
+      #       value: [amd64, arm64]
+      #     - name: profile
+      #       value: [release, debug]
+      params:
+        - name: os
+          value: linux
+        - name: arch
+          value: amd64
+        - name: profile
+          value: release
+        - name: component
+          value: pd
+        - name: version
+          value: "$(tasks.get-release-ver.results.version)"
+        - name: git-ref
+          value: $(params.git-ref)
+        - name: git-sha
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: gen-build-scripts
+    - name: generate-building-scripts-for-images
+      taskRef:
+        name: generate-building-scripts-for-images
+      runAfter:
+        - get-release-ver
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      # matrix:
+      #   params:
+      #     - name: os
+      #       value: [linux, darwin]
+      #     - name: arch
+      #       value: [amd64, arm64]
+      #     - name: profile
+      #       value: [release, debug]
+      params:
+        - name: os
+          value: linux
+        - name: arch
+          value: amd64
+        - name: profile
+          value: release
+        - name: component
+          value: pd
+        - name: version
+          value: "$(tasks.get-release-ver.results.version)"
+        - name: git-ref
+          value: $(params.git-ref)
+        - name: git-sha
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: gen-build-scripts
+    - name: run-building-scripts-for-tarballs
+      taskRef:
+        # TODO: is there a sulution to push for multi platforms.
+        name: run-building-scripts-for-tarballs
+      runAfter:
+        - generate-building-scripts-for-tarballs
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      params:
+        - name: release-dir
+          value: build
+        - name: run-script-file
+          value: build-package-artifacts.sh
+        - name: need-build
+          value: "true"
+        - name: build-image
+          # value: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
+          value: ghcr.io/pingcap-qe/ci/release-build-base:v20231107-4086b32-go1.21_linux_amd64
+      workspaces:
+        - name: source
+          workspace: source
+        - name: build-scripts
+          workspace: gen-build-scripts
+    - name: run-building-scripts-for-images
+      taskRef:
+        # TODO: can we skaffold to make it simpler?
+        name: run-building-scripts-for-images
+      runAfter:
+        - generate-building-scripts-for-images
+        - run-building-scripts-for-tarballs
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      params:
+        - name: release-dir
+          value: build
+        - name: run-script-file
+          value: build-package-images.sh
+        - name: need-build
+          value: "false"
+        - name: build-image
+          value: gcr.io/kaniko-project/executor:debug
+        - name: tag
+          value: "$(tasks.get-release-ver.results.version)-release_linux_amd64"
+      workspaces:
+        - name: source
+          workspace: source
+        - name: build-scripts
+          workspace: gen-build-scripts
+        - name: dockerconfig
+          workspace: dockerconfig

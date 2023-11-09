@@ -4,6 +4,8 @@ namespace: ee-cd
 resources:
   - create-pr-to-sync-owners.yaml
   - echo.yaml
+  - gen-build-binaries-scripts.yaml
+  - gen-build-images-scripts.yaml
   - git-clone.yaml
   - github-set-status.yaml
   - golang-build.yaml
@@ -13,4 +15,6 @@ resources:
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml
   - ko-test-infra.yaml
   - kubernetes-actions.yaml
-  - multi-arch-image-push.yaml # multi-arch-image-push task
+  - multi-arch-image-push.yaml
+  - run-build-binaries-scripts.yaml
+  - run-build-images-scripts.yaml
