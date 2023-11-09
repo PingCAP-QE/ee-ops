@@ -157,8 +157,6 @@ spec:
           value: "false"
         - name: build-image
           value: gcr.io/kaniko-project/executor:debug
-        - name: tag
-          value: "$(tasks.get-release-ver.results.version)-release_linux_amd64"
       workspaces:
         - name: source
           workspace: source

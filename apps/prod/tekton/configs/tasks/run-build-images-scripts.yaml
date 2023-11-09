@@ -22,8 +22,6 @@ spec:
   params:
     - name: release-dir
       default: build
-    - name: tag
-      default: amd64
     - name: build-image
       default: gcr.io/kaniko-project/executor:debug
     - name: kaniko-executor
