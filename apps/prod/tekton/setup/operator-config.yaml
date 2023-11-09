@@ -46,7 +46,7 @@ spec:
     resources:
       - taskrun
       - pipelinerun
-    keep: 100
+    keep: 10
     schedule: "0 * * * *" # hourly
   hub:
     params:
