@@ -5,3 +5,4 @@ resources:
   - nginx
   - rook-ceph
   - nfs-pvc-provisioner
+  - secret-generator

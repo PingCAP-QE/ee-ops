@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: tekton-results
+  namespace: tekton-pipelines
+spec:
+  selfSigned: {}
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tekton-results-cert
+  namespace: tekton-pipelines
+spec:
+  dnsNames:
+    - tekton-results-api-service.tekton-pipelines.svc.cluster.local
+  secretName: tekton-results-tls
+  issuerRef:
+    name: tekton-results-selfsigned
