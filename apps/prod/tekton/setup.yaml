@@ -19,7 +19,7 @@ spec:
           path: /metadata/annotations
           value:
             scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated", "value": "test-infra"}]'
-            scheduler.alpha.kubernetes.io/node-selector: enable-ci=true
+            scheduler.alpha.kubernetes.io/node-selector: enable-ci=true,kubernetes.io/arch=amd64
 
   prune: true
   healthChecks:
@@ -56,3 +56,19 @@ spec:
       name: tekton-dashboard
       namespace: tekton-pipelines
   timeout: 5m0s
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: tekton-results-setup
+  namespace: apps
+spec:
+  dependsOn:
+    - name: tekton-setup
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/prod/tekton/setup/results
+  prune: true

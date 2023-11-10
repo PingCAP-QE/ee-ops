@@ -6,5 +6,5 @@ resources:
   # - https://github.com/tektoncd/operator/releases/download/v0.60.1/release.yaml
   # we fixed the image tag to make it runable on arm64 nodes:
   #   gcr.io/tekton-releases/dogfooding/tkn
-  - operator-release.yaml 
+  - operator-release.yaml
   - operator-config.yaml
