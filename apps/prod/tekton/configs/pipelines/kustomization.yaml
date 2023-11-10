@@ -4,5 +4,4 @@ namespace: ee-cd
 resources:
   - kaniko-build.yaml
   - ko-build-test-infra.yaml
-  - pull-pingcap-qe-artifacts-build-image.yaml
-  - push-tikv-pd-build.yaml
+  - push-build-package.yaml
