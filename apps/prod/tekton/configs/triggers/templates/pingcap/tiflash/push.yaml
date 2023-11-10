@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: push-tikv-pd
+  name: push-pingcap-tiflash
 spec:
   params:
     - name: git-url
@@ -14,7 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-tikv-pd-
+        generateName: push-build-package-pingcap-tiflash-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -22,7 +22,16 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: push-tikv-pd-build
+          name: push-build-package
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: tiflash
         workspaces:
           - name: dockerconfig
             secret:
@@ -45,13 +54,6 @@ spec:
                 resources:
                   requests:
                     storage: 100Mi
-        params:
-          - name: git-url
-            value: $(tt.params.git-url)
-          - name: git-revision
-            value: $(tt.params.git-revision)
-          - name: git-ref
-            value: $(tt.params.git-ref)
         taskRunSpecs:
           - pipelineTaskName: run-building-scripts-for-tarballs
             taskPodTemplate:

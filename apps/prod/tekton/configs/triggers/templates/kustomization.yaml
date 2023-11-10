@@ -1,10 +1,15 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - pingcap/branch-create-product-components-hotfix.yaml
   - pingcap-qe/artifacts/branch-create-pingcap-qe-artifacts.yaml
   - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
   - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml
   - pingcap-qe/artifacts/tag-create-pingcap-qe-artifacts.yaml
-  - tikv/pd/push-build.yaml
+  - pingcap/branch-create-product-components-hotfix.yaml
+  - pingcap/tidb/push.yaml
+  - pingcap/tiflash/push.yaml
+  - pingcap/tiflow/push.yaml
+  - tikv/pd/push.yaml
   - tikv/pd/tag-build.yaml
+  - tikv/tikv/push.yaml
+
