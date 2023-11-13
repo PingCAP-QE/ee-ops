@@ -3,9 +3,9 @@ kind: Task
 metadata:
   name: git-clone
   labels:
-    app.kubernetes.io/version: "0.6"
+    app.kubernetes.io/version: "0.9"
   annotations:
-    tekton.dev/pipelines.minVersion: "0.29.0"
+    tekton.dev/pipelines.minVersion: "0.38.0"
     tekton.dev/categories: Git
     tekton.dev/tags: git
     tekton.dev/displayName: "git clone"
@@ -67,6 +67,10 @@ spec:
       description: Set the `http.sslVerify` global git config. Setting this to `false` is not advised unless you are sure that you trust your git remote.
       type: string
       default: "true"
+    - name: crtFileName
+      description: file name of mounted crt using ssl-ca-directory workspace. default value is ca-bundle.crt.
+      type: string
+      default: "ca-bundle.crt"
     - name: subdirectory
       description: Subdirectory inside the `output` Workspace to clone the repo into.
       type: string
@@ -110,6 +114,9 @@ spec:
       description: The precise commit SHA that was fetched by this Task.
     - name: url
       description: The precise URL that was fetched by this Task.
+    - name: committer-date
+      description:
+        The epoch timestamp of the commit that was fetched by this Task.
   steps:
     - name: clone
       image: "$(params.gitInitImage)"
@@ -128,6 +135,8 @@ spec:
           value: $(params.depth)
         - name: PARAM_SSL_VERIFY
           value: $(params.sslVerify)
+        - name: PARAM_CRT_FILENAME
+          value: $(params.crtFileName)
         - name: PARAM_SUBDIRECTORY
           value: $(params.subdirectory)
         - name: PARAM_DELETE_EXISTING
@@ -158,6 +167,8 @@ spec:
           value: $(workspaces.ssl-ca-directory.bound)
         - name: WORKSPACE_SSL_CA_DIRECTORY_PATH
           value: $(workspaces.ssl-ca-directory.path)
+        - name: GIT_SSH_COMMAND
+          value: "ssh -o StrictHostKeyChecking=accept-new"
       script: |
         #!/usr/bin/env sh
         set -eu
@@ -165,7 +176,6 @@ spec:
         if [ "${PARAM_VERBOSE}" = "true" ] ; then
           set -x
         fi
-
 
         if [ "${WORKSPACE_BASIC_AUTH_DIRECTORY_BOUND}" = "true" ] ; then
           cp "${WORKSPACE_BASIC_AUTH_DIRECTORY_PATH}/.git-credentials" "${PARAM_USER_HOME}/.git-credentials"
@@ -182,6 +192,9 @@ spec:
 
         if [ "${WORKSPACE_SSL_CA_DIRECTORY_BOUND}" = "true" ] ; then
            export GIT_SSL_CAPATH="${WORKSPACE_SSL_CA_DIRECTORY_PATH}"
+           if [ "${PARAM_CRT_FILENAME}" != "" ] ; then
+              export GIT_SSL_CAINFO="${WORKSPACE_SSL_CA_DIRECTORY_PATH}/${PARAM_CRT_FILENAME}"
+           fi
         fi
         CHECKOUT_DIR="${WORKSPACE_OUTPUT_PATH}/${PARAM_SUBDIRECTORY}"
 
@@ -201,13 +214,14 @@ spec:
         }
 
         if [ "${PARAM_DELETE_EXISTING}" = "true" ] ; then
-          cleandir
+          cleandir || true
         fi
 
         test -z "${PARAM_HTTP_PROXY}" || export HTTP_PROXY="${PARAM_HTTP_PROXY}"
         test -z "${PARAM_HTTPS_PROXY}" || export HTTPS_PROXY="${PARAM_HTTPS_PROXY}"
         test -z "${PARAM_NO_PROXY}" || export NO_PROXY="${PARAM_NO_PROXY}"
 
+        git config --global --add safe.directory "${WORKSPACE_OUTPUT_PATH}"
         /ko-app/git-init \
           -url="${PARAM_URL}" \
           -revision="${PARAM_REVISION}" \
@@ -223,5 +237,7 @@ spec:
         if [ "${EXIT_CODE}" != 0 ] ; then
           exit "${EXIT_CODE}"
         fi
+        RESULT_COMMITTER_DATE="$(git log -1 --pretty=%ct)"
+        printf "%s" "${RESULT_COMMITTER_DATE}" > "$(results.committer-date.path)"
         printf "%s" "${RESULT_SHA}" > "$(results.commit.path)"
         printf "%s" "${PARAM_URL}" > "$(results.url.path)"

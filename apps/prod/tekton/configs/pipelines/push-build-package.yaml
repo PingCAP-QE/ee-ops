@@ -31,6 +31,9 @@ spec:
       description: The workspace where the git repo will be cloned.
     - name: gen-build-scripts
       description: The build scripts will be generated in this workspace.
+    - name: git-credentials
+      description: secret contains ssh private key in `id_rsa` key.
+      optional: true
   tasks:
     - name: checkout
       taskRef:
@@ -48,6 +51,8 @@ spec:
       workspaces:
         - name: output
           workspace: source
+        - name: ssh-directory
+          workspace: git-credentials
     - name: get-release-ver
       taskSpec:
         results:
