@@ -21,5 +21,45 @@ X-GitHub-Event: push
     }
 }
 
+### pingcap/tiflow: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "db3a2ddccde9cae2ed8ff3015e4e869d7a9aa7fd",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tiflow",
+        "clone_url": "https://github.com/pingcap/tiflow.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
+
+### pingcap/tidb: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "85eeeea5bfc484879701d3675c92b9138f7da48d",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tidb",
+        "clone_url": "https://github.com/pingcap/tidb.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
+
 ### tikv/pd: create version tag
 ## WIP
