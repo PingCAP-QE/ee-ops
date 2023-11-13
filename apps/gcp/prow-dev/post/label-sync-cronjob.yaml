@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  namespace: apps
+  namespace: apps-dev
   name: prow-label-sync
 spec:
   schedule: "@hourly"

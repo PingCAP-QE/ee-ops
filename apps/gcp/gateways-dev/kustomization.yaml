@@ -1,6 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: apps-dev
 resources:
-  - gotk-components.yaml
-  - gotk-sync.yaml
-  - notification.yaml
+  - gke-gateway.yaml

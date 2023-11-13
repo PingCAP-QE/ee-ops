@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   releaseName: prow
-  targetNamespace: apps
+  targetNamespace: apps-dev
   chart:
     spec:
       chart: prow
