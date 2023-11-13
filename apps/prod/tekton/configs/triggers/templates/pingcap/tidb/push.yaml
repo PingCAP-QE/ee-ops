@@ -54,6 +54,9 @@ spec:
                 resources:
                   requests:
                     storage: 100Mi
+          - name: git-credentials
+            secret:
+              secretName: git-credentials
         taskRunSpecs:
           - pipelineTaskName: run-building-scripts-for-tarballs
             taskPodTemplate:
