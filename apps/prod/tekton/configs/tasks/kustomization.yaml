@@ -18,3 +18,4 @@ resources:
   - multi-arch-image-push.yaml
   - run-build-binaries-scripts.yaml
   - run-build-images-scripts.yaml
+  - oras-push.yaml

@@ -1,0 +1,52 @@
+
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: oras-push
+  namespace: tekton-pipelines
+  labels:
+    app.kubernetes.io/version: "0.1"
+spec:
+  description: Push an artifact to a registry using oras
+  workspaces:
+    - name: source
+      readOnly: true
+  params:
+    - name: file
+      type: string
+      description: >
+        The file to push, it can be glob expression, such as: *.tar.gz
+    - name: destination
+    - name: credential-secret
+    - name: credential-secret-user-key
+      default: username
+    - name: credential-secret-password-key
+      default: password
+    - name: artifact-type
+      default: application/gzip
+  volumes:
+    - name: credential
+      secret:
+        secretName: $(params.credential-secret)
+        items:
+          - key: $(params.credential-secret-user-key)
+            path: username
+          - key: $(params.credential-secret-password-key)
+            path: password
+  steps:
+    - name: push
+      image: ghcr.io/oras-project/oras:v1.1.0
+      volumeMounts:
+        - name: credential
+          mountPath: /etc/oras
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/usr/bin/env bash
+        set -e
+        set -x
+
+        oras version
+
+        registry=$(echo $(params.destination) | cut -d/ -f)
+        oras login -u "$(cat /etc/oras/user)" -p "$(cat /etc/oras/password)" ${registry}
+        oras push $(params.destination) --artifact-type $(params.artifact-type) $(params.file)
