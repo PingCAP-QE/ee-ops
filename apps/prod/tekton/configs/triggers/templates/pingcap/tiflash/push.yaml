@@ -32,6 +32,8 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: tiflash
+          - name: builder-image
+            value: hub.pingcap.net/ee/ci/release-build-base-tiflash:v20230731
         workspaces:
           - name: dockerconfig
             secret:

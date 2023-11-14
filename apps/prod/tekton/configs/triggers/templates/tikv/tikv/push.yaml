@@ -32,6 +32,8 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: tikv
+          - name: builder-image
+            value: hub.pingcap.net/ee/ci/release-build-base-tikv:v20230804
         workspaces:
           - name: dockerconfig
             secret:
