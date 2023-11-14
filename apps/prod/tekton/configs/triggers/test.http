@@ -61,5 +61,42 @@ X-GitHub-Event: push
     }
 }
 
-### tikv/pd: create version tag
-## WIP
+### pingcap/tiflash: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "1addc37a549f23310bbe36f5bc75853bd6508ffd",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tiflash",
+        "clone_url": "https://github.com/pingcap/tiflash.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
+
+### tikv/tikv: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "a50e36052a8c3c470b6ba96ab515c7a7ab067525",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tikv",
+        "clone_url": "https://github.com/tikv/tikv.git",
+        "owner": {
+            "login": "tikv"
+        }
+    }
+}
