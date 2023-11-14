@@ -158,6 +158,25 @@ spec:
           workspace: source
         - name: build-scripts
           workspace: gen-build-scripts
+    - name: puash-tarballs-to-oci
+      taskRef:
+        name: oras-push
+      runAfter:
+        - run-building-scripts-for-tarballs
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      params:
+        - name: artifacts
+          value: "*.tar.gz"
+        - name: context
+          value: build
+        - name: destination
+          # TODO: upload in the run task.
+          value: hub.pingcap.net/ee-debug/hello-$(params.component):$(tasks.get-release-ver.results.version)
+      workspaces:
+        - name: source
+          workspace: source
+        - name: build-scripts
+          workspace: gen-build-scripts          
     - name: run-building-scripts-for-images
       taskRef:
         # TODO: can we skaffold to make it simpler?

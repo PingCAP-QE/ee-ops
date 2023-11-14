@@ -3,7 +3,6 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: oras-push
-  namespace: tekton-pipelines
   labels:
     app.kubernetes.io/version: "0.1"
 spec:
@@ -12,10 +11,14 @@ spec:
     - name: source
       readOnly: true
   params:
-    - name: file
+    - name: artifacts
       type: string
       description: >
         The file to push, it can be glob expression, such as: *.tar.gz
+        relative to context path.
+    - name: context
+      default: ./
+      description: where the artifacts file in.
     - name: destination
     - name: credential-secret
     - name: credential-secret-user-key
@@ -49,4 +52,5 @@ spec:
 
         registry=$(echo $(params.destination) | cut -d/ -f)
         oras login -u "$(cat /etc/oras/user)" -p "$(cat /etc/oras/password)" ${registry}
+        cd $(params.context)
         oras push $(params.destination) --artifact-type $(params.artifact-type) $(params.file)
