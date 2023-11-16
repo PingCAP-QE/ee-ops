@@ -20,7 +20,7 @@ spec:
         app: tibuild
     spec:
       containers:
-      - image: hub.pingcap.net/tibuild/tibuild:ba975d9
+      - image: hub.pingcap.net/tibuild/tibuild:cdc8ca9
         imagePullPolicy: Always
         name: tibuild
         ports:
