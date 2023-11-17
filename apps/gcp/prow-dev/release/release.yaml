@@ -1,11 +1,11 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: prow
+  name: prow-dev
   namespace: flux-system
 spec:
   releaseName: prow
-  targetNamespace: apps
+  targetNamespace: apps-dev
   chart:
     spec:
       chart: prow

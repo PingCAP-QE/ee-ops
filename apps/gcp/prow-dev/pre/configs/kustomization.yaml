@@ -2,30 +2,30 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 configMapGenerator:
   - name: prow-config
-    namespace: apps
+    namespace: apps-dev
     options:
       disableNameSuffixHash: true
     files:
       - config.yaml
   - name: prow-plugin
-    namespace: apps
+    namespace: apps-dev
     options:
       disableNameSuffixHash: true
     files:
       - plugins.yaml
   - name: prow-labels
-    namespace: apps
+    namespace: apps-dev
     options:
       disableNameSuffixHash: true
     files:
       - labels.yaml
   - name: prow-job
-    namespace: apps
+    namespace: apps-dev
     options:
       disableNameSuffixHash: true
     files: []
   - name: prow-external-plugins-config
-    namespace: apps
+    namespace: apps-dev
     options:
       disableNameSuffixHash: true
     files:

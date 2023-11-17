@@ -1,5 +1,5 @@
 # TODO: (@wuhuizuo) add json schema.
-prowjob_namespace: apps
+prowjob_namespace: apps-dev
 pod_namespace: ${TEST_PODS_NAMESPACE}
 log_level: trace
 

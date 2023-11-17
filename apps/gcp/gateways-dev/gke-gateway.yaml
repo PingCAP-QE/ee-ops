@@ -12,7 +12,7 @@ spec:
       mode: Terminate
       certificateRefs:
         - name: prow-tls
-          namespace: apps
+          namespace: apps-dev
   addresses:
   - type: NamedAddress
     value: ${INGRESS_STATIC_IP_NAME}

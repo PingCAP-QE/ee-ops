@@ -3,13 +3,13 @@ apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
   name: tekton-setup
-  namespace: apps
+  namespace: apps-dev
 spec:
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/dev/tekton/setup
+  path: ./apps/gcp/tekton-dev/setup
   interval: 1m0s
   prune: true
   wait: false
@@ -50,7 +50,7 @@ spec:
   postBuild:
     substituteFrom:
       - kind: Secret
-        name: tekton-ingress # should manual created in namespace `apps`
+        name: tekton-ingress # should manual created in namespace `apps-dev`
         optional: true
   images:
     - name: gcr.io/tekton-nightly/github.com/tektoncd/experimental/pipelines-in-pipelines/cmd/controller
