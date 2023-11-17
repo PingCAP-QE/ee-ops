@@ -32,6 +32,19 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: tiflash
+          - name: binary-builder-iamge
+            value: ghcr.io/pingcap-qe/cd/builders/tiflash:v20231115-e1c4b43-go1.21_linux_amd64
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: 2h
         workspaces:
           - name: dockerconfig
             secret:
@@ -45,17 +58,3 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
-          - name: gen-build-scripts
-            volumeClaimTemplate:
-              spec:
-                storageClassName: ceph-block
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 100Mi
-        taskRunSpecs:
-          - pipelineTaskName: run-building-scripts-for-tarballs
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64

@@ -43,6 +43,8 @@ spec:
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: 2h
         workspaces:
           - name: dockerconfig
             secret:
