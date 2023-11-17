@@ -15,6 +15,9 @@ spec:
       description: Includes a docker `config.json`
       mountPath: /root/.docker
       optional: true
+    - name: ssh-directory
+      optional: true
+      description: ssh credential for remote building on mac.
   results:
     - description: The package artifacts
       name: package-artifacts
@@ -62,9 +65,58 @@ spec:
         cat /workspace/build-package-artifacts.sh
     - name: build
       image: "$(params.builder-image)"
+      env:
+        - name: WORKSPACE_SSH_DIRECTORY_BOUND
+          value: $(workspaces.ssh-directory.bound)
       workingDir: $(workspaces.source.path)
+      # TODO: get the user and host by better way. 
       script: |
-        /workspace/build-package-artifacts.sh -b -a -w "$(params.release-dir)"
+        if ["$(params.os)" == "darwin"]; then
+          ##### Build mac targets in tekton task (k8s pod) ####
+          
+          # 0. got the go version(x.y) from the current container with `go version`.
+          go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin
+          
+          # 1. select a mac idle mac machine, if all busy, random one with correct arch.
+          username=$(cat ~/.ssh/username)
+          host=$(cat ~/.ssh/host)
+          workspace_base_dir="/Users/pingcap/workspace"
+
+          # 1.1 Set ssh credentials
+          if [ "${WORKSPACE_SSH_DIRECTORY_BOUND}" = "true" ] ; then
+            cp -R "${WORKSPACE_SSH_DIRECTORY_PATH}" ~/.ssh
+            chmod 700 ~/.ssh
+            chmod -R 400 ~/.ssh/*
+          fi
+
+          # 2. login to the mac with ssh and then execute the shell.
+          # 2.1 create a randon workspace dir in the remote host:
+          remote_workspace_dir="${workspace_base_dir}/$(uuid)"
+          ssh ${username}@${host} "mkdir -p '$remote_workspace_dir'"
+          
+          # 2.2 copy the build shell to the mac host by ssh.
+          scp /workspace/build-package-artifacts.sh ${username}@${host}:"$remote_workspace_dir/"
+          
+          # 2.3 copy source codes from workspace `source` to the mac host by ssh.
+          scp -r $(workspaces.source.path) ${username}@${host}:"$remote_workspace_dir/"
+          remote_workspace_source_path="$remote_workspace_dir/$(basename $(workspaces.source.path))"
+
+          # 2.4 run the shell on the mac host by ssh.
+          ssh <root>@<host> -t  "bash -lc '
+            PATH=${go_bin_path}:\$PATH;
+            cd remote_workspace_source_path;
+            ${remote_workspace_dir}/build-package-artifacts.sh -b -a -w $(params.release-dir)
+          '"
+
+          # 2.5 copy the artifacts from the mac hosts to the workspace `source`.
+          scp -r ${username}@${host}:"$remote_workspace_dir/$(params.release-dir)" ./
+
+          # 3. clean the workspace dir(it will be a random name) on the ssh mac host.
+          ssh ${username}@${host} "rm -rf '$remote_workspace_dir'"
+        else
+          # Linux
+          /workspace/build-package-artifacts.sh -b -a -w "$(params.release-dir)"
+        fi
     - name: publish
       image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
       workingDir: $(workspaces.source.path)

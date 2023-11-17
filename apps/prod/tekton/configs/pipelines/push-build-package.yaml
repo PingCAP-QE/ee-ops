@@ -34,6 +34,9 @@ spec:
     - name: git-credentials
       description: secret contains ssh private key in `id_rsa` key.
       optional: true
+    - name: mac-ssh-credentials
+      description: secret contains ssh private key in `id_rsa` key for login mac
+      optional: true      
   tasks:
     - name: checkout
       taskRef:
@@ -88,7 +91,7 @@ spec:
       #       value: [release, debug]
       params:
         - name: os
-          value: linux
+          value: darwin
         - name: arch
           value: amd64
         - name: profile
@@ -113,6 +116,8 @@ spec:
           workspace: source
         - name: dockerconfig
           workspace: dockerconfig
+        - name: ssh-directory
+          workspace: mac-ssh-credentials
     - name: build-images
       taskRef:
         # TODO: can we skaffold to make it simpler?
@@ -122,7 +127,7 @@ spec:
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
         - name: os
-          value: linux
+          value: darwin
         - name: arch
           value: amd64
         - name: profile

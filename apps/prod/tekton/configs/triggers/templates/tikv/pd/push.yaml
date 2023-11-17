@@ -47,6 +47,9 @@ spec:
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
+          - name: mac-ssh-credentials
+            secret:
+              secretName: mac-ssh-credentials
           - name: source
             volumeClaimTemplate:
               spec:

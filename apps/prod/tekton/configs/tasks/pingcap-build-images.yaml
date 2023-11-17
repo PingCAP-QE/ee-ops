@@ -45,6 +45,11 @@ spec:
     - name: generate
       image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
       script: |
+        if [ "$(params.os)" != "linux" ]; then
+          echo "target os is not linux, skip it."
+          exit 0
+        fi
+
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
         /workspace/artifacts/packages/scripts/gen-package-images-with-config.sh \
@@ -66,4 +71,9 @@ spec:
         - name: KANIKO_EXECUTOR
           value: /kaniko/executor
       script: |
+        if [ "$(params.os)" != "linux" ]; then
+          echo "target os is not linux, skip it."
+          exit 0
+        fi
+
         /workspace/build-package-images.sh "$(params.release-dir)" "$(params.tag)" ${KANIKO_EXECUTOR} "$(params.build)"
