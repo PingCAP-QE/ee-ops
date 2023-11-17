@@ -3,12 +3,12 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
   name: tekton
-  namespace: apps
+  namespace: apps-dev
 spec:
   parentRefs:
     - kind: Gateway
       name: external-https
-      namespace: apps
+      namespace: apps-dev
   hostnames:
     - "${DOMAIN_NAME}"
   rules:
