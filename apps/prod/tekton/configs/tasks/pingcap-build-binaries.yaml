@@ -1,0 +1,73 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-build-binaries
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    Build binaries for the component.
+  workspaces:
+    - name: source
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+      mountPath: /root/.docker
+      optional: true
+  results:
+    - description: The package artifacts
+      name: package-artifacts
+      type: string
+  params:
+    - name: component
+    - name: os
+      default: linux
+    - name: arch
+      default: amd64
+    - name: version
+      type: string
+      description: the version to releasing.
+    - name: profile
+      type: string
+      default: release
+      description: >
+        supports: 'release' or 'debug'.
+    - name: git-ref
+    - name: git-sha
+    - name: builder-image
+      default: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+    - name: release-dir
+      default: build
+    - name: push
+      type: string
+      default: 'false'
+  steps:
+    - name: generate-build-script
+      image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      script: |
+        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
+
+        /workspace/artifacts/packages/scripts/gen-package-artifacts-with-config.sh \
+          $(params.component) \
+          $(params.os) \
+          $(params.arch) \
+          $(params.version) \
+          $(params.profile) \
+          $(params.git-ref) \
+          $(params.git-sha) \
+          /workspace/artifacts/packages/packages.yaml.tmpl \
+          /workspace/build-package-artifacts.sh
+
+        cat /workspace/build-package-artifacts.sh
+    - name: build
+      image: "$(params.builder-image)"
+      workingDir: $(workspaces.source.path)
+      script: |
+        /workspace/build-package-artifacts.sh -b -a -w "$(params.release-dir)"
+    - name: publish
+      image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      workingDir: $(workspaces.source.path)
+      script: |
+        oras version
+        /workspace/build-package-artifacts.sh -p -w "$(params.release-dir)"

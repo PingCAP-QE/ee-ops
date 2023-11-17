@@ -32,6 +32,17 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: tikv
+          - name: binary-builder-iamge
+            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
         workspaces:
           - name: dockerconfig
             secret:
@@ -44,18 +55,4 @@ spec:
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 10Gi
-          - name: gen-build-scripts
-            volumeClaimTemplate:
-              spec:
-                storageClassName: ceph-block
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 100Mi
-        taskRunSpecs:
-          - pipelineTaskName: run-building-scripts-for-tarballs
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
+                    storage: 50Gi

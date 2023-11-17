@@ -19,6 +19,9 @@ spec:
       default: build-package-artifacts.sh
     - name: need-build
       default: 'true'
+    - name: push
+      type: string
+      default: 'false'
   steps:
     - name: build
       image: "$(params.build-image)"

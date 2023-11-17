@@ -24,13 +24,13 @@ spec:
 
         May be it is an idea to judge it by git-url, but it maybe 
         not a generic way for forked repositories with custom names.
+    - name: binary-builder-iamge
+      description: The image used to build binaries.
   workspaces:
-    - name: dockerconfig
-      description: Includes a docker `config.json`
     - name: source
       description: The workspace where the git repo will be cloned.
-    - name: gen-build-scripts
-      description: The build scripts will be generated in this workspace.
+    - name: dockerconfig
+      description: Includes a docker `config.json`
     - name: git-credentials
       description: secret contains ssh private key in `id_rsa` key.
       optional: true
@@ -72,9 +72,9 @@ spec:
       workspaces:
         - name: source
           workspace: source
-    - name: generate-building-scripts-for-tarballs
+    - name: build-binaries
       taskRef:
-        name: generate-building-scripts-for-tarballs
+        name: pingcap-build-binaries
       runAfter:
         - get-release-ver
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
@@ -101,84 +101,46 @@ spec:
           value: $(params.git-ref)
         - name: git-sha
           value: $(params.git-revision)
-      workspaces:
-        - name: output
-          workspace: gen-build-scripts
-    - name: generate-building-scripts-for-images
-      taskRef:
-        name: generate-building-scripts-for-images
-      runAfter:
-        - get-release-ver
-      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
-      # matrix:
-      #   params:
-      #     - name: os
-      #       value: [linux, darwin]
-      #     - name: arch
-      #       value: [amd64, arm64]
-      #     - name: profile
-      #       value: [release, debug]
-      params:
-        - name: os
-          value: linux
-        - name: arch
-          value: amd64
-        - name: profile
-          value: release
-        - name: component
-          value: "$(params.component)"
-        - name: version
-          value: "$(tasks.get-release-ver.results.version)"
-        - name: git-ref
-          value: $(params.git-ref)
-        - name: git-sha
-          value: $(params.git-revision)
-      workspaces:
-        - name: output
-          workspace: gen-build-scripts
-    - name: run-building-scripts-for-tarballs
-      taskRef:
-        # TODO: is there a sulution to push for multi platforms.
-        name: run-building-scripts-for-tarballs
-      runAfter:
-        - generate-building-scripts-for-tarballs
-      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
-      params:
+        - name: builder-image
+          # value: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
+          value: $(params.binary-builder-iamge)
         - name: release-dir
           value: build
-        - name: run-script-file
-          value: build-package-artifacts.sh
-        - name: need-build
-          value: "true"
-        - name: build-image
-          # value: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
-          value: ghcr.io/pingcap-qe/ci/release-build-base:v20231107-4086b32-go1.21_linux_amd64
+        - name: push
+          value: 'true'
       workspaces:
         - name: source
           workspace: source
-        - name: build-scripts
-          workspace: gen-build-scripts
-    - name: run-building-scripts-for-images
+        - name: dockerconfig
+          workspace: dockerconfig
+    - name: build-images
       taskRef:
         # TODO: can we skaffold to make it simpler?
-        name: run-building-scripts-for-images
+        name: pingcap-build-images
       runAfter:
-        - generate-building-scripts-for-images
-        - run-building-scripts-for-tarballs
+        - build-binaries
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
+        - name: os
+          value: linux
+        - name: arch
+          value: amd64
+        - name: profile
+          value: release
+        - name: component
+          value: "$(params.component)"     
+        - name: version
+          value: "$(tasks.get-release-ver.results.version)"           
+        - name: git-ref
+          value: $(params.git-ref)
+        - name: git-sha
+          value: $(params.git-revision)
         - name: release-dir
           value: build
-        - name: run-script-file
-          value: build-package-images.sh
-        - name: need-build
+        - name: build
           value: "false"
-        - name: build-image
-          value: gcr.io/kaniko-project/executor:debug
       workspaces:
         - name: source
           workspace: source
-        - name: build-scripts
-          workspace: gen-build-scripts
         - name: dockerconfig
           workspace: dockerconfig
