@@ -1,0 +1,69 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-build-images
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This task builds images for pingcap components.
+  workspaces:
+    - name: source
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+      mountPath: /kaniko/.docker      
+      optional: true
+  results:
+    - description: Digest of the image just built.
+      name: IMAGE_DIGEST
+    - description: URL of the image just built.
+      name: IMAGE_URL
+  params:
+    - name: component
+    - name: os
+      default: linux
+    - name: arch
+      default: amd64
+    - name: version
+      type: string
+      description: the version to releasing.
+    - name: profile
+      type: string
+      default: release
+      description: >
+        supports: 'release' or 'debug'.
+    - name: git-ref
+    - name: git-sha
+    - name: release-dir
+      default: build
+    - name: build
+      default: 'false'
+      description: Does it need to build the binaries before packing the images?
+  steps:
+    - name: generate
+      image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      script: |
+        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
+
+        /workspace/artifacts/packages/scripts/build-package-images-with-config.sh \
+          $(params.component) \
+          $(params.os) \
+          $(params.arch) \
+          $(params.version) \
+          $(params.profile) \
+          $(params.git-ref) \
+          $(params.git-sha) \
+          /workspace/artifacts/packages/packages.yaml.tmpl \
+          /workspace/build-package-images.sh
+
+        cat /workspace/build-package-images.sh
+    - name: build
+      image: gcr.io/kaniko-project/executor:debug
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: KANIKO_EXECUTOR
+          value: /kaniko/executor
+      script: |
+        /workspace/build-package-images.sh "$(params.release-dir)" "$(params.tag)" ${KANIKO_EXECUTOR} "$(params.build)"

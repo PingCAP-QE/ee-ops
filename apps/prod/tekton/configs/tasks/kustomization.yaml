@@ -16,6 +16,7 @@ resources:
   - ko-test-infra.yaml
   - kubernetes-actions.yaml
   - multi-arch-image-push.yaml
+  - pingcap-build-binaries.yaml
+  - pingcap-build-images.yaml
   - run-build-binaries-scripts.yaml
   - run-build-images-scripts.yaml
-  - oras-push.yaml
