@@ -16,3 +16,4 @@ resources:
   - ccache-pvc
   - jenkins-beta
   - cloudevents-server
+  - boskos

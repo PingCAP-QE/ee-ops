@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: apps
+resources:
+  - base
+  - base/cleaner
+  - overlays/mac-machine-janitor
+  - overlays/mac-machine-reaper
+
+configMapGenerator:
+  - name: boskos-resources
+    files:
+      - boskos-resources.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true
