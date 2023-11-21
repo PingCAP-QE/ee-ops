@@ -518,7 +518,7 @@ trivy:
     # repository the repository for Trivy adapter image
     repository: goharbor/trivy-adapter-photon
     # tag the tag for Trivy adapter image
-    tag: v2.9.0
+    tag: v2.9.1
   # set the service account to be used, default if left empty
   serviceAccountName: ""
   # mount the service account token
