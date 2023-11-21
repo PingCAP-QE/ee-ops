@@ -1,0 +1,10 @@
+resources:
+  - names:
+      - darwin-amd64-1
+      - darwin-arm64-1
+    state: free
+    type: mac-machine
+    config:
+      type: MacMachineConfig
+      content: |
+        {"TODO": "yes"}
