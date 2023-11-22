@@ -50,7 +50,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/master",
     "before": "00000000000000000000000000000000000000000",
-    "after": "85eeeea5bfc484879701d3675c92b9138f7da48d",
+    "after": "90628349860718bb84c94fe7dc1e1f9bd9da4348",
     "ref_type": "branch",
     "repository": {
         "name": "tidb",
