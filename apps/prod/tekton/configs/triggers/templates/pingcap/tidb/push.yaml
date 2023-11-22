@@ -42,7 +42,7 @@ spec:
           - pipelineTaskName: build-images
             taskPodTemplate:
               nodeSelector:
-                kubernetes.io/arch: amd64             
+                kubernetes.io/arch: amd64
         workspaces:
           - name: dockerconfig
             secret:
