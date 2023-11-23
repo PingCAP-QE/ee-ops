@@ -5,9 +5,9 @@ resources:
   # - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
   # - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml
   - pingcap/create-branch-product-components-hotfix.yaml
-  # - pingcap/tidb/push.yaml # passed
-  # - pingcap/tiflash/push.yaml
-  # - pingcap/tiflow/push.yaml # passed
+  - pingcap/tidb/push.yaml
+  - pingcap/tiflash/push.yaml
+  - pingcap/tiflow/push.yaml
   # - tikv/pd/create-tag.yaml
-  - tikv/pd/push.yaml # passed
-  - tikv/tikv/push.yaml
+  # - tikv/pd/push.yaml
+  # - tikv/tikv/push.yaml

@@ -38,11 +38,11 @@ spec:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
               nodeSelector:
-                kubernetes.io/arch: amd64
+                kubernetes.io/arch: arm64
           - pipelineTaskName: build-images
             taskPodTemplate:
               nodeSelector:
-                kubernetes.io/arch: amd64
+                kubernetes.io/arch: arm64
         timeouts:
           pipeline: 3h
         workspaces:
