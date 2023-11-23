@@ -90,6 +90,8 @@ spec:
           ##### Build mac targets in tekton task (k8s pod) ####
           
           # 0. got the go version(x.y) from the current container with `go version`.
+          which go
+          go version
           go_bin_path=""
           if which go; then
             go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin"
