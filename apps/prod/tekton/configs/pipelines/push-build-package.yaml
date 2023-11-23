@@ -24,6 +24,12 @@ spec:
 
         May be it is an idea to judge it by git-url, but it maybe 
         not a generic way for forked repositories with custom names.
+    - name: os
+      default: linux
+    - name: arch
+      default: amd64
+    - name: profile
+      default: release
     - name: binary-builder-iamge
       description: The image used to build binaries.
   workspaces:
@@ -91,11 +97,11 @@ spec:
       #       value: [release, debug]
       params:
         - name: os
-          value: darwin
+          value: "$(params.os)"
         - name: arch
-          value: amd64
+          value: "$(params.arch)"
         - name: profile
-          value: release
+          value: "$(params.profile)"
         - name: component
           value: "$(params.component)"
         - name: version
@@ -127,11 +133,11 @@ spec:
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
         - name: os
-          value: darwin
+          value: "$(params.os)"
         - name: arch
-          value: amd64
+          value: "$(params.arch)"
         - name: profile
-          value: release
+          value: "$(params.profile)"
         - name: component
           value: "$(params.component)"     
         - name: version

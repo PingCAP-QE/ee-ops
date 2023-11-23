@@ -45,13 +45,9 @@ spec:
     - name: generate
       image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
       script: |
-        if [ "$(params.os)" != "linux" ]; then
-          echo "target os is not linux, skip it."
-          exit 0
-        fi
-
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
+        out_script="/workspace/build-package-images.sh"
         /workspace/artifacts/packages/scripts/gen-package-images-with-config.sh \
           $(params.component) \
           $(params.os) \
@@ -61,9 +57,11 @@ spec:
           $(params.git-ref) \
           $(params.git-sha) \
           /workspace/artifacts/packages/packages.yaml.tmpl \
-          /workspace/build-package-images.sh
+          "$out_script"
 
-        cat /workspace/build-package-images.sh
+        if [ -f "$out_script" ]
+          cat "$out_script"
+        fi
     - name: build-and-publish
       image: gcr.io/kaniko-project/executor:debug
       workingDir: $(workspaces.source.path)
@@ -71,9 +69,10 @@ spec:
         - name: KANIKO_EXECUTOR
           value: /kaniko/executor
       script: |
-        if [ "$(params.os)" != "linux" ]; then
-          echo "target os is not linux, skip it."
+        $script="/workspace/build-package-images.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip build."
           exit 0
         fi
 
-        /workspace/build-package-images.sh "$(params.release-dir)" "$(params.tag)" ${KANIKO_EXECUTOR} "$(params.build)"
+        "$script" "$(params.release-dir)" "$(params.tag)" ${KANIKO_EXECUTOR} "$(params.build)"

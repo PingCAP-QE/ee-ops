@@ -5,6 +5,7 @@ resources:
   # - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
   # - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml
   - pingcap/create-branch-product-components-hotfix.yaml
+  - pingcap/advanced-statefulset/push.yaml
   # - pingcap/tidb/push.yaml # passed
   # - pingcap/tiflash/push.yaml
   # - pingcap/tiflow/push.yaml # passed
