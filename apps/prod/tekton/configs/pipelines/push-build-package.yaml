@@ -87,14 +87,6 @@ spec:
       runAfter:
         - get-release-ver
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
-      # matrix:
-      #   params:
-      #     - name: os
-      #       value: [linux, darwin]
-      #     - name: arch
-      #       value: [amd64, arm64]
-      #     - name: profile
-      #       value: [release, debug]
       params:
         - name: os
           value: "$(params.os)"
