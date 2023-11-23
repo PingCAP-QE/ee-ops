@@ -81,7 +81,10 @@ spec:
           ##### Build mac targets in tekton task (k8s pod) ####
           
           # 0. got the go version(x.y) from the current container with `go version`.
-          go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin"
+          go_bin_path=""
+          if which go; then
+            go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin"
+          fi
           
           # 1. select a mac idle mac machine, if all busy, random one with correct arch.
           # TODO: acquire and release mac builder machines with boskos.
