@@ -492,7 +492,7 @@ worker:
       # worker.runnerContainer.image.repository -- image repository (default is https://console.cloud.google.com/marketplace/product/google/rbe-ubuntu18-04)
       repository: ghcr.io/catthehacker/ubuntu
       # worker.runnerContainer.image.tag -- image tag
-      tag: act-22.04@sha256:ae083c47f5258eb7b084083c8ddc49046d758c4a3ad136dc906efa685270ba07
+      tag: act-22.04@sha256:f3fc2ca4287271efcff560a0db9c5831e2b9ca00946a4607b8161d14246e71af
     # worker.runnerContainer.securityContext -- specifies security settings for a container
     securityContext:
       runAsUser: 65534
