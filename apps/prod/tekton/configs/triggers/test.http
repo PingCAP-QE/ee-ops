@@ -70,7 +70,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/master",
     "before": "00000000000000000000000000000000000000000",
-    "after": "1addc37a549f23310bbe36f5bc75853bd6508ffd",
+    "after": "f246f350923eb27e1dcfd271b7792481d5551bce",
     "ref_type": "branch",
     "repository": {
         "name": "tiflash",
@@ -90,7 +90,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/master",
     "before": "00000000000000000000000000000000000000000",
-    "after": "a50e36052a8c3c470b6ba96ab515c7a7ab067525",
+    "after": "86d4a49848cd920e081c2cf0249977149835d1c5",
     "ref_type": "branch",
     "repository": {
         "name": "tikv",

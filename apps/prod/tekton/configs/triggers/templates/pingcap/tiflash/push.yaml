@@ -33,7 +33,7 @@ spec:
           - name: component
             value: tiflash
           - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tiflash:v20231115-e1c4b43-go1.21_linux_amd64
+            value: ghcr.io/pingcap-qe/cd/builders/tiflash:v20231116-e1c4b43_linux_amd64
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -44,11 +44,14 @@ spec:
               nodeSelector:
                 kubernetes.io/arch: amd64
         timeouts:
-          pipeline: 2h
+          pipeline: 3h
         workspaces:
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
+          - name: mac-ssh-credentials
+            secret:
+              secretName: mac-ssh-credentials
           - name: source
             volumeClaimTemplate:
               spec:
