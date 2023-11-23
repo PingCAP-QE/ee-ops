@@ -70,7 +70,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/master",
     "before": "00000000000000000000000000000000000000000",
-    "after": "1addc37a549f23310bbe36f5bc75853bd6508ffd",
+    "after": "f246f350923eb27e1dcfd271b7792481d5551bce",
     "ref_type": "branch",
     "repository": {
         "name": "tiflash",
