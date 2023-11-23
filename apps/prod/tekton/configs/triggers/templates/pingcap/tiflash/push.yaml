@@ -32,6 +32,10 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: tiflash
+          - name: os
+            value: darwin
+          - name: arch
+            value: arm64
           - name: binary-builder-iamge
             value: ghcr.io/pingcap-qe/cd/builders/tiflash:v20231116-e1c4b43_linux_amd64
         taskRunSpecs:

@@ -32,6 +32,10 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: tiflow
+          - name: os
+            value: darwin
+          - name: arch
+            value: arm64
           - name: binary-builder-iamge
             value: ghcr.io/pingcap-qe/cd/builders/tiflow:v20231115-e1c4b43-go1.21
         taskRunSpecs:
