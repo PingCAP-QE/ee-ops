@@ -51,6 +51,7 @@ spec:
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
+        out_script="/workspace/build-package-artifacts.sh"
         /workspace/artifacts/packages/scripts/gen-package-artifacts-with-config.sh \
           $(params.component) \
           $(params.os) \
@@ -60,9 +61,11 @@ spec:
           $(params.git-ref) \
           $(params.git-sha) \
           /workspace/artifacts/packages/packages.yaml.tmpl \
-          /workspace/build-package-artifacts.sh
+          "$out_script"
 
-        cat /workspace/build-package-artifacts.sh
+        if [ -f "$out_script" ]
+          cat "$out_script"
+        fi
     - name: build
       image: "$(params.builder-image)"
       env:
@@ -76,6 +79,12 @@ spec:
         #!/usr/bin/env bash
 
         set -exo pipefail
+
+        script="/workspace/build-package-artifacts.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip build."
+          exit 0
+        fi
 
         if [ "$(params.os)" == "darwin" ]; then
           ##### Build mac targets in tekton task (k8s pod) ####
@@ -109,7 +118,7 @@ spec:
           ssh ${username}@${host} "mkdir -p '$remote_workspace_dir'"
           
           # 2.2 copy the build shell to the mac host by ssh.
-          scp /workspace/build-package-artifacts.sh ${username}@${host}:"$remote_workspace_dir/"
+          scp ""$script"" ${username}@${host}:"$remote_workspace_dir/"
           
           # 2.3 copy source codes from workspace `source` to the mac host by ssh.
           scp -r $(workspaces.source.path) ${username}@${host}:"$remote_workspace_dir/"
@@ -129,11 +138,17 @@ spec:
           ssh ${username}@${host} "rm -rf '$remote_workspace_dir'"
         else
           # Linux
-          /workspace/build-package-artifacts.sh -b -a -w "$(params.release-dir)"
+          "$script" -b -a -w "$(params.release-dir)"
         fi
     - name: publish
       image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
       workingDir: $(workspaces.source.path)
       script: |
+        script="/workspace/build-package-artifacts.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip build."
+          exit 0
+        fi
+
         oras version
-        /workspace/build-package-artifacts.sh -p -w "$(params.release-dir)"
+        "$script" -p -w "$(params.release-dir)"
