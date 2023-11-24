@@ -21,6 +21,26 @@ X-GitHub-Event: push
     }
 }
 
+### tikv/tikv: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "86d4a49848cd920e081c2cf0249977149835d1c5",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tikv",
+        "clone_url": "https://github.com/tikv/tikv.git",
+        "owner": {
+            "login": "tikv"
+        }
+    }
+}
+
 ### pingcap/tiflow: push on master branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
@@ -81,22 +101,4 @@ X-GitHub-Event: push
     }
 }
 
-### tikv/tikv: push on master branch
-POST http://127.0.0.1:8080 HTTP/1.1
-Accept: */*
-content-type: application/json
-X-GitHub-Event: push
 
-{
-    "ref": "refs/heads/master",
-    "before": "00000000000000000000000000000000000000000",
-    "after": "86d4a49848cd920e081c2cf0249977149835d1c5",
-    "ref_type": "branch",
-    "repository": {
-        "name": "tikv",
-        "clone_url": "https://github.com/tikv/tikv.git",
-        "owner": {
-            "login": "tikv"
-        }
-    }
-}
