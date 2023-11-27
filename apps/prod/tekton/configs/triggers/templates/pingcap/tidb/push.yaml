@@ -14,62 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tidb-
-        annotations:
-          "tekton.dev/git-status": "true"
-          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
-          "tekton.dev/git-repo": $(tt.params.git-url)
-          "tekton.dev/git-revision": $(tt.params.git-revision)
-      spec:
-        pipelineRef:
-          name: push-build-package
-        params:
-          - name: git-url
-            value: $(tt.params.git-url)
-          - name: git-revision
-            value: $(tt.params.git-revision)
-          - name: git-ref
-            value: $(tt.params.git-ref)
-          - name: component
-            value: tidb
-          - name: os
-            value: linux
-          - name: arch
-            value: amd64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
-        taskRunSpecs:
-          - pipelineTaskName: build-binaries
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
-          - pipelineTaskName: build-images
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
-        workspaces:
-          - name: dockerconfig
-            secret:
-              secretName: hub-pingcap-net-ee
-          - name: mac-ssh-credentials
-            secret:
-              secretName: mac-ssh-credentials
-          - name: source
-            volumeClaimTemplate:
-              spec:
-                storageClassName: ceph-block
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 10Gi
-          - name: git-credentials # need to fetch some private repositories.
-            secret:
-              secretName: git-credentials
-    - apiVersion: tekton.dev/v1beta1
-      kind: PipelineRun
-      metadata:
-        generateName: push-build-package-pingcap-tidb-
+        generateName: push-build-package-pingcap-tidb-linux-arm64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -106,9 +51,6 @@ spec:
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
-          - name: mac-ssh-credentials
-            secret:
-              secretName: mac-ssh-credentials
           - name: source
             volumeClaimTemplate:
               spec:
@@ -121,10 +63,62 @@ spec:
           - name: git-credentials # need to fetch some private repositories.
             secret:
               secretName: git-credentials
-- apiVersion: tekton.dev/v1beta1
+    - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tidb-
+        generateName: push-build-package-pingcap-tidb-linux-amd64-
+        annotations:
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        pipelineRef:
+          name: push-build-package
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: tidb
+          - name: os
+            value: linux
+          - name: arch
+            value: amd64
+          - name: binary-builder-iamge
+            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
+          - name: git-credentials # need to fetch some private repositories.
+            secret:
+              secretName: git-credentials
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: push-build-package-pingcap-tidb-darwin-arm64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"

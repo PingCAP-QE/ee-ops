@@ -14,7 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-tikv-tikv-
+        generateName: push-build-package-tikv-tikv-linux-arm-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -32,6 +32,10 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: tikv
+          - name: os
+            value: linux
+          - name: arch
+            value: arm64
           - name: binary-builder-iamge
             value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         taskRunSpecs:
@@ -43,6 +47,99 @@ spec:
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: arm64
+        timeouts:
+          pipeline: 2h
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 50Gi
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: push-build-package-tikv-tikv-linux-amd64-
+        annotations:
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        pipelineRef:
+          name: push-build-package
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: tikv
+          - name: os
+            value: linux
+          - name: arch
+            value: amd64
+          - name: binary-builder-iamge
+            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: 2h
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 50Gi
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: push-build-package-tikv-tikv-darwin-arm-
+        annotations:
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        pipelineRef:
+          name: push-build-package
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: tikv
+          - name: os
+            value: darwin
+          - name: arch
+            value: arm64
+          - name: binary-builder-iamge
+            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         timeouts:
           pipeline: 2h
         workspaces:
