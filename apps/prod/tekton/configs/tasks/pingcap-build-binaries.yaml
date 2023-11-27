@@ -63,7 +63,7 @@ spec:
           /workspace/artifacts/packages/packages.yaml.tmpl \
           "$out_script"
 
-        if [ -f "$out_script" ]
+        if [ -f "$out_script" ]; then
           cat "$out_script"
         fi
     - name: build
@@ -90,10 +90,8 @@ spec:
           ##### Build mac targets in tekton task (k8s pod) ####
           
           # 0. got the go version(x.y) from the current container with `go version`.
-          which go
-          go version
           go_bin_path=""
-          if which go; then
+          if go version; then
             go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin"
           fi
           

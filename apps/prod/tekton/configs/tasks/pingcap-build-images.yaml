@@ -59,7 +59,7 @@ spec:
           /workspace/artifacts/packages/packages.yaml.tmpl \
           "$out_script"
 
-        if [ -f "$out_script" ]
+        if [ -f "$out_script" ]; then
           cat "$out_script"
         fi
     - name: build-and-publish
@@ -69,7 +69,7 @@ spec:
         - name: KANIKO_EXECUTOR
           value: /kaniko/executor
       script: |
-        $script="/workspace/build-package-images.sh"
+        script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then
           echo "No build script, skip build."
           exit 0

@@ -117,6 +117,10 @@ spec:
         - name: ssh-directory
           workspace: mac-ssh-credentials
     - name: build-images
+      when:
+        - input: "$(params.os)"
+          operator: in
+          values: ["linux"]
       taskRef:
         # TODO: can we skaffold to make it simpler?
         name: pingcap-build-images
