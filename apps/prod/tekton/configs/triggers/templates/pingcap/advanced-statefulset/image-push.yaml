@@ -12,19 +12,20 @@ spec:
       description: The image digest
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
-      kind: TaskRun
+      kind: PipelineRun
       metadata:
         generateName: image-push-pingcap-advanced-statefulset-run-
       spec:
+        pipelineRef:
+          name: auto-compose-multi-arch-image
         params:
-          - name: message
-            value: >-
-              pushed image: $(tt.params.image_url), 
-              the tag is: $(tt.params.tag), 
-              and the digest is: $(tt.params.digest).
-              Have a fun.
-        taskRef:
-          kind: Task
-          name: echo
-        
-
+        - name: image_url
+          value: "$(tt.params.image_url)"
+        - name: tag
+          value: "$(tt.params.tag)"
+        - name: digest
+          value: "$(tt.params.digest)"
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
