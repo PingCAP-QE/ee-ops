@@ -39,7 +39,7 @@ spec:
     - name: git-ref
     - name: git-sha
     - name: builder-image
-      default: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
     - name: release-dir
       default: build
     - name: push
@@ -47,7 +47,7 @@ spec:
       default: 'false'
   steps:
     - name: generate-build-script
-      image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -141,7 +141,7 @@ spec:
           "$script" -b -a -w "$(params.release-dir)"
         fi
     - name: publish
-      image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
       workingDir: $(workspaces.source.path)
       script: |
         script="/workspace/build-package-artifacts.sh"

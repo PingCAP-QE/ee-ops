@@ -14,7 +14,7 @@ spec:
     - name: release-dir
       default: build
     - name: build-image
-      default: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
     - name: run-script-file
       default: build-package-artifacts.sh
     - name: need-build

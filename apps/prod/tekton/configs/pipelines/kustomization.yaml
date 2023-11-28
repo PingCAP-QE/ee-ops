@@ -5,3 +5,4 @@ resources:
   - kaniko-build.yaml
   - ko-build-test-infra.yaml
   - push-build-package.yaml
+  - auto-compose-multi-arch-image.yaml

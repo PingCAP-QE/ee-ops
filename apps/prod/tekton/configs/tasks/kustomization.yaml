@@ -15,6 +15,7 @@ resources:
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml
   - ko-test-infra.yaml
   - kubernetes-actions.yaml
+  - multi-arch-image-pre-collect.yaml
   - multi-arch-image-push.yaml
   - pingcap-build-binaries.yaml
   - pingcap-build-images.yaml

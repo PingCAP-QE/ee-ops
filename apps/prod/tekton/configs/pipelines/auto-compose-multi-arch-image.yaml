@@ -1,0 +1,52 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: auto-compose-multi-arch-image
+spec:
+  params:
+    - name: image_url
+      description: The image full url for pull
+    - name: tag
+      description: The pushed image tag
+    - name: digest
+      description: The pushed image digest
+  workspaces:
+    - name: dockerconfig
+      description: Includes a docker `config.json`   
+  tasks:
+    - name: display
+      taskRef:
+        kind: Task
+        name: echo
+      params:
+          - name: message
+            value: >-
+              pushed image: $(params.image_url), 
+              the tag is: $(params.tag), 
+              and the digest is: $(params.digest).
+              Have a fun.
+    - name: compute
+      runAfter:
+        - display
+      taskRef:
+        name: multi-arch-image-pre-collect
+      params:
+        - name: image_url
+          value: "$(params.image_url)"
+        - name: release_tag_suffix
+          value: release
+    - name: push-tag
+      runAfter:
+        - compute
+      taskRef:
+        name: multi-arch-image-push
+      params:
+        - name: IMAGE
+          value: "$(tasks.compute.results.repo)"
+        - name: tags
+          value: "$(tasks.compute.results.tags)"
+        - name: platform-and-digest-list
+          value: $(tasks.compute.results.digests[*])
+      workspaces:
+        - name: dockerconfig
+          workspace: dockerconfig
