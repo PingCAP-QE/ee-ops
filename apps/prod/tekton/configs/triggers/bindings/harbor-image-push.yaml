@@ -33,4 +33,4 @@ spec:
     - name: tag
       value: $(body.event_data.resources[0].tag)
     - name: namespace
-      value: $(body.event_data.date_created.namespace)
+      value: $(body.event_data.repository.namespace)

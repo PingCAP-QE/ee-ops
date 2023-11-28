@@ -43,7 +43,7 @@ spec:
       description: Does it need to build the binaries before packing the images?
   steps:
     - name: generate
-      image: ghcr.io/pingcap-qe/ci/release-utils:v20231107-4086b32
+      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 

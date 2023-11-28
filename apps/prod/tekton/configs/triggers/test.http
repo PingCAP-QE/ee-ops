@@ -101,29 +101,48 @@ X-GitHub-Event: push
     }
 }
 
+### pingcap/advanced-statefulset: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "00595b4ef4ac4f08e16c930994ccc611c7ee6c64",
+    "ref_type": "branch",
+    "repository": {
+        "name": "advanced-statefulset",
+        "clone_url": "https://github.com/pingcap/advanced-statefulset.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
 
 ### push image tags on harbor
 POST http://127.0.0.1:8080 HTTP/1.1
 Content-Type: application/json
 
 {
-  "type": "PUSH_ARTIFACT",
-  "occur_at": 1701140373,
-  "operator": "robot$release",
-  "event_data": {
-    "resources": [
-        {
-            "digest": "sha256:14b865676344230458998ebe886d32165264303c38a811a5a6372301ebf45c41",
-            "tag": "v1",
-            "resource_url": "hub.pingcap.net/pingcap/hello:v1"
+    "type": "PUSH_ARTIFACT",
+    "occur_at": 1701143709,
+    "operator": "wuhui.zuo",
+    "event_data": {
+        "resources": [
+            {
+                "digest": "sha256:c80bf3f0ad847433fe891b1bfb63425346a25633ff6dafbab2bc8ac7d14a6c3e",
+                "tag": "master-00595b4-release_linux_amd64",
+                "resource_url": "hub.pingcap.net/pingcap/advanced-statefulset:master-00595b4-release_linux_amd64"
+            }
+        ],
+        "repository": {
+            "date_created": 1699859083,
+            "name": "advanced-statefulset",
+            "namespace": "pingcap",
+            "repo_full_name": "pingcap/advanced-statefulset",
+            "repo_type": "public"
         }
-    ],
-    "repository": {
-        "date_created": 1701140373,
-        "name": "hello",
-        "namespace": "pingcap",
-        "repo_full_name": "pingcap/hello",
-        "repo_type": "public"
     }
-  }
 }
