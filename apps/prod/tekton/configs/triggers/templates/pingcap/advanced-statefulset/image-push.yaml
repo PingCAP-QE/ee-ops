@@ -1,0 +1,30 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: image-push-pingcap-advanced-statefulset
+spec:
+  params:
+    - name: image_url
+      description: The image full url for pull
+    - name: tag
+      description: The image tag
+    - name: digest
+      description: The image digest
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: TaskRun
+      metadata:
+        generateName: image-push-pingcap-advanced-statefulset-run-
+      spec:
+        params:
+          - name: message
+            value: >-
+              pushed image: $(tt.params.image_url), 
+              the tag is: $(tt.params.tag), 
+              and the digest is: $(tt.params.digest).
+              Have a fun.
+        taskRef:
+          kind: Task
+          name: echo
+        
+

@@ -93,3 +93,47 @@ spec:
         labelSelector:
           matchLabels:
             type: github-tag-create
+    - name: harbor-image-pushed
+      interceptors:
+        # event payload:
+        # {
+        #   "type": "PUSH_ARTIFACT",
+        #   "occur_at": 1701140373,
+        #   "operator": "robot$release",
+        #   "event_data": {
+        #     "resources": [
+        #         {
+        #             "digest": "sha256:14b865676344230458998ebe886d32165264303c38a811a5a6372301ebf45c41",
+        #             "tag": "v1",
+        #             "resource_url": "hub.pingcap.net/pingcap/hello:v1"
+        #         }
+        #     ],
+        #     "event_data": {
+        #         "date_created": 1701140373,
+        #         "name": "hello",
+        #         "namespace": "pingcap",
+        #         "repo_full_name": "pingcap/hello",
+        #         "repo_type": "public"
+        #     }
+        #   }
+        # }
+        - name: filter on image push events on inner container repositories.
+          ref:
+            name: "cel"
+          params:
+            - name: filter
+              value: body.type == 'PUSH_ARTIFACT' && body.event_data.event_data.namespace in ['pingcap', 'tikv']
+        - name: filter on tag images.
+          ref:
+            name: "cel"
+          params:
+            - name: filter
+              value: >-
+                ! body.event_data.event_data.resources[0].tag.startsWith('sha256:')
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: image-push

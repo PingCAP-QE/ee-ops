@@ -5,3 +5,4 @@ resources:
   - github-branch-create.yaml
   - github-branch-push.yaml
   - github-tag-create.yaml
+  - harbor-image-push.yaml
