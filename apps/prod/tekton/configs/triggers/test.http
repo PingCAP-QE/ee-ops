@@ -100,3 +100,30 @@ X-GitHub-Event: push
         }
     }
 }
+
+
+### push image tags on harbor
+POST http://127.0.0.1:8080 HTTP/1.1
+Content-Type: application/json
+
+{
+  "type": "PUSH_ARTIFACT",
+  "occur_at": 1701140373,
+  "operator": "robot$release",
+  "event_data": {
+    "resources": [
+        {
+            "digest": "sha256:14b865676344230458998ebe886d32165264303c38a811a5a6372301ebf45c41",
+            "tag": "v1",
+            "resource_url": "hub.pingcap.net/pingcap/hello:v1"
+        }
+    ],
+    "repository": {
+        "date_created": 1701140373,
+        "name": "hello",
+        "namespace": "pingcap",
+        "repo_full_name": "pingcap/hello",
+        "repo_type": "public"
+    }
+  }
+}
