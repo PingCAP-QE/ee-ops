@@ -7,10 +7,10 @@ resources:
   - pingcap-qe/artifacts/tag-create-pingcap-qe-artifacts.yaml
   - pingcap/branch-create-product-components-hotfix.yaml
   - pingcap/advanced-statefulset/push.yaml
-  # - pingcap/tidb/push.yaml
-  # - pingcap/tiflash/push.yaml
-  # - pingcap/tiflow/push.yaml
+  - pingcap/advanced-statefulset/image-push.yaml
+  - pingcap/tidb/push.yaml
+  - pingcap/tiflash/push.yaml
+  - pingcap/tiflow/push.yaml
   - tikv/pd/push.yaml
-  # - tikv/pd/tag-build.yaml
-  # - tikv/tikv/push.yaml
-
+  - tikv/pd/tag-build.yaml
+  - tikv/tikv/push.yaml
