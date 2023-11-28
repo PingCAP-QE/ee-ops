@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: multi-arch-image-pre-collect
+  name: multi-arch-image-collect
 spec:
   description: |
     The working flow:
@@ -15,7 +15,9 @@ spec:
       - master-00595b4-release-arm64       => master-00595b4-release => master-00595b4 => master
   params:
     - name: image_url
-      description: The full url of the pushed image, contain the tag part.
+      description: |
+        The full url of the pushed image, contain the tag part.
+        It will parse the repo from it.
     - name: release_tag_suffix
       default: "release"
   results:
@@ -29,7 +31,7 @@ spec:
         image digests list for different platforms, element format is
         <platform> => <digest>
   steps:
-    - name: prepare
+    - name: prepare-manifest
       image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
       script: |
         #! /usr/bin/env bash
@@ -39,6 +41,7 @@ spec:
         :> $(results.digests.path)
         :> $(results.repo.path)
         :> $(results.tags.path)
+        :> manifest.yaml
 
         # steps:
         # 1. check the pushed tag, if not existed, step will fail.
@@ -54,13 +57,15 @@ spec:
         )
 
         # repo
-        printf "%s" "$pushed_repo" > $(results.repo.path)
+        yq -i ".image = \"$pushed_repo\"" manifest.yaml
 
         # tags
         tags="$tag"
         tags="$tags $(echo $tag | sed -E 's/[-_]$(params.release_tag_suffix)$//g')"
-        printf "%s" "$tags" > $(results.tags.path)
-
+        # for tags
+        for t in $tags; do
+          yq -i ".tags += [\"$t\"]" manifest.yaml
+        done
 
         # digest map
         jq -n '[]' > $(results.digests.path)
@@ -68,11 +73,23 @@ spec:
           manifest-tool inspect --raw "${pushed_repo}:$t" > manifest.json
           platform=`jq -r '.os + "/" + .architecture' manifest.json`
           digest=`jq -r '.digest' manifest.json`
+          echo "add for: ${platform} => ${digest}"
 
-          cp $(results.digests.path) temp.json && \
-          jq -n ". += [\"$platform => $digest\"]" temp.json > $(results.digests.path) && \
-          rm -f temp.json
+          os="$(echo "$platform" | awk -F/ '{print $1}')"
+          architecture="${platform#*/}"
+          yq -i '.manifests += [{}]' manifest.yaml
+          yq -i ".manifests[-1].image = \"${pushed_repo}@${digest}\"" manifest.yaml
+          yq -i ".manifests[-1].platform.os = \"$os\"" manifest.yaml
+          yq -i ".manifests[-1].platform.architecture = \"$architecture\"" manifest.yaml
         done
+
+        cat manifest.yaml
+        printf "%s" "$pushed_repo" > $(results.repo.path)
+        printf "%s" "$tags" > $(results.tags.path)
+      workingDir: /workspace
+    - name: push-manifest
+      image: mplatform/manifest-tool:alpine-v2.0.8
+      args: [push, from-spec, manifest.yaml]
       workingDir: /workspace
   workspaces:
     - description: Includes a docker `config.json`

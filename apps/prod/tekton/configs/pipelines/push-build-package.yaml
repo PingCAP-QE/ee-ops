@@ -32,6 +32,7 @@ spec:
       default: release
     - name: binary-builder-iamge
       description: The image used to build binaries.
+      default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
