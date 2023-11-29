@@ -47,6 +47,12 @@ spec:
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
+        git_ref="$(params.git-ref)"
+        git_sha="$(params.git-sha)"
+        if [ "$git_sha" == "$git_ref" ]; then
+          git_sha=""
+        fi
+
         out_script="/workspace/build-package-images.sh"
         /workspace/artifacts/packages/scripts/gen-package-images-with-config.sh \
           $(params.component) \
@@ -54,8 +60,8 @@ spec:
           $(params.arch) \
           $(params.version) \
           $(params.profile) \
-          $(params.git-ref) \
-          $(params.git-sha) \
+          $git_ref \
+          "$git_sha" \
           /workspace/artifacts/packages/packages.yaml.tmpl \
           "$out_script"
 
