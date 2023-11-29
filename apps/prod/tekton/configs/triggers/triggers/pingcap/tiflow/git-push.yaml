@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-pingcap-advanced-statefulset
+  name: git-push-pingcap-tiflow
   labels:
     type: github-branch-push
     github-owner: pingcap
-    github-repo: advanced-statefulset
+    github-repo: tiflow
 spec:
   interceptors:
     - name: filter on repo owner and name
@@ -14,7 +14,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'advanced-statefulset'
+            body.repository.owner.login == 'pingcap' && body.repository.name == 'tiflow'
     - name: filter on branches
       ref:
         name: cel
@@ -25,4 +25,4 @@ spec:
   bindings:
     - ref: github-branch-push
   template:
-    ref: build-pingcap-advanced-statefulset
+    ref: build-pingcap-tiflow

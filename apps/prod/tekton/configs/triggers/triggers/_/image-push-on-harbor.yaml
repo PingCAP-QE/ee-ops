@@ -14,7 +14,15 @@ spec:
           value: >-
             body.event_data.repository.repo_full_name in [
               'pingcap/advanced-statefulset',
-              'tikv/pd/image'
+              'pingcap/tidb/images/br',
+              'pingcap/tidb/images/dumpling',
+              'pingcap/tidb/images/tidb-lightning',
+              'pingcap/tidb/images/tidb-server',
+              'pingcap/tiflash/image',
+              'pingcap/tiflow/images/cdc',
+              'pingcap/tiflow/images/dm',
+              'tikv/pd/image',
+              'tikv/tikv/image'
             ]
     - name: filter on single arch image tags.
       ref:
