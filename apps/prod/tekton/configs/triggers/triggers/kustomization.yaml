@@ -11,6 +11,6 @@ resources:
   # - pingcap/tidb/push.yaml
   # - pingcap/tiflash/push.yaml
   # - pingcap/tiflow/push.yaml
-  # - tikv/pd/push.yaml
+  - tikv/pd/git-push.yaml
+  - tikv/pd/git-create-tag.yaml
   # - tikv/tikv/push.yaml
-  # - tikv/pd/create-tag.yaml
