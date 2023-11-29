@@ -33,7 +33,6 @@ spec:
 
         set -exo pipefail
 
-        :> $(results.digests.path)
         :> $(results.repo.path)
         :> $(results.tags.path)
         :> manifest.yaml
@@ -80,7 +79,6 @@ spec:
         cat manifest.yaml
         printf "%s" "$pushed_repo" > $(results.repo.path)
         printf "%s" "$tags" > $(results.tags.path)
-        jq -n '[]' > $(results.digests.path)
       workingDir: /workspace
     - name: push-manifest
       image: mplatform/manifest-tool:alpine-v2.0.8
