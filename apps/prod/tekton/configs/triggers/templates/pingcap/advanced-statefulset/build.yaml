@@ -14,7 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-advanced-statefulset-amd64-
+        generateName: build-package-pingcap-advanced-statefulset-amd64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -22,7 +22,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: push-build-package
+          name: pingcap-build-package
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -61,7 +61,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-advanced-statefulset-arm64-
+        generateName: build-package-pingcap-advanced-statefulset-arm64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -69,7 +69,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: push-build-package
+          name: pingcap-build-package
         params:
           - name: git-url
             value: $(tt.params.git-url)

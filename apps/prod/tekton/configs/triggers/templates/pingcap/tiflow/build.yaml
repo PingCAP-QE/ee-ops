@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: push-pingcap-tiflow
+  name: build-pingcap-tiflow
 spec:
   params:
     - name: git-url
@@ -14,7 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tiflow-linux-arm64-
+        generateName: build-package-pingcap-tiflow-linux-arm64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -22,7 +22,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: push-build-package
+          name: pingcap-build-package
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -63,7 +63,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tiflow-linux-amd64-
+        generateName: build-package-pingcap-tiflow-linux-amd64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -71,7 +71,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: push-build-package
+          name: pingcap-build-package
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -112,7 +112,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tiflow-darwin-arm64-
+        generateName: build-package-pingcap-tiflow-darwin-arm64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -120,7 +120,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: push-build-package
+          name: pingcap-build-package
         params:
           - name: git-url
             value: $(tt.params.git-url)
