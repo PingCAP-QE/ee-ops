@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: push-build-package
+  name: pingcap-build-package
 spec:
   params:
     - name: git-url

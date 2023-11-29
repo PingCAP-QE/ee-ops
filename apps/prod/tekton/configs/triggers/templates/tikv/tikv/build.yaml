@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: push-pingcap-tidb
+  name: build-tikv-tikv
 spec:
   params:
     - name: git-url
@@ -14,7 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tidb-linux-arm64-
+        generateName: build-package-tikv-tikv-linux-arm64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -31,13 +31,13 @@ spec:
           - name: git-ref
             value: $(tt.params.git-ref)
           - name: component
-            value: tidb
+            value: tikv
           - name: os
             value: linux
           - name: arch
             value: arm64
           - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
+            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -47,6 +47,8 @@ spec:
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: arm64
+        timeouts:
+          pipeline: 2h
         workspaces:
           - name: dockerconfig
             secret:
@@ -59,14 +61,11 @@ spec:
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 10Gi
-          - name: git-credentials # need to fetch some private repositories.
-            secret:
-              secretName: git-credentials
+                    storage: 50Gi
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tidb-linux-amd64-
+        generateName: build-package-tikv-tikv-linux-amd64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -83,13 +82,13 @@ spec:
           - name: git-ref
             value: $(tt.params.git-ref)
           - name: component
-            value: tidb
+            value: tikv
           - name: os
             value: linux
           - name: arch
             value: amd64
           - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
+            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -99,6 +98,8 @@ spec:
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: 2h
         workspaces:
           - name: dockerconfig
             secret:
@@ -111,14 +112,11 @@ spec:
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 10Gi
-          - name: git-credentials # need to fetch some private repositories.
-            secret:
-              secretName: git-credentials
+                    storage: 50Gi
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: push-build-package-pingcap-tidb-darwin-arm64-
+        generateName: build-package-tikv-tikv-darwin-arm64-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -135,13 +133,15 @@ spec:
           - name: git-ref
             value: $(tt.params.git-ref)
           - name: component
-            value: tidb
+            value: tikv
           - name: os
             value: darwin
           - name: arch
             value: arm64
           - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
+            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
+        timeouts:
+          pipeline: 2h
         workspaces:
           - name: dockerconfig
             secret:
@@ -157,7 +157,4 @@ spec:
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 10Gi
-          - name: git-credentials # need to fetch some private repositories.
-            secret:
-              secretName: git-credentials
+                    storage: 50Gi

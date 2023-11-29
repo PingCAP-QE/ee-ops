@@ -8,8 +8,8 @@ resources:
   - pingcap-qe/artifacts/tag-create-pingcap-qe-artifacts.yaml
   - pingcap/advanced-statefulset/build.yaml
   - pingcap/branch-create-product-components-hotfix.yaml
-  - pingcap/tidb/push.yaml
-  - pingcap/tiflash/push.yaml
-  - pingcap/tiflow/push.yaml
+  - pingcap/tidb/build.yaml
+  - pingcap/tiflash/build.yaml
+  - pingcap/tiflow/build.yaml
   - tikv/pd/build.yaml
-  - tikv/tikv/push.yaml
+  - tikv/tikv/build.yaml

@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: push-pingcap-tiflash
+  name: git-push-pingcap-tidb
   labels:
     type: github-branch-push
     github-owner: pingcap
-    github-repo: tiflash
+    github-repo: tidb
 spec:
   interceptors:
     - name: filter on repo owner and name
@@ -14,7 +14,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tiflash'
+            body.repository.owner.login == 'pingcap' && body.repository.name == 'tidb'
     - name: filter on branches
       ref:
         name: cel
@@ -25,4 +25,4 @@ spec:
   bindings:
     - ref: github-branch-push
   template:
-    ref: push-pingcap-tiflash
+    ref: build-pingcap-tidb

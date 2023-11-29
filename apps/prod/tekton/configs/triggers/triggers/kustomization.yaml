@@ -5,12 +5,16 @@ resources:
   - pingcap/advanced-statefulset/git-create-tag.yaml
   - pingcap/advanced-statefulset/git-push.yaml
   - pingcap/create-branch-product-components-hotfix.yaml
+  - pingcap/tidb/git-create-tag.yaml
+  - pingcap/tidb/git-push.yaml
+  - pingcap/tiflash/git-create-tag.yaml
+  - pingcap/tiflash/git-push.yaml
+  - pingcap/tiflow/git-create-tag.yaml
+  - pingcap/tiflow/git-push.yaml
   - tikv/pd/git-create-tag.yaml
   - tikv/pd/git-push.yaml
+  - tikv/tikv/git-create-tag.yaml
+  - tikv/tikv/git-push.yaml
   # - pingcap-qe/artifacts/create-tag-pingcap-qe-artifacts.yaml
   # - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
   # - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml
-  # - pingcap/tidb/push.yaml
-  # - pingcap/tiflash/push.yaml
-  # - pingcap/tiflow/push.yaml
-  # - tikv/tikv/push.yaml

@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: push-tikv-tikv
+  name: git-push-tikv-tikv
   labels:
     type: github-branch-push
     github-owner: tikv
@@ -25,4 +25,4 @@ spec:
   bindings:
     - ref: github-branch-push
   template:
-    ref: push-tikv-tikv
+    ref: build-tikv-tikv
