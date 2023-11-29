@@ -27,7 +27,7 @@ spec:
       description: tags pushed
   steps:
     - name: prepare-manifest
-      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+      image: ghcr.io/pingcap-qe/cd/utils/release:bcb089f
       script: |
         #! /usr/bin/env bash
 
@@ -76,13 +76,16 @@ spec:
           yq -i ".manifests[-1].platform.architecture = \"$architecture\"" manifest.yaml
         done
 
-        cat manifest.yaml
-        printf "%s" "$pushed_repo" > $(results.repo.path)
-        printf "%s" "$tags" > $(results.tags.path)
-      workingDir: /workspace
-    - name: push-manifest
-      image: mplatform/manifest-tool:alpine-v2.0.8
-      args: [push, from-spec, manifest.yaml]
+        if yq -e '.manifests |length > 1' manifest.yaml >/dev/null 2>&1; then
+          printf "%s" "$pushed_repo" > $(results.repo.path)
+          printf "%s" "$tags" > $(results.tags.path)
+          cat manifest.yaml
+          manifest-tool push from-spec manifest.yaml
+        else
+          echo "🤷 no more than one arch tags found. Skip push oci manifest tags"
+          exit 0
+        fi
+
       workingDir: /workspace
   workspaces:
     - description: Includes a docker `config.json`
