@@ -1,0 +1,28 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: tag-create-pingcap-advanced-statefulset
+  labels:
+    type: github-tag-create
+    github-owner: pingcap
+    github-repo: advanced-statefulset
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'pingcap' && body.repository.name == 'advanced-statefulset'
+    - name: filter on version tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^refs/tags/v[0-9]+[.]v[0-9]+[.]v[0-9]+')
+  bindings:
+    - ref: github-tag-create
+  template:
+    ref: build-pingcap-advanced-statefulset

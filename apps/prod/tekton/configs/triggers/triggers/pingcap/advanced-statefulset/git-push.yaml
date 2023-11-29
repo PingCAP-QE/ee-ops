@@ -25,4 +25,4 @@ spec:
   bindings:
     - ref: github-branch-push
   template:
-    ref: push-pingcap-advanced-statefulset
+    ref: build-pingcap-advanced-statefulset

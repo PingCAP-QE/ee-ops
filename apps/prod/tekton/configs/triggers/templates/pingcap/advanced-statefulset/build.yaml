@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: push-pingcap-advanced-statefulset
+  name: build-pingcap-advanced-statefulset
 spec:
   params:
     - name: git-url
