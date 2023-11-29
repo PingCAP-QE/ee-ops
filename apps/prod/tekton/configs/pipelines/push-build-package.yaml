@@ -33,6 +33,8 @@ spec:
     - name: binary-builder-iamge
       description: The image used to build binaries.
       default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+    - name: push
+      default: 'true'
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
@@ -57,7 +59,7 @@ spec:
         - name: depth
           value: "0"
         - name: refspec
-          value: +refs/heads/$(params.git-ref):refs/remotes/origin/$(params.git-ref)
+          value: +refs/heads/*:refs/remotes/origin/*
       workspaces:
         - name: output
           workspace: source
@@ -109,7 +111,7 @@ spec:
         - name: release-dir
           value: build
         - name: push
-          value: 'true'
+          value: "$(params.push)"
       workspaces:
         - name: source
           workspace: source
@@ -122,8 +124,10 @@ spec:
         - input: "$(params.os)"
           operator: in
           values: ["linux"]
+        - input: "$(params.push)"
+          operator: in
+          values: ["true"]
       taskRef:
-        # TODO: can we skaffold to make it simpler?
         name: pingcap-build-images
       runAfter:
         - build-binaries

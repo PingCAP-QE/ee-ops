@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: push-tikv-pd
+  name: build-tikv-pd
 spec:
   params:
     - name: git-url
