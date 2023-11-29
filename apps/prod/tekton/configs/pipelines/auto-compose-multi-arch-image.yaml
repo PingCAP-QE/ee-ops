@@ -8,8 +8,6 @@ spec:
       description: The image full url for pull
     - name: tag
       description: The pushed image tag
-    - name: digest
-      description: The pushed image digest
   workspaces:
     - name: dockerconfig
       description: Includes a docker `config.json`   

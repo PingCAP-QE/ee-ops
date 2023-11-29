@@ -1,16 +1,16 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - _/image-push-on-harbor.yaml
+  - pingcap/advanced-statefulset/git-create-tag.yaml
+  - pingcap/advanced-statefulset/git-push.yaml
+  - pingcap/create-branch-product-components-hotfix.yaml
+  - tikv/pd/git-create-tag.yaml
+  - tikv/pd/git-push.yaml
   # - pingcap-qe/artifacts/create-tag-pingcap-qe-artifacts.yaml
   # - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
   # - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml
-  - pingcap/create-branch-product-components-hotfix.yaml
-  - pingcap/advanced-statefulset/git-push.yaml
-  - pingcap/advanced-statefulset/git-create-tag.yaml
-  - pingcap/advanced-statefulset/image-push.yaml
   # - pingcap/tidb/push.yaml
   # - pingcap/tiflash/push.yaml
   # - pingcap/tiflow/push.yaml
-  - tikv/pd/git-push.yaml
-  - tikv/pd/git-create-tag.yaml
   # - tikv/tikv/push.yaml
