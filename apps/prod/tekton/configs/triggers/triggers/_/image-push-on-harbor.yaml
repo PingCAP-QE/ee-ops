@@ -1,11 +1,9 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: image-push-pingcap-advanced-statefulset
+  name: image-push-on-harbor
   labels:
     type: image-push
-    github-owner: tikv
-    github-repo: pd
 spec:
   interceptors:
     - name: filter on image repo names
@@ -14,7 +12,10 @@ spec:
       params:
         - name: filter
           value: >-
-            body.event_data.repository.repo_full_name == 'pingcap/advanced-statefulset'
+            body.event_data.repository.repo_full_name in [
+              'pingcap/advanced-statefulset',
+              'tikv/pd/image'
+            ]
     - name: filter on single arch image tags.
       ref:
         name: "cel"
@@ -25,4 +26,4 @@ spec:
   bindings:
     - ref: harbor-image-push
   template:
-    ref: image-push-pingcap-advanced-statefulset
+    ref: image-push

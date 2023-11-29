@@ -121,6 +121,26 @@ X-GitHub-Event: push
     }
 }
 
+########################
+### pingcap/advanced-statefulset: create a new version tag
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: create
+
+{
+  "ref": "v0.5.1-alpha.1",
+  "ref_type": "tag",
+  "repository": {
+    "name": "advanced-statefulset",
+    "clone_url": "https://github.com/pingcap/advanced-statefulset.git",
+    "owner": {
+      "login": "pingcap"
+    }
+  }
+}
+
+########################
 ### push image tags on harbor
 POST http://127.0.0.1:8080 HTTP/1.1
 Content-Type: application/json

@@ -24,12 +24,7 @@ spec:
     - name: repo
       description: image repo
     - name: tags
-      description: tags to push
-    - name: digests
-      type: array
-      description: |
-        image digests list for different platforms, element format is
-        <platform> => <digest>
+      description: tags pushed
   steps:
     - name: prepare-manifest
       image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
@@ -68,7 +63,6 @@ spec:
         done
 
         # digest map
-        jq -n '[]' > $(results.digests.path)
         for t in `oras repo tags $pushed_repo | grep -E "${tag}[-_].*[-_](amd64|arm64)$"`; do
           manifest-tool inspect --raw "${pushed_repo}:$t" > manifest.json
           platform=`jq -r '.os + "/" + .architecture' manifest.json`
@@ -86,6 +80,7 @@ spec:
         cat manifest.yaml
         printf "%s" "$pushed_repo" > $(results.repo.path)
         printf "%s" "$tags" > $(results.tags.path)
+        jq -n '[]' > $(results.digests.path)
       workingDir: /workspace
     - name: push-manifest
       image: mplatform/manifest-tool:alpine-v2.0.8

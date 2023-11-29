@@ -1,20 +1,18 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: image-push-pingcap-advanced-statefulset
+  name: image-push
 spec:
   params:
     - name: image_url
       description: The image full url for pull
     - name: tag
       description: The image tag
-    - name: digest
-      description: The image digest
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: image-push-pingcap-advanced-statefulset-run-
+        generateName: auto-compose-multi-arch-image-run-
       spec:
         pipelineRef:
           name: auto-compose-multi-arch-image
@@ -23,8 +21,6 @@ spec:
           value: "$(tt.params.image_url)"
         - name: tag
           value: "$(tt.params.tag)"
-        - name: digest
-          value: "$(tt.params.digest)"
         workspaces:
           - name: dockerconfig
             secret:
