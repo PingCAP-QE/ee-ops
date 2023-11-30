@@ -21,3 +21,5 @@ resources:
   - pingcap-build-images.yaml
   - run-build-binaries-scripts.yaml
   - run-build-images-scripts.yaml
+  - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
+  - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release
