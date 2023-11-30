@@ -15,3 +15,5 @@ resources:
       type: MacMachineConfig
       content: |
         {"TODO": "yes"}
+
+# TODO: #812 add ci jobs to verify boskos config for tekton.
