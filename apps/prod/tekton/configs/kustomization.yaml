@@ -6,3 +6,4 @@ resources:
   - tasks
   - pipelines
   - triggers
+  - rbac
