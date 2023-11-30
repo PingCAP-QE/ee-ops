@@ -31,6 +31,6 @@ patchesJson6902:
         path: /spec/template/spec/containers/0/env
         value:
           - name: JANITOR_RESOURCE_TYPES
-            value: mac-machine
+            value: mac-machine-amd64,mac-machine-arm64
           - name: JANITOR_BINARY
             value: /bin/echo

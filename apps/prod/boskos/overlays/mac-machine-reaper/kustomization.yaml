@@ -31,4 +31,4 @@ patchesJson6902:
         path: /spec/template/spec/containers/0/env
         value:
           - name: REAPER_RESOURCE_TYPES
-            value: mac-machine
+            value: mac-machine-amd64,mac-machine-arm64
