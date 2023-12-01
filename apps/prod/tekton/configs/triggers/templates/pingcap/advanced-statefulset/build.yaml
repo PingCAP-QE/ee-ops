@@ -14,7 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-pingcap-advanced-statefulset-amd64-
+        generateName: build-package-pingcap-advanced-statefulset-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -61,7 +61,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-pingcap-advanced-statefulset-arm64-
+        generateName: build-package-pingcap-advanced-statefulset-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"

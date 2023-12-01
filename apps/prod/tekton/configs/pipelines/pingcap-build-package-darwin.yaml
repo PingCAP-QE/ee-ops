@@ -1,0 +1,142 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pingcap-build-package-darwin
+spec:
+  params:
+    - name: git-url
+      type: string
+    - name: git-ref
+      type: string
+      default: master
+    - name: git-revision
+      default: master
+      type: string
+    - name: component
+      type: string
+      description: |
+        compoent name, supports:
+        - tidb
+        - tikv
+        - pd
+        - tiflash
+        - tiflow
+        - advanced-statefulset
+
+        May be it is an idea to judge it by git-url, but it maybe 
+        not a generic way for forked repositories with custom names.
+    - name: arch
+      default: amd64
+    - name: profile
+      default: release
+    - name: binary-builder-iamge
+      description: The image used to build binaries.
+      default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+    - name: push
+      default: 'true'
+  workspaces:
+    - name: source
+      description: The workspace where the git repo will be cloned.
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+    - name: git-credentials
+      description: secret contains ssh private key in `id_rsa` key.
+      optional: true
+    - name: mac-ssh-credentials
+      description: secret contains ssh private key in `id_rsa` key for login mac
+  tasks:
+    - name: checkout
+      retries: 3
+      taskRef:
+        kind: Task
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+        - name: depth
+          value: "0"
+        - name: refspec
+          value: +refs/heads/*:refs/remotes/origin/*
+      workspaces:
+        - name: output
+          workspace: source
+        - name: ssh-directory
+          workspace: git-credentials
+    - name: get-release-ver
+      taskSpec:
+        results:
+          - name: version
+            description: The release version of the git repo
+        workspaces:
+          - name: source
+        steps:
+          - name: git-describe
+            image: alpine/git:2.40.1
+            workingDir: $(workspaces.source.path)
+            script: |
+              RESULT_VERSION="$(git describe --tags --always --dirty)"
+              printf "%s" "${RESULT_VERSION}" > $(results.version.path)
+      runAfter:
+        - checkout
+      workspaces:
+        - name: source
+          workspace: source
+    - name: acquire-mac-machine
+      retries: 5
+      taskRef:
+        name: boskos-acquire
+      params:
+        - name: server-url
+          value: http://boskos.apps.svc
+        - name: type
+          value: "mac-machine-$(params.arch)"
+        - name: owner-name
+          value: "$(context.pipelineRun.name)"
+    - name: build-binaries
+      taskRef:
+        name: pingcap-build-binaries-darwin
+      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+      params:
+        - name: os
+          value: darwin
+        - name: arch
+          value: "$(params.arch)"
+        - name: profile
+          value: "$(params.profile)"
+        - name: component
+          value: "$(params.component)"
+        - name: version
+          value: "$(tasks.get-release-ver.results.version)"
+        - name: git-ref
+          value: $(params.git-ref)
+        - name: git-sha
+          value: $(params.git-revision)
+        - name: builder-image
+          # value: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
+          value: $(params.binary-builder-iamge)
+        - name: release-dir
+          value: build
+        - name: push
+          value: "$(params.push)"
+        - name: mac-builder-resource
+          value: "$(tasks.acquire-mac-machine.results.leased-resource)"        
+      workspaces:
+        - name: source
+          workspace: source
+        - name: dockerconfig
+          workspace: dockerconfig
+        - name: ssh-directory
+          workspace: mac-ssh-credentials
+  finally:
+    - name: release-mac-machine
+      taskRef:
+        name: boskos-release
+      params:
+        - name: server-url
+          value: http://boskos.apps.svc
+        - name: leased-resource
+          value: "$(tasks.acquire-mac-machine.results.leased-resource)"
+        - name: owner-name
+          value: "$(context.pipelineRun.name)"

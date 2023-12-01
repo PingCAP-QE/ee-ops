@@ -21,6 +21,7 @@ spec:
         - pd
         - tiflash
         - tiflow
+        - advanced-statefulset
 
         May be it is an idea to judge it by git-url, but it maybe 
         not a generic way for forked repositories with custom names.
@@ -87,8 +88,6 @@ spec:
     - name: build-binaries
       taskRef:
         name: pingcap-build-binaries
-      runAfter:
-        - get-release-ver
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
         - name: os
@@ -117,8 +116,6 @@ spec:
           workspace: source
         - name: dockerconfig
           workspace: dockerconfig
-        - name: ssh-directory
-          workspace: mac-ssh-credentials
     - name: build-images
       when:
         - input: "$(params.os)"

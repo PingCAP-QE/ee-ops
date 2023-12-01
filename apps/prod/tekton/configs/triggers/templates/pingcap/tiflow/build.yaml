@@ -14,56 +14,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-pingcap-tiflow-linux-arm64-
-        annotations:
-          "tekton.dev/git-status": "true"
-          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
-          "tekton.dev/git-repo": $(tt.params.git-url)
-          "tekton.dev/git-revision": $(tt.params.git-revision)
-      spec:
-        pipelineRef:
-          name: pingcap-build-package
-        params:
-          - name: git-url
-            value: $(tt.params.git-url)
-          - name: git-revision
-            value: $(tt.params.git-revision)
-          - name: git-ref
-            value: $(tt.params.git-ref)
-          - name: component
-            value: tiflow
-          - name: os
-            value: linux
-          - name: arch
-            value: arm64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tiflow:v20231115-e1c4b43-go1.21
-        taskRunSpecs:
-          - pipelineTaskName: build-binaries
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
-          - pipelineTaskName: build-images
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
-        workspaces:
-          - name: dockerconfig
-            secret:
-              secretName: hub-pingcap-net-ee
-          - name: source
-            volumeClaimTemplate:
-              spec:
-                storageClassName: ceph-block
-                accessModes:
-                  - ReadWriteOnce
-                resources:
-                  requests:
-                    storage: 10Gi
-    - apiVersion: tekton.dev/v1beta1
-      kind: PipelineRun
-      metadata:
-        generateName: build-package-pingcap-tiflow-linux-amd64-
+        generateName: build-package-pingcap-tiflow-linux-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -96,6 +47,8 @@ spec:
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: 1h
         workspaces:
           - name: dockerconfig
             secret:
@@ -112,7 +65,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-pingcap-tiflow-darwin-arm64-
+        generateName: build-package-pingcap-tiflow-linux-
         annotations:
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
@@ -131,7 +84,108 @@ spec:
           - name: component
             value: tiflow
           - name: os
-            value: darwin
+            value: linux
+          - name: arch
+            value: arm64
+          - name: binary-builder-iamge
+            value: ghcr.io/pingcap-qe/cd/builders/tiflow:v20231115-e1c4b43-go1.21
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: arm64
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: arm64
+        timeouts:
+          pipeline: 1h
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: build-package-pingcap-tiflow-darwin-
+        annotations:
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        pipelineRef:
+          name: pingcap-build-package-darwin
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: tiflow
+          - name: arch
+            value: amd64
+          - name: binary-builder-iamge
+            value: ghcr.io/pingcap-qe/cd/builders/tiflow:v20231115-e1c4b43-go1.21
+        taskRunSpecs:
+          - pipelineTaskName: acquire-mac-machine
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+          - pipelineTaskName: release-mac-machine
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: 1h
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: mac-ssh-credentials
+            secret:
+              secretName: mac-ssh-credentials
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: 10Gi
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: build-package-pingcap-tiflow-darwin-
+        annotations:
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        pipelineRef:
+          name: pingcap-build-package-darwin
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: tiflow
           - name: arch
             value: arm64
           - name: binary-builder-iamge
@@ -152,3 +206,14 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
+        timeouts:
+          pipeline: 1h
+        taskRunSpecs:
+          - pipelineTaskName: acquire-mac-machine
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+          - pipelineTaskName: release-mac-machine
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64

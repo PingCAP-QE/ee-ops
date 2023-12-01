@@ -18,6 +18,7 @@ resources:
   - multi-arch-image-collect.yaml
   - multi-arch-image-push.yaml
   - pingcap-build-binaries.yaml
+  - pingcap-build-binaries-darwin.yaml
   - pingcap-build-images.yaml
   - run-build-binaries-scripts.yaml
   - run-build-images-scripts.yaml
