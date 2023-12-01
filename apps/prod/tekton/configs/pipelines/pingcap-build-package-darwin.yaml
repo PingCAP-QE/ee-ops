@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pingcap-build-package
+  name: pingcap-build-package-darwin
 spec:
   params:
     - name: git-url
@@ -25,8 +25,6 @@ spec:
 
         May be it is an idea to judge it by git-url, but it maybe 
         not a generic way for forked repositories with custom names.
-    - name: os
-      default: linux
     - name: arch
       default: amd64
     - name: profile
@@ -46,9 +44,9 @@ spec:
       optional: true
     - name: mac-ssh-credentials
       description: secret contains ssh private key in `id_rsa` key for login mac
-      optional: true      
   tasks:
     - name: checkout
+      retries: 3
       taskRef:
         kind: Task
         name: git-clone
@@ -85,13 +83,24 @@ spec:
       workspaces:
         - name: source
           workspace: source
+    - name: acquire-mac-machine
+      retries: 5
+      taskRef:
+        name: boskos-acquire
+      params:
+        - name: server-url
+          value: http://boskos.apps.svc
+        - name: type
+          value: "mac-machine-$(params.arch)"
+        - name: owner-name
+          value: "$(context.pipelineRun.name)"
     - name: build-binaries
       taskRef:
-        name: pingcap-build-binaries
+        name: pingcap-build-binaries-darwin
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
         - name: os
-          value: "$(params.os)"
+          value: darwin
         - name: arch
           value: "$(params.arch)"
         - name: profile
@@ -111,45 +120,23 @@ spec:
           value: build
         - name: push
           value: "$(params.push)"
+        - name: mac-builder-resource
+          value: "$(tasks.acquire-mac-machine.results.leased-resource)"        
       workspaces:
         - name: source
           workspace: source
         - name: dockerconfig
           workspace: dockerconfig
-    - name: build-images
-      when:
-        - input: "$(params.os)"
-          operator: in
-          values: ["linux"]
-        - input: "$(params.push)"
-          operator: in
-          values: ["true"]
+        - name: ssh-directory
+          workspace: mac-ssh-credentials
+  finally:
+    - name: release-mac-machine
       taskRef:
-        name: pingcap-build-images
-      runAfter:
-        - build-binaries
-      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+        name: boskos-release
       params:
-        - name: os
-          value: "$(params.os)"
-        - name: arch
-          value: "$(params.arch)"
-        - name: profile
-          value: "$(params.profile)"
-        - name: component
-          value: "$(params.component)"     
-        - name: version
-          value: "$(tasks.get-release-ver.results.version)"           
-        - name: git-ref
-          value: $(params.git-ref)
-        - name: git-sha
-          value: $(params.git-revision)
-        - name: release-dir
-          value: build
-        - name: build
-          value: "false"
-      workspaces:
-        - name: source
-          workspace: source
-        - name: dockerconfig
-          workspace: dockerconfig
+        - name: server-url
+          value: http://boskos.apps.svc
+        - name: leased-resource
+          value: "$(tasks.acquire-mac-machine.results.leased-resource)"
+        - name: owner-name
+          value: "$(context.pipelineRun.name)"
