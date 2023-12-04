@@ -1,9 +1,12 @@
 apiVersion: v2
 name: git-cdn
-description: | 
+description: |
   It's a git mirror that you can place near your CI workers and developers.
-  It acts as a git+http(s) proxy, reducing WAN usage and accelerating git 
+  It acts as a git+http(s) proxy, reducing WAN usage and accelerating git
   access for large repositories.
+maintainers:
+  - name: wuhuizuo
+    email: wuhuizuo@126.com
 
 # A chart can be either an 'application' or a 'library' chart.
 #
