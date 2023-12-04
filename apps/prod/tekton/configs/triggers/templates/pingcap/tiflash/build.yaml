@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: builde-pingcap-tiflash
+  name: build-pingcap-tiflash
 spec:
   params:
     - name: git-url
