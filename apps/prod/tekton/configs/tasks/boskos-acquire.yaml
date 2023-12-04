@@ -53,6 +53,8 @@ spec:
       metadata:
         name: boskos-heartbeat-$LEASED_RESOURCE
       spec:
+        nodeSelector:
+          kubernetes.io/arch: amd64
         containers:
         - name: heartbeat
           image: gcr.io/k8s-staging-boskos/boskosctl@sha256:a7fc984732c5dd0b4e0fe0a92e2730fa4b6bddecd0f6f6c7c6b5501abe4ab105
