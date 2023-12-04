@@ -17,3 +17,4 @@ resources:
   - jenkins-beta
   - cloudevents-server
   - boskos
+  - git-cdn

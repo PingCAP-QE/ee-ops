@@ -2,10 +2,8 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: cloudevents-server
-  namespace: flux-system
 spec:
   releaseName: cloudevents-server
-  targetNamespace: apps
   chart:
     spec:
       chart: cloudevents-server
