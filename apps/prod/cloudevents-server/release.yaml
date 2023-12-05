@@ -36,8 +36,8 @@ spec:
     nodeSelector:
       kubernetes.io/arch: amd64
     image:
-      repository: hub.pingcap.net/ee/apps/cloudevents-server
-      tag: v0.1.0-1-ga3d0cd3
+      repository: ghcr.io/pingcap-qe/ee-apps/cloudevents-server
+      tag: f4f2f4c
     server:
       args: [--config=/config/config.yaml]
       volumeMounts:
