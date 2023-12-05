@@ -19,4 +19,4 @@ Chart.lock
 /charts/**/*.tgz
 
 # IDEs
-/.vscode
+.vscode
