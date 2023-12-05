@@ -62,6 +62,9 @@ spec:
                 resources:
                   requests:
                     storage: 50Gi
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -113,6 +116,9 @@ spec:
                 resources:
                   requests:
                     storage: 50Gi
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -165,6 +171,9 @@ spec:
                 resources:
                   requests:
                     storage: 50Gi
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -208,6 +217,9 @@ spec:
                 resources:
                   requests:
                     storage: 50Gi
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
@@ -216,5 +228,4 @@ spec:
           - pipelineTaskName: release-mac-machine
             taskPodTemplate:
               nodeSelector:
-                kubernetes.io/arch: amd64    
-    
+                kubernetes.io/arch: amd64

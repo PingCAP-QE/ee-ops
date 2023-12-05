@@ -116,7 +116,7 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
-          - name: git-basic-auth # need to fetch some private repositories.
+          - name: git-basic-auth # fetch with git-cdn.
             secret:
               secretName: git-credentials-basic
     - apiVersion: tekton.dev/v1beta1
