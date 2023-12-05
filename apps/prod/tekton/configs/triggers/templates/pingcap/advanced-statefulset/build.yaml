@@ -58,6 +58,9 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -105,3 +108,6 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
