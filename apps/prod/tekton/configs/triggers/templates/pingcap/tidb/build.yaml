@@ -62,9 +62,9 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
-          - name: git-credentials # need to fetch some private repositories.
+          - name: git-basic-auth # need to fetch some private repositories.
             secret:
-              secretName: git-credentials
+              secretName: git-credentials-basic
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -116,9 +116,9 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
-          - name: git-credentials # need to fetch some private repositories.
+          - name: git-basic-auth # need to fetch some private repositories.
             secret:
-              secretName: git-credentials
+              secretName: git-credentials-basic
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -162,9 +162,9 @@ spec:
           - name: mac-ssh-credentials
             secret:
               secretName: mac-ssh-credentials
-          - name: git-credentials # need to fetch some private repositories.
+          - name: git-basic-auth # need to fetch some private repositories.
             secret:
-              secretName: git-credentials
+              secretName: git-credentials-basic
           - name: source
             volumeClaimTemplate:
               spec:
@@ -215,9 +215,9 @@ spec:
                 resources:
                   requests:
                     storage: 10Gi
-          - name: git-credentials # need to fetch some private repositories.
+          - name: git-basic-auth # need to fetch some private repositories.
             secret:
-              secretName: git-credentials
+              secretName: git-credentials-basic
         timeouts:
           pipeline: 1h
         taskRunSpecs:
