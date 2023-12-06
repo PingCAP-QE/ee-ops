@@ -40,7 +40,7 @@ spec:
           key: dedicated
           operator: Equal
           value: test-infra
-    default-cloud-events-sink: https://cloudevents-server.apps.svc/events
+    default-cloud-events-sink: http://cloudevents-server.apps.svc/events
 
   trigger:
     default-service-account: "default"
