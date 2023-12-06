@@ -18,6 +18,7 @@ spec:
     enable-tekton-oci-bundles: true
     require-git-ssh-secret-known-hosts: false
     running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
+    send-cloudevents-for-runs: true
 
     ###### metrics items ########
     metrics.pipelinerun.duration-type: histogram
@@ -39,6 +40,8 @@ spec:
           key: dedicated
           operator: Equal
           value: test-infra
+    default-cloud-events-sink: https://cloudevents-server.apps.svc/events
+
   trigger:
     default-service-account: "default"
     enable-api-fields: alpha # stable | alpha
