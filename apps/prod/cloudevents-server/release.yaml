@@ -38,7 +38,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/cloudevents-server
       # datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/cloudevents-server
-      tag: e652158
+      tag: bcd76b2
     server:
       args: [--config=/config/config.yaml]
       volumeMounts:
