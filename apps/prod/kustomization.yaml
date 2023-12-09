@@ -3,9 +3,10 @@ kind: Kustomization
 resources:
   - ../_base
   - namespace.yaml
-  - jenkins
-  - jenkins-gitee.yaml
   - mongodb
+  - jenkins
+  - jenkins-beta
+  - jenkins-gitee.yaml
   - greenhouse
   - ats
   - goproxy
@@ -14,7 +15,7 @@ resources:
   - buildbarn
   - prow-worker
   - ccache-pvc
-  - jenkins-beta
   - cloudevents-server
   - boskos
   - git-cdn
+  - tibuild
