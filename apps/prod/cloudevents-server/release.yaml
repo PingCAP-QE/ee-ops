@@ -37,8 +37,8 @@ spec:
       kubernetes.io/arch: amd64
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/cloudevents-server
-      # datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/cloudevents-server
-      tag: bcd76b2
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/cloudevents-server
+      tag: 3ad8efa
     server:
       args: [--config=/config/config.yaml]
       volumeMounts:
