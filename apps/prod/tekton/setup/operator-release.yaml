@@ -7,8 +7,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektonchains.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -45,8 +45,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektonconfigs.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -83,8 +83,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektondashboards.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -121,8 +121,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektonhubs.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -165,8 +165,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektoninstallersets.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -200,8 +200,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektonpipelines.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -238,8 +238,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektonresults.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -333,8 +333,8 @@ apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tektontriggers.operator.tekton.dev
 spec:
   group: operator.tekton.dev
@@ -783,15 +783,12 @@ rules:
       - resolution.tekton.dev
     resources:
       - resolutionrequests
-      - resolutionrequests/status
     verbs:
       - get
       - list
       - watch
       - create
       - delete
-      - update
-      - patch
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -960,7 +957,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  version: v0.62.0
+  version: v0.61.0
 kind: ConfigMap
 metadata:
   labels:
@@ -982,7 +979,7 @@ kind: Service
 metadata:
   labels:
     app: tekton-pipelines-controller
-    version: v0.62.0
+    version: v0.61.0
   name: tekton-operator
   namespace: tekton-operator
 spec:
@@ -1001,8 +998,8 @@ metadata:
   labels:
     app: tekton-operator
     name: tekton-operator-webhook
-    operator.tekton.dev/release: devel
-    version: devel
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tekton-operator-webhook
   namespace: tekton-operator
 spec:
@@ -1018,8 +1015,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tekton-operator
   namespace: tekton-operator
 spec:
@@ -1051,13 +1048,13 @@ spec:
             - name: OPERATOR_NAME
               value: tekton-operator
             - name: IMAGE_PIPELINES_PROXY
-              value: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/proxy-webhook:v0.62.0@sha256:3c079de954e7a8c56fea86ba064b436d4a668da68f034b26d498d4197b4448f7
+              value: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/proxy-webhook:v0.61.0@sha256:143e0f1e22ca6dee89b29d99626a9badc8d4e08d6707aebfec93ac89a117845d
             - name: IMAGE_JOB_PRUNER_TKN
               value: gcr.io/tekton-releases/dogfooding/tkn:v20221201-ed0196540a
             - name: METRICS_DOMAIN
               value: tekton.dev/operator
             - name: VERSION
-              value: devel
+              value: v0.61.0
             - name: CONFIG_OBSERVABILITY_NAME
               value: tekton-config-observability
             - name: AUTOINSTALL_COMPONENTS
@@ -1070,7 +1067,7 @@ spec:
                 configMapKeyRef:
                   key: DEFAULT_TARGET_NAMESPACE
                   name: tekton-config-defaults
-          image: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/operator:v0.62.0@sha256:7f9071864b49439de21eb0413ef4fe5773116b00db34b73214920c21e26fd640
+          image: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/operator:v0.61.0@sha256:c91ed327f06ad60b3a43a2838eee6b833b78b00ffb482a9de531f452fb90c6fa
           imagePullPolicy: Always
           name: tekton-operator-lifecycle
         - args:
@@ -1092,10 +1089,10 @@ spec:
             - name: PROFILING_PORT
               value: "9009"
             - name: VERSION
-              value: devel
+              value: v0.61.0
             - name: METRICS_DOMAIN
               value: tekton.dev/operator
-          image: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/operator:v0.62.0@sha256:7f9071864b49439de21eb0413ef4fe5773116b00db34b73214920c21e26fd640
+          image: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/operator:v0.61.0@sha256:c91ed327f06ad60b3a43a2838eee6b833b78b00ffb482a9de531f452fb90c6fa
           imagePullPolicy: Always
           name: tekton-operator-cluster-operations
       serviceAccountName: tekton-operator
@@ -1104,8 +1101,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    operator.tekton.dev/release: v0.62.0
-    version: v0.62.0
+    operator.tekton.dev/release: v0.61.0
+    version: v0.61.0
   name: tekton-operator-webhook
   namespace: tekton-operator
 spec:
@@ -1133,7 +1130,7 @@ spec:
               value: tekton-operator-webhook-certs
             - name: METRICS_DOMAIN
               value: tekton.dev/operator
-          image: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/webhook:v0.62.0@sha256:af242fc4ca25235e64db10fb478031cb55d882cc1f783d4a5392d048605e5b35
+          image: gcr.io/tekton-releases/github.com/tektoncd/operator/cmd/kubernetes/webhook:v0.61.0@sha256:38698adafe8317c6846e967c92c20db205f9a5152b255a92b8190fe0f78a272f
           name: tekton-operator-webhook
           ports:
             - containerPort: 8443
