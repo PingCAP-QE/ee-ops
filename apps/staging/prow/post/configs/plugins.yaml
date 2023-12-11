@@ -60,7 +60,7 @@ label:
 external_plugins:
   PingCAP-QE/artifacts:
     - name: tektoncd # forward to tekton trigger event listener.
-      endpoint: http://el-trigger-groups-listener.ci-demo.svc:8080
+      endpoint: http://el-public.ci-demo.svc:8080
       events:
         - pull_request
     - name: needs-rebase
@@ -75,7 +75,7 @@ external_plugins:
         - issue_comment
   PingCAP-QE/ee-ops:
     - name: tektoncd # forward to tekton trigger event listener.
-      endpoint: http://el-trigger-groups-listener.ci-demo.svc:8080
+      endpoint: http://el-public.ci-demo.svc:8080
       events:
         - pull_request
     - name: needs-rebase

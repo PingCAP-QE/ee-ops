@@ -2,7 +2,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: trigger-groups-listener
+  name: public
 spec:
   serviceAccountName: tekton-trigger-eventlistener
   triggerGroups:
