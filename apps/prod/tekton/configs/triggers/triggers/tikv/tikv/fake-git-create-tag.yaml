@@ -1,0 +1,29 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: fake-tag-create-tikv-tikv
+  labels:
+    type: fake-github-tag-create
+    github-owner: tikv
+    github-repo: tikv
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'tikv' && body.repository.name == 'tikv'
+    - name: filter on version tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
+  bindings:
+    - ref: github-tag-create
+    - ref: ce-context
+  template:
+    ref: build-tikv-tikv
