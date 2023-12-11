@@ -1,0 +1,55 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: internal
+spec:
+  serviceAccountName: tekton-trigger-eventlistener
+  triggerGroups:
+    - name: tibuild-fake-github-branch-push
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: >
+                header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.push', 'net.pingcap.tibuild.hotfix.push']
+        # "refs/heads/main" => "main"
+        - name: shortten the git REF
+          ref:
+            name: cel
+          params:
+            - name: overlays
+              value:
+                - key: short-ref
+                  expression: body.ref.replace('refs/heads/', '')
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: fake-github-branch-push
+    - name: tibuild-fake-github-tag-create
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: >
+                header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.create', 'net.pingcap.tibuild.hotfix.create']
+        - name: "validate tag create"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.ref_type == 'tag'
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: fake-github-tag-create

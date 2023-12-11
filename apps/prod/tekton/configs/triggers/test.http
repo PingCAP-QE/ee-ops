@@ -1,5 +1,5 @@
 ## You should run it firstly:
-## kubectl port-forward -n ee-cd svc/el-trigger-groups-listener 8080
+## kubectl port-forward -n ee-cd svc/el-public 8080
 
 ### tikv/pd: push on master branch
 POST http://127.0.0.1:8080 HTTP/1.1

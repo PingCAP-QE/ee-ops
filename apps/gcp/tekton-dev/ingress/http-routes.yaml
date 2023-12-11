@@ -17,7 +17,7 @@ spec:
             type: PathPrefix
             value: "${PATH_FOR_HOOK}(/|$)(.*)"
       backendRefs:
-        - name: el-trigger-groups-listener
+        - name: el-public
           namespace: ee-cd
           port: 8080
       filters:
