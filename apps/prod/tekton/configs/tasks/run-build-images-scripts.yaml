@@ -35,4 +35,4 @@ spec:
       image: "$(params.build-image)"
       workingDir: $(workspaces.source.path)
       script: |
-        $(workspaces.build-scripts.path)/$(params.run-script-file) "$(params.release-dir)" "$(params.tag)" "$(params.kaniko-executor)" "$(params.need-build)"
+        $(workspaces.build-scripts.path)/$(params.run-script-file) "$(params.release-dir)" "$(params.need-build)" "$(params.kaniko-executor)" 
