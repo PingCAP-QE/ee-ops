@@ -81,4 +81,4 @@ spec:
           exit 0
         fi
 
-        "$script" "$(params.release-dir)" "$(params.tag)" ${KANIKO_EXECUTOR} "$(params.build)"
+        "$script" "$(params.release-dir)" "$(params.build)" ${KANIKO_EXECUTOR}
