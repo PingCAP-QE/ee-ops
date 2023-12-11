@@ -20,6 +20,11 @@ spec:
   - name: server-url
     description: The URL of the running boskos server
     default: "http://boskos.test-pods.svc.cluster.local"
+  - name: timeout
+    description: >
+      Retry this long until the resource has been acquired.
+      Example: 10s, 5m, 1h.
+    default: '1m'
   - name: type
     description: |
       The type of resource to request. Resource types are specified in the resource
@@ -37,6 +42,7 @@ spec:
       RESOURCE=$(boskosctl acquire \
         --server-url=$(params.server-url) \
         --owner-name=$(params.owner-name) \
+        --timeout=$(params.timeout) \
         --type=$(params.type) \
         --state=free \
         --target-state=busy)
