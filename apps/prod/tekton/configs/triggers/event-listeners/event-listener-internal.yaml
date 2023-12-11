@@ -24,6 +24,22 @@ spec:
               value:
                 - key: short-ref
                   expression: body.ref.replace('refs/heads/', '')
+        - name: extract cloud event context.
+          ref:
+            name: cel
+          params:
+            - name: overlays
+              value:
+                - key: ce-context
+                  expression: |
+                    {
+                      "type": header.canonical('ce-type'),
+                      "source": header.canonical('ce-source'),
+                      "subject": header.canonical('ce-subject'),
+                      "user": header.canonical('ce-user'),
+                    }.marshalJSON()
+                - key: ce-context-user
+                  expression: header.canonical('ce-user')
       triggerSelector:
         namespaceSelector:
           matchNames:

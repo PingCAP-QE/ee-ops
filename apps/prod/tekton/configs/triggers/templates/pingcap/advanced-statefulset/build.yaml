@@ -10,12 +10,16 @@ spec:
       description: The git revision
     - name: git-ref
       description: The git branch
+    - name: ce-context
+      description: cloud event context.
+      default: '{}'      
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
         generateName: build-package-pingcap-advanced-statefulset-
         annotations:
+          "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
           "tekton.dev/git-repo": $(tt.params.git-url)
@@ -66,6 +70,7 @@ spec:
       metadata:
         generateName: build-package-pingcap-advanced-statefulset-
         annotations:
+          "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
           "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
           "tekton.dev/git-repo": $(tt.params.git-url)
