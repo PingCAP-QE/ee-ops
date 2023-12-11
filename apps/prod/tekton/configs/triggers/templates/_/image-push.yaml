@@ -10,17 +10,17 @@ spec:
       description: The image tag
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
-      kind: PipelineRun
+      kind: TaskRun
       metadata:
         generateName: auto-compose-multi-arch-image-run-
       spec:
-        pipelineRef:
-          name: auto-compose-multi-arch-image
+        taskRef:
+          name: multi-arch-image-collect
         params:
-        - name: image_url
-          value: "$(tt.params.image_url)"
-        - name: tag
-          value: "$(tt.params.tag)"
+          - name: image_url
+            value: "$(tt.params.image_url)"
+          - name: release_tag_suffix
+            value: release
         workspaces:
           - name: dockerconfig
             secret:
