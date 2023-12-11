@@ -5,10 +5,4 @@ metadata:
 spec:
   params:
     - name: ce-context
-      value: >-
-        {
-          "type": "$(header.canonical('ce-type'))",
-          "subject": "$(header.canonical('ce-subject'))",
-          "source": "$(header.canonical('ce-source'))",
-          "user": "$(header.canonical('ce-user'))"
-        }
+      value: $(extensions.ce-context)
