@@ -1,5 +1,5 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
+namespace: apps
 resources:
-  - setup.yaml
-  - configs.yaml
+  - https://github.com/triggermesh/triggermesh/releases/download/v1.27.0/triggermesh-crds.yaml
+  # Download from: https://github.com/triggermesh/triggermesh/releases/download/v1.27.0/triggermesh.yaml, and we delete the namespace resource.
+  - triggermesh.yaml
