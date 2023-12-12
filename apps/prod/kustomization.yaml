@@ -19,3 +19,4 @@ resources:
   - boskos
   - git-cdn
   - tibuild
+  - triggermesh
