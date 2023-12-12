@@ -1,0 +1,519 @@
+# Copyright 2022 TriggerMesh Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: triggermesh-core-namespaced-admin
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-admin: "true"
+    app.kubernetes.io/part-of: triggermesh
+rules:
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources: ["*"]
+    verbs: ["*"]
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: triggermesh-core-namespaced-edit
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-edit: "true"
+    app.kubernetes.io/part-of: triggermesh
+rules:
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources: ["*"]
+    verbs:
+      - create
+      - update
+      - patch
+      - delete
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: triggermesh-core-namespaced-view
+  labels:
+    rbac.authorization.k8s.io/aggregate-to-view: "true"
+    app.kubernetes.io/part-of: triggermesh
+rules:
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources: ["*"]
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-core-controller
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+  # Record Kubernetes events
+  - apiGroups:
+      - ''
+    resources:
+      - events
+    verbs:
+      - create
+      - patch
+      - update
+  # Manage broker deployments
+  - apiGroups:
+      - apps
+    resources:
+      - deployments
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - patch
+  # Manage broker services, endpoints and secrets (for configuration)
+  - apiGroups:
+      - ''
+    resources:
+      - services
+      - endpoints
+      - secrets
+    verbs:
+      - get
+      - list
+      - watch
+      - create
+      - update
+      - delete
+      - patch
+  # Read reconciled TriggerMesh core resources and update their statuses
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources:
+      - memorybrokers
+      - redisbrokers
+      - triggers
+    verbs:
+      - list
+      - watch
+      - get
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources:
+      - memorybrokers/status
+      - redisbrokers/status
+      - triggers/status
+    verbs:
+      - update
+  # Ensure compatibility with the OwnerReferencesPermissionEnforcement Admission Controller
+  # https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#ownerreferencespermissionenforcement
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources:
+      - memorybrokers/finalizers
+      - redisbrokers/finalizers
+      - triggers/finalizers
+    verbs:
+      - update
+  # Set finalizers
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources:
+      - memorybrokers
+      - redisbrokers
+      - triggers
+    verbs:
+      - patch
+  # Manage resource-specific ServiceAccounts and RoleBindings
+  - apiGroups:
+      - ''
+    resources:
+      - serviceaccounts
+      - serviceaccounts/finalizers
+    verbs:
+      - list
+      - watch
+      - create
+      - update
+      - delete
+  - apiGroups:
+      - rbac.authorization.k8s.io
+    resources:
+      - rolebindings
+    verbs:
+      - list
+      - watch
+      - create
+  # Read configuration/credentials
+  - apiGroups:
+      - ''
+    resources:
+      - secrets
+    verbs:
+      - get
+  # Read controller configurations
+  # Create and read broker status ConfigMaps
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    verbs:
+      - list
+      - watch
+      - create
+      - get
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    resourceNames:
+      - config-logging
+      - config-observability
+      - config-leader-election
+    verbs:
+      - get
+  # Acquire leases for leader election
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs:
+      - get
+      - create
+      - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-broker
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+rules:
+  # Read broker configuration, including credentials.
+  - apiGroups:
+      - ''
+    resources:
+      - secrets
+    verbs:
+      - list
+      - watch
+      - get
+  # Read observability configuration.
+  - apiGroups:
+      - ''
+    resources:
+      - configmaps
+    verbs:
+      - list
+      - watch
+      - get
+      - update
+---
+# Use this aggregated ClusterRole when you need readonly access to "Addressables"
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  # There might be an addressable-resolver ClusterRole if Knative Eventing is installed.
+  # This would be a duplicate for TriggerMesh's brokers that would add support for scenarios
+  # where Knative Eventing is not installed but Knative Serving is.
+  name: addressable-resolver-triggermesh
+  labels:
+    eventing.knative.dev/release: devel
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+aggregationRule:
+  clusterRoleSelectors:
+    - matchLabels:
+        duck.knative.dev/addressable: "true"
+rules: [] # Rules are automatically filled in by the controller manager.
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: service-addressable-resolver-triggermesh
+  labels:
+    eventing.knative.dev/release: devel
+    duck.knative.dev/addressable: "true"
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+# Do not use this role directly. These rules will be added to the "addressable-resolver" role.
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - services
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: serving-addressable-resolver-triggermesh
+  labels:
+    eventing.knative.dev/release: devel
+    duck.knative.dev/addressable: "true"
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+# Do not use this role directly. These rules will be added to the "addressable-resolver" role.
+rules:
+  - apiGroups:
+      - serving.knative.dev
+    resources:
+      - routes
+      - routes/status
+      - services
+      - services/status
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: channel-addressable-resolver-triggermesh
+  labels:
+    eventing.knative.dev/release: devel
+    duck.knative.dev/addressable: "true"
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+# Do not use this role directly. These rules will be added to the "addressable-resolver" role.
+rules:
+  - apiGroups:
+      - messaging.knative.dev
+    resources:
+      - channels
+      - channels/status
+    verbs:
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - messaging.knative.dev
+    resources:
+      - channels/finalizers
+    verbs:
+      - update
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: broker-addressable-resolver-triggermesh
+  labels:
+    eventing.knative.dev/release: devel
+    duck.knative.dev/addressable: "true"
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+# Do not use this role directly. These rules will be added to the "addressable-resolver" role.
+rules:
+  - apiGroups:
+      - eventing.knative.dev
+    resources:
+      - brokers
+      - brokers/status
+    verbs:
+      - get
+      - list
+      - watch
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: flows-addressable-resolver-triggermesh
+  labels:
+    eventing.knative.dev/release: devel
+    duck.knative.dev/addressable: "true"
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/name: knative-eventing
+# Do not use this role directly. These rules will be added to the "addressable-resolver" role.
+rules:
+  - apiGroups:
+      - flows.knative.dev
+    resources:
+      - sequences
+      - sequences/status
+      - parallels
+      - parallels/status
+    verbs:
+      - get
+      - list
+      - watch
+---
+# This role provides readonly access to "Addressable" duck types.
+# All the rules it contains get aggregated into the "addressable-resolver" ClusterRole.
+# https://github.com/knative/eventing/blob/release-0.26/config/core/roles/addressable-resolvers-clusterrole.yaml#L15-L28
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: triggermesh-core-addressable-resolver
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+    duck.knative.dev/addressable: 'true'
+rules:
+  - apiGroups:
+      - eventing.triggermesh.io
+    resources:
+      - memorybrokers
+      - redisbrokers
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: triggermesh-core-controller
+  namespace: triggermesh
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-core-controller
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+  - kind: ServiceAccount
+    name: triggermesh-core-controller
+    namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: triggermesh-core-controller
+---
+# Controller must be granted the same permissions it assigns
+# to the broker deployment.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-core-controller-for-brokers
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+  - kind: ServiceAccount
+    name: triggermesh-core-controller
+    namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: triggermesh-broker
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-core-controller-resolver
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+  - kind: ServiceAccount
+    name: triggermesh-core-controller
+    namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: addressable-resolver-triggermesh
+---
+# If Knative Eventing is installed, use also the addressable-resolver.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: triggermesh-core-controller-resolver-knative
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+subjects:
+  - kind: ServiceAccount
+    name: triggermesh-core-controller
+    namespace: triggermesh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: addressable-resolver
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: triggermesh-core-controller
+  namespace: triggermesh
+  labels:
+    app.kubernetes.io/part-of: triggermesh
+    app.kubernetes.io/version: devel
+    app.kubernetes.io/component: core-controller
+    app.kubernetes.io/name: triggermesh-eventing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: triggermesh-core-controller
+  template:
+    metadata:
+      labels:
+        app: triggermesh-core-controller
+        app.kubernetes.io/part-of: triggermesh
+        app.kubernetes.io/version: devel
+        app.kubernetes.io/component: core-controller
+        app.kubernetes.io/name: triggermesh-eventing
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app: eventing-controller
+                topologyKey: kubernetes.io/hostname
+              weight: 100
+      serviceAccountName: triggermesh-core-controller
+      enableServiceLinks: false
+      containers:
+        - name: controller
+          terminationMessagePolicy: FallbackToLogsOnError
+          image: gcr.io/triggermesh/core-controller:v1.5.3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 50Mi
+            limits:
+              cpu: 50m
+              memory: 200Mi
+          env:
+            - name: SYSTEM_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            # Logging/observability configuration
+            - name: CONFIG_LOGGING_NAME
+              value: config-logging
+            - name: CONFIG_OBSERVABILITY_NAME
+              value: config-observability
+            - name: METRICS_DOMAIN
+              value: triggermesh.io
+            # Deployment images
+            - name: MEMORYBROKER_BROKER_IMAGE
+              value: gcr.io/triggermesh/memory-broker:v1.5.3
+            - name: REDISBROKER_REDIS_IMAGE
+              value: redis/redis-stack-server:latest
+            - name: REDISBROKER_BROKER_IMAGE
+              value: gcr.io/triggermesh/redis-broker:v1.5.3
+            # Pull policy for broker, REMOVE for production environments
+            - name: REDISBROKER_BROKER_IMAGE_PULL_POLICY
+              value: Always
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: [all]
+          ports:
+            - name: metrics
+              containerPort: 9090
+            - name: profiling
+              containerPort: 8008
