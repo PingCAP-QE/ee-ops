@@ -16,10 +16,9 @@ spec:
       mountPath: /kaniko/.docker      
       optional: true
   results:
-    - description: Digest of the image just built.
-      name: IMAGE_DIGEST
-    - description: URL of the image just built.
-      name: IMAGE_URL
+    - description: Just built and pushed images, it will be a yaml content.
+      name: pushed
+      type: string
   params:
     - name: component
     - name: os
@@ -81,4 +80,8 @@ spec:
           exit 0
         fi
 
-        "$script" "$(params.release-dir)" "$(params.build)" ${KANIKO_EXECUTOR}
+        if [ "$(params.build)" = "true" ]; then
+          "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path) -b
+        else
+          "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path)
+        fi
