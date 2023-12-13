@@ -36,6 +36,13 @@ spec:
       default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
     - name: push
       default: 'true'
+  results:
+    - name: pushed-binaries
+      description: pushed binaries.
+      value: "$(tasks.build-binaries.results.pushed)"
+    - name: pushed-images
+      description: pushed images.
+      value: "$(tasks.build-images.results.pushed)"
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
