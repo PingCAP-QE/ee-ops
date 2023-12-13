@@ -19,8 +19,8 @@ spec:
       optional: true
       description: ssh credential for remote building on mac.
   results:
-    - description: The package artifacts
-      name: package-artifacts
+    - description: Just built and pushed images, it will be a yaml content.
+      name: pushed
       type: string
   params:
     - name: component
@@ -92,5 +92,4 @@ spec:
         fi
 
         oras version
-        "$script" -p -w "$(params.release-dir)"
-  
+        "$script" -p -w "$(params.release-dir)" -o $(results.pushed.path)
