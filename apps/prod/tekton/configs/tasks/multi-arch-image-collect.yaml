@@ -28,6 +28,7 @@ spec:
   steps:
     - name: prepare-manifest
       image: ghcr.io/pingcap-qe/cd/utils/release:bcb089f
+      workingDir: /workspace
       script: |
         #! /usr/bin/env bash
 
@@ -55,7 +56,11 @@ spec:
 
         # tags
         tags="$tag"
+        # [master-00595b4-release] => [master-00595b4-release, master-00595b4]
         tags="$tags $(echo $tag | sed -E 's/[-_]$(params.release_tag_suffix)$//g')"
+        # [..., master-00595b4] => [..., master-00595b4, master]
+        tags="$tags $(echo ${tags##* } | sed -E 's/[-][0-9a-f]{7,40}$//g')"
+
         # for tags
         for t in $tags; do
           yq -i ".tags += [\"$t\"]" manifest.yaml
@@ -86,7 +91,6 @@ spec:
           exit 0
         fi
 
-      workingDir: /workspace
   workspaces:
     - description: Includes a docker `config.json`
       mountPath: /root/.docker
