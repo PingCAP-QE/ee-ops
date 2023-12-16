@@ -1,0 +1,46 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: git-push-on-fips-branches
+  labels:
+    type: github-branch-push
+    github-owner: tikv
+    github-repo: tikv
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            (
+              body.repository.owner.login == 'tikv' && 
+                body.repository.name in ['tikv', 'pd']
+            ) || (
+              body.repository.owner.login == 'pingcap' && 
+                body.repository.name in [
+                  'tidb', 'tiflow', 'tidb-dashboard', 'ng-monitoring'
+                ]
+            )
+
+    - name: filter on branches
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^refs/heads/(feature/release-6.5-fips)$')
+
+  bindings:
+    - ref: github-branch-push
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: fips }
+    - { name: timeout, value: 2h }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-memory, vaule: 32Gi }
+    - { name: builder-resources-cpu, value: "8" }
+
+  template:
+    ref: build-component-linux
