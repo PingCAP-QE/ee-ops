@@ -4,8 +4,6 @@ metadata:
   name: git-push-on-fips-branches
   labels:
     type: github-branch-push
-    github-owner: tikv
-    github-repo: tikv
 spec:
   interceptors:
     - name: filter on repo owner and name
