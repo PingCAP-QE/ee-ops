@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
-    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
   description: >-
     This task builds images for pingcap components.

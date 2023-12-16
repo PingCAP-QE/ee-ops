@@ -31,9 +31,6 @@ spec:
       default: amd64
     - name: profile
       default: release
-    - name: binary-builder-iamge
-      description: The image used to build binaries.
-      default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
     - name: push
       default: 'true'
   results:
@@ -74,6 +71,8 @@ spec:
         - name: basic-auth
           workspace: git-basic-auth
     - name: get-release-ver
+      runAfter:
+        - checkout
       taskSpec:
         results:
           - name: version
@@ -87,11 +86,23 @@ spec:
             script: |
               RESULT_VERSION="$(git describe --tags --always --dirty)"
               printf "%s" "${RESULT_VERSION}" > $(results.version.path)
-      runAfter:
-        - checkout
       workspaces:
         - name: source
           workspace: source
+    - name: get-binaries-builder
+      taskRef:
+        name: pingcap-get-builder-image
+      params:
+        - name: component
+          value: "$(params.component)"
+        - name: os
+          value: "$(params.os)"
+        - name: arch
+          value: "$(params.arch)"
+        - name: profile
+          value: "$(params.profile)"
+        - name: version
+          value: "$(tasks.get-release-ver.results.version)"
     - name: build-binaries
       taskRef:
         name: pingcap-build-binaries
@@ -112,7 +123,7 @@ spec:
         - name: git-sha
           value: $(params.git-revision)
         - name: builder-image
-          value: $(params.binary-builder-iamge)
+          value: "$(tasks.get-binaries-builder.results.image-url)"
         - name: release-dir
           value: build
         - name: push
