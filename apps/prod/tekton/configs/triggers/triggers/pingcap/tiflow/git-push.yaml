@@ -21,8 +21,10 @@ spec:
       params:
         - name: filter
           value: >-
-            body.ref.matches('^refs/heads/(master)$')
+            body.ref.matches('^refs/heads/(master|feature/release-6.5-fips)$')
+
   bindings:
     - ref: github-branch-push
+
   template:
     ref: build-pingcap-tiflow

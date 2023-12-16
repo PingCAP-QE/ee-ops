@@ -2,6 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: ee-cd
 resources:
+  - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
+  - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release
   - create-pr-to-sync-owners.yaml
   - echo.yaml
   - gen-build-binaries-scripts.yaml
@@ -17,10 +19,9 @@ resources:
   - kubernetes-actions.yaml
   - multi-arch-image-collect.yaml
   - multi-arch-image-push.yaml
-  - pingcap-build-binaries.yaml
   - pingcap-build-binaries-darwin.yaml
+  - pingcap-build-binaries.yaml
   - pingcap-build-images.yaml
+  - pingcap-get-builder-image.yaml
   - run-build-binaries-scripts.yaml
   - run-build-images-scripts.yaml
-  - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
-  - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release

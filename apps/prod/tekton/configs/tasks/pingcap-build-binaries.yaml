@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
-    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
   description: >-
     Build binaries for the component.
@@ -74,20 +74,29 @@ spec:
 
         if [ -f "$out_script" ]; then
           cat "$out_script"
+        else
+          echo "🤷 no output script generated!"
         fi
     - name: build
       image: "$(params.builder-image)"
       workingDir: $(workspaces.source.path)
       # TODO: get the user and host by better way. 
       script: |
-        /workspace/build-package-artifacts.sh -b -a -w "$(params.release-dir)"
+        script="/workspace/build-package-artifacts.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          exit 0
+        fi
+
+        "$script" -b -a -w "$(params.release-dir)"
     - name: publish
       image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
       workingDir: $(workspaces.source.path)
       script: |
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then
-          echo "No build script, skip build."
+          echo "No build script, skip it."
+          echo '{}' > $(results.pushed.path)
           exit 0
         fi
 
