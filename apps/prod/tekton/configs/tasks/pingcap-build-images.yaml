@@ -66,6 +66,8 @@ spec:
 
         if [ -f "$out_script" ]; then
           cat "$out_script"
+        else
+          echo "🤷 no output script generated!"
         fi
     - name: build-and-publish
       image: gcr.io/kaniko-project/executor:debug
@@ -76,7 +78,8 @@ spec:
       script: |
         script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then
-          echo "No build script, skip build."
+          echo "No build script, skip it."
+          echo '{}' > $(results.pushed.path)
           exit 0
         fi
 

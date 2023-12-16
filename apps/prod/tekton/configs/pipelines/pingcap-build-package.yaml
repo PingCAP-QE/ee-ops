@@ -112,7 +112,6 @@ spec:
         - name: git-sha
           value: $(params.git-revision)
         - name: builder-image
-          # value: ghcr.io/pingcap-qe/ci/release-build-base:v20231029-b8b8d34-go1.21
           value: $(params.binary-builder-iamge)
         - name: release-dir
           value: build
