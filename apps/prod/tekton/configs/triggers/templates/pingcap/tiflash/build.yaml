@@ -40,8 +40,6 @@ spec:
             value: linux
           - name: arch
             value: amd64
-          - name: binary-builder-iamge
-            value: hub.pingcap.net/ee/ci/release-build-base-tiflash:v20231106
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -101,8 +99,6 @@ spec:
             value: linux
           - name: arch
             value: arm64
-          - name: binary-builder-iamge
-            value: hub.pingcap.net/ee/ci/release-build-base-tiflash:v20231106
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -160,8 +156,6 @@ spec:
             value: tiflash
           - name: arch
             value: amd64
-          - name: binary-builder-iamge
-            value: hub.pingcap.net/ee/ci/release-build-base-tiflash:v20231106
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
@@ -216,8 +210,6 @@ spec:
             value: tiflash
           - name: arch
             value: arm64
-          - name: binary-builder-iamge
-            value: hub.pingcap.net/ee/ci/release-build-base-tiflash:v20231106
         timeouts:
           pipeline: 3h
         workspaces:

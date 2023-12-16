@@ -40,8 +40,6 @@ spec:
             value: linux
           - name: arch
             value: amd64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -95,8 +93,6 @@ spec:
             value: linux
           - name: arch
             value: arm64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -148,8 +144,6 @@ spec:
             value: tikv
           - name: arch
             value: amd64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
@@ -204,8 +198,6 @@ spec:
             value: tikv
           - name: arch
             value: arm64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
         timeouts:
           pipeline: 2h
         workspaces:

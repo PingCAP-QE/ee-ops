@@ -40,8 +40,6 @@ spec:
             value: linux
           - name: arch
             value: amd64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -95,8 +93,6 @@ spec:
             value: linux
           - name: arch
             value: arm64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -127,7 +123,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-pingcap-tiflow-darwin-
+        generateName: build-package-pingcap-tidb-darwin-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -148,8 +144,6 @@ spec:
             value: tidb
           - name: arch
             value: amd64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
@@ -204,8 +198,6 @@ spec:
             value: tidb
           - name: arch
             value: arm64
-          - name: binary-builder-iamge
-            value: ghcr.io/pingcap-qe/cd/builders/tidb:v20231115-e1c4b43-go1.21
         workspaces:
           - name: dockerconfig
             secret:
