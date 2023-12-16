@@ -21,7 +21,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.ref.matches('^refs/heads/(master|feature/release-6.5-fips)$')
+            body.ref.matches('^refs/heads/(master)$')
 
   bindings:
     - ref: github-branch-push
