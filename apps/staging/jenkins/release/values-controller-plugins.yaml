@@ -73,7 +73,7 @@ controller:
     - artifactId: generic-webhook-trigger
       source:
         # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
-        version: 1.88.0
+        version: 1.88.2
     - artifactId: timestamper
       source:
         # renovate: datasource=jenkins-plugins depName=timestamper
