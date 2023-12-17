@@ -71,7 +71,7 @@ controller:
     - artifactId: generic-webhook-trigger
       source:
         # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
-        version: 1.88.0
+        version: 1.88.2
     - artifactId: ssh-agent
       source:
         # renovate: datasource=jenkins-plugins depName=ssh-agent
