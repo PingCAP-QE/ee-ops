@@ -27,7 +27,7 @@ spec:
       script: |
         git clone https://github.com/pingcap/community.git --branch master
     - name: create-pull-request
-      image: denoland/deno:1.38.5
+      image: denoland/deno:1.39.0
       workingDir: /workspace/community
       script: |
         owner=$(basename $(dirname $(params.git-url)))
