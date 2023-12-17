@@ -8,7 +8,7 @@ spec:
   resources:
     requests:
       storage: 600Gi
-  storageClassName: ceph-filesystem
+  storageClassName: nfs
   volumeMode: Filesystem
 ---
 apiVersion: v1
@@ -21,5 +21,5 @@ spec:
   resources:
     requests:
       storage: 50Gi
-  storageClassName: ceph-filesystem
+  storageClassName: nfs
   volumeMode: Filesystem
