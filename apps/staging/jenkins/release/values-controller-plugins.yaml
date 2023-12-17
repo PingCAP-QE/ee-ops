@@ -81,7 +81,7 @@ controller:
     - artifactId: ssh-agent
       source:
         # renovate: datasource=jenkins-plugins depName=ssh-agent
-        version: 333.v878b_53c89511
+        version: 346.vda_a_c4f2c8e50
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
