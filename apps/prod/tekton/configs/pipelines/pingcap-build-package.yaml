@@ -73,19 +73,8 @@ spec:
     - name: get-release-ver
       runAfter:
         - checkout
-      taskSpec:
-        results:
-          - name: version
-            description: The release version of the git repo
-        workspaces:
-          - name: source
-        steps:
-          - name: git-describe
-            image: alpine/git:2.40.1
-            workingDir: $(workspaces.source.path)
-            script: |
-              RESULT_VERSION="$(git describe --tags --always --dirty)"
-              printf "%s" "${RESULT_VERSION}" > $(results.version.path)
+      taskRef:
+        name: pingcap-get-release-version
       workspaces:
         - name: source
           workspace: source
