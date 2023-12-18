@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-get-release-version
+spec:
+  results:
+    - description: The release version of the git repo
+      name: version
+      type: string
+  steps:
+    - image: alpine/git:2.40.1
+      name: git-describe
+      workingDir: $(workspaces.source.path)
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: '100m'
+      script: |
+        RESULT_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
+        printf "%s" "${RESULT_VERSION}" > $(results.version.path)
+  workspaces:
+    - name: source

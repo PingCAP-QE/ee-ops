@@ -23,5 +23,6 @@ resources:
   - pingcap-build-binaries.yaml
   - pingcap-build-images.yaml
   - pingcap-get-builder-image.yaml
+  - pingcap-get-release-version.yaml
   - run-build-binaries-scripts.yaml
   - run-build-images-scripts.yaml
