@@ -59,7 +59,7 @@ spec:
         # [master-00595b4-release] => [master-00595b4-release, master-00595b4]
         tags="$tags $(echo $tag | sed -E 's/[-_]$(params.release_tag_suffix)$//g')"
         # [..., master-00595b4] => [..., master-00595b4, master]
-        tags="$tags $(echo ${tags##* } | sed -E 's/[-][0-9a-f]{7,40}$//g')"
+        tags="$tags $(echo ${tags##* } | sed -E 's/[-][0-9a-f]{7,40}//g')"
 
         # for tags
         for t in $tags; do
