@@ -83,6 +83,8 @@ spec:
       env:
         - name: CARGO_NET_GIT_FETCH_WITH_CLI
           value: 'true'
+        - name: GOPROXY
+          value: 'http://goproxy.apps.svc,direct'
       # TODO: get the user and host by better way. 
       script: |
         script="/workspace/build-package-artifacts.sh"
