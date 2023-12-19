@@ -4,4 +4,4 @@ namespace: jenkins-cd
 resources:
   - namespace.yaml
   - ../_base/rbac.yaml
-  - pvc
+  - pvc.yaml
