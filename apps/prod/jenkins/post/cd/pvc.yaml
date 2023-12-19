@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cargo-home-linux-amd64
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 32Gi
+  storageClassName: nfs
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: cargo-home-linux-arm64
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 32Gi
+  storageClassName: nfs
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ccache-dir-linux-amd64
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 64Gi
+  storageClassName: nfs
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ccache-dir-linux-arm64
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 64Gi
+  storageClassName: nfs
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rustup-home-linux-amd64
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 32Gi
+  storageClassName: nfs
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: rustup-home-linux-arm64
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 32Gi
+  storageClassName: nfs
+  volumeMode: Filesystem
