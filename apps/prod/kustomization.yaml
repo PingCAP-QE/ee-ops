@@ -14,7 +14,6 @@ resources:
   - brc
   - buildbarn
   - prow-worker
-  - ccache-pvc
   - cloudevents-server
   - boskos
   - git-cdn
