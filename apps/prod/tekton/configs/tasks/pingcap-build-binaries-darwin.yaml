@@ -186,7 +186,7 @@ spec:
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then
           echo "No build script, skip it."
-          echo '{}' > $(results.pushed.path)
+          printf '"{}"' > $(results.pushed.path)
           exit 0
         fi
 
