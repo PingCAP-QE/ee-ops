@@ -38,7 +38,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/cloudevents-server
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/cloudevents-server versioning=docker
-      tag: 2eb7cb6
+      tag: d0148db
     server:
       args: [--config=/config/config.yaml]
       volumeMounts:
