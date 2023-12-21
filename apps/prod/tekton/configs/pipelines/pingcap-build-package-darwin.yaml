@@ -86,14 +86,14 @@ spec:
     - name: acquire-mac-machine
       runAfter:
         - checkout    
-      retries: 5
+      retries: 1
       taskRef:
         name: boskos-acquire
       params:
         - name: server-url
           value: http://boskos.apps.svc
         - name: timeout
-          value: 15m
+          value: 5m
         - name: type
           value: "mac-machine-$(params.arch)"
         - name: owner-name
