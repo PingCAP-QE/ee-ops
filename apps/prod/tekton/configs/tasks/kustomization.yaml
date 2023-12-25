@@ -24,5 +24,6 @@ resources:
   - pingcap-build-images.yaml
   - pingcap-get-builder-image.yaml
   - pingcap-get-release-version.yaml
+  - publish-tiup-from-oci-artifact.yaml
   - run-build-binaries-scripts.yaml
   - run-build-images-scripts.yaml
