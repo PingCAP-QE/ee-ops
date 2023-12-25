@@ -1,0 +1,104 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: publish-tiup-from-oci-artifact
+spec:
+  description: |
+    The working flow:
+    1. fetch the manifect config
+    2. get the `.tiup` filed from the config.
+    3. loop to publish to tiup mirror.
+  params:
+    - name: artifact-url
+      description: |
+        The full url of the pushed image, contain the tag part.
+        It will parse the repo from it.
+    - name: release_tag_suffix
+      default: "release"
+    - name: tiup-tool-version
+      default: "v1.13.0"
+    - name: tiup-mirror
+      description: Staging is http://tiup.pingcap.net:8988, product is https://tiup-mirrors.pingcap.com.
+      default: http://tiup.pingcap.net:8988
+  steps:
+    - name: analyse
+      image: ghcr.io/pingcap-qe/cd/utils/release:bcb089f
+      workingDir: /workspace
+      script: |
+        #! /usr/bin/env bash
+        set -exo pipefail
+
+        # fetch artifact config
+        oras manifest fetch-config "$(params.artifact-url)" > artifact-config.json
+        if yq -e -oy '.tiup | length == 0' artifact-config.json; then
+          echo "No tiup pacakges are need to published."
+          exit 0
+        fi
+
+        # download the artifact
+        oras pull "$(params.artifact-url)"
+
+        # publish the tiup packages
+        :> publish.sh
+        tiup_last_index=$(yq --output-format=yaml '.tiup | length - 1' artifact-config.json)
+        os="$(yq --output-format=yaml '.os' artifact-config.json)"
+        architecture="$(yq --output-format=yaml '.architecture' artifact-config.json)"
+        version="$(yq --output-format=yaml '.version' artifact-config.json)"
+        for i in `seq 0 $tiup_last_index`; do
+          pkg_file="$(yq --output-format=yaml .tiup[$i].file artifact-config.json)"
+          pkg_name=$(echo "$pkg_file" | sed "s/-$version/ /" | cut -d ' ' -f1)
+          entrypoint="$(yq --output-format=yaml .tiup[$i].entrypoint artifact-config.json)"
+          desc="$(yq --output-format=yaml .tiup[$i].description artifact-config.json)"
+
+          # tiup mirror publish <comp-name> <version> <tarball> <entry> [flags]
+          if yq -e -oy ".tiup[$i].standalone" artifact-config.json; then
+            printf 'tiup mirror publish %s %s %s %s --os %s --arch %s --standalone --desc "%s"\n' \
+              $pkg_name $version $pkg_file $entrypoint $os $architecture "$desc" \
+            >> publish.sh
+          else
+            printf 'tiup mirror publish %s %s %s %s --os %s --arch %s --desc "%s"\n' \
+              $pkg_name $version $pkg_file $entrypoint $os $architecture "$desc" \
+            >> publish.sh
+          fi
+        done
+
+        cat publish.sh
+    - name: publish
+      image: ghcr.io/pingcap-qe/cd/utils/release:bcb089f
+      workingDir: /workspace
+      script: |
+        #! /usr/bin/env bash
+        set -exo pipefail
+
+        if [ ! -f  /workspace/publish.sh ]; then
+          echo "No tiup pacakges are need to published."
+          exit 0
+        fi
+
+        # install tiup tool.
+        TIUP_HOME=~/.tiup
+        bin_dir=$TIUP_HOME/bin
+        mkdir -vp "$bin_dir"
+        ARCH=$([ "$(arch)" = "x86_64" ] && echo amd64 || echo arm64)
+        download_url=https://tiup-mirrors.pingcap.com/tiup-$(params.tiup-tool-version)-linux-${ARCH}.tar.gz
+        wget -q -O - "$download_url" | tar -zxvf - -C "$bin_dir"
+        chmod 755 "$bin_dir/tiup"
+        export PATH=$bin_dir:$PATH
+        which tiup
+
+        # set mirror.
+        tiup mirror set $(params.tiup-mirror)
+
+        # set publish credentials
+        mkdir -vp $TIUP_HOME/keys
+        cp $(workspaces.tiup-keys.path)/private.json $TIUP_HOME/keys/
+
+        # publish the tiup packages
+        chmod +x publish.sh && /workspace/publish.sh
+  workspaces:
+    - description: Includes a TiUP private key `private.json`
+      name: tiup-keys
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+      mountPath: /root/.docker
+      optional: true

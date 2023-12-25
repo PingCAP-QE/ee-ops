@@ -1,6 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
+  - _/artifact-push-on-harbor.yaml
   - _/git-push-on-fips-branches.yaml
   - _/image-push-on-harbor.yaml
   - pingcap/advanced-statefulset/fake-git-create-tag.yaml
