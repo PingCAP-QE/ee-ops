@@ -75,6 +75,10 @@ spec:
       env:
         - name: KANIKO_EXECUTOR
           value: /kaniko/executor
+      resources:
+        requests:
+          cpu: "4"
+          memory: 8Gi
       script: |
         script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then

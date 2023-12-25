@@ -12,7 +12,7 @@ spec:
       description: The git branch
     - name: ce-context
       description: cloud event context.
-      default: '{}'      
+      default: '{}'
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun

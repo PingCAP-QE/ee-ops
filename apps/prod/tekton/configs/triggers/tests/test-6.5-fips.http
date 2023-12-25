@@ -1,0 +1,123 @@
+## You should run it firstly:
+## kubectl port-forward -n ee-cd svc/el-public 8080
+
+### tikv/tikv: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/feature/release-6.5-fips",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "afad6c2d830553841e01dc30e808b007c1ddd995",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tikv",
+        "clone_url": "https://github.com/tikv/tikv.git",
+        "owner": {
+            "login": "tikv"
+        }
+    }
+}
+
+### tikv/pd: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/feature/release-6.5-fips",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "8e509aa9bd4cb0a5fa5792ed5666c8df8777cc7c",
+    "ref_type": "branch",
+    "repository": {
+        "name": "pd",
+        "clone_url": "https://github.com/tikv/pd.git",
+        "owner": {
+            "login": "tikv"
+        }
+    }
+}
+
+### pingcap/tiflow: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/feature/release-6.5-fips",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "ec9ddbec5f8676370fa3eac174c061646dfb9e63",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tiflow",
+        "clone_url": "https://github.com/pingcap/tiflow.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
+
+### pingcap/tidb: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/feature/release-6.5-fips",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "f67cdaba18062b4e42be4f678702194d6dd0ebc5",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tidb",
+        "clone_url": "https://github.com/pingcap/tidb.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
+
+
+### pingcap/tidb-dashboard: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/feature/release-6.5-fips",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "a75207480d2d9c2a9ea52b40e712efe498de76ec",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tidb-dashboard",
+        "clone_url": "https://github.com/pingcap/tidb-dashboard.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
+
+### pingcap/ng-monitoring: push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/feature/release-6.5-fips",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "2f3445bc7f075c656693f37512e0fdf1fd9c3406",
+    "ref_type": "branch",
+    "repository": {
+        "name": "ng-monitoring",
+        "clone_url": "https://github.com/pingcap/ng-monitoring.git",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
