@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-pingcap-tidb
+  name: tag-create-pingcap-tiproxy
   labels:
-    type: github-branch-push
+    type: github-tag-create
     github-owner: pingcap
-    github-repo: tidb
+    github-repo: tiproxy
 spec:
   interceptors:
     - name: filter on repo owner and name
@@ -14,21 +14,21 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tidb'
-    - name: filter on branches
+            body.repository.owner.login == 'pingcap' && body.repository.name == 'tiproxy'
+    - name: filter on version tags
       ref:
         name: cel
       params:
         - name: filter
           value: >-
-            body.ref.matches('^refs/heads/(master)$')
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
   bindings:
-    - ref: github-branch-push
+    - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: release }
     - { name: timeout, value: 30m }
-    - { name: source-ws-size, value: 50Gi }
+    - { name: source-ws-size, value: 10Gi }
     - { name: builder-resources-memory, value: 32Gi }
     - { name: builder-resources-cpu, value: "8" }
   template:

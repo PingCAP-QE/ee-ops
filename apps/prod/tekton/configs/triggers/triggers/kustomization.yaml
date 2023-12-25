@@ -20,6 +20,10 @@ resources:
   - pingcap/tiflow/fake-git-push.yaml
   - pingcap/tiflow/git-create-tag.yaml
   - pingcap/tiflow/git-push.yaml
+  - pingcap/tiproxy/fake-git-create-tag.yaml
+  - pingcap/tiproxy/fake-git-push.yaml
+  - pingcap/tiproxy/git-create-tag.yaml
+  - pingcap/tiproxy/git-push.yaml
   - tikv/pd/fake-git-create-tag.yaml
   - tikv/pd/fake-git-push.yaml
   - tikv/pd/git-create-tag.yaml
@@ -28,6 +32,3 @@ resources:
   - tikv/tikv/fake-git-push.yaml
   - tikv/tikv/git-create-tag.yaml
   - tikv/tikv/git-push.yaml
-  # - pingcap-qe/artifacts/create-tag-pingcap-qe-artifacts.yaml
-  # - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
-  # - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml

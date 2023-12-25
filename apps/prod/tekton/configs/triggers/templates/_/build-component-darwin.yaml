@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: build-pingcap-advanced-statefulset
+  name: build-component-darwin
 spec:
   params:
     - name: git-url
@@ -10,6 +10,23 @@ spec:
       description: The git revision
     - name: git-ref
       description: The git branch
+    - name: component
+      description: component name, tidb|tikv|pd|tiflow|tiflash, etc...
+    - name: os
+      default: darwin
+    - name: profile
+      description: build target profile
+      default: release
+    - name: timeout
+      description: pipeline run timeout
+      default: 2h
+    - name: source-ws-size
+      description: workspace size for source.
+      default: 10Gi
+    - name: builder-resources-memory
+      default: 16Gi
+    - name: builder-resources-cpu
+      default: "4"
     - name: ce-context
       description: cloud event context.
       default: '{}'
@@ -17,7 +34,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-pingcap-advanced-statefulset-
+        generateName: build-package-$(tt.params.component)-$(tt.params.os)-amd64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -26,7 +43,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: pingcap-build-package
+          name: pingcap-build-package-darwin
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -35,20 +52,24 @@ spec:
           - name: git-ref
             value: $(tt.params.git-ref)
           - name: component
-            value: advanced-statefulset
+            value: $(tt.params.component)
+          - name: profile
+            value: $(tt.params.profile)
           - name: os
-            value: linux
+            value: $(tt.params.os)
           - name: arch
             value: amd64
         taskRunSpecs:
-          - pipelineTaskName: build-binaries
+          - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: amd64
-          - pipelineTaskName: build-images
+          - pipelineTaskName: release-mac-machine
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
@@ -61,14 +82,17 @@ spec:
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 10Gi
+                    storage: $(tt.params.source-ws-size)
           - name: git-basic-auth # fetch with git-cdn.
             secret:
               secretName: git-credentials-basic
+          - name: mac-ssh-credentials
+            secret:
+              secretName: mac-ssh-credentials
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-pingcap-advanced-statefulset-
+        generateName: build-package-$(tt.params.component)-$(tt.params.os)-arm64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -77,7 +101,7 @@ spec:
           "tekton.dev/git-revision": $(tt.params.git-revision)
       spec:
         pipelineRef:
-          name: pingcap-build-package
+          name: pingcap-build-package-darwin
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -86,20 +110,24 @@ spec:
           - name: git-ref
             value: $(tt.params.git-ref)
           - name: component
-            value: advanced-statefulset
+            value: $(tt.params.component)
+          - name: profile
+            value: $(tt.params.profile)
           - name: os
-            value: linux
+            value: $(tt.params.os)
           - name: arch
             value: arm64
         taskRunSpecs:
-          - pipelineTaskName: build-binaries
+          - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
               nodeSelector:
-                kubernetes.io/arch: arm64
-          - pipelineTaskName: build-images
+                kubernetes.io/arch: amd64
+          - pipelineTaskName: release-mac-machine
             taskPodTemplate:
               nodeSelector:
-                kubernetes.io/arch: arm64
+                kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
@@ -112,7 +140,10 @@ spec:
                   - ReadWriteOnce
                 resources:
                   requests:
-                    storage: 10Gi
+                    storage: $(tt.params.source-ws-size)
           - name: git-basic-auth # fetch with git-cdn.
             secret:
               secretName: git-credentials-basic
+          - name: mac-ssh-credentials
+            secret:
+              secretName: mac-ssh-credentials
