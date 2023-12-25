@@ -140,54 +140,23 @@ X-GitHub-Event: create
   }
 }
 
-########################
-### push image tags on harbor
+
+### pingcap/tiproxy push on main branch
 POST http://127.0.0.1:8080 HTTP/1.1
-Content-Type: application/json
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
 
 {
-    "type": "PUSH_ARTIFACT",
-    "occur_at": 1701143709,
-    "operator": "wuhui.zuo",
-    "event_data": {
-        "resources": [
-            {
-                "digest": "sha256:c80bf3f0ad847433fe891b1bfb63425346a25633ff6dafbab2bc8ac7d14a6c3e",
-                "tag": "master-00595b4-release_linux_amd64",
-                "resource_url": "hub.pingcap.net/pingcap/advanced-statefulset:master-00595b4-release_linux_amd64"
-            }
-        ],
-        "repository": {
-            "date_created": 1699859083,
-            "name": "advanced-statefulset",
-            "namespace": "pingcap",
-            "repo_full_name": "pingcap/advanced-statefulset",
-            "repo_type": "public"
-        }
-    }
-}
-
-########################
-### devbuild with office repo branch
-POST http://127.0.0.1:8080 HTTP/1.1
-Content-Type: application/json; charset=UTF-8
-Ce-specversion: 1.0
-Ce-id: 445eb4fb-c6bc-4b14-995a-4543dc541d13
-Ce-source: https://tibuild.pingcap.net/dev-build/debug-123
-Ce-type: net.pingcap.tibuild.devbuild.push
-Ce-subject: debug-123
-Ce-user: wuhui.zuo@pingcap.com
-
-{
-    "ref": "refs/heads/master",
-    "before": "0000000000000000000000000000000000000000",
-    "after": "fcdeec42aa9a9033c576083c1571dcd264d068c8",
+    "ref": "refs/heads/main",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "b1d210fa8a61abcba293aea2b2adfca1793b353f",
     "ref_type": "branch",
     "repository": {
-        "name": "pd",
-        "clone_url": "https://github.com/tikv/pd.git",
+        "name": "tiproxy",
+        "clone_url": "https://github.com/pingcap/tiproxy",
         "owner": {
-            "login": "tikv"
+            "login": "pingcap"
         }
     }
 }

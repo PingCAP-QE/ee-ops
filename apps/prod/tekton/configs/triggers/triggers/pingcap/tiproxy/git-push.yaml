@@ -21,7 +21,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.ref.matches('^refs/heads/(master)$')
+            body.ref.matches('^refs/heads/(main|master)$')
   bindings:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
