@@ -28,6 +28,3 @@ resources:
   - tikv/tikv/fake-git-push.yaml
   - tikv/tikv/git-create-tag.yaml
   - tikv/tikv/git-push.yaml
-  # - pingcap-qe/artifacts/create-tag-pingcap-qe-artifacts.yaml
-  # - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
-  # - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml

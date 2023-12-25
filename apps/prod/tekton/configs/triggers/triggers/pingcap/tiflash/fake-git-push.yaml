@@ -25,5 +25,12 @@ spec:
   bindings:
     - ref: github-branch-push
     - ref: ce-context
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: release }
+    - { name: timeout, value: 2h }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-memory, value: 64Gi }
+    - { name: builder-resources-cpu, value: "16" }
   template:
-    ref: build-pingcap-tiflash
+    ref: build-component
