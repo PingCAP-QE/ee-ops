@@ -1,0 +1,27 @@
+## You should run it firstly:
+## kubectl port-forward -n ee-cd svc/el-public 8080
+
+########################
+### devbuild with office repo branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Content-Type: application/json; charset=UTF-8
+Ce-specversion: 1.0
+Ce-id: 445eb4fb-c6bc-4b14-995a-4543dc541d13
+Ce-source: https://tibuild.pingcap.net/dev-build/debug-123
+Ce-type: net.pingcap.tibuild.devbuild.push
+Ce-subject: debug-123
+Ce-user: wuhui.zuo@pingcap.com
+
+{
+    "ref": "refs/heads/master",
+    "before": "0000000000000000000000000000000000000000",
+    "after": "fcdeec42aa9a9033c576083c1571dcd264d068c8",
+    "ref_type": "branch",
+    "repository": {
+        "name": "pd",
+        "clone_url": "https://github.com/tikv/pd.git",
+        "owner": {
+            "login": "tikv"
+        }
+    }
+}
