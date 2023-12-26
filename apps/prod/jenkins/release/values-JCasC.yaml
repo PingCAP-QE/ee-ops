@@ -170,7 +170,7 @@ controller:
                 }
               }
 
-              queue('seed')
+              // queue('seed')
       github-pull-request-builder-trigger: |
         unclassified:
           ghprbTrigger:
