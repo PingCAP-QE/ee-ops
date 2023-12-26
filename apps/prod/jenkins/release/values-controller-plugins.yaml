@@ -11,7 +11,7 @@ controller:
     - name: JENKINS_UC_DOWNLOAD
       value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
-  installLatestPlugins: false
+  installLatestPlugins: true
 
   # List of plugins to be install during Jenkins controller start
   installPlugins:
