@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: build-component-darwin
+  name: build-component-all-platforms
 spec:
   params:
     - name: git-url
@@ -12,8 +12,6 @@ spec:
       description: The git branch
     - name: component
       description: component name, tidb|tikv|pd|tiflow|tiflash, etc...
-    - name: os
-      default: darwin
     - name: profile
       description: build target profile
       default: release
@@ -34,7 +32,129 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-$(tt.params.component)-$(tt.params.os)-amd64-
+        generateName: build-package-$(tt.params.component)-linux-amd64-
+        annotations:
+          "tekton.dev/ce-context": $(tt.params.ce-context)
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        pipelineRef:
+          name: pingcap-build-package
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: $(tt.params.component)
+          - name: profile
+            value: $(tt.params.profile)
+          - name: os
+            value: linux
+          - name: arch
+            value: amd64
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+            stepOverrides:
+              - name: build
+                resources:
+                  requests:
+                    memory: $(tt.params.builder-resources-memory)
+                    cpu: $(tt.params.builder-resources-cpu)
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: amd64
+        timeouts:
+          pipeline: $(tt.params.timeout)
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: $(tt.params.source-ws-size)
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: build-package-$(tt.params.component)-linux-arm64-
+        annotations:
+          "tekton.dev/ce-context": $(tt.params.ce-context)
+          "tekton.dev/git-status": "true"
+          "tekton.dev/status-target-url": "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
+          "tekton.dev/git-repo": $(tt.params.git-url)
+          "tekton.dev/git-revision": $(tt.params.git-revision)
+      spec:
+        pipelineRef:
+          name: pingcap-build-package
+        params:
+          - name: git-url
+            value: $(tt.params.git-url)
+          - name: git-revision
+            value: $(tt.params.git-revision)
+          - name: git-ref
+            value: $(tt.params.git-ref)
+          - name: component
+            value: $(tt.params.component)
+          - name: profile
+            value: $(tt.params.profile)
+          - name: os
+            value: linux
+          - name: arch
+            value: arm64
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: arm64
+            stepOverrides:
+              - name: build
+                resources:
+                  requests:
+                    memory: $(tt.params.builder-resources-memory)
+                    cpu: $(tt.params.builder-resources-cpu)
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: arm64
+        timeouts:
+          pipeline: $(tt.params.timeout)
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: source
+            volumeClaimTemplate:
+              spec:
+                storageClassName: ceph-block
+                accessModes:
+                  - ReadWriteOnce
+                resources:
+                  requests:
+                    storage: $(tt.params.source-ws-size)
+          - name: git-basic-auth # fetch with git-cdn.
+            secret:
+              secretName: git-credentials-basic
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        generateName: build-package-$(tt.params.component)-darwin-amd64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -55,8 +175,6 @@ spec:
             value: $(tt.params.component)
           - name: profile
             value: $(tt.params.profile)
-          - name: os
-            value: $(tt.params.os)
           - name: arch
             value: amd64
         taskRunSpecs:
@@ -92,7 +210,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-$(tt.params.component)-$(tt.params.os)-arm64-
+        generateName: build-package-$(tt.params.component)-darwin-arm64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -113,8 +231,6 @@ spec:
             value: $(tt.params.component)
           - name: profile
             value: $(tt.params.profile)
-          - name: os
-            value: $(tt.params.os)
           - name: arch
             value: arm64
         taskRunSpecs:
@@ -147,3 +263,4 @@ spec:
           - name: mac-ssh-credentials
             secret:
               secretName: mac-ssh-credentials
+    
