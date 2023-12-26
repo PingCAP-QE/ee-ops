@@ -31,21 +31,6 @@ controller:
     -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
   
 
-  # Optionally specify additional init-containers
-  customInitContainers:
-    - name: init-create-logs-dir
-      image: "alpine:3.18.3"
-      imagePullPolicy: Always
-      command: ["mkdir", "-p", "/var/jenkins_home/logs"]
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        runAsGroup: 1000
-        runAsUser: 1000
-      volumeMounts:
-        - mountPath: /var/jenkins_home
-          name: jenkins-home
-
   # jenkinsOpts: ""
   # If you are using the ingress definitions provided by this chart via the `controller.ingress` block the configured hostname will be the ingress hostname starting with `https://` or `http://` depending on the `tls` configuration.
   # The Protocol can be overwritten by specifying `controller.jenkinsUrlProtocol`.
