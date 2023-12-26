@@ -1,0 +1,94 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-build-images
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
+spec:
+  description: >-
+    This task builds images for pingcap components.
+  workspaces:
+    - name: source
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+      mountPath: /kaniko/.docker      
+      optional: true
+  results:
+    - description: Just built and pushed images, it will be a yaml content.
+      name: pushed
+      type: string
+  params:
+    - name: component
+    - name: os
+      default: linux
+    - name: arch
+      default: amd64
+    - name: version
+      type: string
+      description: the version to releasing.
+    - name: profile
+      type: string
+      default: release
+      description: >
+        supports: 'release' or 'debug'.
+    - name: git-ref
+    - name: git-sha
+    - name: release-dir
+      default: build
+    - name: build
+      default: 'false'
+      description: Does it need to build the binaries before packing the images?
+  steps:
+    - name: generate
+      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+      script: |
+        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
+
+        git_ref="$(params.git-ref)"
+        git_sha="$(params.git-sha)"
+        if [ "$git_sha" == "$git_ref" ]; then
+          git_sha=""
+        fi
+
+        out_script="/workspace/build-package-images.sh"
+        /workspace/artifacts/packages/scripts/gen-package-images-with-config.sh \
+          $(params.component) \
+          $(params.os) \
+          $(params.arch) \
+          $(params.version) \
+          $(params.profile) \
+          $git_ref \
+          "$git_sha" \
+          /workspace/artifacts/packages/packages.yaml.tmpl \
+          "$out_script"
+
+        if [ -f "$out_script" ]; then
+          cat "$out_script"
+        else
+          echo "🤷 no output script generated!"
+        fi
+    - name: build-and-publish
+      image: gcr.io/kaniko-project/executor:debug
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: KANIKO_EXECUTOR
+          value: /kaniko/executor
+      resources:
+        requests:
+          cpu: "4"
+          memory: 8Gi
+      script: |
+        script="/workspace/build-package-images.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          printf '"{}"' > $(results.pushed.path)
+          exit 0
+        fi
+
+        if [ "$(params.build)" = "true" ]; then
+          "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path) -b
+        else
+          "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path)
+        fi

@@ -3,8 +3,8 @@ kind: Kustomization
 resources:
   - namespace.yaml
   # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
-  # - https://github.com/tektoncd/operator/releases/download/v0.55.1/release.yaml
+  # - https://github.com/tektoncd/operator/releases/download/v0.60.1/release.yaml
   # we fixed the image tag to make it runable on arm64 nodes:
   #   gcr.io/tekton-releases/dogfooding/tkn
-  - operator-release.yaml 
+  - operator-release.yaml
   - operator-config.yaml

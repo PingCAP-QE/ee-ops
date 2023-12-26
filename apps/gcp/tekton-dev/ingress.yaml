@@ -1,0 +1,24 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: tekton-ingress
+  namespace: apps-dev
+spec:
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/gcp/tekton-dev/ingress
+  dependsOn:
+    - name: tekton-setup
+      namespace: apps-dev
+    - name: tekton-configs
+      namespace: apps-dev
+  prune: true
+  postBuild:
+    substitute:
+      DOMAIN_NAME: prow-dev.tidb.net
+      PATH_FOR_HOOK: /tekton/hook
+      PATH_FOR_DASHBOARD: /tekton/dashboard

@@ -1,0 +1,36 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: fake-tag-create-tikv-pd
+  labels:
+    type: fake-github-tag-create
+    github-owner: tikv
+    github-repo: pd
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'tikv' && body.repository.name == 'pd'
+    - name: filter on version tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
+  bindings:
+    - ref: github-tag-create
+    - ref: ce-context
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: release }
+    - { name: timeout, value: 30m }
+    - { name: source-ws-size, value: 50Gi }
+    - { name: builder-resources-memory, value: 32Gi }
+    - { name: builder-resources-cpu, value: "8" }
+  template:
+    ref: build-component

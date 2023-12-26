@@ -31,13 +31,6 @@ spec:
     "app.kubernetes.io/component": "{{ .Values.controller.componentName }}"
     "app.kubernetes.io/instance": "{{ .Release.Name }}"
   type: {{ .Values.controller.agentListenerServiceType }}
-  {{- with .Values.controller.agentListenerServiceSessionAffinity }}
-  sessionAffinity: {{ . }}
-  {{- end }}
-  {{- with .Values.controller.agentListenerServiceSessionAffinityConfig }}
-  sessionAffinityConfig:
-{{ toYaml . | indent 4 }}
-  {{- end }}
   {{if eq .Values.controller.agentListenerServiceType "LoadBalancer"}}
 {{- if .Values.controller.agentListenerLoadBalancerSourceRanges }}
   loadBalancerSourceRanges:

@@ -1,0 +1,109 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-build-binaries
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
+spec:
+  description: >-
+    Build binaries for the component.
+  workspaces:
+    - name: source
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+      mountPath: /root/.docker
+      optional: true
+    - name: ssh-directory
+      optional: true
+      description: ssh credential for remote building on mac.
+  results:
+    - description: Just built and pushed images, it will be a yaml content.
+      name: pushed
+      type: string
+  params:
+    - name: component
+    - name: os
+      default: linux
+    - name: arch
+      default: amd64
+    - name: version
+      type: string
+      description: the version to releasing.
+    - name: profile
+      type: string
+      default: release
+      description: >
+        supports: 'release' or 'debug'.
+    - name: git-ref
+    - name: git-sha
+    - name: builder-image
+      default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+    - name: release-dir
+      default: build
+    - name: push
+      type: string
+      default: 'false'
+    - name: mac-builder-resource
+      type: string
+      default: ''
+  steps:
+    - name: generate-build-script
+      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+      script: |
+        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
+
+        git_ref="$(params.git-ref)"
+        git_sha="$(params.git-sha)"
+        if [ "$git_sha" == "$git_ref" ]; then
+          git_sha=""
+        fi
+
+        out_script="/workspace/build-package-artifacts.sh"
+        /workspace/artifacts/packages/scripts/gen-package-artifacts-with-config.sh \
+          $(params.component) \
+          $(params.os) \
+          $(params.arch) \
+          $(params.version) \
+          $(params.profile) \
+          $git_ref \
+          "$git_sha" \
+          /workspace/artifacts/packages/packages.yaml.tmpl \
+          "$out_script"
+
+        if [ -f "$out_script" ]; then
+          cat "$out_script"
+        else
+          echo "🤷 no output script generated!"
+        fi
+    - name: build
+      image: "$(params.builder-image)"
+      workingDir: $(workspaces.source.path)
+      env:
+        - name: CARGO_NET_GIT_FETCH_WITH_CLI
+          value: 'true'
+        - name: GOPROXY
+          value: 'http://goproxy.apps.svc,direct'
+      # TODO: get the user and host by better way. 
+      script: |
+        script="/workspace/build-package-artifacts.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          exit 0
+        fi
+
+        "$script" -b -a -w "$(params.release-dir)"
+    - name: publish
+      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+      workingDir: $(workspaces.source.path)
+      script: |
+        script="/workspace/build-package-artifacts.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          printf '"{}"' > $(results.pushed.path)
+          exit 0
+        fi
+
+        oras version
+        "$script" -p -w "$(params.release-dir)" -o $(results.pushed.path)

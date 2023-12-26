@@ -140,9 +140,15 @@ jenkins:
   clouds:
   - kubernetes:
       containerCapStr: "{{ .Values.agent.containerCap }}"
+      {{- if .Values.agent.jnlpregistry }}
+      jnlpregistry: "{{ .Values.agent.jnlpregistry }}"
+      {{- end }}
       defaultsProviderTemplate: "{{ .Values.agent.defaultsProviderTemplate }}"
       connectTimeout: "{{ .Values.agent.kubernetesConnectTimeout }}"
       readTimeout: "{{ .Values.agent.kubernetesReadTimeout }}"
+      {{- if .Values.agent.directConnection }}
+      directConnection: true
+      {{- else }}
       {{- if .Values.agent.jenkinsUrl }}
       jenkinsUrl: "{{ tpl .Values.agent.jenkinsUrl . }}"
       {{- else }}
@@ -157,10 +163,11 @@ jenkins:
       {{- else }}
       webSocket: true
       {{- end }}
+      {{- end }}
       maxRequestsPerHostStr: {{ .Values.agent.maxRequestsPerHostStr | quote }}
       name: "{{ .Values.controller.cloudName }}"
       namespace: "{{ template "jenkins.agent.namespace" . }}"
-      serverUrl: "https://kubernetes.default"
+      serverUrl: "{{ .Values.kubernetesURL }}"
       {{- if .Values.agent.enabled }}
       podLabels:
       - key: "jenkins/{{ .Release.Name }}-{{ .Values.agent.componentName }}"
@@ -177,8 +184,13 @@ jenkins:
       {{- /* save .Values.agent */}}
       {{- $agent := .Values.agent }}
       {{- range $name, $additionalAgent := .Values.additionalAgents }}
+        {{- $additionalContainersEmpty := and (hasKey $additionalAgent "additionalContainers") (empty $additionalAgent.additionalContainers)  }}
         {{- /* merge original .Values.agent into additional agent to ensure it at least has the default values */}}
         {{- $additionalAgent := merge $additionalAgent $agent }}
+        {{- /* clear list of additional containers in case it is configured empty for this agent (merge might have overwritten that) */}}
+        {{- if $additionalContainersEmpty }}
+        {{- $_ := set $additionalAgent "additionalContainers" list }}
+        {{- end }}
         {{- /* set .Values.agent to $additionalAgent */}}
         {{- $_ := set $.Values "agent" $additionalAgent }}
         {{- include "jenkins.casc.podTemplate" $ | nindent 8 }}
@@ -242,13 +254,31 @@ Returns kubernetes pod template configuration as code
     command: {{ .Values.agent.command }}
     envVars:
       - envVar:
+        {{- if .Values.agent.directConnection }}
+          key: "JENKINS_DIRECT_CONNECTION"
+          {{- if .Values.agent.jenkinsTunnel }}
+          value: "{{ tpl .Values.agent.jenkinsTunnel . }}"
+          {{- else }}
+          value: "{{ template "jenkins.fullname" . }}-agent.{{ template "jenkins.namespace" . }}.svc.{{.Values.clusterZone}}:{{ .Values.controller.agentListenerPort }}"
+          {{- end }}
+        {{- else }}
           key: "JENKINS_URL"
           {{- if .Values.agent.jenkinsUrl }}
           value: {{ tpl .Values.agent.jenkinsUrl . }}
           {{- else }}
           value: "http://{{ template "jenkins.fullname" . }}.{{ template "jenkins.namespace" . }}.svc.{{.Values.clusterZone}}:{{.Values.controller.servicePort}}{{ default "/" .Values.controller.jenkinsUriPrefix }}"
           {{- end }}
+        {{- end }}
     image: "{{ .Values.agent.image }}:{{ .Values.agent.tag }}"
+    {{- if .Values.agent.livenessProbe }}
+    livenessProbe:
+      execArgs: {{.Values.agent.livenessProbe.execArgs | quote}}
+      failureThreshold: {{.Values.agent.livenessProbe.failureThreshold}}
+      initialDelaySeconds: {{.Values.agent.livenessProbe.initialDelaySeconds}}
+      periodSeconds: {{.Values.agent.livenessProbe.periodSeconds}}
+      successThreshold: {{.Values.agent.livenessProbe.successThreshold}}
+      timeoutSeconds: {{.Values.agent.livenessProbe.timeoutSeconds}}
+    {{- end }}
     privileged: "{{- if .Values.agent.privileged }}true{{- else }}false{{- end }}"
     resourceLimitCpu: {{.Values.agent.resources.limits.cpu}}
     resourceLimitMemory: {{.Values.agent.resources.limits.memory}}
@@ -258,16 +288,59 @@ Returns kubernetes pod template configuration as code
     runAsGroup: {{ .Values.agent.runAsGroup }}
     ttyEnabled: {{ .Values.agent.TTYEnabled }}
     workingDir: {{ .Values.agent.workingDir }}
-{{- if .Values.agent.envVars }}
+{{- range $additionalContainers := .Values.agent.additionalContainers }}
+  - name: "{{ $additionalContainers.sideContainerName }}"
+    alwaysPullImage: {{ $additionalContainers.alwaysPullImage | default $.Values.agent.alwaysPullImage }}
+    args: "{{ $additionalContainers.args | replace "$" "^$" }}"
+    command: {{ $additionalContainers.command }}
+    envVars:
+      - envVar:
+          key: "JENKINS_URL"
+          {{- if $additionalContainers.jenkinsUrl }}
+          value: {{ tpl ($additionalContainers.jenkinsUrl) . }}
+          {{- else }}
+          value: "http://{{ template "jenkins.fullname" $ }}.{{ template "jenkins.namespace" $ }}.svc.{{ $.Values.clusterZone }}:{{ $.Values.controller.servicePort }}{{ default "/" $.Values.controller.jenkinsUriPrefix }}"
+          {{- end }}
+    image: "{{ $additionalContainers.image }}:{{ $additionalContainers.tag }}"
+    {{- if $additionalContainers.livenessProbe }}
+    livenessProbe:
+      execArgs: {{$additionalContainers.livenessProbe.execArgs | quote}}
+      failureThreshold: {{$additionalContainers.livenessProbe.failureThreshold}}
+      initialDelaySeconds: {{$additionalContainers.livenessProbe.initialDelaySeconds}}
+      periodSeconds: {{$additionalContainers.livenessProbe.periodSeconds}}
+      successThreshold: {{$additionalContainers.livenessProbe.successThreshold}}
+      timeoutSeconds: {{$additionalContainers.livenessProbe.timeoutSeconds}}
+    {{- end }}
+    privileged: "{{- if $additionalContainers.privileged }}true{{- else }}false{{- end }}"
+    resourceLimitCpu: {{ if $additionalContainers.resources }}{{ $additionalContainers.resources.limits.cpu }}{{ else }}{{ $.Values.agent.resources.limits.cpu }}{{ end }}
+    resourceLimitMemory: {{ if $additionalContainers.resources }}{{ $additionalContainers.resources.limits.memory }}{{ else }}{{ $.Values.agent.resources.limits.memory }}{{ end }}
+    resourceRequestCpu: {{ if $additionalContainers.resources }}{{ $additionalContainers.resources.requests.cpu }}{{ else }}{{ $.Values.agent.resources.requests.cpu }}{{ end }}
+    resourceRequestMemory: {{ if $additionalContainers.resources }}{{ $additionalContainers.resources.requests.memory }}{{ else }}{{ $.Values.agent.resources.requests.memory }}{{ end }}
+    runAsUser: {{ $additionalContainers.runAsUser | default $.Values.agent.runAsUser }}
+    runAsGroup: {{ $additionalContainers.runAsGroup | default $.Values.agent.runAsGroup }}
+    ttyEnabled: {{ $additionalContainers.TTYEnabled | default $.Values.agent.TTYEnabled }}
+    workingDir: {{ $additionalContainers.workingDir | default $.Values.agent.workingDir }}
+{{- end }}
+{{- if or .Values.agent.envVars .Values.agent.secretEnvVars }}
   envVars:
   {{- range $index, $var := .Values.agent.envVars }}
     - envVar:
         key: {{ $var.name }}
         value: {{ tpl $var.value $ }}
   {{- end }}
+  {{- range $index, $var := .Values.agent.secretEnvVars }}
+    - secretEnvVar:
+        key: {{ $var.key }}
+        secretName: {{ $var.secretName }}
+        secretKey: {{ $var.secretKey }}
+        optional: {{ $var.optional | default false }}
+  {{- end }}
 {{- end }}
   idleMinutes: {{ .Values.agent.idleMinutes }}
   instanceCap: 2147483647
+  {{- if .Values.agent.hostNetworking }}
+  hostNetwork: {{ .Values.agent.hostNetworking }}
+  {{- end }}
   {{- if .Values.agent.imagePullSecretName }}
   imagePullSecrets:
   - name: {{ .Values.agent.imagePullSecretName }}

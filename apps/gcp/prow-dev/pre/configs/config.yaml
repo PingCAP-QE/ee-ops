@@ -1,0 +1,142 @@
+# TODO: (@wuhuizuo) add json schema.
+prowjob_namespace: apps-dev
+pod_namespace: ${TEST_PODS_NAMESPACE}
+log_level: trace
+
+branch-protection:
+  enforce_admins: true # rules apply to admins too!
+  orgs:
+    ti-community-infra:
+      repos:
+        test-dev:
+          branches:
+            master:
+              protect: true
+              required_pull_request_reviews:
+                require_code_owner_reviews: true
+                required_approving_review_count: 1
+              required_status_checks:
+                contexts:
+                  - "tide"
+                  - "triage"
+                strict: false
+
+in_repo_config:
+  enabled:
+    ti-community-infra/test-dev: true
+
+deck:
+  external_agent_logs:
+    - agent: jenkins
+      url_template: "http://prow-jenkins-operator/job/{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/consoleText"
+  spyglass:
+    lenses:
+      - lens:
+          name: metadata
+        required_files:
+          - started.json|finished.json
+      - lens:
+          config:
+          name: buildlog
+        required_files:
+          - build-log.txt
+      - lens:
+          name: junit
+        required_files:
+          - .*/junit.*\.xml
+      - lens:
+          name: podinfo
+        required_files:
+          - podinfo.json
+
+plank:
+  job_url_prefix_config:
+    "*": https://${DOMAIN_NAME}/view/
+  report_templates:
+    "*":
+      "[Full PR test
+      history](https://${DOMAIN_NAME}/pr-history?org={{.Spec.Refs.Org}}&repo={{.Spec.Refs.Repo}}&pr={{with
+      index .Spec.Refs.Pulls 0}}{{.Number}}{{end }}). [Your PR
+      dashboard](https://${DOMAIN_NAME}/pr?query=is:pr+state:open+author:{{with
+      index .Spec.Refs.Pulls 0}}{{.Author}}{{end }})."
+  default_decoration_configs:
+    "*":
+      gcs_configuration:
+        bucket: gs://${BUCKET_NAME}
+        path_strategy: explicit
+      gcs_credentials_secret: gcs-credentials
+      utility_images:
+        clonerefs: gcr.io/k8s-prow/clonerefs:v20221205-a1b0b85d88
+        entrypoint: gcr.io/k8s-prow/entrypoint:v20221205-a1b0b85d88
+        initupload: gcr.io/k8s-prow/initupload:v20221205-a1b0b85d88
+        sidecar: gcr.io/k8s-prow/sidecar:v20221205-a1b0b85d88
+
+tide:
+  sync_period: 2m
+
+  target_url: https://${DOMAIN_NAME}/tide
+  merge_method:
+    ti-community-infra/test-dev: squash
+
+  # Note: \\w => \\\\w
+  merge_commit_template:
+    ti-community-infra/test-dev:
+      title: "{{ .Title }} (#{{ .Number }})"
+      # Regex for matching issue number line: https://regex101.com/r/ezCYFC/1/
+      body: |
+        {{- $body := print .Body -}}
+        {{- $issueNumberLine := .ExtractContent "(?im)^Issue Number:.+" $body -}}
+        {{- $numbers := .GitHub.NormalizeIssueNumbers $issueNumberLine -}}
+        {{- if $numbers -}}
+          {{- range $index, $number := $numbers -}}
+            {{- if $index }}, {{ end -}}
+            {{- .AssociatePrefix }} {{ .Org -}}/{{- .Repo -}}#{{- .Number -}}
+          {{- end -}}
+        {{- else -}}
+          {{- " " -}}
+        {{- end -}}
+
+  queries:
+    - repos:
+        - ti-community-infra/test-dev
+      labels:
+        - lgtm
+        - approved
+      missingLabels:
+        - do-not-merge/hold
+        - do-not-merge/work-in-progress
+        - do-not-merge/invalid-commit-message
+        - needs-rebase
+
+  context_options:
+    orgs:
+      ti-community-infra:
+        repos:
+          test-dev:
+            required-if-present-contexts:
+              - "markdown-test"
+            skip-unknown-contexts: true
+            from-branch-protection: false
+
+  batch_size_limit:
+    "ti-community-infra/test-dev": 4
+  prioritize_existing_batches:
+    "ti-community-infra/test-dev": true
+
+# for jenkins operator component.
+jenkins_operators:
+  - max_concurrency: 20
+    max_goroutines: 20
+    job_url_template:
+      'https://${DOMAIN_NAME}/view/gs/${BUCKET_NAME}/prow-logs/{{if eq .Spec.Type
+      "presubmit"}}pr-logs/pull{{else if eq .Spec.Type
+      "batch"}}pr-logs/pull{{else}}logs{{end}}{{if ne .Spec.Refs.Repo
+      "origin"}}/{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}{{end}}{{if eq .Spec.Type
+      "presubmit"}}/{{with index .Spec.Refs.Pulls 0}}{{.Number}}{{end}}{{else if
+      eq .Spec.Type "batch"}}/batch{{end}}/{{.Spec.Job}}/{{.Status.BuildID}}/'
+    report_templates:
+      "*":
+        '[Full PR test history](https://${DOMAIN_NAME}/pr-history/{{if ne
+        .Spec.Refs.Repo
+        "origin"}}{{.Spec.Refs.Org}}_{{.Spec.Refs.Repo}}/{{end}}{{with index
+        .Spec.Refs.Pulls 0}}{{.Number}}{{end}}).'

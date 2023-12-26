@@ -1,0 +1,8 @@
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: ce-context
+spec:
+  params:
+    - name: ce-context
+      value: $(extensions.ce-context)

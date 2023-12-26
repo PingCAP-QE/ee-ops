@@ -1,0 +1,37 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: fake-git-push-tikv-pd
+  labels:
+    type: fake-github-branch-push
+    github-owner: tikv
+    github-repo: pd
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'tikv' && body.repository.name == 'pd'
+    - name: filter on branches
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^refs/heads/(master)$')
+
+  bindings:
+    - ref: github-branch-push
+    - ref: ce-context
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: release }
+    - { name: timeout, value: 30m }
+    - { name: source-ws-size, value: 50Gi }
+    - { name: builder-resources-memory, value: 32Gi }
+    - { name: builder-resources-cpu, value: "8" }
+  template:
+    ref: build-component

@@ -39,6 +39,8 @@ spec:
           key: dedicated
           operator: Equal
           value: test-infra
+    default-cloud-events-sink: http://cloudevents-server.apps.svc/events
+
   trigger:
     default-service-account: "default"
     enable-api-fields: alpha # stable | alpha
@@ -46,7 +48,7 @@ spec:
     resources:
       - taskrun
       - pipelinerun
-    keep: 100
+    keep: 1000
     schedule: "0 * * * *" # hourly
   hub:
     params:

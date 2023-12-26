@@ -1,0 +1,27 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: image-push
+spec:
+  params:
+    - name: image_url
+      description: The image full url for pull
+    - name: tag
+      description: The image tag
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: TaskRun
+      metadata:
+        generateName: auto-compose-multi-arch-image-run-
+      spec:
+        taskRef:
+          name: multi-arch-image-collect
+        params:
+          - name: image_url
+            value: "$(tt.params.image_url)"
+          - name: release_tag_suffix
+            value: release
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee

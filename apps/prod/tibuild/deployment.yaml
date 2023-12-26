@@ -20,7 +20,7 @@ spec:
         app: tibuild
     spec:
       containers:
-      - image: hub.pingcap.net/tibuild/tibuild:afb7bba
+      - image: ghcr.io/pingcap-qe/ee-apps/tibuild:d987e3c
         imagePullPolicy: Always
         name: tibuild
         ports:
@@ -43,6 +43,8 @@ spec:
         - name: configs
           mountPath: "/app/configs"
           readOnly: true
+      nodeSelector:
+        kubernetes.io/arch: "amd64"
       volumes:
       - name: configs
         secret:

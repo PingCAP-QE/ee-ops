@@ -1,0 +1,35 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: tag-create-tikv-tikv
+  labels:
+    type: github-tag-create
+    github-owner: tikv
+    github-repo: tikv
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'tikv' && body.repository.name == 'tikv'
+    - name: filter on version tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
+  bindings:
+    - ref: github-tag-create
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: release }
+    - { name: timeout, value: 2h }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-memory, value: 64Gi }
+    - { name: builder-resources-cpu, value: "16" }    
+  template:
+    ref: build-component

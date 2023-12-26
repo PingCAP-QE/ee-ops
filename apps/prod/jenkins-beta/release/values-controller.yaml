@@ -1,7 +1,7 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  image: "hub.pingcap.net/jenkins/jenkins-with-plugins"
-  tag: "2.387.3-jdk11"
+  # renovate: datasource=docker depName=jenkins/jenkins versioning=docker
+  tag: 2.426.2
   resources:
     requests:
       cpu: "4"
@@ -9,9 +9,6 @@ controller:
     limits:
       cpu: "8"
       memory: 32Gi
-
-  # all plugins are installed in the image already
-  installPlugins: false
 
   affinity:
     nodeAffinity:
@@ -36,6 +33,21 @@ controller:
     -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
     -XX:+UnlockDiagnosticVMOptions
     -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
+
+  # Optionally specify additional init-containers
+  customInitContainers:
+    - name: init-create-logs-dir
+      image: "alpine:3.18.3"
+      imagePullPolicy: Always
+      command: ["mkdir", "-p", "/var/jenkins_home/logs"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsGroup: 1000
+        runAsUser: 1000
+      volumeMounts:
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
 
   # jenkinsOpts: ""
   # If you are using the ingress definitions provided by this chart via the `controller.ingress` block the configured hostname will be the ingress hostname starting with `https://` or `http://` depending on the `tls` configuration.
