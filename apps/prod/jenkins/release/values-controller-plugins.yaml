@@ -11,79 +11,9 @@ controller:
     - name: JENKINS_UC_DOWNLOAD
       value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
-  installLatestPlugins: true
+  # all plugins are installed in the image already
+  installPlugins: false
 
-  # List of plugins to be install during Jenkins controller start
-  installPlugins:
-    # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
-    # but without outer `plugin` key.
-    - artifactId: kubernetes
-      source:
-        # renovate: datasource=jenkins-plugins depName=kubernetes
-        version: 4029.v5712230ccb_f8
-    - artifactId: kubernetes-client-api
-      source:
-        # renovate: datasource=jenkins-plugins depName=kubernetes-client-api
-        version: 6.8.1-224.vd388fca_4db_3b_
-    - artifactId: configuration-as-code
-      source:
-        # renovate: datasource=jenkins-plugins depName=configuration-as-code
-        version: 1756.v2b_7eea_874392
-    - artifactId: prometheus
-      source:
-        # renovate: datasource=jenkins-plugins depName=prometheus
-        version: 2.4.1
-    - artifactId: blueocean
-      source:
-        # renovate: datasource=jenkins-plugins depName=blueocean
-        version: 1.27.8
-    - artifactId: job-dsl
-      source:
-        # renovate: datasource=jenkins-plugins depName=job-dsl
-        version: 1.87
-    - artifactId: build-failure-analyzer
-      source:
-        url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - artifactId: pipeline-utility-steps
-      source:
-        # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
-        version: 2.16.0
-    - artifactId: http_request
-      source:
-        # renovate: datasource=jenkins-plugins depName=http_request
-        version: 1.18
-    - artifactId: workflow-aggregator
-      source:
-        # renovate: datasource=jenkins-plugins depName=workflow-aggregator
-        version: 596.v8c21c963d92d
-    - artifactId: instance-identity
-      source:
-        # renovate: datasource=jenkins-plugins depName=instance-identity
-        version: 185.v303dc7c645f9
-    - artifactId: jenkins-pipeline-cache
-      source:
-        # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
-        url: https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
-    - artifactId: ghprb
-      source:
-        # renovate: datasource=jenkins-plugins depName=ghprb
-        version: 1.42.2
-    - artifactId: generic-webhook-trigger
-      source:
-        # renovate: datasource=jenkins-plugins depName=generic-webhook-trigger
-        version: 1.88.2
-    - artifactId: ssh-agent
-      source:
-        # renovate: datasource=jenkins-plugins depName=ssh-agent
-        version: 346.vda_a_c4f2c8e50
-    - artifactId: cloudevents
-      source:
-        # renovate: datasource=jenkins-plugins depName=cloudevents
-        version: 1.0.0
-    - artifactId: json-path-api
-      source:
-        # renovate: datasource=jenkins-plugins depName=json-path-api
-        version: 2.8.0-5.v07cb_a_1ca_738c
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
