@@ -11,7 +11,7 @@ controller:
     - name: JENKINS_UC_DOWNLOAD
       value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
-  installLatestPlugins: true
+  installLatestPlugins: false
 
   # List of plugins to be install during Jenkins controller start
   installPlugins:
@@ -80,6 +80,11 @@ controller:
       source:
         # renovate: datasource=jenkins-plugins depName=cloudevents
         version: 1.0.0
+    - artifactId: json-path-api
+      source:
+        # renovate: datasource=jenkins-plugins depName=json-path-api
+        version: 2.8.0-5.v07cb_a_1ca_738c
+
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
