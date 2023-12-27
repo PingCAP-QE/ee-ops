@@ -13,8 +13,9 @@ spec:
       description: |
         The full url of the pushed image, contain the tag part.
         It will parse the repo from it.
-    - name: release_tag_suffix
-      default: "release"
+    - name: nightly
+      description: publish as nightly version.
+      default: "false"
     - name: tiup-tool-version
       default: "v1.13.0"
     - name: tiup-mirror
@@ -44,6 +45,12 @@ spec:
         os="$(yq --output-format=yaml '.os' artifact-config.json)"
         architecture="$(yq --output-format=yaml '.architecture' artifact-config.json)"
         version="$(yq --output-format=yaml '.version' artifact-config.json)"
+        if $nightly; then
+          # from v7.6.0-alpha-574-g75b451c454 => v7.6.0-alpha-nightly
+          version=`echo "$version" | sed -E 's/\-[0-9]+-g[0-9a-f]+$//'`
+          version="${version}-nightly"
+        fi
+
         for i in `seq 0 $tiup_last_index`; do
           pkg_file="$(yq --output-format=yaml .tiup[$i].file artifact-config.json)"
           pkg_name=$(echo "$pkg_file" | sed "s/-$version/ /" | cut -d ' ' -f1)
