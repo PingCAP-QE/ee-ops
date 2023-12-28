@@ -1,0 +1,145 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: push-oci-artifact-to-tiup-for-trunk-branches
+spec:
+  params:
+    - name: image_url
+      description: The OCI artifact full url
+    - name: tag
+      description: The artifact tag
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: TaskRun
+      metadata:
+        generateName: publish-tiup-from-oci-artifact-staging-
+      spec:
+        taskRef:
+          name: publish-tiup-from-oci-artifact
+        params:
+          - name: artifact-url
+            value: "$(tt.params.image_url)"
+          - name: nightly
+            value: "true"
+          - name: tiup-tool-version
+            value: v1.13.1
+          - name: tiup-mirror
+            value: http://tiup.pingcap.net:8988
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: tiup-keys
+            secret:
+              secretName: tiup-credentials-staging
+    - apiVersion: tekton.dev/v1beta1
+      kind: TaskRun
+      metadata:
+        generateName: publish-tiup-from-oci-artifact-prod-
+      spec:
+        taskRef:
+          name: publish-tiup-from-oci-artifact
+        params:
+          - name: artifact-url
+            value: "$(tt.params.image_url)"
+          - name: nightly
+            value: "true"
+          - name: tiup-tool-version
+            value: v1.13.1
+          - name: tiup-mirror
+            value: https://tiup-mirrors.pingcap.com
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: tiup-keys
+            secret:
+              secretName: tiup-credentials-prod
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: push-oci-artifact-to-tiup-for-release-branches
+spec:
+  params:
+    - name: image_url
+      description: The OCI artifact full url
+    - name: tag
+      description: The artifact tag
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: TaskRun
+      metadata:
+        generateName: publish-tiup-from-oci-artifact-staging-
+      spec:
+        taskRef:
+          name: publish-tiup-from-oci-artifact
+        params:
+          - name: artifact-url
+            value: "$(tt.params.image_url)"
+          - name: tiup-tool-version
+            value: v1.13.1
+          - name: tiup-mirror
+            value: http://tiup.pingcap.net:8988
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: tiup-keys
+            secret:
+              secretName: tiup-credentials-staging
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: push-oci-artifact-to-tiup-for-tags
+spec:
+  params:
+    - name: image_url
+      description: The OCI artifact full url
+    - name: tag
+      description: The artifact tag
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: TaskRun
+      metadata:
+        generateName: publish-tiup-from-oci-artifact-staging-
+      spec:
+        taskRef:
+          name: publish-tiup-from-oci-artifact
+        params:
+          - name: artifact-url
+            value: "$(tt.params.image_url)"
+          - name: tiup-tool-version
+            value: v1.13.1
+          - name: tiup-mirror
+            value: http://tiup.pingcap.net:8988
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: tiup-keys
+            secret:
+              secretName: tiup-credentials-staging
+    - apiVersion: tekton.dev/v1beta1
+      kind: TaskRun
+      metadata:
+        generateName: publish-tiup-from-oci-artifact-prod-
+      spec:
+        taskRef:
+          name: publish-tiup-from-oci-artifact
+        params:
+          - name: artifact-url
+            value: "$(tt.params.image_url)"
+          - name: tiup-tool-version
+            value: v1.13.1
+          - name: tiup-mirror
+            value: https://tiup-mirrors.pingcap.com
+        workspaces:
+          - name: dockerconfig
+            secret:
+              secretName: hub-pingcap-net-ee
+          - name: tiup-keys
+            secret:
+              secretName: tiup-credentials-prod
+
