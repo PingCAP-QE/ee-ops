@@ -25,11 +25,10 @@ spec:
   bindings:
     - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
-    - { name: os, value: linux }
     - { name: profile, value: release }
     - { name: timeout, value: 2h }
     - { name: source-ws-size, value: 100Gi }
     - { name: builder-resources-memory, value: 64Gi }
     - { name: builder-resources-cpu, value: "16" }
   template:
-    ref: build-component
+    ref: build-component-all-platforms
