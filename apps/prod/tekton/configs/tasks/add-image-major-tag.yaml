@@ -2,13 +2,18 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: add-image-major-tag
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/platforms: "linux/amd64,linux/arm64"  
 spec:
   params:
     - name: image_url
       description: The image full url for pull
+  stepTemplate:
+    image: ghcr.io/pingcap-qe/cd/utils/release:bcb089f
   steps:
     - name: add-nightly-tag
-      image: alpine
       script: |
         pushed_repo="$(echo $(params.image_url) | cut -d ':' -f 1)"
         pushed_tag="$(echo $(params.image_url) | cut -d ':' -f 2)"
@@ -19,11 +24,10 @@ spec:
           oras tag $(params.image_url) nightly
           echo "✅ Added nightly tag"
         else
-          echo "🤚 Tag is not main or master"
+          echo "🤚 Pushed tag is not main or master"
         fi
-    
+
     - name: add-latest-tag
-      image: alpine
       script: |
           pushed_repo="$(echo $(params.image_url) | cut -d ':' -f 1)"
           pushed_tag="$(echo $(params.image_url) | cut -d ':' -f 2)"
@@ -44,5 +48,9 @@ spec:
               echo "🤚 Tag is not the latest version"
             fi
           else
-            echo "Tag is not a version tag"
+            echo "🤚 Pushed tag is not a version tag"
           fi
+  workspaces:
+    - description: Includes a docker `config.json`
+      mountPath: /root/.docker
+      name: dockerconfig
