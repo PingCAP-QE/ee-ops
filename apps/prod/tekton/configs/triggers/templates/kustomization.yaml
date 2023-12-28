@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - _/artifact-push.yaml
   - _/build-component-all-platforms.yaml
   - _/build-component.yaml
   - _/image-push.yaml
+  - _/push-oci-artifact-to-tiup.yaml
   - pingcap-qe/artifacts/branch-create-pingcap-qe-artifacts.yaml
   - pingcap-qe/artifacts/pull-pingcap-qe-artifacts.yaml
   - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml
