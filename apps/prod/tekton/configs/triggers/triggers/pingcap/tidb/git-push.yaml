@@ -39,7 +39,7 @@ kind: Trigger
 metadata:
   name: git-push-pingcap-tidb-enterprise
   labels:
-    type: github-branch-push
+    type: template_disalbe_github-branch-push
     github-owner: pingcap
     github-repo: tidb
     edition: enterprise
