@@ -29,7 +29,7 @@ spec:
           pushed_tag="$(echo $(params.image_url) | cut -d ':' -f 2)"
 
           # Check if the tag is the latest version and add "latest"
-          if [ "$(echo $TAG | grep -E '^v\d+\.\d+\.+\d+$')"  ]; then
+          if [ "$(echo $pushed_tag | grep -E '^v\d+\.\d+\.+\d+$')"  ]; then
             echo "Checking if tag is the latest version"
             # Retrieve existing tags
             EXISTING_TAGS=$(oras repo tags ${pushed_repo} | grep -E '^v\d+\.\d+\.+\d+$')
