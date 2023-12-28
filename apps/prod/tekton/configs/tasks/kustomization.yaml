@@ -5,7 +5,7 @@ resources:
   - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
   - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release
   - create-pr-to-sync-owners.yaml
-  - echo.yaml
+  - echo.yaml ##### an example task.
   - gen-build-binaries-scripts.yaml
   - gen-build-images-scripts.yaml
   - git-clone.yaml
@@ -14,7 +14,8 @@ resources:
   - golang-test.yaml
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/kaniko/0.6/kaniko.yaml # kaniko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/ko/0.1/ko.yaml # ko task
-  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml
+  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/skopeo-copy/0.3/skopeo-copy.yaml # skopeo-copy task.
+  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml # tkn task
   - ko-test-infra.yaml
   - kubernetes-actions.yaml
   - multi-arch-image-collect.yaml
@@ -25,5 +26,3 @@ resources:
   - pingcap-get-builder-image.yaml
   - pingcap-get-release-version.yaml
   - publish-tiup-from-oci-artifact.yaml
-  - run-build-binaries-scripts.yaml
-  - run-build-images-scripts.yaml
