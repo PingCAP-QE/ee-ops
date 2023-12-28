@@ -19,7 +19,7 @@ spec:
     - name: tiup-tool-version
       default: "v1.13.0"
     - name: tiup-mirror
-      description: Staging is http://tiup.pingcap.net:8988, product is https://tiup-mirrors.pingcap.com.
+      description: Staging is http://tiup.pingcap.net:8988, product is http://tiup.pingcap.net:8987.
       default: http://tiup.pingcap.net:8988
   steps:
     - name: analyse
@@ -53,7 +53,7 @@ spec:
 
         for i in `seq 0 $tiup_last_index`; do
           pkg_file="$(yq --output-format=yaml .tiup[$i].file artifact-config.json)"
-          pkg_name=$(echo "$pkg_file" | sed "s/-$version/ /" | cut -d ' ' -f1)
+          pkg_name=$(echo "$pkg_file" | sed -E "s/-v[0-9]+.+//")
           entrypoint="$(yq --output-format=yaml .tiup[$i].entrypoint artifact-config.json)"
           desc="$(yq --output-format=yaml .tiup[$i].description artifact-config.json)"
 
