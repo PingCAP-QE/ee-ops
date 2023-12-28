@@ -11,16 +11,11 @@ spec:
         name: cel
       params:
         - name: filter
-          value: >-
-            (
-              body.repository.owner.login == 'tikv' && 
-                body.repository.name in ['tikv', 'pd']
-            ) || (
-              body.repository.owner.login == 'pingcap' && 
-                body.repository.name in [
-                  'tidb', 'tiflow', 'tidb-dashboard', 'ng-monitoring'
-                ]
-            )
+          value: >-        
+            body.repository.owner.login == 'pingcap' && 
+              body.repository.name in [
+                'tidb-dashboard', 'ng-monitoring'
+            ]
 
     - name: filter on branches
       ref:
