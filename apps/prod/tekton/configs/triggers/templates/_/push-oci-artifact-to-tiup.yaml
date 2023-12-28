@@ -47,7 +47,7 @@ spec:
           - name: tiup-tool-version
             value: v1.13.1
           - name: tiup-mirror
-            value: https://tiup-mirrors.pingcap.com
+            value: http://tiup.pingcap.net:8987
         workspaces:
           - name: dockerconfig
             secret:
@@ -134,7 +134,7 @@ spec:
           - name: tiup-tool-version
             value: v1.13.1
           - name: tiup-mirror
-            value: https://tiup-mirrors.pingcap.com
+            value: http://tiup.pingcap.net:8987
         workspaces:
           - name: dockerconfig
             secret:
