@@ -10,7 +10,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/feature/release-6.5-fips",
     "before": "00000000000000000000000000000000000000000",
-    "after": "afad6c2d830553841e01dc30e808b007c1ddd995",
+    "after": "16802d5b00f9bd2eff690d406615a1fee660c6ea",
     "ref_type": "branch",
     "repository": {
         "name": "tikv",
@@ -30,7 +30,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/feature/release-6.5-fips",
     "before": "00000000000000000000000000000000000000000",
-    "after": "8e509aa9bd4cb0a5fa5792ed5666c8df8777cc7c",
+    "after": "baae09dc963837e975691a9e95ea5f2314228769",
     "ref_type": "branch",
     "repository": {
         "name": "pd",
@@ -70,7 +70,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/feature/release-6.5-fips",
     "before": "00000000000000000000000000000000000000000",
-    "after": "f67cdaba18062b4e42be4f678702194d6dd0ebc5",
+    "after": "cf362ee23ffc6a45b6230838c53ac3ceea8b4ea6",
     "ref_type": "branch",
     "repository": {
         "name": "tidb",
