@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: ee-cd
 resources:
   - add-image-major-tag.yaml
+  - aws-cli.yaml # from and hacked: https://hub.tekton.dev/tekton/task/aws-cli
   - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
   - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release
   - create-pr-to-sync-owners.yaml
@@ -18,6 +19,7 @@ resources:
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/skopeo-copy/0.3/skopeo-copy.yaml # skopeo-copy task.
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml # tkn task
   - ko-test-infra.yaml
+  - ks3utils.yaml # from and hacked: https://hub.tekton.dev/tekton/task/aws-cli
   - kubernetes-actions.yaml
   - multi-arch-image-collect.yaml
   - multi-arch-image-push.yaml
