@@ -29,3 +29,5 @@ resources:
   - pingcap-get-builder-image.yaml
   - pingcap-get-release-version.yaml
   - publish-tiup-from-oci-artifact.yaml
+  - restore-cache-with-ks3.yaml
+  - save-cache-with-ks3.yaml
