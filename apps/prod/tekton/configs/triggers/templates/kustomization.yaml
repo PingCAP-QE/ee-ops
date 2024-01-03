@@ -10,8 +10,9 @@ resources:
   - pingcap-qe/artifacts/push-pingcap-qe-artifacts.yaml
   - pingcap-qe/artifacts/tag-create-pingcap-qe-artifacts.yaml
   - pingcap/advanced-statefulset/build.yaml
-  - pingcap/branch-create-product-components-hotfix.yaml
+  - pingcap/sync-owners-for-hotfix-branch.yaml
   - pingcap/tidb/build.yaml
+  - pingcap/tidb/update-gomod-for-hotfix-branch.yaml
   - pingcap/tiflash/build.yaml
   - pingcap/tiflow/build.yaml
   - tikv/pd/build.yaml
