@@ -11,13 +11,15 @@ spec:
     Build binaries for the component.
   workspaces:
     - name: source
+      description: source code.
+    - name: cargo-home
+      description: Cache for cargo packages.
+      mountPath: /workspace/.cargo
+      optional: true
     - name: dockerconfig
       description: Includes a docker `config.json`
       mountPath: /root/.docker
       optional: true
-    - name: ssh-directory
-      optional: true
-      description: ssh credential for remote building on mac.
   results:
     - description: Just built and pushed images, it will be a yaml content.
       name: pushed
@@ -85,7 +87,8 @@ spec:
           value: 'true'
         - name: GOPROXY
           value: 'http://goproxy.apps.svc,direct'
-      # TODO: get the user and host by better way. 
+        - name: CARGO_HOME
+          value: /workspace/.cargo
       script: |
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then
