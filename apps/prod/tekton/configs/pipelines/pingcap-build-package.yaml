@@ -23,7 +23,7 @@ spec:
         - tiflow
         - advanced-statefulset
 
-        May be it is an idea to judge it by git-url, but it maybe 
+        May be it is an idea to judge it by git-url, but it maybe
         not a generic way for forked repositories with custom names.
     - name: os
       default: linux
@@ -48,9 +48,9 @@ spec:
     - name: git-basic-auth
       description: secret containing a .gitconfig and .git-credentials file.
       optional: true
-    - name: mac-ssh-credentials
-      description: secret contains ssh private key in `id_rsa` key for login mac
-      optional: true      
+    - name: cargo-home
+      description: cache for cargo pacakges when build binaries
+      optional: true
   tasks:
     - name: checkout
       taskRef:
@@ -143,9 +143,9 @@ spec:
         - name: profile
           value: "$(params.profile)"
         - name: component
-          value: "$(params.component)"     
+          value: "$(params.component)"
         - name: version
-          value: "$(tasks.get-release-ver.results.version)"           
+          value: "$(tasks.get-release-ver.results.version)"
         - name: git-ref
           value: $(params.git-ref)
         - name: git-sha
