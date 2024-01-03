@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: branch-create-product-components-hotfix
+  name: update-pingcap-tidb-gomod-for-hotfix-branch
 spec:
   params:
     - name: git-url
@@ -13,13 +13,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
       metadata:
-        generateName: branch-create-product-components-hotfix-run-
-        annotations:
-          "tekton.dev/git-status": "true"
-          "tekton.dev/status-target-url":
-            "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
-          "tekton.dev/git-repo": $(tt.params.git-url)
-          "tekton.dev/git-revision": $(tt.params.git-ref)
+        generateName: create-pr-to-fix-gomod-for-hotfix-
       spec:
         params:
           - name: git-url
@@ -28,10 +22,10 @@ spec:
             value: $(tt.params.git-ref)
         taskRef:
           kind: Task
-          name: create-pr-to-sync-owners
+          name: create-pr-to-fix-gomod
         podTemplate:
             nodeSelector:
-              kubernetes.io/arch: "amd64"       
+              kubernetes.io/arch: "amd64"
         workspaces:
           - name: github
             secret:
