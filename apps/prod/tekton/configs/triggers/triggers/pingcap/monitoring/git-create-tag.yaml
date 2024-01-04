@@ -21,14 +21,14 @@ spec:
       params:
         - name: filter
           value: >-
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-alpha)?')
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
   bindings:
     - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
     - { name: timeout, value: 30m }
-    - { name: source-ws-size, value: 10Gi }
-    - { name: builder-resources-memory, value: 32Gi }
-    - { name: builder-resources-cpu, value: "8" }
+    - { name: source-ws-size, value: 8Gi }
+    - { name: builder-resources-memory, value: 4Gi }
+    - { name: builder-resources-cpu, value: "2" }
   template:
     ref: build-component-all-platforms

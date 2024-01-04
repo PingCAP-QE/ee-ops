@@ -29,8 +29,8 @@ spec:
     - { name: os, value: linux }
     - { name: profile, value: release }
     - { name: timeout, value: 30m }
-    - { name: source-ws-size, value: 10Gi }
-    - { name: builder-resources-memory, value: 32Gi }
-    - { name: builder-resources-cpu, value: "8" }
+    - { name: source-ws-size, value: 8Gi }
+    - { name: builder-resources-memory, value: 4Gi }
+    - { name: builder-resources-cpu, value: "2" }
   template:
     ref: build-component

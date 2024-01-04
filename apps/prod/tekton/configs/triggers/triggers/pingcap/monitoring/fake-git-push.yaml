@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: fake-git-push-pingcap-tiproxy
+  name: fake-git-push-pingcap-monitoring
   labels:
     type: fake-github-branch-push
     github-owner: pingcap
-    github-repo: tiproxy
+    github-repo: monitoring
 spec:
   interceptors:
     - name: filter on repo owner and name
@@ -14,7 +14,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tiproxy'
+            body.repository.owner.login == 'pingcap' && body.repository.name == 'monitoring'
     - name: filter on branches
       ref:
         name: cel
@@ -30,8 +30,8 @@ spec:
     - { name: os, value: linux }
     - { name: profile, value: release }
     - { name: timeout, value: 30m }
-    - { name: source-ws-size, value: 10Gi }
-    - { name: builder-resources-memory, value: 32Gi }
-    - { name: builder-resources-cpu, value: "8" }
+    - { name: source-ws-size, value: 8Gi }
+    - { name: builder-resources-memory, value: 4Gi }
+    - { name: builder-resources-cpu, value: "2" }
   template:
     ref: build-component
