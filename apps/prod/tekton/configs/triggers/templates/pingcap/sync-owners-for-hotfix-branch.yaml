@@ -36,23 +36,3 @@ spec:
           - name: github
             secret:
               secretName: github
-    - apiVersion: tekton.dev/v1beta1
-      kind: TaskRun
-      metadata:
-        generateName: create-pr-to-fix-gomod-for-hotfix-
-      spec:
-        params:
-          - name: git-url
-            value: $(tt.params.git-url)
-          - name: branch
-            value: $(tt.params.git-ref)
-        taskRef:
-          kind: Task
-          name: create-pr-to-fix-gomod
-        podTemplate:
-            nodeSelector:
-              kubernetes.io/arch: "amd64"
-        workspaces:
-          - name: github
-            secret:
-              secretName: github
