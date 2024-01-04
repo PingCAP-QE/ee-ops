@@ -15,6 +15,7 @@ controller:
     - { name: codecov-token, keyName: tidb }
     - { name: codecov-token, keyName: tikv-migration }
     - { name: codecov-token, keyName: tiflow }
+    - { name: codecov-token, keyName: tiproxy}
     # for coveralls uploading
     - { name: coveralls-token, keyName: tiflow }
     # for ci cache, no need create manually.
@@ -126,6 +127,11 @@ controller:
                       description: codecov token for tiflow
                       scope: GLOBAL
                       secret: ${codecov-token-tiflow}
+                  - string:
+                      id: codecov-token-tiproxy
+                      description: codecov token for tiproxy
+                      scope: GLOBAL
+                      secret: ${codecov-token-tiproxy}
               - domain:
                   name: coveralls.io
                 credentials:
