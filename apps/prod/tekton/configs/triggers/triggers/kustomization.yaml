@@ -9,6 +9,10 @@ resources:
   - pingcap/advanced-statefulset/fake-git-push.yaml
   - pingcap/advanced-statefulset/git-create-tag.yaml
   - pingcap/advanced-statefulset/git-push.yaml
+  - pingcap/monitoring/fake-git-create-tag.yaml
+  - pingcap/monitoring/fake-git-push.yaml
+  - pingcap/monitoring/git-create-tag.yaml
+  - pingcap/monitoring/git-push.yaml
   - pingcap/tidb/fake-git-create-tag.yaml
   - pingcap/tidb/fake-git-push.yaml
   - pingcap/tidb/git-create-branch.yaml
