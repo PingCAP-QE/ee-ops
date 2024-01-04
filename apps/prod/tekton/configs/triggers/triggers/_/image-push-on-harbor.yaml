@@ -45,8 +45,7 @@ spec:
             body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
              && !
             body.event_data.repository.repo_full_name.matches('/package(s)?')
-
-    - name: filter on image tags      
+    - name: filter on image tags
       ref:
         name: "cel"
       params:

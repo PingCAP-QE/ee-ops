@@ -2,7 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: ee-cd
 resources:
-  - add-image-major-tag.yaml
   - aws-cli.yaml # from and hacked: https://hub.tekton.dev/tekton/task/aws-cli
   - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
   - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release
@@ -13,8 +12,8 @@ resources:
   - github-set-status.yaml
   - golang-build.yaml
   - golang-test.yaml
-  - hotfix/create-pr-to-sync-owners.yaml
   - hotfix/create-pr-to-fix-gomod.yaml
+  - hotfix/create-pr-to-sync-owners.yaml
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/kaniko/0.6/kaniko.yaml # kaniko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/ko/0.1/ko.yaml # ko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/skopeo-copy/0.3/skopeo-copy.yaml # skopeo-copy task.
@@ -24,6 +23,7 @@ resources:
   - kubernetes-actions.yaml
   - multi-arch-image-collect.yaml
   - multi-arch-image-push.yaml
+  - pingcap-auto-add-image-major-tag.yaml
   - pingcap-build-binaries-darwin.yaml
   - pingcap-build-binaries.yaml
   - pingcap-build-images.yaml
