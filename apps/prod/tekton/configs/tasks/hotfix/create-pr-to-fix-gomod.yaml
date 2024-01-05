@@ -37,8 +37,10 @@ spec:
         go mod tidy
 
         # update bazel file
-        echo 'build --remote_cache=http://ats.apps.svc/brc/tidb --remote_timeout="30s"' > ~/.bazelrc
-        make bazel_prepare
+        if git status -s | grep go.mod; then
+          echo 'build --remote_cache=http://ats.apps.svc/brc/tidb --remote_timeout="30s"' > ~/.bazelrc
+          make bazel_prepare
+        fi
     - name: create-pr
       image: bitnami/git:2.43.0
       workingDir: /workspace/src
@@ -47,7 +49,7 @@ spec:
         git config --global user.email "ti-community-prow-bot@tidb.io"
         git config --global user.name  "ti-chi-bot"
 
-        if $(git status -s | grep go.mod); then
+        if git status -s | grep go.mod; then
           echo "🚀 Let's update go.mod and go.sum files..."
         else
           echo "🤷 No need to update the go.mod file, they are updated."
