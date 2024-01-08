@@ -90,6 +90,9 @@ spec:
           - name: git-basic-auth # fetch with git-cdn.
             secret:
               secretName: git-credentials-basic
+          - name: cargo-home
+            persistentVolumeClaim:
+              claimName: cargo-home
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -151,6 +154,9 @@ spec:
           - name: git-basic-auth # fetch with git-cdn.
             secret:
               secretName: git-credentials-basic
+          - name: cargo-home
+            persistentVolumeClaim:
+              claimName: cargo-home
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -263,4 +269,3 @@ spec:
           - name: mac-ssh-credentials
             secret:
               secretName: mac-ssh-credentials
-    

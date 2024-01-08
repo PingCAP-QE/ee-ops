@@ -26,9 +26,9 @@ spec:
     - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
-    - { name: timeout, value: 2h }
+    - { name: timeout, value: 2h30m }
     - { name: source-ws-size, value: 100Gi }
     - { name: builder-resources-memory, value: 64Gi }
-    - { name: builder-resources-cpu, value: "16" }    
+    - { name: builder-resources-cpu, value: "16" }
   template:
     ref: build-component-all-platforms

@@ -122,6 +122,8 @@ spec:
           workspace: source
         - name: dockerconfig
           workspace: dockerconfig
+        - name: cargo-home
+          workspace: cargo-home
     - name: build-images
       when:
         - input: "$(params.os)"
