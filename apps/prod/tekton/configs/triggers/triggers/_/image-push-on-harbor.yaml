@@ -33,7 +33,7 @@ kind: Trigger
 metadata:
   name: multi-arch-image-push-on-harbor
   labels:
-    type: image-push
+    type: x-image-push
 spec:
   interceptors:
     - name: filter on image repo names
