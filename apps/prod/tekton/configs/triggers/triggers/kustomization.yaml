@@ -14,6 +14,10 @@ resources:
   - pingcap/tidb/git-create-branch.yaml
   - pingcap/tidb/git-create-tag.yaml
   - pingcap/tidb/git-push.yaml
+  - pingcap/tidb-binlog/git-create-tag.yaml
+  - pingcap/tidb-binlog/git-push.yaml
+  - pingcap/tidb-tools/git-create-tag.yaml
+  - pingcap/tidb-tools/git-push.yaml
   - pingcap/tiflash/fake-git-create-tag.yaml
   - pingcap/tiflash/fake-git-push.yaml
   - pingcap/tiflash/git-create-tag.yaml
