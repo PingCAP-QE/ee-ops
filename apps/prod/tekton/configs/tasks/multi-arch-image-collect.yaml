@@ -40,7 +40,7 @@ spec:
 
         # steps:
         # 1. check the pushed tag, if not existed, step will fail.
-        oras repo tags $(params.image_url)
+        oras discover --distribution-spec v1.1-referrers-tag $(params.image_url)
 
         # 2. compute the mult-arch tags and digests
         pushed_repo="$(echo $(params.image_url) | cut -d ':' -f 1)"
