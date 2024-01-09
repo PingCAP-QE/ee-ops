@@ -157,7 +157,7 @@ spec:
         scp ""$script"" ${username}@${host}:"$remote_workspace_dir/"
 
         # 2.3 copy source codes from workspace `source` to the remote host by ssh.
-        scp -r $(workspaces.source.path) ${username}@${host}:"$remote_workspace_dir/"
+        rsync --ignore-errors --progress -azh -e ssh $(workspaces.source.path) ${username}@${host}:"$remote_workspace_dir"
         remote_workspace_source_path="$remote_workspace_dir/$(basename $(workspaces.source.path))"
 
         # 2.4 run the shell on the mac host by ssh.
