@@ -160,3 +160,43 @@ X-GitHub-Event: push
         }
     }
 }
+
+### pingcap/tidb-binlog push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "154d6d99d8bda586e10723c3aacc6c4d8ff6a1c6",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tidb-binlog",
+        "clone_url": "https://github.com/pingcap/tidb-binlog",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
+
+### pingcap/tidb-tools push on master branch
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: push
+
+{
+    "ref": "refs/heads/master",
+    "before": "00000000000000000000000000000000000000000",
+    "after": "c4bdf178b3d6ae0242332aa7ef8448b74eb5b45c",
+    "ref_type": "branch",
+    "repository": {
+        "name": "tidb-tools",
+        "clone_url": "https://github.com/pingcap/tidb-tools",
+        "owner": {
+            "login": "pingcap"
+        }
+    }
+}
