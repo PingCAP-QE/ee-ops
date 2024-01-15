@@ -181,6 +181,24 @@ X-GitHub-Event: push
     }
 }
 
+### pingcap/tidb-binlog version tag created
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: create
+
+{
+  "ref": "v7.5.0",
+  "ref_type": "tag",
+  "repository": {
+    "name": "tidb-binlog",
+    "clone_url": "https://github.com/pingcap/tidb-binlog.git",
+    "owner": {
+      "login": "pingcap"
+    }
+  }
+}
+
 ### pingcap/tidb-tools push on master branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
@@ -199,4 +217,22 @@ X-GitHub-Event: push
             "login": "pingcap"
         }
     }
+}
+
+### pingcap/tidb-tools version tag created
+POST http://127.0.0.1:8080 HTTP/1.1
+Accept: */*
+content-type: application/json
+X-GitHub-Event: create
+
+{
+  "ref": "v7.5.0",
+  "ref_type": "tag",
+  "repository": {
+    "name": "tidb-tools",
+    "clone_url": "https://github.com/pingcap/tidb-tools.git",
+    "owner": {
+      "login": "pingcap"
+    }
+  }
 }

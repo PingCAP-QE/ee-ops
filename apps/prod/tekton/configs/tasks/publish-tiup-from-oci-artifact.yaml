@@ -17,7 +17,7 @@ spec:
       description: publish as nightly version.
       default: "false"
     - name: tiup-tool-version
-      default: "v1.13.0"
+      default: "v1.14.1"
     - name: tiup-mirror
       description: Staging is http://tiup.pingcap.net:8988, product is http://tiup.pingcap.net:8987.
       default: http://tiup.pingcap.net:8988
