@@ -13,6 +13,10 @@ resources:
   - pingcap/monitoring/fake-git-push.yaml
   - pingcap/monitoring/git-create-tag.yaml
   - pingcap/monitoring/git-push.yaml
+  - pingcap/ng-monitoring/fake-git-create-tag.yaml
+  - pingcap/ng-monitoring/fake-git-push.yaml
+  - pingcap/ng-monitoring/git-create-tag.yaml
+  - pingcap/ng-monitoring/git-push.yaml
   - pingcap/tidb/fake-git-create-tag.yaml
   - pingcap/tidb/fake-git-push.yaml
   - pingcap/tidb/git-create-branch.yaml
