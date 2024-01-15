@@ -14,7 +14,25 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'monitoring'
+            (
+              body.repository.owner.login == 'pingcap' && 
+              body.repository.name in [
+                'monitoring',
+                'tidb',
+                'tidb-binlog',
+                'tiflash',
+                'tiflow',
+                'tiproxy',
+              ]
+            ) || (
+              body.repository.owner.login == 'tikv' && 
+              body.repository.name in [
+                'tikv',
+                'pd',
+                'migration'
+              ]
+            )
+
     - name: filter on branches
       ref:
         name: cel
@@ -23,8 +41,10 @@ spec:
           value: >-
             body.ref.matches('^refs/heads/(main|master)$')
   bindings:
-    - ref: github-branch-push
-    - { name: component, value: $(body.repository.name) }
+    - { name: git-url, value: https://github.com/pingcap/monitoring.git }
+    - { name: git-revision, value: master }
+    - { name: git-ref, value: master }
+    - { name: component, value: monitoring }
     - { name: profile, value: release }
     - { name: timeout, value: 30m }
     - { name: source-ws-size, value: 8Gi }
