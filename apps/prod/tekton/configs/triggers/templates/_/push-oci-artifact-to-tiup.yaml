@@ -22,7 +22,7 @@ spec:
           - name: nightly
             value: "true"
           - name: tiup-tool-version
-            value: v1.13.1
+            value: v1.14.1
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8988
         workspaces:
@@ -45,7 +45,7 @@ spec:
           - name: nightly
             value: "true"
           - name: tiup-tool-version
-            value: v1.13.1
+            value: v1.14.1
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8987
         workspaces:
@@ -78,7 +78,7 @@ spec:
           - name: artifact-url
             value: "$(tt.params.image_url)"
           - name: tiup-tool-version
-            value: v1.13.1
+            value: v1.14.1
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8988
         workspaces:
@@ -111,7 +111,7 @@ spec:
           - name: artifact-url
             value: "$(tt.params.image_url)"
           - name: tiup-tool-version
-            value: v1.13.1
+            value: v1.14.1
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8988
         workspaces:
@@ -132,7 +132,7 @@ spec:
           - name: artifact-url
             value: "$(tt.params.image_url)"
           - name: tiup-tool-version
-            value: v1.13.1
+            value: v1.14.1
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8987
         workspaces:
