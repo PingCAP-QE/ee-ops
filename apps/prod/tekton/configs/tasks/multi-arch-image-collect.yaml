@@ -63,7 +63,7 @@ spec:
 
         # for tags
         for t in $tags; do
-          yq -i ".tags += [\"$t\"]" manifest.yaml
+          yq -i ".tags += ([\"$t\"] | unique)" manifest.yaml
         done
 
         # digest map
