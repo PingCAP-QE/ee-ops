@@ -21,7 +21,7 @@ spec:
       mountPath: /root/.docker
       optional: true
   results:
-    - description: Just built and pushed images, it will be a yaml content.
+    - description: Just built and pushed artifacts, it will be a yaml content.
       name: pushed
       type: string
   params:
@@ -41,7 +41,7 @@ spec:
     - name: git-ref
     - name: git-sha
     - name: builder-image
-      default: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+      default: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
     - name: release-dir
       default: build
     - name: push
@@ -52,7 +52,7 @@ spec:
       default: ''
   steps:
     - name: generate-build-script
-      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -98,7 +98,7 @@ spec:
 
         "$script" -b -a -w "$(params.release-dir)"
     - name: publish
-      image: ghcr.io/pingcap-qe/cd/utils/release:5d33328
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       workingDir: $(workspaces.source.path)
       script: |
         script="/workspace/build-package-artifacts.sh"

@@ -1,0 +1,102 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-compose-offline-pkgs
+  labels:
+    app.kubernetes.io/version: "0.1"
+  annotations:
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
+spec:
+  description: >-
+    Compose TiUP offline deploy packages.
+  workspaces:
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+      mountPath: /root/.docker
+      optional: true
+  results:
+    - description: Just built and pushed images, it will be a yaml content.
+      name: pushed
+      type: string
+  params:
+    - name: os
+      default: linux
+    - name: arch
+      default: amd64
+    - name: version
+      type: string
+      description: the version to releasing.
+    - name: edition
+      type: string
+      default: community
+      description: >
+        supports: 'community' or 'enterprise'.
+    - name: push
+      type: string
+      default: 'false'
+    - name: tiup-tool-version
+      default: "v1.14.1"
+    - name: tiup-mirror
+      description: Staging is http://tiup.pingcap.net:8988, product is http://tiup.pingcap.net:8987.
+      default: http://tiup.pingcap.net:8987
+  steps:
+    - name: generate-composing-script
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+      resources:
+        requests:
+          cpu: "100m"
+          memory: 1Gi
+      script: |
+        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
+
+        out_script="/workspace/compose-offline-packages-artifacts.sh"
+        /workspace/artifacts/packages/scripts/gen-package-offline-package-with-config.sh \
+          $(params.os) \
+          $(params.arch) \
+          $(params.version) \
+          $(params.edition) \
+          /workspace/artifacts/packages/offline-packages.yaml.tmpl \
+          "$out_script"
+
+        if [ -f "$out_script" ]; then
+          cat "$out_script"
+        else
+          echo "🤷 no output script generated!"
+          exit 1
+        fi
+    - name: compose-and-publish
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+      resources:
+        limits:
+          cpu: "4"
+          memory: 16Gi
+      script: |
+        #! /usr/bin/env bash
+        set -exo pipefail
+
+        script="/workspace/compose-offline-packages-artifacts.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          exit 0
+        fi
+
+        # install tiup tool.
+        TIUP_HOME=~/.tiup
+        bin_dir=$TIUP_HOME/bin
+        mkdir -vp "$bin_dir"
+        ARCH=$([ "$(arch)" = "x86_64" ] && echo amd64 || echo arm64)
+        download_url=https://tiup-mirrors.pingcap.com/tiup-$(params.tiup-tool-version)-linux-${ARCH}.tar.gz
+        wget -q -O - "$download_url" | tar -zxvf - -C "$bin_dir"
+        chmod 755 "$bin_dir/tiup"
+        export PATH=$bin_dir:$PATH
+        which tiup
+
+        # set mirror.
+        tiup mirror set $(params.tiup-mirror)
+
+        if $(params.push); then
+          "$script" -p -w build -o $(results.pushed.path)
+        else
+          "$script" -w build
+          printf "%s" "null" > $(results.pushed.path)
+        fi

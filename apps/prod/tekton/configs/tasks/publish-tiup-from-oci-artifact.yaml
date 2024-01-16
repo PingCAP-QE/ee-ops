@@ -23,7 +23,7 @@ spec:
       default: http://tiup.pingcap.net:8988
   steps:
     - name: analyse
-      image: ghcr.io/pingcap-qe/cd/utils/release:bcb089f
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       workingDir: /workspace
       script: |
         #! /usr/bin/env bash
@@ -72,7 +72,7 @@ spec:
 
         cat publish.sh
     - name: publish
-      image: ghcr.io/pingcap-qe/cd/utils/release:bcb089f
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       workingDir: /workspace
       script: |
         #! /usr/bin/env bash
