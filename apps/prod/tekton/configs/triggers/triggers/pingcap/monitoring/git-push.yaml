@@ -42,7 +42,7 @@ spec:
             body.ref.matches('^refs/heads/(main|master)$')
   bindings:
     - { name: git-url, value: https://github.com/pingcap/monitoring.git }
-    - { name: git-revision, value: origin/master }
+    - { name: git-revision, value: master }
     - { name: git-ref, value: master }
     - { name: component, value: monitoring }
     - { name: profile, value: release }
