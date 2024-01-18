@@ -110,7 +110,7 @@ spec:
         yq '.["$(params.mac-builder-resource)"].config.workspace_dir'   "${WORKSPACE_SSH_DIRECTORY_PATH}/hosts.yaml" > "$REMOTE_BUILDER_INFO_DIR/ssh_workspace"
         # TODO: do more pre-check or pre-set.
     - name: pre-build
-      image: $(params.builder-image)
+      image: "$(params.builder-image)"
       script: |
         # 1. optional get go builder in PATH env var, got the go version(x.y) from the current container with `go version`.
         :> /workspace/remote.env
