@@ -109,8 +109,18 @@ spec:
         yq '.["$(params.mac-builder-resource)"].host'   "${WORKSPACE_SSH_DIRECTORY_PATH}/hosts.yaml" > "$REMOTE_BUILDER_INFO_DIR/ssh_host"
         yq '.["$(params.mac-builder-resource)"].config.workspace_dir'   "${WORKSPACE_SSH_DIRECTORY_PATH}/hosts.yaml" > "$REMOTE_BUILDER_INFO_DIR/ssh_workspace"
         # TODO: do more pre-check or pre-set.
+    - name: pre-build
+      image: $(params.builder-image)
+      script: |
+        # 1. optional get go builder in PATH env var, got the go version(x.y) from the current container with `go version`.
+        :> /workspace/remote.env
+
+        if go version; then
+          go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin"
+          echo "export PATH=${go_bin_path}:\$PATH" >> /workspace/remote.env
+        fi
     - name: build
-      image: "$(params.builder-image)"
+      image: ghcr.io/pingcap-qe/cd/utils/remote:v20231216-51-g3bb25fd
       env:
         - name: WORKSPACE_SSH_DIRECTORY_BOUND
           value: $(workspaces.ssh-directory.bound)
@@ -150,27 +160,20 @@ spec:
         # TODO: we need some pre-check scripts: such as get git version...
 
         # 2.1 create a randon workspace dir in the remote host:
-        remote_workspace_dir="${workspace_base_dir}/$(uuidgen)"
+        remote_workspace_dir="${workspace_base_dir}/$(context.taskRun.name)"
         ssh ${username}@${host} "mkdir -p '$remote_workspace_dir'"
         
         # 2.2 copy the build shell to the remote host by ssh.
-        scp ""$script"" ${username}@${host}:"$remote_workspace_dir/"
+        scp "$script" /workspace/remote.env ${username}@${host}:"$remote_workspace_dir/"
 
         # 2.3 copy source codes from workspace `source` to the remote host by ssh.
         rsync --ignore-errors --progress -azh -e ssh $(workspaces.source.path) ${username}@${host}:"$remote_workspace_dir"
         remote_workspace_source_path="$remote_workspace_dir/$(basename $(workspaces.source.path))"
 
         # 2.4 run the shell on the mac host by ssh.
-        # 2.4.1 optional get go builder in PATH env var, got the go version(x.y) from the current container with `go version`.
-        go_bin_path=""
-        if go version; then
-          go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin"
-        fi
-
-        # run remote build
         ssh $username@$host -t  "bash -lc '
-          PATH=${go_bin_path}:\$PATH;
           cd "$remote_workspace_source_path";
+          source ${remote_workspace_dir}/remote.env;
           ${remote_workspace_dir}/build-package-artifacts.sh -b -a -w $(params.release-dir)
         '"
 
