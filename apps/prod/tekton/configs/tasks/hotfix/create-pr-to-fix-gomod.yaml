@@ -36,10 +36,13 @@ spec:
         go mod edit -replace sourcegraph.com/sourcegraph/appdash-data=github.com/sourcegraph/appdash-data@v0.0.0-20151005221446-73f23eafcf67
         go mod tidy
 
-        # update bazel file
-        if git status -s | grep go.mod; then
+        if git diff --exit-code --name-status go.mod; then
+          echo "🤷 No need to update the go.mod file, they are updated."
+          exit 0
+        else
+          # update bazel file
           echo 'build --remote_cache=http://ats.apps.svc/brc/tidb --remote_timeout="30s"' > ~/.bazelrc
-          make bazel_prepare
+          make bazel_prepare || true
         fi
     - name: create-pr
       image: bitnami/git:2.43.0
@@ -49,11 +52,11 @@ spec:
         git config --global user.email "ti-community-prow-bot@tidb.io"
         git config --global user.name  "ti-chi-bot"
 
-        if git status -s | grep go.mod; then
-          echo "🚀 Let's update go.mod and go.sum files..."
-        else
+        if git diff --exit-code --name-status go.mod; then
           echo "🤷 No need to update the go.mod file, they are updated."
           exit 0
+        else
+          echo "🚀 Let's update go.mod and go.sum files..."
         fi
 
         # install `gh` tool
