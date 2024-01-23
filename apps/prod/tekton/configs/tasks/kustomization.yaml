@@ -5,6 +5,7 @@ resources:
   - aws-cli.yaml # from and hacked: https://hub.tekton.dev/tekton/task/aws-cli
   - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
   - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release
+  - crane-copy.yaml # crane copy task
   - echo.yaml ##### an example task.
   - gen-build-binaries-scripts.yaml
   - gen-build-images-scripts.yaml
@@ -16,7 +17,6 @@ resources:
   - hotfix/create-pr-to-sync-owners.yaml
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/kaniko/0.6/kaniko.yaml # kaniko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/ko/0.1/ko.yaml # ko task
-  - https://raw.githubusercontent.com/tektoncd/catalog/main/task/skopeo-copy/0.3/skopeo-copy.yaml # skopeo-copy task.
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml # tkn task
   - ko-test-infra.yaml
   - ks3utils.yaml # from and hacked: https://hub.tekton.dev/tekton/task/aws-cli
