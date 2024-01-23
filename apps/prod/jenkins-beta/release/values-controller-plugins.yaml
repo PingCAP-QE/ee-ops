@@ -83,7 +83,7 @@ controller:
     - artifactId: json-path-api
       source:
         # renovate: datasource=jenkins-plugins depName=json-path-api
-        version: 2.8.0-5.v07cb_a_1ca_738c
+        version: 2.9.0-33.v2527142f2e1d
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
