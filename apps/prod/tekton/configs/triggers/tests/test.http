@@ -168,7 +168,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/main",
     "before": "00000000000000000000000000000000000000000",
-    "after": "b1d210fa8a61abcba293aea2b2adfca1793b353f",
+    "after": "5273b42a131f4fb9dac95606b89b15f20fc85fe4",
     "ref_type": "branch",
     "repository": {
         "name": "tiproxy",
