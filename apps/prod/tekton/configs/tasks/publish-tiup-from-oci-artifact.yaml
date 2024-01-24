@@ -46,10 +46,9 @@ spec:
         architecture="$(yq --output-format=yaml '.architecture' artifact-config.json)"
         version="$(yq --output-format=yaml '.version' artifact-config.json)"
         if $nightly; then
-          # from v7.6.0-alpha-574-g75b451c454 => v7.6.0-alpha-instant
+          # from v7.6.0-alpha-574-g75b451c454 => v7.6.0-alpha-nightly
           version=`echo "$version" | sed -E 's/\-[0-9]+-g[0-9a-f]+$//'`
-          version="${version}-instant"
-          # TODO: current not override nightly
+          version="${version}-nightly"
         fi
 
         for i in `seq 0 $tiup_last_index`; do
