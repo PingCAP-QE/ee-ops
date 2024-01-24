@@ -3,4 +3,4 @@ kind: ServiceAccount
 metadata:
   name: image-releaser
 secrets:
-  - name: dockerhub-release-cred
+  - name: image-release-cred
