@@ -20,6 +20,10 @@ resources:
   - pingcap/ng-monitoring/git-push.yaml
   - pingcap/tidb-binlog/git-create-tag.yaml
   - pingcap/tidb-binlog/git-push.yaml
+  - pingcap/tidb-dashboard/fake-git-create-tag.yaml
+  - pingcap/tidb-dashboard/fake-git-push.yaml
+  - pingcap/tidb-dashboard/git-create-tag.yaml
+  - pingcap/tidb-dashboard/git-push.yaml
   - pingcap/tidb-tools/git-create-tag.yaml
   - pingcap/tidb-tools/git-push.yaml
   - pingcap/tidb/fake-git-create-tag.yaml

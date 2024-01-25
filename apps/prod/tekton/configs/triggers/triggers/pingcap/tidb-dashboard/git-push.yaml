@@ -1,0 +1,34 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: git-push-pingcap-tidb-dashboard
+  labels:
+    type: github-branch-push
+    github-owner: pingcap
+    github-repo: tidb-dashboard
+spec:
+  interceptors:
+    - name: filter on repo owner and name
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'pingcap' && body.repository.name == 'tidb-dashboard'
+    - name: filter on branches
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.ref.matches('^refs/heads/(main|master)$')
+  bindings:
+    - ref: github-branch-push
+    - { name: component, value: $(body.repository.name) }
+    - { name: profile, value: release }
+    - { name: timeout, value: 30m }
+    - { name: source-ws-size, value: 8Gi }
+    - { name: builder-resources-memory, value: 4Gi }
+    - { name: builder-resources-cpu, value: "2" }
+  template:
+    ref: build-component-all-platforms
