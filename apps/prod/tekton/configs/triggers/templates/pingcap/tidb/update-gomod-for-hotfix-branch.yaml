@@ -9,6 +9,8 @@ spec:
     - name: git-ref
       description: The git ref
       default: main
+    - name: golang-image
+      default: ghcr.io/pingcap-qe/ci/base:v20231216-14-g77d0cd2-go1.19
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
@@ -20,6 +22,8 @@ spec:
             value: $(tt.params.git-url)
           - name: branch
             value: $(tt.params.git-ref)
+          - name: golang-image
+            value: $(tt.params.golang-image)
         taskRef:
           kind: Task
           name: create-pr-to-fix-gomod

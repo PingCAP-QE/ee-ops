@@ -17,6 +17,9 @@ spec:
     - name: branch
       description: branch name
       type: string
+    - name: golang-image
+      description: the image to run go mod edit and go mod tidy
+      default: ghcr.io/pingcap-qe/ci/base:v20231216-14-g77d0cd2-go1.19
   steps:
     - name: clone
       image: bitnami/git:2.43.0
@@ -24,7 +27,7 @@ spec:
       script: |
         git clone $(params.git-url) --branch $(params.branch) --depth 1 /workspace/src
     - name: update-gomod
-      image: ghcr.io/pingcap-qe/ci/base:v20231216-14-g77d0cd2-go1.19
+      image: "$(params.golang-image)"
       workingDir: /workspace/src
       env:
         - name: GOPROXY
