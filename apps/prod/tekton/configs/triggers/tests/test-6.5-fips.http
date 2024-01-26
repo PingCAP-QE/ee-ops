@@ -1,7 +1,7 @@
 ## You should run it firstly:
 ## kubectl port-forward -n ee-cd svc/el-public 8080
 
-### tikv/tikv: push on master branch
+### tikv/tikv: push on fips branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
 content-type: application/json
@@ -21,7 +21,7 @@ X-GitHub-Event: push
     }
 }
 
-### tikv/pd: push on master branch
+### tikv/pd: push on fips branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
 content-type: application/json
@@ -41,7 +41,7 @@ X-GitHub-Event: push
     }
 }
 
-### pingcap/tiflow: push on master branch
+### pingcap/tiflow: push on fips branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
 content-type: application/json
@@ -61,7 +61,7 @@ X-GitHub-Event: push
     }
 }
 
-### pingcap/tidb: push on master branch
+### pingcap/tidb: push on fips branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
 content-type: application/json
@@ -82,7 +82,7 @@ X-GitHub-Event: push
 }
 
 
-### pingcap/tidb-dashboard: push on master branch
+### pingcap/tidb-dashboard: push on fips branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
 content-type: application/json
@@ -102,7 +102,7 @@ X-GitHub-Event: push
     }
 }
 
-### pingcap/ng-monitoring: push on master branch
+### pingcap/ng-monitoring: push on fips branch
 POST http://127.0.0.1:8080 HTTP/1.1
 Accept: */*
 content-type: application/json
