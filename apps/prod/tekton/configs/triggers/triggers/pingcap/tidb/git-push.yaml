@@ -21,6 +21,9 @@ spec:
         name: cel
       params:
         - name: filter
+          # support branches:
+          # - master
+          # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
             body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1|6[.]5|6[.]1))$')
   bindings:
@@ -37,9 +40,9 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-pingcap-tidb-enterprise
+  name: git-push-pingcap-tidb-enterprise-without-plugins
   labels:
-    type: template_disalbe_github-branch-push
+    type: github-branch-push
     github-owner: pingcap
     github-repo: tidb
     edition: enterprise
@@ -57,13 +60,15 @@ spec:
         name: cel
       params:
         - name: filter
+          # support branches:
+          # - feature/release-X.Y-*
           value: >-
-            body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1|6[.]5|6[.]1))$')
+            body.ref.matches('^refs/heads/(feature/release-[0-9]+[.][0-9]+-.*)$')
   bindings:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
-    - { name: profile, value: enterprise }
+    - { name: profile, value: enterprise-without-plugins }
     - { name: timeout, value: 45m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
