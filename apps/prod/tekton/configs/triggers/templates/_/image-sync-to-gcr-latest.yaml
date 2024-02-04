@@ -1,0 +1,39 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: image-sync-to-gcr-latest
+spec:
+  params:
+    - description: The image full url for pull
+      name: image_url
+    - description: The image tag
+      name: tag
+    - name: target_img
+      description: The artifact tag
+  resourcetemplates:
+      - apiVersion: tekton.dev/v1beta1
+        kind: TaskRun
+        metadata:
+          generateName: copy-image-dockerhub-
+        spec:
+          params:
+          - name: src-image-url
+            value: $(tt.params.image_url)
+          - name: dst-image-url
+            value: $(tt.params.target_img):$(tt.params.tag)
+          serviceAccountName: image-releaser-gcr
+          taskRef:
+            name: crane-copy
+      - apiVersion: tekton.dev/v1beta1
+        kind: TaskRun
+        metadata:
+          generateName: copy-image-dockerhub-
+        spec:
+          params:
+          - name: src-image-url
+            value: $(tt.params.image_url)
+          - name: dst-image-url
+            value: $(tt.params.target_img):nightly
+          serviceAccountName: image-releaser-gcr
+          taskRef:
+            name: crane-copy
