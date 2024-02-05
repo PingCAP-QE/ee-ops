@@ -1,0 +1,30 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: image-push-dockerhub-ng-monitoring
+  labels:
+    type: image-push
+  namespace: ee-cd
+spec:
+  bindings:
+  - kind: TriggerBinding
+    ref: harbor-image-push
+  - name: target_img
+    value: "docker.io/pingcap/ng-monitoring"
+  interceptors:
+  - name: filter on image repo names
+    params:
+    - name: filter
+      value: body.event_data.repository.repo_full_name in ['pingcap/ng-monitoring/image']
+    ref:
+      kind: ClusterInterceptor
+      name: cel
+  - name: filter on image tags
+    params:
+    - name: filter
+      value: body.event_data.resources[0].tag.matches('^master$')
+    ref:
+      kind: ClusterInterceptor
+      name: cel
+  template:
+    ref: image-sync-to-dockerhub-nightly
