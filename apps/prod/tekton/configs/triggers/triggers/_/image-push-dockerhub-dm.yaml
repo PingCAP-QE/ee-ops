@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: image-push-gcr-tiflow-operator
+  name: image-push-dockerhub-dm
   labels:
     type: image-push
   namespace: ee-cd
@@ -10,12 +10,12 @@ spec:
   - kind: TriggerBinding
     ref: harbor-image-push
   - name: target_img
-    value: "gcr.io/pingcap-public/tidbcloud/tiflow-operator"
+    value: "docker.io/pingcap/dm"
   interceptors:
   - name: filter on image repo names
     params:
     - name: filter
-      value: body.event_data.repository.repo_full_name in ['pingcap/tiflow-operator/image']
+      value: body.event_data.repository.repo_full_name in ['pingcap/tiflow/images/dm']
     ref:
       kind: ClusterInterceptor
       name: cel
@@ -27,4 +27,4 @@ spec:
       kind: ClusterInterceptor
       name: cel
   template:
-    ref: image-sync-to-gcr-latest
+    ref: image-sync-to-dockerhub-nightly

@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: multi-arch-image-push-on-harboar-tiflow-engine
+  name: image-push-dockerhub-tidb-server
   labels:
     type: image-push
   namespace: ee-cd
@@ -10,7 +10,7 @@ spec:
   - kind: TriggerBinding
     ref: harbor-image-push
   - name: target_img
-    value: "pingcap/tidb"
+    value: "docker.io/pingcap/tidb"
   interceptors:
   - name: filter on image repo names
     params:
