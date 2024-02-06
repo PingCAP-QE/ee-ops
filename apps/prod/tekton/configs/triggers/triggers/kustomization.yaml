@@ -3,6 +3,20 @@ kind: Kustomization
 resources:
   - _/artifact-push-on-harbor.yaml
   - _/git-push-on-fips-branches.yaml
+  - _/image-push-dockerhub-br.yaml
+  - _/image-push-dockerhub-cdc.yaml
+  - _/image-push-dockerhub-dm.yaml
+  - _/image-push-dockerhub-dumpling.yaml
+  - _/image-push-dockerhub-lightning.yaml
+  - _/image-push-dockerhub-ng-monitoring.yaml
+  - _/image-push-dockerhub-pd.yaml
+  - _/image-push-dockerhub-tidb-binlog.yaml
+  - _/image-push-dockerhub-tidb-monitor-initializer.yaml
+  - _/image-push-dockerhub-tidb-server.yaml
+  - _/image-push-dockerhub-tiflash.yaml
+  - _/image-push-dockerhub-tikv.yaml
+  - _/image-push-gcr-tiflow-engine.yaml
+  - _/image-push-gcr-tiflow-operator.yaml
   - _/image-push-on-harbor-tiproxy.yaml
   - _/image-push-on-harbor.yaml
   - pingcap/_/git-create-branch-gomod-update.yaml

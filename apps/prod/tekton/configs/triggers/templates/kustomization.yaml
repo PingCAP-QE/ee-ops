@@ -5,5 +5,7 @@ resources:
   - _/build-component.yaml
   - _/image-push.yaml
   - _/push-oci-artifact-to-tiup.yaml
+  - _/image-sync-to-dockerhub-nightly.yaml
+  - _/image-sync-to-gcr-latest.yaml
   - pingcap/sync-owners-for-hotfix-branch.yaml
   - pingcap/tidb/update-gomod-for-hotfix-branch.yaml
