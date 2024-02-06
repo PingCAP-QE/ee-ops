@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: pingcap-delivery-image
+  name: pingcap-deliver-image
   labels:
     app.kubernetes.io/version: "0.1.0"
   annotations:

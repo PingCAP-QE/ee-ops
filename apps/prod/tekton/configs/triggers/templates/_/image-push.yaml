@@ -49,3 +49,24 @@ spec:
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: image-deliver-to-external-registries
+spec:
+  params:
+    - name: image_url
+      description: The image full url with tag.
+  resourcetemplates:
+      - apiVersion: tekton.dev/v1beta1
+        kind: TaskRun
+        metadata:
+          generateName: pingcap-deliver-image-
+        spec:
+          taskRef:
+            name: pingcap-deliver-image
+          params:
+          - name: src-image-url
+            value: $(tt.params.image_url)
+          serviceAccountName: image-releaser

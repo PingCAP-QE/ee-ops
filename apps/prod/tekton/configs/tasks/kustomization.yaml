@@ -28,7 +28,7 @@ resources:
   - pingcap-build-binaries.yaml
   - pingcap-build-images.yaml
   - pingcap-compose-offline-pkgs.yaml
-  - pingcap-delivery-image.yaml
+  - pingcap-deliver-image.yaml
   - pingcap-get-builder-image.yaml
   - pingcap-get-release-version.yaml
   - publish-tiup-from-oci-artifact.yaml
