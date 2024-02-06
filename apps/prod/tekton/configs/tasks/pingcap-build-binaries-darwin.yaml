@@ -177,7 +177,7 @@ spec:
           ${remote_workspace_dir}/build-package-artifacts.sh -b -a -w $(params.release-dir)
         '"
 
-        # 2.5 copy the artifacts from the mac hosts to the workspace `source`, we need delivery them internal firstly.
+        # 2.5 copy the artifacts from the mac hosts to the workspace `source`, we need deliver them internal firstly.
         scp -r ${username}@${host}:"$remote_workspace_source_path/$(params.release-dir)" ./
 
         # 3. clean the workspace dir(it will be a random name) on the ssh mac host.

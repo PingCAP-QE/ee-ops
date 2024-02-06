@@ -12,16 +12,12 @@ spec:
       params:
         - name: filter
           value: >-
-            body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
-             && !
-            body.event_data.repository.repo_full_name.matches('/package(s)?')
-
-    - name: filter on single arch image tags.
-      ref:
-        name: "cel"
-      params:
-        - name: filter
-          value: >-
+            (
+              body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
+              && !
+              body.event_data.repository.repo_full_name.matches('/package(s)?')
+            )
+             &&
             body.event_data.resources[0].tag.matches('[-_](amd64|arm64)$')
   bindings:
     - ref: harbor-image-push
@@ -33,26 +29,51 @@ kind: Trigger
 metadata:
   name: multi-arch-image-push-on-harbor
   labels:
-    type: x-image-push
+    type: x-image-push # disabled with prefix "x-"
 spec:
   interceptors:
-    - name: filter on image repo names
+    - name: filter on image repo names and tags
       ref:
         name: cel
       params:
         - name: filter
           value: >-
-            body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
-             && !
-            body.event_data.repository.repo_full_name.matches('/package(s)?')
-    - name: filter on image tags
-      ref:
-        name: "cel"
-      params:
-        - name: filter
-          value: >-
+            (
+              body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
+              && !
+              body.event_data.repository.repo_full_name.matches('/package(s)?')
+            )
+            &&
             body.event_data.resources[0].tag.matches('^(master|main|v[0-9]+[.][0-9]+[.][0-9]+)$')
+
   bindings:
     - ref: harbor-image-push
   template:
     ref: add-image-major-tag
+---
+# currently, we just delivery the nightly.
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: multi-arch-image-push-on-harbor-branch-tags
+  labels:
+    type: image-push
+spec:
+  interceptors:
+    - name: filter on image repo names and tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            (
+              body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
+              && !
+              body.event_data.repository.repo_full_name.matches('/package(s)?')
+            ) &&
+            body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]+)?)$')
+
+  bindings:
+    - ref: harbor-image-push
+  template:
+    ref: image-deliver-to-external-registries
