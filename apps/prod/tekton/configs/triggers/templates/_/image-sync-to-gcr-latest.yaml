@@ -34,6 +34,6 @@ spec:
             value: $(tt.params.image_url)
           - name: dst-image-url
             value: $(tt.params.target_img):nightly
-          serviceAccountName: image-releaser-gcr
+          serviceAccountName: image-releaser
           taskRef:
             name: crane-copy

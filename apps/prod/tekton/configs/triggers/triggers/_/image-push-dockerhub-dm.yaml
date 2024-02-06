@@ -6,11 +6,6 @@ metadata:
     type: image-push
   namespace: ee-cd
 spec:
-  bindings:
-  - kind: TriggerBinding
-    ref: harbor-image-push
-  - name: target_img
-    value: "docker.io/pingcap/dm"
   interceptors:
   - name: filter on image repo names
     params:
@@ -26,5 +21,10 @@ spec:
     ref:
       kind: ClusterInterceptor
       name: cel
+  bindings:
+  - kind: TriggerBinding
+    ref: harbor-image-push
+  - name: target_img
+    value: "docker.io/pingcap/dm"
   template:
     ref: image-sync-to-dockerhub-nightly
