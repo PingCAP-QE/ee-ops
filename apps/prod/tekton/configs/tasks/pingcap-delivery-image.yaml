@@ -1,0 +1,47 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-delivery-image
+  labels:
+    app.kubernetes.io/version: "0.1.0"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.12.1"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: cli
+    tekton.dev/displayName: "pingcap inner image delivery"
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
+spec:
+  params:
+    - name: src-image-url
+      description: URL of the image to be copied to the destination registry
+  steps:
+    - name: gen-commands      
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+      script: |
+        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
+
+        # the container have not the crane tool, in this step we just generate commands that will be run in next step container.
+        out_script="/workspace/delivery.sh"
+        /workspace/artifacts/packages/scripts/gen-delivery-images-with-config.sh \
+          $(params.src-image-url) \
+          /workspace/artifacts/packages/delivery.yaml \
+          "$out_script"
+
+        if [ -f "$out_script" ]; then
+          cat "$out_script"
+        else
+          echo "🤷 no output script generated!"
+        fi
+    - name: run-commands
+      image: gcr.io/go-containerregistry/crane/debug:v0.15.2
+      script: |
+        #!/busybox/sh
+        set -e
+
+        script="/workspace/delivery.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          exit 0
+        fi
+
+        chmod +x $script && $script
