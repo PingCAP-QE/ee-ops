@@ -45,8 +45,8 @@ spec:
         os="$(yq --output-format=yaml '.os' artifact-config.json)"
         architecture="$(yq --output-format=yaml '.architecture' artifact-config.json)"
         version="$(yq --output-format=yaml '.version' artifact-config.json)"
-        if $nightly; then
-          # from v7.6.0-alpha-574-g75b451c454 => v7.6.0-alpha-nightly
+        if [ "$(params.nightly)" == "true" ]; then
+          # from vX.Y.Z-alpha-574-g75b451c454 => vX.Y.Z-alpha-nightly
           version=`echo "$version" | sed -E 's/\-[0-9]+-g[0-9a-f]+$//'`
           version="${version}-nightly"
         fi
