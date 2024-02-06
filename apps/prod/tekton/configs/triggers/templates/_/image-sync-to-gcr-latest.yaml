@@ -21,7 +21,7 @@ spec:
             value: $(tt.params.image_url)
           - name: dst-image-url
             value: $(tt.params.target_img):$(tt.params.tag)
-          serviceAccountName: image-releaser-gcr
+          serviceAccountName: image-releaser
           taskRef:
             name: crane-copy
       - apiVersion: tekton.dev/v1beta1
