@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: pingcap-deliver-image
   labels:
-    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/version: "0.1.1"
   annotations:
     tekton.dev/pipelines.minVersion: "0.12.1"
     tekton.dev/categories: CLI
@@ -16,22 +16,16 @@ spec:
       description: URL of the image to be copied to the destination registry
   steps:
     - name: gen-commands      
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+      image: docker.io/denoland/deno:alpine-1.40.3 # it has `wget` tool.
       script: |
-        git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
+        cfg_yaml_file="https://raw.githubusercontent.com/PingCAP-QE/artifacts/main/packages/delivery.yaml"
+        gen_script_url="https://raw.githubusercontent.com/PingCAP-QE/artifacts/main/packages/scripts/gen-delivery-image-commands.ts"
 
-        # the container have not the crane tool, in this step we just generate commands that will be run in next step container.
-        out_script="/workspace/delivery.sh"
-        /workspace/artifacts/packages/scripts/gen-delivery-images-with-config.sh \
-          $(params.src-image-url) \
-          /workspace/artifacts/packages/delivery.yaml \
-          "$out_script"
-
-        if [ -f "$out_script" ]; then
-          cat "$out_script"
-        else
-          echo "🤷 no output script generated!"
-        fi
+        wget -O delivery.yaml "$cfg_yaml_file"
+        deno run --allow-read --allow-write "$gen_script_url" \
+          --image_url="$(params.src-image-url)" \
+          --yaml_file=delivery.yaml \
+          --outfile=/workspace/delivery.sh
     - name: run-commands
       image: gcr.io/go-containerregistry/crane/debug:v0.15.2
       script: |

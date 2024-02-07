@@ -70,3 +70,6 @@ spec:
           - name: src-image-url
             value: $(tt.params.image_url)
           serviceAccountName: image-releaser
+          podTemplate:
+            nodeSelector:
+              kubernetes.io/arch: "amd64"
