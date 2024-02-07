@@ -8,19 +8,15 @@ metadata:
     github-repo: tiproxy
 spec:
   interceptors:
-    - name: filter on repo owner and name
-      ref:
-        name: cel
+    - name: filter on repo owner and name and branches
+      ref: { name: cel }
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tiproxy'
-    - name: filter on branches
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.owner.login == 'pingcap'
+              &&
+            body.repository.name == 'tiproxy'
+              &&
             body.ref.matches('^refs/heads/(main|master)$')
 
   bindings:

@@ -9,22 +9,18 @@ metadata:
     edition: community
 spec:
   interceptors:
-    - name: filter on repo owner and name
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tidb'
-    - name: filter on branches
-      ref:
-        name: cel
+    - name: filter on repo owner and name and branches
+      ref: { name: cel }
       params:
         - name: filter
           # support branches:
           # - master
           # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
+            body.repository.owner.login == 'pingcap'
+              &&
+            body.repository.name == 'tidb'
+              &&
             body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1|6[.]5|6[.]1))$')
   bindings:
     - ref: github-branch-push
@@ -48,14 +44,7 @@ metadata:
     edition: enterprise
 spec:
   interceptors:
-    - name: filter on repo owner and name
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tidb'
-    - name: filter on branches
+    - name: filter on repo owner and name and branches
       ref:
         name: cel
       params:
@@ -63,7 +52,12 @@ spec:
           # support branches:
           # - feature/release-X.Y-*
           value: >-
+            body.repository.owner.login == 'pingcap'
+              &&
+            body.repository.name == 'tidb'
+              &&
             body.ref.matches('^refs/heads/(feature/release-[0-9]+[.][0-9]+-.*)$')
+
   bindings:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
