@@ -50,7 +50,7 @@ spec:
       params:
         - name: filter
           # support branches:
-          # - feature/release-X.Y-*        
+          # - feature/release-X.Y-*
           value: >-
             body.repository.owner.login == 'pingcap'
               &&
