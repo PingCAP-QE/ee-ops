@@ -24,6 +24,8 @@ resources:
   - pingcap/tidb-dashboard/fake-git-push.yaml
   - pingcap/tidb-dashboard/git-create-tag.yaml
   - pingcap/tidb-dashboard/git-push.yaml
+  - pingcap/tidb-ctl/git-create-tag.yaml
+  - pingcap/tidb-ctl/git-push.yaml
   - pingcap/tidb-tools/git-create-tag.yaml
   - pingcap/tidb-tools/git-push.yaml
   - pingcap/tidb/fake-git-create-tag.yaml
