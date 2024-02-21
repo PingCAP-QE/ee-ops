@@ -1,0 +1,113 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: artifact-push-on-harbor-with-trunk-branch-tags-tidb
+  labels:
+    type: image-push
+spec:
+  interceptors:
+    - name: filter on image repo names and tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
+            &&
+            body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
+        - name: overlays
+          value:
+          - key: arch
+            expression: body.event_data.resources[0].tag.split('_')[-1]
+          - key: os
+            expression: body.event_data.resources[0].tag.split('_')[-2]
+          - key: git-ref
+            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[:-1].join('_')
+          - key: git-revision
+            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[-1]
+  bindings:
+    - { name: component, value: ctl }
+    - { name: profile, value: release }
+    - { name: git-url, value: https://github.com/pingcap/tidb.git }
+    - { name: git-ref, value: $(extensions.git-ref) }
+    - { name: git-revision, value: $(extensions.git-revision) }
+    - { name: os, value: $(extensions.os) }
+    - { name: arch, value: $(extensions.arch) }
+  template:
+    ref: build-component-single-platform
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: artifact-push-on-harbor-with-release-branch-tags-tidb
+  labels:
+    type: image-push
+spec:
+  interceptors:
+    - name: filter on image repo names and tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
+            &&
+            body.event_data.resources[0].tag.matches('^release-[0-9]+[.][0-9]+(-[0-9a-f]{7,10})-.*_(linux|darwin)_(amd64|arm64)$')
+        - name: overlays
+          value:
+          - key: arch
+            expression: body.event_data.resources[0].tag.split('_')[-1]
+          - key: os
+            expression: body.event_data.resources[0].tag.split('_')[-2]
+          - key: git-ref
+            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[:-1].join('_')
+          - key: git-revision
+            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[-1]
+  bindings:
+    - { name: component, value: ctl }
+    - { name: profile, value: release }
+    - { name: git-url, value: https://github.com/pingcap/tidb.git }
+    - { name: git-ref, value: $(extensions.git-ref) }
+    - { name: git-revision, value: $(extensions.git-revision) }
+    - { name: os, value: $(extensions.os) }
+    - { name: arch, value: $(extensions.arch) }
+  template:
+    ref: build-component-single-platform
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: artifact-push-on-harbor-with-git-tags-tidb
+  labels:
+    type: image-push
+spec:
+  interceptors:
+    - name: filter on image repo names and tags
+      ref:
+        name: cel
+      params:
+        - name: filter
+          value: >-
+            body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
+            &&
+            body.event_data.resources[0].tag.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-[0-9a-f]{7,10})_(linux|darwin)_(amd64|arm64)$')
+        - name: overlays
+          value:
+          - key: arch
+            expression: body.event_data.resources[0].tag.split('_')[-1]
+          - key: os
+            expression: body.event_data.resources[0].tag.split('_')[-2]
+          - key: git-ref
+            expression: body.event_data.resources[0].tag.split('_')[-3]
+          - key: git-revision
+            expression: body.event_data.resources[0].tag.split('_')[-3]
+  bindings:
+    - { name: component, value: ctl }
+    - { name: profile, value: release }
+    - { name: git-url, value: https://github.com/pingcap/tidb.git }
+    - { name: git-ref, value: $(extensions.git-ref) }
+    - { name: git-revision, value: $(extensions.git-revision) }
+    - { name: os, value: $(extensions.os) }
+    - { name: arch, value: $(extensions.arch) }
+  template:
+    ref: build-component-single-platform
