@@ -17,14 +17,14 @@ spec:
             body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
-          - key: arch
-            expression: body.event_data.resources[0].tag.split('_')[-1]
-          - key: os
-            expression: body.event_data.resources[0].tag.split('_')[-2]
           - key: git-ref
-            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[:-1].join('_')
+            expression: body.event_data.resources[0].tag.split('_')[0].split('-')[0]
           - key: git-revision
-            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[-1]
+            expression: body.event_data.resources[0].tag.split('_')[0].split('-')[1]
+          - key: os
+            expression: body.event_data.resources[0].tag.split('_')[1]
+          - key: arch
+            expression: body.event_data.resources[0].tag.split('_')[2]
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
@@ -55,14 +55,14 @@ spec:
             body.event_data.resources[0].tag.matches('^release-[0-9]+[.][0-9]+(-[0-9a-f]{7,10})-.*_(linux|darwin)_(amd64|arm64)$')
         - name: overlays
           value:
-          - key: arch
-            expression: body.event_data.resources[0].tag.split('_')[-1]
-          - key: os
-            expression: body.event_data.resources[0].tag.split('_')[-2]
           - key: git-ref
-            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[:-1].join('_')
+            expression: body.event_data.resources[0].tag.split('_')[0].split('-')[0:1].join('-')
           - key: git-revision
-            expression: body.event_data.resources[0].tag.split('_')[-3].spint('-')[-1]
+            expression: body.event_data.resources[0].tag.split('_')[0].split('-')[2]
+          - key: os
+            expression: body.event_data.resources[0].tag.split('_')[1]
+          - key: arch
+            expression: body.event_data.resources[0].tag.split('_')[2]
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
@@ -93,14 +93,14 @@ spec:
             body.event_data.resources[0].tag.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-[0-9a-f]{7,10})_(linux|darwin)_(amd64|arm64)$')
         - name: overlays
           value:
-          - key: arch
-            expression: body.event_data.resources[0].tag.split('_')[-1]
-          - key: os
-            expression: body.event_data.resources[0].tag.split('_')[-2]
           - key: git-ref
-            expression: body.event_data.resources[0].tag.split('_')[-3]
+            expression: body.event_data.resources[0].tag.split('_')[0]
           - key: git-revision
-            expression: body.event_data.resources[0].tag.split('_')[-3]
+            expression: body.event_data.resources[0].tag.split('_')[0]
+          - key: os
+            expression: body.event_data.resources[0].tag.split('_')[1]
+          - key: arch
+            expression: body.event_data.resources[0].tag.split('_')[2]
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }

@@ -11,9 +11,9 @@ Content-Type: application/json
     "event_data": {
         "resources": [
             {
-                "digest": "sha256:6efdf19e78f53389153a1b7351168ee81a15ca2aa25a157fd47a714b5dcf14e4",
-                "tag": "master-1fc92b3_linux_amd64",
-                "resource_url": "hub.pingcap.net/pingcap/tidb/package:master-1fc92b3_linux_amd64"
+                "digest": "sha256:135e16fc9db29cba5c6bb59a837af7da53c25332d3213d534cab4afa9122a9d7",
+                "tag": "master-38abd86_linux_amd64",
+                "resource_url": "hub.pingcap.net/pingcap/tidb/package:master-38abd86_linux_amd64"
             }
         ],
         "repository": {
