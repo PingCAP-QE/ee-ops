@@ -10,7 +10,7 @@ X-GitHub-Event: push
 {
     "ref": "refs/heads/master",
     "before": "00000000000000000000000000000000000000000",
-    "after": "154d6d99d8bda586e10723c3aacc6c4d8ff6a1c6",
+    "after": "a7fae77dc59418da9d8971ffae3a7399e34e290f",
     "ref_type": "branch",
     "repository": {
         "name": "tidb-binlog",
