@@ -81,7 +81,7 @@ spec:
         fi
     - name: build
       image: "$(params.builder-image)"
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.component)
       env:
         - name: CARGO_NET_GIT_FETCH_WITH_CLI
           value: 'true'
@@ -99,7 +99,7 @@ spec:
         "$script" -b -a -w "$(params.release-dir)"
     - name: publish
       image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.component)
       script: |
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then

@@ -130,7 +130,7 @@ spec:
           value: "(params.mac-builder-resource)"
         - name: REMOTE_BUILDER_INFO_DIR
           value: /workspace/remote-builder
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.component)
       # TODO: get the user and host by better way. 
       script: |
         #!/usr/bin/env bash
@@ -168,7 +168,7 @@ spec:
 
         # 2.3 copy source codes from workspace `source` to the remote host by ssh.
         rsync --ignore-errors --progress -azh -e ssh $(workspaces.source.path) ${username}@${host}:"$remote_workspace_dir"
-        remote_workspace_source_path="$remote_workspace_dir/$(basename $(workspaces.source.path))"
+        remote_workspace_source_path="$remote_workspace_dir/$(basename $(workspaces.source.path))/$(params.component)"
 
         # 2.4 run the shell on the mac host by ssh.
         ssh $username@$host -t  "bash -lc '
@@ -184,7 +184,7 @@ spec:
         ssh ${username}@${host} "rm -rf '$remote_workspace_dir'"
     - name: publish
       image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.component)
       script: |
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then
