@@ -1,0 +1,62 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-get-external-git-refs
+spec:
+  results:
+    - description: The external git url
+      name: need
+      type: string
+    - description: The external git url
+      name: url
+      type: string
+    - description: The external git reversion
+      name: reversion
+      type: string
+  steps:
+    - image: alpine/git:2.40.1
+      name: get
+      workingDir: $(workspaces.source.path)
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: '100m'
+      script: |
+        echo -n "false" > $(results.need.path)
+
+        # Get the URL of the origin remote of current workspace.
+        origin_url=$(git remote get-url origin)
+        # Check if the URL contains "pingcap/tidb"
+        if [[ $origin_url != *"pingcap/tidb"* ]]; then    
+            echo "🏃 The repo is not 'pingcap/tidb', exit now."
+            exit 0
+        fi
+
+        echo -n "true" > $(results.need.path)
+        echo -n "https://github.com/pingcap-inc/enterprise-plugin.git" > $(results.url.path)
+
+        # Get the external git revision.
+        RELEASE_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
+        origin_ref="$(git branch --contains | grep -v 'HEAD detached' | sed 's/^ *//'| sed 's/^* //')"
+
+        if [[ $origin_ref =~ ^feature/release-[0-9]+\.[0-9]+ ]]; then
+          MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1, $2}')
+          EXT_REVERSION="release-$MAJOR_MINOR"
+        elif [[ $origin_ref =~ ^release-[0-9]+\.[0-9]+-.*-v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+          # hotfix branches
+          MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | awk -F. '{print $1, $2}')
+          EXT_REVERSION="release-$MAJOR_MINOR_PATCH"
+        elif [[ $origin_ref =~ ^(master|main|feature/.*) ]]; then
+          EXT_REVERSION="master"
+        else
+          # GA version tags and RC release branches
+          EXT_REVERSION="$origin_ref"
+        fi
+        # Set the external git revision.
+        printf "%s" "${EXT_REVERSION}" > $(results.reversion.path)
+
+        echo "🎯 will we need it: $(cat $(results.need.path))";
+        echo "🔗 git url: $(cat $(results.url.path))"
+        echo "📝 git reversion: $(cat $(results.reversion.path))"
+  workspaces:
+    - name: source
