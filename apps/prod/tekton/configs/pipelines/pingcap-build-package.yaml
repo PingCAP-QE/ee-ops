@@ -54,7 +54,6 @@ spec:
   tasks:
     - name: checkout
       taskRef:
-        kind: Task
         name: git-clone
       params:
         - name: url
@@ -64,7 +63,9 @@ spec:
         - name: depth
           value: "0"
         - name: refspec
-          value: +refs/heads/*:refs/remotes/origin/*
+          value: +refs/heads/*:refs/heads/*
+        - name: subdirectory
+          value: $(params.component)
       workspaces:
         - name: output
           workspace: source
@@ -78,6 +79,7 @@ spec:
       workspaces:
         - name: source
           workspace: source
+          subPath: $(params.component)
     - name: get-binaries-builder
       taskRef:
         name: pingcap-get-builder-image

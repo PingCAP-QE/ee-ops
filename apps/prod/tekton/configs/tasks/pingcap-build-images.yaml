@@ -71,7 +71,7 @@ spec:
         fi
     - name: build-and-publish
       image: gcr.io/kaniko-project/executor:debug
-      workingDir: $(workspaces.source.path)
+      workingDir: $(workspaces.source.path)/$(params.component)
       env:
         - name: KANIKO_EXECUTOR
           value: /kaniko/executor
