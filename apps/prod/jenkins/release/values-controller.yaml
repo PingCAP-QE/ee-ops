@@ -1,7 +1,7 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
   image: "hub.pingcap.net/jenkins/jenkins-with-plugins"
-  tag: "2.387.3-jdk11"
+  tag: "2.426.3-lts-jdk11"
   resources:
     requests:
       cpu: "16"
