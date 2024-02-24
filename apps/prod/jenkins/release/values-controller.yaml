@@ -19,6 +19,10 @@ controller:
                 operator: In
                 values:
                   - amd64
+              - key: ee-infra-service
+                operator: In
+                values:
+                  - "true"
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # current jenkins using java-11.
