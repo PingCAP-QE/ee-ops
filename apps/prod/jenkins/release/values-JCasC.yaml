@@ -15,6 +15,7 @@ controller:
     - { name: codecov-token, keyName: tidb }
     - { name: codecov-token, keyName: tikv-migration }
     - { name: codecov-token, keyName: tiflow }
+    - { name: codecov-token, keyName: tiproxy}
     # for coveralls uploading
     - { name: coveralls-token, keyName: tiflow }
     # for ci cache, no need create manually.
@@ -28,6 +29,14 @@ controller:
     # for harbor
     - { name: harbor, keyName: tiflow-engine-username }
     - { name: harbor, keyName: tiflow-engine-password }
+    # for s3 upload
+    - { name: docs-cn, keyName: aws-ak }
+    - { name: docs-cn, keyName: aws-sk }
+    - { name: docs-cn, keyName: aws-region }
+    - { name: docs-cn, keyName: aws-bn }
+    - { name: docs-cn, keyName: qiniu-ak }
+    - { name: docs-cn, keyName: qiniu-sk }
+    - { name: docs-cn, keyName: qiniu-bn }
 
   additionalSecrets: []
   #  - name: nameOfSecret
@@ -118,6 +127,11 @@ controller:
                       description: codecov token for tiflow
                       scope: GLOBAL
                       secret: ${codecov-token-tiflow}
+                  - string:
+                      id: codecov-token-tiproxy
+                      description: codecov token for tiproxy
+                      scope: GLOBAL
+                      secret: ${codecov-token-tiproxy}
               - domain:
                   name: coveralls.io
                 credentials:
@@ -126,6 +140,44 @@ controller:
                       description: coveralls token for tiflow
                       scope: GLOBAL
                       secret: ${coveralls-token-tiflow}
+              - domain:
+                  name: ci.service
+                credentials:
+                  - string:
+                    id: docs-cn-aws-ak
+                    description: aws token for docs-cn
+                    scope: GLOBAL
+                    secret: ${docs-cn-aws-ak}
+                  - string:
+                    id: docs-cn-aws-sk
+                    description: aws token for docs-cn
+                    scope: GLOBAL
+                    secret: ${docs-cn-aws-sk}
+                  - string:
+                    id: docs-cn-aws-region
+                    description: aws token for docs-cn
+                    scope: GLOBAL
+                    secret: ${docs-cn-aws-region}
+                  - string:
+                    id: docs-cn-aws-bn
+                    description: aws token for docs-cn
+                    scope: GLOBAL
+                    secret: ${docs-cn-aws-bn}
+                  - string:
+                    id: docs-cn-qiniu-ak
+                    description: qiniu token for docs-cn
+                    scope: GLOBAL
+                    secret: ${docs-cn-qiniu-ak}
+                  - string:
+                    id: docs-cn-qiniu-sk
+                    description: qiniu token for docs-cn
+                    scope: GLOBAL
+                    secret: ${docs-cn-qiniu-sk}
+                  - string:
+                    id: docs-cn-qiniu-bn
+                    description: qiniu token for docs-cn
+                    scope: GLOBAL
+                    secret: ${docs-cn-qiniu-bn}
               - domain:
                   name: hub.pingcap.net
                 credentials:
