@@ -20,7 +20,7 @@ spec:
               &&
             body.repository.name == 'tiflash'
               &&
-            body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1|6[.]5|6[.]1))$')            
+            body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1))$')            
 
   bindings:
     - ref: github-branch-push
