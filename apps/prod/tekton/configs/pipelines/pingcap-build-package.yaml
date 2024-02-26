@@ -32,7 +32,7 @@ spec:
     - name: profile
       default: release
     - name: push
-      default: 'true'
+      default: "true"
   results:
     - name: pushed-binaries
       description: pushed binaries.
@@ -53,6 +53,7 @@ spec:
       optional: true
   tasks:
     - name: checkout
+      retries: 2
       taskRef:
         name: git-clone
       params:
@@ -65,6 +66,23 @@ spec:
         - name: refspec
           value: +refs/heads/*:refs/heads/*
         - name: subdirectory
+          value: $(params.component)
+      workspaces:
+        - name: output
+          workspace: source
+        - name: basic-auth
+          workspace: git-basic-auth
+    - name: checkout-ext
+      runAfter:
+        - checkout
+      taskRef:
+        name: pingcap-git-clone-ext
+      params:
+        - name: depth
+          value: "0"
+        - name: refspec
+          value: +refs/heads/*:refs/heads/*
+        - name: master-directory
           value: $(params.component)
       workspaces:
         - name: output
@@ -95,6 +113,8 @@ spec:
         - name: version
           value: "$(tasks.get-release-ver.results.version)"
     - name: build-binaries
+      runAfter:
+        - checkout-ext
       taskRef:
         name: pingcap-build-binaries
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
