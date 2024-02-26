@@ -14,7 +14,7 @@ spec:
   description: >-
     These Tasks are Git tasks to clone external git repositories that the main repository needs.
 
-    This task will compute the external git refs, then clone it into a subdirectory of the
+    This task will compute the external git refs from the master repo directory, then clone it into a subdirectory of the
     output Workspace.
   workspaces:
     - name: output
