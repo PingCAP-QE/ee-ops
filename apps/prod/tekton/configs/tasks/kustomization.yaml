@@ -30,6 +30,7 @@ resources:
   - pingcap-compose-offline-pkgs.yaml
   - pingcap-deliver-image.yaml
   - pingcap-get-builder-image.yaml
+  - pingcap-git-clone-ext.yaml
   - pingcap-get-release-version.yaml
   - publish-tiup-from-oci-artifact.yaml
   - restore-cache-with-ks3.yaml
