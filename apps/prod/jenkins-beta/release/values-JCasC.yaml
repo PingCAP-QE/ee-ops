@@ -11,6 +11,15 @@ controller:
     - { name: github, keyName: git-username }
     - { name: github, keyName: bot-token }
     - { name: github, keyName: pr-diff-token }
+    # for codecov.io uploading
+    - { name: codecov-token, keyName: tidb }
+    - { name: codecov-token, keyName: tikv-migration }
+    - { name: codecov-token, keyName: tiflow }
+    - { name: codecov-token, keyName: tiproxy}
+
+    # for harbor
+    - { name: harbor, keyName: tiflow-engine-username }
+    - { name: harbor, keyName: tiflow-engine-password }
 
     # for ci cache, no need create manually.
     - { name: jenkins-beta-cache, keyName: region }
@@ -20,6 +29,15 @@ controller:
     - { name: jenkins-beta-cache, keyName: access-secret }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
     - { name: mongodb, keyName: mongodb-root-password }
+
+    # for s3 upload
+    - { name: docs-cn, keyName: aws-ak }
+    - { name: docs-cn, keyName: aws-sk }
+    - { name: docs-cn, keyName: aws-region }
+    - { name: docs-cn, keyName: aws-bn }
+    - { name: docs-cn, keyName: qiniu-ak }
+    - { name: docs-cn, keyName: qiniu-sk }
+    - { name: docs-cn, keyName: qiniu-bn }
 
 
   additionalSecrets: []
@@ -93,6 +111,77 @@ controller:
                       description: github token to list pr diff files.
                       scope: GLOBAL
                       secret: ${github-pr-diff-token}
+              - domain:
+                  name: codecov.io
+                credentials:
+                  - string:
+                      id: codecov-token-tidb
+                      description: codecov token for tidb
+                      scope: GLOBAL
+                      secret: ${codecov-token-tidb}
+                  - string:
+                      id: codecov-token-tikv-migration
+                      description: codecov token for tikv/migration
+                      scope: GLOBAL
+                      secret: ${codecov-token-tikv-migration}
+                  - string:
+                      id: codecov-token-tiflow
+                      description: codecov token for tiflow
+                      scope: GLOBAL
+                      secret: ${codecov-token-tiflow}
+                  - string:
+                      id: codecov-token-tiproxy
+                      description: codecov token for tiproxy
+                      scope: GLOBAL
+                      secret: ${codecov-token-tiproxy}
+              - domain:
+                  name: ci.service
+                credentials:
+                  - string:
+                      id: docs-cn-aws-ak
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-ak}
+                  - string:
+                      id: docs-cn-aws-sk
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-sk}
+                  - string:
+                      id: docs-cn-aws-region
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-region}
+                  - string:
+                      id: docs-cn-aws-bn
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-bn}
+                  - string:
+                      id: docs-cn-qiniu-ak
+                      description: qiniu token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-qiniu-ak}
+                  - string:
+                      id: docs-cn-qiniu-sk
+                      description: qiniu token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-qiniu-sk}
+                  - string:
+                      id: docs-cn-qiniu-bn
+                      description: qiniu token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-qiniu-bn}
+              - domain:
+                  name: hub.pingcap.net
+                credentials:
+                  - usernamePassword:
+                      scope: GLOBAL
+                      id: harbor-tiflow-engine
+                      description: user/password for tiflow engine test in harbor
+                      username: ${harbor-tiflow-engine-username}
+                      password: ${harbor-tiflow-engine-password}
+
       # for jobs.
       jobs-dsl: |
         jobs:
