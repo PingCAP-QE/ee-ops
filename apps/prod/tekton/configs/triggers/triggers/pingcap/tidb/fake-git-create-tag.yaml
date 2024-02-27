@@ -8,19 +8,16 @@ metadata:
     github-repo: tidb
 spec:
   interceptors:
-    - name: filter on repo owner and name
+    - name: filter on repo owner and name and tags
       ref:
         name: cel
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tidb'
-    - name: filter on version tags
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.owner.login == 'pingcap'
+            &&
+            body.repository.name == 'tidb'
+            &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
   bindings:
     - ref: github-tag-create
@@ -31,6 +28,6 @@ spec:
     - { name: timeout, value: 30m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
-    - { name: builder-resources-cpu, value: "8" }    
+    - { name: builder-resources-cpu, value: "8" }
   template:
     ref: build-component

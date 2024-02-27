@@ -17,9 +17,9 @@ spec:
           # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
             body.repository.owner.login == 'pingcap'
-              &&
+            &&
             body.repository.name == 'tidb'
-              &&
+            &&
             body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1))$')
 
   bindings:
