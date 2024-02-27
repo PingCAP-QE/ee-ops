@@ -67,7 +67,7 @@ spec:
         done
 
         # digest map
-        for t in `oras repo tags $pushed_repo | grep -E "${tag}[-_].*[-_](amd64|arm64)$"`; do
+        for t in `oras repo tags $pushed_repo | grep -E "${tag}[-_]linux[-_](amd64|arm64)$"`; do
           manifest-tool inspect --raw "${pushed_repo}:$t" > manifest.json
           platform=`jq -r '.os + "/" + .architecture' manifest.json`
           digest=`jq -r '.digest' manifest.json`
