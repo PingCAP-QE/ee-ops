@@ -6,21 +6,19 @@ metadata:
     type: github-tag-create
     github-owner: pingcap
     github-repo: tidb
+    edition: community
 spec:
   interceptors:
-    - name: filter on repo owner and name
+    - name: filter on repo owner and name and tags
       ref:
         name: cel
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tidb'
-    - name: filter on version tags
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.owner.login == 'pingcap'
+            &&
+            body.repository.name == 'tidb'
+            &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
   bindings:
     - ref: github-tag-create
@@ -32,3 +30,36 @@ spec:
     - { name: builder-resources-cpu, value: "8" }
   template:
     ref: build-component-all-platforms
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: tag-create-pingcap-tidb-enterprise
+  labels:
+    type: github-tag-create
+    github-owner: pingcap
+    github-repo: tidb
+    edition: enterprise
+spec:
+  interceptors:
+    - name: filter on repo owner and name and tags
+      ref: { name: cel }
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'pingcap'
+            &&
+            body.repository.name == 'tidb'
+            &&
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
+  bindings:
+    - ref: github-branch-push
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: enterprise }
+    - { name: timeout, value: 30m }
+    - { name: source-ws-size, value: 50Gi }
+    - { name: builder-resources-memory, value: 32Gi }
+    - { name: builder-resources-cpu, value: "8" }
+  template:
+    ref: build-component
