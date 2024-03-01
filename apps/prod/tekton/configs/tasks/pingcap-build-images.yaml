@@ -75,6 +75,8 @@ spec:
       env:
         - name: KANIKO_EXECUTOR
           value: /kaniko/executor
+        - name: KANIKO_REGISTRY_MIRROR
+          value: registry-mirror.pingcap.net
       resources:
         requests:
           cpu: "4"
