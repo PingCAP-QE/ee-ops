@@ -14,13 +14,10 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tiproxy'
-    - name: filter on version tags
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.owner.login == 'pingcap'
+            &&
+            body.repository.name == 'tiproxy'
+            &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
   bindings:
     - ref: github-tag-create

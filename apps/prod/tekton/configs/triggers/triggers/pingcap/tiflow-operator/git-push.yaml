@@ -14,9 +14,9 @@ spec:
         - name: filter
           value: >-
             body.repository.owner.login == 'pingcap'
-              &&
+            &&
             body.repository.name == 'tiflow-operator'
-              &&
+            &&
             body.ref.matches('^refs/heads/(master)$')
 
   bindings:
