@@ -6,6 +6,7 @@ metadata:
     type: github-branch-push
     github-owner: tikv
     github-repo: tikv
+    profile: community
 spec:
   interceptors:
     - name: filter on repo owner and name and branches
@@ -17,9 +18,9 @@ spec:
           # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
             body.repository.owner.login == 'tikv'
-              &&
+            &&
             body.repository.name == 'tikv'
-              &&
+            &&
             body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1))$')
 
   bindings:
@@ -32,3 +33,40 @@ spec:
     - { name: builder-resources-cpu, value: "16" }
   template:
     ref: build-component-all-platforms
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: git-push-tikv-tikv-enterprise
+  labels:
+    type: github-branch-push
+    github-owner: tikv
+    github-repo: tikv
+    profile: enterprise
+spec:
+  interceptors:
+    - name: filter on repo owner and name and branches
+      ref: { name: cel }
+      params:
+        - name: filter
+          # support branches:
+          # - master
+          # - release-6.1, release-6.5, release-7.1, release-7.5
+          value: >-
+            body.repository.owner.login == 'tikv'
+            &&
+            body.repository.name == 'tikv'
+            &&
+            body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1))$')
+
+  bindings:
+    - ref: github-branch-push
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: enterprise }
+    - { name: timeout, value: 2h30m }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-memory, value: 64Gi }
+    - { name: builder-resources-cpu, value: "16" }
+  template:
+    ref: build-component

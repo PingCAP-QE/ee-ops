@@ -14,9 +14,9 @@ spec:
         - name: filter
           value: >-
             body.repository.owner.login == 'pingcap'
-              &&
+            &&
             body.repository.name == 'tiproxy'
-              &&
+            &&
             body.ref.matches('^refs/heads/(main|master)$')
   bindings:
     - ref: github-branch-push

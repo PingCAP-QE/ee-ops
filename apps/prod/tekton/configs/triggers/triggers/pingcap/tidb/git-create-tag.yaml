@@ -6,12 +6,11 @@ metadata:
     type: github-tag-create
     github-owner: pingcap
     github-repo: tidb
-    edition: community
+    profile: community
 spec:
   interceptors:
     - name: filter on repo owner and name and tags
-      ref:
-        name: cel
+      ref: { name: cel }
       params:
         - name: filter
           value: >-
@@ -39,7 +38,7 @@ metadata:
     type: github-tag-create
     github-owner: pingcap
     github-repo: tidb
-    edition: enterprise
+    profile: enterprise
 spec:
   interceptors:
     - name: filter on repo owner and name and tags
@@ -53,7 +52,7 @@ spec:
             &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
   bindings:
-    - ref: github-branch-push
+    - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: enterprise }

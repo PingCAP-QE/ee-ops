@@ -13,11 +13,11 @@ spec:
             name: "cel"
           params:
             - name: filter
-              value: >
+              value: >-
                 body.type == 'PUSH_ARTIFACT' 
-                  && 
+                && 
                 body.event_data.repository.namespace in ['pingcap', 'tikv'] 
-                  &&
+                &&
                 ! body.event_data.resources[0].tag.startsWith('sha256:')
       triggerSelector:
         namespaceSelector:
@@ -33,7 +33,7 @@ spec:
             name: cel
           params:
             - name: filter
-              value: >
+              value: >-
                 header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.push', 'net.pingcap.tibuild.hotfix.push']
         # "refs/heads/main" => "main"
         - name: shortten the git REF
