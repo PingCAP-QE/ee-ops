@@ -8,19 +8,16 @@ metadata:
     github-repo: pd
 spec:
   interceptors:
-    - name: filter on repo owner and name
+    - name: filter on repo owner and name and tags
       ref:
         name: cel
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'tikv' && body.repository.name == 'pd'
-    - name: filter on version tags
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.owner.login == 'tikv'
+            &&
+            body.repository.name == 'pd'
+            &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+')
   bindings:
     - ref: github-tag-create
