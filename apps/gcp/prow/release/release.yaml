@@ -74,7 +74,7 @@ spec:
         enabled: false
       image:
         repository: ticommunityinfra/hook
-        tag: v20230927-01102e9c12
+        tag: v20240301-09ad8bf
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
