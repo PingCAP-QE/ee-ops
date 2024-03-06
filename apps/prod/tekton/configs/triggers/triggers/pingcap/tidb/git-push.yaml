@@ -72,12 +72,12 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-pingcap-tidb-debug
+  name: git-push-pingcap-tidb-failpoint
   labels:
     type: github-branch-push
     github-owner: pingcap
     github-repo: tidb
-    profile: debug
+    profile: failpoint
 spec:
   interceptors:
     - name: filter on repo owner and name and branches
@@ -97,7 +97,7 @@ spec:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
-    - { name: profile, value: debug }
+    - { name: profile, value: failpoint }
     - { name: timeout, value: 30m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
