@@ -22,7 +22,7 @@ spec:
       type: string
       default: release
       description: >
-        supports: 'release' or 'debug'.
+        supports: 'release' or 'failpoint'.
     - name: git-ref
     - name: git-sha
     - name: build-image

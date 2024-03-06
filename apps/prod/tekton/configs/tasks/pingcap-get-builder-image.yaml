@@ -27,7 +27,7 @@ spec:
       type: string
       default: release
       description: >
-        supports: 'release' or 'debug' or others.
+        supports: 'release' or 'failpoint' or others.
   steps:
     - name: get
       image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
