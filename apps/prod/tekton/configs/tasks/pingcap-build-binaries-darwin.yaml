@@ -112,9 +112,12 @@ spec:
     - name: pre-build
       image: "$(params.builder-image)"
       script: |
-        # 1. optional get go builder in PATH env var, got the go version(x.y) from the current container with `go version`.
         :> /workspace/remote.env
 
+        1. set locale lang
+        echo "export LC_ALL=C.UTF-8" >> /workspace/remote.env
+
+        # 2. optional get go builder in PATH env var, got the go version(x.y) from the current container with `go version`.
         if go version; then
           go_bin_path="/usr/local/$(go version | cut -d ' ' -f 3 | cut -d '.' -f -2)/bin"
           echo "export PATH=${go_bin_path}:\$PATH" >> /workspace/remote.env
