@@ -17,6 +17,28 @@ spec:
           cpu: '100m'
       script: |
         RESULT_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
+        if [[ "$RESULT_VERSION" =~ -[0-9]+-g[0-9a-f]{7,10}(-dirty)?$ ]]; then
+          # Check if "-alpha-" is included in the version string
+          if [[ "$RESULT_VERSION" == *"-alpha-"* ]]; then
+              echo "First patch version detected. Skipping patch increment."
+          else
+            echo "The code is checkouted on branch, I will increase the path version."
+
+            # Extract major, minor, and patch version components
+            IFS='.' read -r -a version_parts <<<"$(echo "$RESULT_VERSION" | grep -oE '^v[0-9]+\.[0-9]+\.[0-9]+')"
+            major="${version_parts[0]}"
+            minor="${version_parts[1]}"
+            patch="${version_parts[2]}"
+
+            # Increment the patch version
+            ((patch++))
+
+            # Construct the new version string
+            RESULT_VERSION="$major.$minor.$patch-pre"
+          fi
+        fi
+
         printf "%s" "${RESULT_VERSION}" > $(results.version.path)
+
   workspaces:
     - name: source
