@@ -114,7 +114,7 @@ spec:
       script: |
         :> /workspace/remote.env
 
-        1. set locale lang
+        # 1. set locale lang
         echo "export LC_ALL=C.UTF-8" >> /workspace/remote.env
 
         # 2. optional get go builder in PATH env var, got the go version(x.y) from the current container with `go version`.
