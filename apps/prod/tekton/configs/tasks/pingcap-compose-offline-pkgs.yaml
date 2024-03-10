@@ -39,9 +39,13 @@ spec:
     - name: tiup-mirror
       description: Staging is http://tiup.pingcap.net:8988, product is http://tiup.pingcap.net:8987.
       default: http://tiup.pingcap.net:8987
+  stepTemplate:
+    image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+    env:
+      - name: OUT_SCRIPT
+        value: /workspace/compose-offline-packages-artifacts.sh
   steps:
     - name: generate-composing-script
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       resources:
         requests:
           cpu: "100m"
@@ -49,23 +53,28 @@ spec:
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
-        out_script="/workspace/compose-offline-packages-artifacts.sh"
         /workspace/artifacts/packages/scripts/gen-package-offline-package-with-config.sh \
           $(params.os) \
           $(params.arch) \
           $(params.version) \
           $(params.edition) \
           /workspace/artifacts/packages/offline-packages.yaml.tmpl \
-          "$out_script"
+          "$OUT_SCRIPT"
 
-        if [ -f "$out_script" ]; then
-          cat "$out_script"
+        if [ -f "$OUT_SCRIPT" ]; then
+          cat "$OUT_SCRIPT"
         else
           echo "🤷 no output script generated!"
           exit 1
         fi
+    - name: check
+      resources:
+        limits:
+          cpu: "1"
+          memory: 16Gi
+      command: [/workspace/compose-offline-packages-artifacts.sh]
+      args: ["-c"]
     - name: compose-and-publish
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       resources:
         limits:
           cpu: "4"
@@ -73,12 +82,6 @@ spec:
       script: |
         #! /usr/bin/env bash
         set -exo pipefail
-
-        script="/workspace/compose-offline-packages-artifacts.sh"
-        if [ ! -f "$script" ]; then
-          echo "No build script, skip it."
-          exit 0
-        fi
 
         # install tiup tool.
         TIUP_HOME=~/.tiup
@@ -95,8 +98,8 @@ spec:
         tiup mirror set $(params.tiup-mirror)
 
         if $(params.push); then
-          "$script" -p -w build -o $(results.pushed.path)
+          "$OUT_SCRIPT" -r -w build -p -o $(results.pushed.path)
         else
-          "$script" -w build
+          "$OUT_SCRIPT" -r -w build
           printf "%s" "null" > $(results.pushed.path)
         fi
