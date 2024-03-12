@@ -42,9 +42,9 @@ spec:
         # publish the tiup packages
         :> publish.sh
         tiup_last_index=$(yq --output-format=yaml '.["net.pingcap.tibuild.tiup"] | length - 1' artifact-config.json)
-        os="$(yq --output-format=yaml '.os' artifact-config.json)"
-        architecture="$(yq --output-format=yaml '.architecture' artifact-config.json)"
-        version="$(yq --output-format=yaml '.version' artifact-config.json)"
+        os=$(yq --output-format=yaml '.["net.pingcap.tibuild.os"]' artifact-config.json)
+        architecture=$(yq --output-format=yaml '.["net.pingcap.tibuild.architecture"]' artifact-config.json)
+        version=$(yq --output-format=yaml '.["org.opencontainers.image.version"]' artifact-config.json)
         if [ "$(params.nightly)" == "true" ]; then
           # from vX.Y.Z-alpha-574-g75b451c454 => vX.Y.Z-alpha-nightly
           version=`echo "$version" | sed -E 's/\-[0-9]+-g[0-9a-f]+$//'`
@@ -52,13 +52,13 @@ spec:
         fi
 
         for i in `seq 0 $tiup_last_index`; do
-          pkg_file="$(yq --output-format=yaml .["net.pingcap.tibuild.tiup"][$i].file artifact-config.json)"
+          pkg_file="$(yq --output-format=yaml .[\"net.pingcap.tibuild.tiup\"][$i].file artifact-config.json)"
           pkg_name=$(echo "$pkg_file" | sed -E "s/-v[0-9]+.+//")
-          entrypoint="$(yq --output-format=yaml .["net.pingcap.tibuild.tiup"][$i].entrypoint artifact-config.json)"
-          desc="$(yq --output-format=yaml .["net.pingcap.tibuild.tiup"][$i].description artifact-config.json)"
+          entrypoint="$(yq --output-format=yaml .[\"net.pingcap.tibuild.tiup\"][$i].entrypoint artifact-config.json)"
+          desc="$(yq --output-format=yaml .[\"net.pingcap.tibuild.tiup\"][$i].description artifact-config.json)"
 
           # tiup mirror publish <comp-name> <version> <tarball> <entry> [flags]
-          if yq -e -oy ".["net.pingcap.tibuild.tiup"][$i].standalone" artifact-config.json; then
+          if yq -e -oy ".[\"net.pingcap.tibuild.tiup\"][$i].standalone" artifact-config.json; then
             printf 'tiup mirror publish %s %s %s %s --os %s --arch %s --standalone --desc "%s"\n' \
               $pkg_name $version $pkg_file $entrypoint $os $architecture "$desc" \
             >> publish.sh

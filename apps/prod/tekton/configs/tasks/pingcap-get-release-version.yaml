@@ -25,7 +25,7 @@ spec:
           if [[ "$RESULT_VERSION" == *"-alpha-"* ]]; then
             echo "First patch version detected. Skipping patch increment."
           else
-            echo "The code is checkouted on branch, I will increase the path version."
+            echo "The code is checkouted on branch, I will increase the patch version."
             # Extract version components
             version_part=$(echo "$RESULT_VERSION" | cut -d '-' -f 1)
 
