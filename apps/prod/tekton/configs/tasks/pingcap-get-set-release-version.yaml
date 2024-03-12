@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: pingcap-get-release-version
+  name: pingcap-get-set-release-version
 spec:
   results:
     - description: The release version of the git repo
@@ -34,7 +34,13 @@ spec:
             patch=$(echo "$version_part" | cut -d '.' -f 3)
 
             # Increment the patch version
-            RESULT_VERSION="$major.$minor.$((++patch))-pre"
+            ((++patch))
+            # force add a local tag for build.
+            git_tag="$major.$minor.$patch"
+            git tag --contains | git tag -d
+            git tag -f ${git_tag}
+
+            RESULT_VERSION="${git_tag}-pre"
           fi
         fi
 
