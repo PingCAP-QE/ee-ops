@@ -13,7 +13,7 @@ spec:
     - name: source
     - name: dockerconfig
       description: Includes a docker `config.json`
-      mountPath: /kaniko/.docker      
+      mountPath: /kaniko/.docker
       optional: true
   results:
     - description: Just built and pushed images, it will be a yaml content.
@@ -95,15 +95,14 @@ spec:
           "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path)
         fi
     - name: add-more-tags
-      image: gcr.io/go-containerregistry/crane/debug:v0.15.2
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       script: |
-        #!/busybox/sh
-        set -e
-
         script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then
           echo "No build script, skip it."
           exit 0
         fi
 
-        "$script" -t || true
+        oras version
+        cp -r $(workspaces.dockerconfig.path) ~/.docker # need the credentials.
+        "$script" -P -t || true # -P means disable build and push the image.
