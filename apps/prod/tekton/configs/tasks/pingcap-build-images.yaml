@@ -94,3 +94,16 @@ spec:
         else
           "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path)
         fi
+    - name: add-more-tags
+      image: gcr.io/go-containerregistry/crane/debug:v0.15.2
+      script: |
+        #!/busybox/sh
+        set -e
+
+        script="/workspace/build-package-images.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          exit 0
+        fi
+
+        "$script" -t || true
