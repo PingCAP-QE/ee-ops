@@ -20,6 +20,7 @@ spec:
         set -e
 
         RESULT_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
+        echo "Draft version got with git: $RESULT_VERSION"
         if [[ "$RESULT_VERSION" =~ "-[0-9]+-g[0-9a-f]{7,10}(-dirty)?$" ]]; then
           # Check if "-alpha-" is included in the version string
           if [[ "$RESULT_VERSION" == *"-alpha-"* ]]; then
@@ -33,10 +34,8 @@ spec:
             minor=$(echo "$version_part" | cut -d '.' -f 2)
             patch=$(echo "$version_part" | cut -d '.' -f 3)
 
-            # Increment the patch version
-            ((++patch))
-            # force add a local tag for build.
-            git_tag="$major.$minor.$patch"
+            # Increment the patch version and force add a local tag for build.
+            git_tag="$major.$minor.$((++patch))"
             git tag --contains | git tag -d
             git tag -f ${git_tag}
 
@@ -44,7 +43,7 @@ spec:
           fi
         fi
 
-        printf "%s" "${RESULT_VERSION}" > $(results.version.path)
+        printf "%s" "${RESULT_VERSION}" | tee $(results.version.path)
 
   workspaces:
     - name: source
