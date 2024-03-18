@@ -17,7 +17,7 @@ spec:
             &&
             body.repository.name == 'monitoring'
             &&
-            body.ref.matches('^refs/heads/(master|release-(7[.]5|7[.]1))$')
+            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
 
   bindings:
     - ref: github-branch-push
