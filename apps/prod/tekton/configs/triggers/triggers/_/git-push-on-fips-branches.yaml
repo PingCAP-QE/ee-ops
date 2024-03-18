@@ -10,9 +10,9 @@ spec:
       ref:
         name: cel
       params:
-        - name: filter
+        - name: filter on repo and branches
           value: >-
-            (
+            ((
               body.repository.owner.login == 'tikv' && 
                 body.repository.name in ['tikv', 'pd']
             ) || (
@@ -20,16 +20,9 @@ spec:
                 body.repository.name in [
                   'tidb', 'tiflow', 'tidb-dashboard', 'ng-monitoring'
                 ]
-            )
-
-    - name: filter on branches
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            ))
+            &&
             body.ref.matches('^refs/heads/(feature/release-6.5-fips)$')
-
   bindings:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
