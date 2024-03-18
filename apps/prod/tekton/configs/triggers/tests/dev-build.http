@@ -1,5 +1,5 @@
 ## You should run it firstly:
-## kubectl port-forward -n ee-cd svc/el-internal 8080
+## kubectl port-forward -n ee-cd svc/el-tibuild 8080
 
 ########################
 ### devbuild with office repo branch
