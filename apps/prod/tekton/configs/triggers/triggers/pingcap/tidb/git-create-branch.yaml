@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-tikv-pd
+  name: branch-create-pingcap-tidb
   labels:
-    type: github-branch-push
-    github-owner: tikv
-    github-repo: pd
+    type: github-branch-create
+    github-owner: pingcap
+    github-repo: tidb
     profile: community
 spec:
   interceptors:
@@ -14,14 +14,13 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'tikv'
+            body.repository.owner.login == 'pingcap'
             &&
-            body.repository.name == 'pd'
+            body.repository.name == 'tidb'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
-
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
     - { name: timeout, value: 30m }
@@ -34,11 +33,11 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-tikv-pd-enterprise
+  name: branch-create-pingcap-tidb-enterprise
   labels:
-    type: github-branch-push
-    github-owner: tikv
-    github-repo: pd
+    type: github-branch-create
+    github-owner: pingcap
+    github-repo: tidb
     profile: enterprise
 spec:
   interceptors:
@@ -47,14 +46,13 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'tikv'
+            body.repository.owner.login == 'pingcap'
             &&
-            body.repository.name == 'pd'
+            body.repository.name == 'tidb'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
-
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: enterprise }
@@ -68,11 +66,11 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-tikv-pd-failpoint
+  name: branch-create-pingcap-tidb-failpoint
   labels:
-    type: github-branch-push
-    github-owner: tikv
-    github-repo: pd
+    type: github-branch-create
+    github-owner: pingcap
+    github-repo: tidb
     profile: failpoint
 spec:
   interceptors:
@@ -84,14 +82,13 @@ spec:
           # - master
           # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
-            body.repository.owner.login == 'tikv'
+            body.repository.owner.login == 'pingcap'
             &&
-            body.repository.name == 'pd'
+            body.repository.name == 'tidb'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
-
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: failpoint }

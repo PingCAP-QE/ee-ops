@@ -28,7 +28,7 @@ spec:
     - { name: profile, value: release }
     - { name: timeout, value: 2h }
     - { name: source-ws-size, value: 100Gi }
-    - { name: builder-resources-memory, value: 64Gi }
-    - { name: builder-resources-cpu, value: "16" }
+    - { name: builder-resources-memory, value: 32Gi }
+    - { name: builder-resources-cpu, value: "8" }
   template:
     ref: build-component-all-platforms

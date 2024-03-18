@@ -1,15 +1,15 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: tag-create-tikv-pd
+  name: branch-create-tikv-pd
   labels:
-    type: github-tag-create
+    type: github-branch-create
     github-owner: tikv
     github-repo: pd
     profile: community
 spec:
   interceptors:
-    - name: filter on repo owner and tags
+    - name: filter on repo owner and name and branches
       ref: { name: cel }
       params:
         - name: filter
@@ -18,9 +18,9 @@ spec:
             &&
             body.repository.name == 'pd'
             &&
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-tag-create
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
     - { name: timeout, value: 30m }
@@ -33,15 +33,15 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: tag-create-tikv-pd-enterprise
+  name: branch-create-tikv-pd-enterprise
   labels:
-    type: github-tag-create
+    type: github-branch-create
     github-owner: tikv
     github-repo: pd
     profile: enterprise
 spec:
   interceptors:
-    - name: filter on repo owner and name and tags
+    - name: filter on repo owner and name and branches
       ref: { name: cel }
       params:
         - name: filter
@@ -50,12 +50,46 @@ spec:
             &&
             body.repository.name == 'pd'
             &&
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-tag-create
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: enterprise }
+    - { name: timeout, value: 30m }
+    - { name: source-ws-size, value: 50Gi }
+    - { name: builder-resources-memory, value: 32Gi }
+    - { name: builder-resources-cpu, value: "8" }
+  template:
+    ref: build-component
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: branch-create-tikv-pd-failpoint
+  labels:
+    type: github-branch-create
+    github-owner: tikv
+    github-repo: pd
+    profile: failpoint
+spec:
+  interceptors:
+    - name: filter on repo owner and name and branches
+      ref: { name: cel }
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'tikv'
+            &&
+            body.repository.name == 'pd'
+            &&
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
+
+  bindings:
+    - ref: github-branch-create
+    - { name: component, value: $(body.repository.name) }
+    - { name: os, value: linux }
+    - { name: profile, value: failpoint }
     - { name: timeout, value: 30m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
