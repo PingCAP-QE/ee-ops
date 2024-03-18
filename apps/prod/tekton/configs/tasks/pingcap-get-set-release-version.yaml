@@ -22,20 +22,23 @@ spec:
         RESULT_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
         echo "Draft version got with git: $RESULT_VERSION"
         if [[ "$RESULT_VERSION" =~ "-[0-9]+-g[0-9a-f]{7,10}(-dirty)?$" ]]; then
+          version_part=$(echo "$RESULT_VERSION" | cut -d '-' -f 1)
+
+          major=$(echo "$version_part" | cut -d '.' -f 1)
+          minor=$(echo "$version_part" | cut -d '.' -f 2)
+          patch=$(echo "$version_part" | cut -d '.' -f 3)
+
           # Check if "-alpha-" is included in the version string
           if [[ "$RESULT_VERSION" == *"-alpha-"* ]]; then
             echo "First patch version detected. Skipping patch increment."
           else
+            # Increment the patch version.
             echo "The code is checkouted on branch, I will increase the patch version."
-            # Extract version components
-            version_part=$(echo "$RESULT_VERSION" | cut -d '-' -f 1)
-
-            major=$(echo "$version_part" | cut -d '.' -f 1)
-            minor=$(echo "$version_part" | cut -d '.' -f 2)
-            patch=$(echo "$version_part" | cut -d '.' -f 3)
-
-            # Increment the patch version and force add a local tag for build.
             git_tag="$major.$minor.$((++patch))"
+          fi
+
+          if git branch --contains | grep -E "\brelease-[0-9]+[.][0-9]+"; then
+            # force add a local tag for build when on release branch.
             git tag --contains | git tag -d
             git tag -f ${git_tag}
 
