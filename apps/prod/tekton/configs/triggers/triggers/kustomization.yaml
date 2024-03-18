@@ -3,7 +3,7 @@ kind: Kustomization
 resources:
   - _/artifact-push-on-harbor.yaml
   - _/ctl/artifact-push-on-harbor.yaml
-  - _/git-push-on-fips-branches.yaml
+  # - _/git-push-on-fips-branches.yaml
   - _/image-push-on-harbor.yaml
   - pingcap/_/git-create-branch-gomod-update.yaml
   - pingcap/_/git-create-branch.yaml

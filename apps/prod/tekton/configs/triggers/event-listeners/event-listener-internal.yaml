@@ -69,19 +69,15 @@ spec:
             type: fake-github-branch-push
     - name: tibuild-fake-github-tag-create
       interceptors:
-        - name: "filter on eventType"
+        - name: "filter on eventType and refs"
           ref:
             name: cel
           params:
             - name: filter
               value: >
                 header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.create', 'net.pingcap.tibuild.hotfix.create']
-        - name: "validate tag create"
-          ref:
-            name: cel
-          params:
-            - name: filter
-              value: body.ref_type == 'tag'
+                &&
+                body.ref_type == 'tag'
       triggerSelector:
         namespaceSelector:
           matchNames:
