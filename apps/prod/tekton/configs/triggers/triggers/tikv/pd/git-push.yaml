@@ -13,9 +13,6 @@ spec:
       ref: { name: cel }
       params:
         - name: filter
-          # support branches:
-          # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
             body.repository.owner.login == 'tikv'
             &&
@@ -49,9 +46,6 @@ spec:
       ref: { name: cel }
       params:
         - name: filter
-          # support branches:
-          # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
             body.repository.owner.login == 'tikv'
             &&
