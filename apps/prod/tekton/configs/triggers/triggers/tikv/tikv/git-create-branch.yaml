@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-tikv-pd
+  name: branch-create-tikv-tikv
   labels:
-    type: github-branch-push
+    type: github-branch-create
     github-owner: tikv
-    github-repo: pd
+    github-repo: tikv
     profile: community
 spec:
   interceptors:
@@ -16,29 +16,28 @@ spec:
           value: >-
             body.repository.owner.login == 'tikv'
             &&
-            body.repository.name == 'pd'
+            body.repository.name == 'tikv'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
-
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
-    - { name: timeout, value: 30m }
-    - { name: source-ws-size, value: 50Gi }
-    - { name: builder-resources-memory, value: 32Gi }
-    - { name: builder-resources-cpu, value: "8" }
+    - { name: timeout, value: 2h30m }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-memory, value: 64Gi }
+    - { name: builder-resources-cpu, value: "16" }
   template:
     ref: build-component-all-platforms
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-tikv-pd-enterprise
+  name: branch-create-tikv-tikv-enterprise
   labels:
-    type: github-branch-push
+    type: github-branch-create
     github-owner: tikv
-    github-repo: pd
+    github-repo: tikv
     profile: enterprise
 spec:
   interceptors:
@@ -49,30 +48,29 @@ spec:
           value: >-
             body.repository.owner.login == 'tikv'
             &&
-            body.repository.name == 'pd'
+            body.repository.name == 'tikv'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
-
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: enterprise }
-    - { name: timeout, value: 30m }
-    - { name: source-ws-size, value: 50Gi }
-    - { name: builder-resources-memory, value: 32Gi }
-    - { name: builder-resources-cpu, value: "8" }
+    - { name: timeout, value: 2h30m }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-memory, value: 64Gi }
+    - { name: builder-resources-cpu, value: "16" }
   template:
     ref: build-component
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-tikv-pd-failpoint
+  name: branch-create-tikv-tikv-failpoint
   labels:
-    type: github-branch-push
+    type: github-branch-create
     github-owner: tikv
-    github-repo: pd
+    github-repo: tikv
     profile: failpoint
 spec:
   interceptors:
@@ -80,24 +78,20 @@ spec:
       ref: { name: cel }
       params:
         - name: filter
-          # support branches:
-          # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
             body.repository.owner.login == 'tikv'
             &&
-            body.repository.name == 'pd'
+            body.repository.name == 'tikv'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
-
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: failpoint }
-    - { name: timeout, value: 30m }
-    - { name: source-ws-size, value: 50Gi }
-    - { name: builder-resources-memory, value: 32Gi }
-    - { name: builder-resources-cpu, value: "8" }
+    - { name: timeout, value: 2h30m }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-memory, value: 64Gi }
+    - { name: builder-resources-cpu, value: "16" }
   template:
     ref: build-component

@@ -13,47 +13,56 @@ resources:
   - pingcap/advanced-statefulset/git-push.yaml
   - pingcap/monitoring/fake-git-create-tag.yaml
   - pingcap/monitoring/fake-git-push.yaml
+  - pingcap/monitoring/git-create-branch.yaml
   - pingcap/monitoring/git-create-tag.yaml
   - pingcap/monitoring/git-push.yaml
   - pingcap/ng-monitoring/fake-git-create-tag.yaml
   - pingcap/ng-monitoring/fake-git-push.yaml
+  - pingcap/ng-monitoring/git-create-branch.yaml
   - pingcap/ng-monitoring/git-create-tag.yaml
   - pingcap/ng-monitoring/git-push.yaml
+  - pingcap/tidb-binlog/git-create-branch.yaml
   - pingcap/tidb-binlog/git-create-tag.yaml
   - pingcap/tidb-binlog/git-push.yaml
   - pingcap/tidb-ctl/git-create-tag.yaml
   - pingcap/tidb-ctl/git-push.yaml
   - pingcap/tidb-dashboard/fake-git-create-tag.yaml
   - pingcap/tidb-dashboard/fake-git-push.yaml
+  - pingcap/tidb-dashboard/git-create-branch.yaml
   - pingcap/tidb-dashboard/git-create-tag.yaml
   - pingcap/tidb-dashboard/git-push.yaml
   - pingcap/tidb-tools/git-create-tag.yaml
   - pingcap/tidb-tools/git-push.yaml
   - pingcap/tidb/fake-git-create-tag.yaml
   - pingcap/tidb/fake-git-push.yaml
+  - pingcap/tidb/git-create-branch.yaml
   - pingcap/tidb/git-create-tag.yaml
   - pingcap/tidb/git-push.yaml
   - pingcap/tiflash/fake-git-create-tag.yaml
   - pingcap/tiflash/fake-git-push.yaml
+  - pingcap/tiflash/git-create-branch.yaml
   - pingcap/tiflash/git-create-tag.yaml
   - pingcap/tiflash/git-push.yaml
-  - pingcap/tiflow/fake-git-create-tag.yaml
-  - pingcap/tiflow/fake-git-push.yaml
-  - pingcap/tiflow/git-create-tag.yaml
-  - pingcap/tiflow/git-push.yaml
   - pingcap/tiflow-operator/fake-git-create-tag.yaml
   - pingcap/tiflow-operator/fake-git-push.yaml
   - pingcap/tiflow-operator/git-create-tag.yaml
   - pingcap/tiflow-operator/git-push.yaml
+  - pingcap/tiflow/fake-git-create-tag.yaml
+  - pingcap/tiflow/fake-git-push.yaml
+  - pingcap/tiflow/git-create-branch.yaml
+  - pingcap/tiflow/git-create-tag.yaml
+  - pingcap/tiflow/git-push.yaml
   - pingcap/tiproxy/fake-git-create-tag.yaml
   - pingcap/tiproxy/fake-git-push.yaml
   - pingcap/tiproxy/git-create-tag.yaml
   - pingcap/tiproxy/git-push.yaml
   - tikv/pd/fake-git-create-tag.yaml
   - tikv/pd/fake-git-push.yaml
+  - tikv/pd/git-create-branch.yaml
   - tikv/pd/git-create-tag.yaml
   - tikv/pd/git-push.yaml
   - tikv/tikv/fake-git-create-tag.yaml
   - tikv/tikv/fake-git-push.yaml
+  - tikv/tikv/git-create-branch.yaml
   - tikv/tikv/git-create-tag.yaml
   - tikv/tikv/git-push.yaml

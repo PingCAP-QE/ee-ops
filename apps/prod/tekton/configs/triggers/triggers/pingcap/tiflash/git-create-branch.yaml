@@ -1,9 +1,9 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-pingcap-tiflash
+  name: branch-create-pingcap-tiflash
   labels:
-    type: github-branch-push
+    type: github-branch-create
     github-owner: pingcap
     github-repo: tiflash
     profile: community
@@ -18,9 +18,9 @@ spec:
             &&
             body.repository.name == 'tiflash'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
     - { name: timeout, value: 2h }
@@ -33,9 +33,9 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: git-push-pingcap-tiflash-enterprise
+  name: branch-create-pingcap-tiflash-enterprise
   labels:
-    type: github-branch-push
+    type: github-branch-create
     github-owner: pingcap
     github-repo: tiflash
     profile: enterprise
@@ -50,9 +50,9 @@ spec:
             &&
             body.repository.name == 'tiflash'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-branch-push
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: enterprise }

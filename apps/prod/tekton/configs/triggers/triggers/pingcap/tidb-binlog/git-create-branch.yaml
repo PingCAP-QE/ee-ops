@@ -1,16 +1,15 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: tag-create-pingcap-tidb-binlog
+  name: branch-create-pingcap-tidb-binlog
   labels:
-    type: github-tag-create
+    type: github-branch-create
     github-owner: pingcap
     github-repo: tidb-binlog
 spec:
   interceptors:
-    - name: filter on repo owner and name and tags
-      ref:
-        name: cel
+    - name: filter on repo owner and name and branches
+      ref: { name: cel }
       params:
         - name: filter
           value: >-
@@ -18,9 +17,9 @@ spec:
             &&
             body.repository.name == 'tidb-binlog'
             &&
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:
-    - ref: github-tag-create
+    - ref: github-branch-create
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
     - { name: timeout, value: 2h }
