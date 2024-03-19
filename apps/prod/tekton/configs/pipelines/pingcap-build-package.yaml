@@ -148,9 +148,6 @@ spec:
           workspace: cargo-home
     - name: build-images
       when:
-        - input: "$(params.os)"
-          operator: in
-          values: ["linux"]
         - input: "$(params.push)"
           operator: in
           values: ["true"]

@@ -14,7 +14,7 @@ spec:
           value: >-
             body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
             &&
-            body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]{7,10})_(linux)_(amd64|arm64)$')
+            body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
           - key: git-ref
@@ -52,7 +52,7 @@ spec:
           value: >-
             body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
             &&
-            body.event_data.resources[0].tag.matches('^release-[0-9]+[.][0-9]+(-[0-9a-f]{7,10})_(linux)_(amd64|arm64)$')
+            body.event_data.resources[0].tag.matches('^release-[0-9]+[.][0-9]+(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
           - key: git-ref
@@ -90,7 +90,7 @@ spec:
           value: >-
             body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
             &&
-            body.event_data.resources[0].tag.matches('^v[0-9]+[.][0-9]+[.][0-9]+_(linux)_(amd64|arm64)$')
+            body.event_data.resources[0].tag.matches('^v[0-9]+[.][0-9]+[.][0-9]+_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
           - key: git-ref
