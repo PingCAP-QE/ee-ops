@@ -12,15 +12,13 @@ spec:
       ref: { name: cel }
       params:
         - name: filter
-          # support branches:
-          # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
+
           value: >-
             body.repository.owner.login == 'pingcap'
             &&
             body.repository.name == 'ng-monitoring'
             &&
-            body.ref.matches('^refs/heads/(main|master|release-(7[.]5|7[.]1))$')
+            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
   bindings:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
