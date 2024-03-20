@@ -23,6 +23,9 @@ spec:
             body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
+          - key: git-url
+            expression: >-
+              'https://github.com/' + body.event_data.repository.repo_full_name.replace('/package', '.git')
           - key: git-ref
             expression: body.event_data.resources[0].tag.split('_')[0].split('-')[0]
           - key: git-revision
@@ -34,7 +37,7 @@ spec:
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
-    - { name: git-url, value: https://github.com/pingcap/tidb.git }
+    - { name: git-url, value: $(extensions.git-url) }
     - { name: git-ref, value: $(extensions.git-ref) }
     - { name: git-revision, value: $(extensions.git-revision) }
     - { name: os, value: $(extensions.os) }
@@ -67,6 +70,9 @@ spec:
             body.event_data.resources[0].tag.matches('^release-[0-9]+[.][0-9]+(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
+          - key: git-url
+            expression: >-
+              "https://github.com/" + body.event_data.repository.repo_full_name.replace('/package', '.git')          
           - key: git-ref
             expression: body.event_data.resources[0].tag.split("_")[0].split("-")[0] + "-" + body.event_data.resources[0].tag.split("_")[0].split("-")[1]
           - key: git-revision
@@ -78,7 +84,7 @@ spec:
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
-    - { name: git-url, value: https://github.com/pingcap/tidb.git }
+    - { name: git-url, value: $(extensions.git-url) }
     - { name: git-ref, value: $(extensions.git-ref) }
     - { name: git-revision, value: $(extensions.git-revision) }
     - { name: os, value: $(extensions.os) }
@@ -111,6 +117,9 @@ spec:
             body.event_data.resources[0].tag.matches('^v[0-9]+[.][0-9]+[.][0-9]+_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
+          - key: git-url
+            expression: >-
+              "https://github.com/" + body.event_data.repository.repo_full_name.replace('/package', '.git')          
           - key: git-ref
             expression: body.event_data.resources[0].tag.split('_')[0]
           - key: git-revision
@@ -122,7 +131,7 @@ spec:
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
-    - { name: git-url, value: https://github.com/pingcap/tidb.git }
+    - { name: git-url, value: $(extensions.git-url) }
     - { name: git-ref, value: $(extensions.git-ref) }
     - { name: git-revision, value: $(extensions.git-revision) }
     - { name: os, value: $(extensions.os) }
