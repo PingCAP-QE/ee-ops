@@ -12,14 +12,8 @@ spec:
       params:
         - name: filter
           value: >-
-            body.event_data.repository.repo_full_name in [
-            'pingcap/tidb/package', 
-            'pingcap/tiflow/package', 
-            'pingcap/tidb-binlog/package', 
-            'pingcap/tidb-ctl/package',
-            'tikv/pd/pacakge',
-            'tikv/tikv/package'
-            ] &&
+            body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
+            &&
             body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
@@ -56,14 +50,8 @@ spec:
       params:
         - name: filter
           value: >-
-            body.event_data.repository.repo_full_name in [
-            'pingcap/tidb/package', 
-            'pingcap/tiflow/package', 
-            'pingcap/tidb-binlog/package', 
-            'pingcap/tidb-ctl/package',
-            'tikv/pd/pacakge',
-            'tikv/tikv/package'
-            ] &&
+            body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
+            &&
             body.event_data.resources[0].tag.matches('^release-[0-9]+[.][0-9]+(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
@@ -100,14 +88,8 @@ spec:
       params:
         - name: filter
           value: >-
-            body.event_data.repository.repo_full_name in [
-            'pingcap/tidb/package', 
-            'pingcap/tiflow/package', 
-            'pingcap/tidb-binlog/package', 
-            'pingcap/tidb-ctl/package',
-            'tikv/pd/pacakge',
-            'tikv/tikv/package'
-            ] &&
+            body.event_data.repository.repo_full_name.matches('^pingcap/tidb/package$')
+            &&
             body.event_data.resources[0].tag.matches('^v[0-9]+[.][0-9]+[.][0-9]+_(darwin|linux)_(amd64|arm64)$')
         - name: overlays
           value:
