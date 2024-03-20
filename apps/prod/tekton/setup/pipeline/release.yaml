@@ -1375,6 +1375,20 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
 data:
+  default-timeout-minutes: "60" # unit is minutes, default timeout for TaskRun and PipelineRun.
+  default-service-account: "default"
+  # default empty dir, can not be shared between tasks.
+  default-task-run-workspace-binding: >
+    emptyDir: {}
+  default-pod-template: |
+    nodeSelector:
+      enable-ci: "true"
+    tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: test-infra
+  default-cloud-events-sink: http://cloudevents-server.apps.svc/events
   _example: |
     ################################
     #                              #
@@ -1465,7 +1479,7 @@ data:
   # See more in the workspace documentation about Affinity Assistant
   # https://github.com/tektoncd/pipeline/blob/main/docs/workspaces.md#affinity-assistant-and-specifying-workspace-order-in-a-pipeline
   # or https://github.com/tektoncd/pipeline/pull/2630 for more info.
-  disable-affinity-assistant: "false"
+  disable-affinity-assistant: "true"
   # Setting this flag to "true" will prevent Tekton scanning attached
   # service accounts and injecting any credentials it finds into your
   # Steps.
@@ -1505,18 +1519,18 @@ data:
   # Setting this flag to "true" enables the use of Tekton OCI bundle.
   # This is an experimental feature and thus should still be considered
   # an alpha feature.
-  enable-tekton-oci-bundles: "false"
+  enable-tekton-oci-bundles: "true"
   # Setting this flag to "true" enables the use of custom tasks from
   # within pipelines.
   # This is an experimental feature and thus should still be considered
   # an alpha feature.
-  enable-custom-tasks: "false"
+  enable-custom-tasks: "true"
   # Setting this flag will determine which gated features are enabled.
   # Acceptable values are "stable" or "alpha".
-  enable-api-fields: "stable"
+  enable-api-fields: alpha
   # Setting this flag to "true" enables CloudEvents for Runs, as long as a
   # CloudEvents sink is configured in the config-defaults config map
-  send-cloudevents-for-runs: "false"
+  send-cloudevents-for-runs: "true"
 
 ---
 # Copyright 2021 The Tekton Authors

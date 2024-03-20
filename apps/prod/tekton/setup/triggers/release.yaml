@@ -1115,6 +1115,7 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-triggers
 data:
+  default-service-account: "default"
   _example: |
     ################################
     #                              #
@@ -1161,7 +1162,7 @@ metadata:
 data:
   # Setting this flag will determine which gated features are enabled.
   # Acceptable values are "stable" or "alpha".
-  enable-api-fields: "stable"
+  enable-api-fields: alpha
   # Setting this field with valid regex pattern matching the pattern will exclude labels from
   # getting added to resources created by the EventListener such as the deployment
   labels-exclusion-pattern: ""
