@@ -109,4 +109,6 @@ spec:
         fi
 
         oras version
+        # try 2 times.
+        "$script" -p -w "$(params.release-dir)" -o $(results.pushed.path) || \
         "$script" -p -w "$(params.release-dir)" -o $(results.pushed.path)
