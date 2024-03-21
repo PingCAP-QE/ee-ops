@@ -170,7 +170,7 @@ spec:
         - name: git-ref
           value: $(params.git-ref)
         - name: git-sha
-          value: $(tasks.checkout.commit)
+          value: $(tasks.checkout.results.commit)
         - name: release-dir
           value: build
         - name: build
