@@ -132,7 +132,7 @@ spec:
         - name: git-ref
           value: $(params.git-ref)
         - name: git-sha
-          value: $(params.git-revision)
+          value: $(tasks.checkout.results.commit)
         - name: builder-image
           value: "$(tasks.get-binaries-builder.results.image-url)"
         - name: release-dir
@@ -170,7 +170,7 @@ spec:
         - name: git-ref
           value: $(params.git-ref)
         - name: git-sha
-          value: $(params.git-revision)
+          value: $(tasks.checkout.results.commit)
         - name: release-dir
           value: build
         - name: build
