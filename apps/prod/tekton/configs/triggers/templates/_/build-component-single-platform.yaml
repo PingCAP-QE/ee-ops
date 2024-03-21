@@ -36,7 +36,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-$(tt.params.component)-$(tt.params.profile)-$(tt.params.os)-$(tt.params.arch)-
+        generateName: bp-$(tt.params.component)-$(tt.params.profile)-$(tt.params.os)-$(tt.params.arch)-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
