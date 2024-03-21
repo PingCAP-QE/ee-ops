@@ -90,8 +90,12 @@ spec:
         fi
 
         if [ "$(params.build)" = "true" ]; then
+          # try 2 times.
+          "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path) -b \
           "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path) -b
         else
+          # try 2 times.
+          "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path) || \
           "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path)
         fi
     - name: add-more-tags
