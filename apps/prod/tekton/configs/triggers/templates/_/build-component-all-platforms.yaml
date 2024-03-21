@@ -32,7 +32,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-$(tt.params.component)-linux-amd64-
+        generateName: build-package-$(tt.params.component)-$(tt.params.profile)-linux-amd64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -96,7 +96,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-$(tt.params.component)-linux-arm64-
+        generateName: build-package-$(tt.params.component)-$(tt.params.profile)-linux-arm64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -160,7 +160,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-$(tt.params.component)-darwin-amd64-
+        generateName: build-package-$(tt.params.component)-$(tt.params.profile)-darwin-amd64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
@@ -216,7 +216,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
-        generateName: build-package-$(tt.params.component)-darwin-arm64-
+        generateName: build-package-$(tt.params.component)-$(tt.params.profile)-darwin-arm64-
         annotations:
           "tekton.dev/ce-context": $(tt.params.ce-context)
           "tekton.dev/git-status": "true"
