@@ -46,7 +46,6 @@ spec:
                   ee-cd;--keep=100;pipelinerun
                   ee-cd;--keep=400;taskrun
           restartPolicy: OnFailure
-          schedulerName: default-scheduler
           serviceAccount: tekton-pipelines-controller
           serviceAccountName: tekton-pipelines-controller
           terminationGracePeriodSeconds: 30
