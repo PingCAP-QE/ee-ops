@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  labels:
+    tektonconfig.operator.tekton.dev/pruner: "true"
+  name: tekton-resource-pruner
+  namespace: tekton-pipelines
+spec:
+  schedule: 0 * * * * # hourly
+  concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 3
+      template:
+        spec:
+          containers:
+            - image: gcr.io/tekton-releases/dogfooding/tkn:v20221201-ed0196540a
+              name: pruner          
+              command:
+                - /bin/sh
+                - -c
+                - >-
+                  function prune() {
+                    n=$1;
+                    a=$2;
+                    resources=$3;
+                    old_ifs=" ";
+                    IFS=",";
+                    for r in $resources; do 
+                      tkn $r delete -n=$n $a -f; 
+                    done;
+                    IFS=$old_ifs;
+                  };
+                  echo $conf;
+                  for c in $*; do
+                    ns=$(echo $c | cut -d ";" -f 1);
+                    args=$(echo $c | cut -d ";" -f 2);
+                    resources=$(echo $c | cut -d ";" -f 3);
+                    prune $ns $args $resources;
+                  done;
+              args:
+                - -s
+                - >-
+                  ee-cd;--keep=100;pipelinerun
+                  ee-cd;--keep=400;taskrun
+          restartPolicy: OnFailure
+          serviceAccount: tekton-pipelines-controller
+          serviceAccountName: tekton-pipelines-controller
+          terminationGracePeriodSeconds: 30
