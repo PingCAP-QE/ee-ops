@@ -115,7 +115,7 @@ spec:
         - name: server-url
           value: http://boskos.apps.svc
         - name: timeout
-          value: 10m
+          value: 15m
         - name: type
           value: "mac-machine-$(params.arch)"
         - name: owner-name
@@ -160,6 +160,7 @@ spec:
     - name: release-mac-machine
       taskRef:
         name: boskos-release
+      timeout: 2m0s
       params:
         - name: server-url
           value: http://boskos.apps.svc
