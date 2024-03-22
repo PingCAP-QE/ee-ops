@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: artifact-push-on-harbor-with-trunk-branch-tags-ctl-upstream-repos
+  name: artifact-push-on-harbor-with-trunk-branch-tags-ctl-repos
   labels:
     type: image-push
 spec:
@@ -48,7 +48,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: artifact-push-on-harbor-with-release-branch-tags-ctl-upstream-repos
+  name: artifact-push-on-harbor-with-release-branch-tags-ctl-repos
   labels:
     type: image-push
 spec:
@@ -95,7 +95,7 @@ spec:
 # apiVersion: triggers.tekton.dev/v1beta1
 # kind: Trigger
 # metadata:
-#   name: artifact-push-on-harbor-with-git-tags-ctl-upstream-repos
+#   name: artifact-push-on-harbor-with-git-tags-ctl-repos
 #   labels:
 #     type: image-push
 # spec:
