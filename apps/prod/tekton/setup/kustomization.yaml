@@ -4,6 +4,7 @@ resources:
   - pipeline
   - triggers
   - dashboard
+  - cronjobs
   # deprecated: oprator is not extensible.
   # - namespace.yaml
   # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
