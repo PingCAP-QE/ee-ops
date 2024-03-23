@@ -9,11 +9,6 @@ metadata:
 spec:
   description: >-
     Compose TiUP offline deploy packages.
-  workspaces:
-    - name: dockerconfig
-      description: Includes a docker `config.json`
-      mountPath: /root/.docker
-      optional: true
   results:
     - description: Just built and pushed images, it will be a yaml content.
       name: pushed
@@ -37,8 +32,8 @@ spec:
     - name: tiup-tool-version
       default: "v1.14.1"
     - name: tiup-mirror
-      description: Staging is http://tiup.pingcap.net:8988, product is http://tiup.pingcap.net:8987.
-      default: http://tiup.pingcap.net:8987
+      description: Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988, 
+      default: http://tiup.pingcap.net:8988
   stepTemplate:
     image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
     env:
@@ -59,7 +54,8 @@ spec:
           $(params.version) \
           $(params.edition) \
           /workspace/artifacts/packages/offline-packages.yaml.tmpl \
-          "$OUT_SCRIPT"
+          "$OUT_SCRIPT" \
+          $(params.tiup-mirror)
 
         if [ -f "$OUT_SCRIPT" ]; then
           cat "$OUT_SCRIPT"
@@ -67,14 +63,7 @@ spec:
           echo "🤷 no output script generated!"
           exit 1
         fi
-    - name: check
-      resources:
-        limits:
-          cpu: "1"
-          memory: 16Gi
-      command: [/workspace/compose-offline-packages-artifacts.sh]
-      args: ["-c"]
-    - name: compose-and-publish
+    - name: run
       resources:
         limits:
           cpu: "4"
@@ -98,8 +87,8 @@ spec:
         tiup mirror set $(params.tiup-mirror)
 
         if $(params.push); then
-          "$OUT_SCRIPT" -r -w build -p -o $(results.pushed.path)
+          "$OUT_SCRIPT" -c -r -w build -p -o $(results.pushed.path)
         else
-          "$OUT_SCRIPT" -r -w build
+          "$OUT_SCRIPT" -c -r -w build
           printf "%s" "null" > $(results.pushed.path)
         fi
