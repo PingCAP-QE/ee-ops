@@ -63,7 +63,7 @@ spec:
 
         # for tags
         for t in $tags; do
-          yq -i ".tags += ([\"$t\"] | unique)" manifest.yaml
+          yq -i ".tags = (.tags + [\"$t\"] | unique)" manifest.yaml
         done
 
         # digest map
@@ -83,7 +83,7 @@ spec:
 
         if yq -e '.manifests |length > 1' manifest.yaml >/dev/null 2>&1; then
           printf "%s" "$pushed_repo" > $(results.repo.path)
-          printf "%s" "$tags" > $(results.tags.path)
+          yq '.tags | join " "' manifest.yaml | tr -d '\n' > $(results.tags.path)
           cat manifest.yaml
           manifest-tool push from-spec manifest.yaml
         else
