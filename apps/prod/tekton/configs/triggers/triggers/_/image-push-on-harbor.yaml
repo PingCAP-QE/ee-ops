@@ -15,7 +15,7 @@ spec:
             (
             body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
             && !
-            body.event_data.repository.repo_full_name.matches('/package(s)?')
+            body.event_data.repository.repo_full_name.matches('/(package|offline-package)(s)?')
             )
             &&
             body.event_data.resources[0].tag.matches('[-_](amd64|arm64)$')
