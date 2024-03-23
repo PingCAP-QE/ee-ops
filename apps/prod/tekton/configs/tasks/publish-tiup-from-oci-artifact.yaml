@@ -29,15 +29,14 @@ spec:
         #! /usr/bin/env bash
         set -exo pipefail
 
+        artifact_url="$(params.artifact-url)"
+
         # fetch artifact config
-        oras manifest fetch-config "$(params.artifact-url)" > artifact-config.json
+        oras manifest fetch-config $artifact_url >artifact-config.json
         if yq -e -oy '.["net.pingcap.tibuild.tiup"] | length == 0' artifact-config.json; then
           echo "No tiup pacakges are need to published."
           exit 0
         fi
-
-        # download the artifact
-        oras pull "$(params.artifact-url)"
 
         # publish the tiup packages
         :> publish.sh
@@ -47,11 +46,21 @@ spec:
         version=$(yq --output-format=yaml '.["org.opencontainers.image.version"]' artifact-config.json)
         if [ "$(params.nightly)" == "true" ]; then
           # from vX.Y.Z-alpha-574-g75b451c454 => vX.Y.Z-alpha-nightly
-          version=`echo "$version" | sed -E 's/\-[0-9]+-g[0-9a-f]+$//'`
+          version=$(echo "$version" | sed -E 's/\-[0-9]+-g[0-9a-f]+$//')
           version="${version}-nightly"
         fi
 
-        for i in `seq 0 $tiup_last_index`; do
+        # GA case:
+        #   when
+        #   - the version is "vX.Y.Z-pre" and
+        #   - the artifact_url has suffix: "vX.Y.Z_(linux|darwin)_(amd64|arm64)",
+        #   then
+        #   - set the version to "vX.Y.Z"
+        if [[ "$version" == v[0-9]*.[0-9]*.[0-9]*-pre && "$artifact_url" =~ .*:v[0-9]*.[0-9]*.[0-9]*_(linux|darwin)_(amd64|arm64)$ ]]; then
+          version="${version%-pre}"
+        fi
+
+        for i in $(seq 0 $tiup_last_index); do
           pkg_file="$(yq --output-format=yaml .[\"net.pingcap.tibuild.tiup\"][$i].file artifact-config.json)"
           pkg_name=$(echo "$pkg_file" | sed -E "s/-v[0-9]+.+//")
           entrypoint="$(yq --output-format=yaml .[\"net.pingcap.tibuild.tiup\"][$i].entrypoint artifact-config.json)"
@@ -69,6 +78,10 @@ spec:
           fi
         done
 
+        # download the artifact
+        oras pull $artifact_url
+
+        echo "✅ Done, the generated script content:"
         cat publish.sh
     - name: publish
       image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
