@@ -37,9 +37,9 @@ spec:
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
-    - { name: git-url, value: $(extensions.git-url) }
+    - { name: git-url, value: https://github.com/tikv/pd.git } # no need the repo to build but need it to compute version routes.
     - { name: git-ref, value: $(extensions.git-ref) }
-    - { name: git-revision, value: $(extensions.git-revision) }
+    - { name: git-revision, value: $(extensions.git-ref) }
     - { name: os, value: $(extensions.os) }
     - { name: arch, value: $(extensions.arch) }
   template:
@@ -84,9 +84,9 @@ spec:
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
-    - { name: git-url, value: $(extensions.git-url) }
+    - { name: git-url, value: https://github.com/tikv/pd.git } # no need the repo to build but need it to compute version routes.
     - { name: git-ref, value: $(extensions.git-ref) }
-    - { name: git-revision, value: $(extensions.git-revision) }
+    - { name: git-revision, value: $(extensions.git-ref) }
     - { name: os, value: $(extensions.os) }
     - { name: arch, value: $(extensions.arch) }
   template:
