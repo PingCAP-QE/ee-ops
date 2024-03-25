@@ -4,11 +4,12 @@ import { parseArgs } from "https://deno.land/std@0.220.1/cli/parse_args.ts";
 
 interface Payload {
   ref: string;
-  before: string;
-  after: string;
+  before?: string;
+  after?: string;
   ref_type: string;
   repository: {
     name: string;
+    full_name?: string;
     clone_url: string;
     owner: {
       login: string;
@@ -35,21 +36,30 @@ async function generateEventPayload(
   const owner = url.pathname.split("/")[1];
   const repoName = url.pathname.split("/").pop()?.replace(/\.git$/, "");
   const isTag = ref.startsWith("refs/tags/");
-  const lastCommitSha = await getCommitSha(owner, repoName!, ref);
+  const refName = isTag
+    ? ref.replace("refs/tags/", "")
+    : ref.replace("refs/heads/", "");
 
-  return {
-    ref: ref,
-    before: "0000000000000000000000000000000000000000",
-    after: lastCommitSha,
+  const payload: Payload = {
+    ref: refName,
     ref_type: isTag ? "tag" : "branch",
     repository: {
       name: repoName!,
-      clone_url: gitUrl,
+      full_name: `${owner}/${repoName}`,
       owner: {
         login: owner,
       },
+      clone_url: gitUrl,
     },
   };
+
+  if (!isTag) {
+    const lastCommitSha = await getCommitSha(owner, repoName!, ref);
+    payload.before = "0000000000000000000000000000000000000000";
+    payload.after = lastCommitSha;
+  }
+
+  return payload;
 }
 
 async function sendEvent(
@@ -61,6 +71,7 @@ async function sendEvent(
   const eventType = payload.ref_type === "branch" ? "push" : "create";
 
   console.debug(payload);
+
   const response = await fetch(eventUrl, {
     method: "POST",
     headers: {
