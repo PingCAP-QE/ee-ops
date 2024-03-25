@@ -18,7 +18,7 @@ spec:
             &&
             body.repository.name == 'pd'
             &&
-            body.ref.matches('^refs/tags/v[0-9]+[.][0-9]+[.][0-9]+$')
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
   bindings:
     - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
@@ -50,7 +50,7 @@ spec:
             &&
             body.repository.name == 'pd'
             &&
-            body.ref.matches('^refs/tags/v[0-9]+[.][0-9]+[.][0-9]+$')
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
   bindings:
     - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
