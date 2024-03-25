@@ -37,13 +37,15 @@ spec:
         name: cel
       params:
         - name: filter
+          # tag matches:
+          # - master, main, release-X.Y, vX.Y.Z-pre, vX.Y.Z. with or not with suffix: "-enterprise", "-failpoint"
           value: >-
             (
             body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
             && !
             body.event_data.repository.repo_full_name.matches('/package(s)?')
             ) &&
-            body.event_data.resources[0].tag.matches('^(master|main|release-[0-9]+[.][0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)(-[0-9a-f]+)?(-(enterprise|failpoint))?$')
+            body.event_data.resources[0].tag.matches('^(master|main|release-[0-9]+[.][0-9]+|v[0-9]+[.][0-9]+[.][0-9]+(-pre)?)(-[0-9a-f]+)?(-(enterprise|failpoint))?$')
 
   bindings:
     - ref: harbor-image-push
