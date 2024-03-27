@@ -1,0 +1,241 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pingcap-release-ga
+spec:
+  params:
+    - name: version
+      type: string
+    - name: os
+      default: linux
+    - name: qiniu-creds-secret-name
+      default: qiniu-creds
+  workspaces:
+    # TODO: why need to push dm offline pkgs to another bucket?
+    - name: aws-secrets
+      optional: true
+  tasks:
+    - name: ga-tag-oci-artifacts
+      params:
+        - name: rc-version
+          value: "$(params.version)-pre"
+        - name: ga-version
+          value: $(params.version)
+      taskSpec:
+        description: include images and non-image artifacts.
+        params:
+          - name: rc-version
+          - name: ga-version
+        steps:
+          - name: run
+            image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
+            script: |
+              #! /usr/bin/env bash
+              set -ex
+
+              rc_ver="$(params.rc-version)"
+              ga_ver="$(params.ga-version)"
+              registry="hub.pingcap.net"
+
+              wget -c --tries=3 https://github.com/PingCAP-QE/ci/raw/main/scripts/artifacts/tag-rc2ga-on-repos.sh
+              chmod +x tag-rc2ga-on-repos.sh
+
+              # force add the tag on repos:
+              # ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry" true
+              ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry"
+
+    - name: wait-tiup-delivery
+      runAfter:
+        - "ga-tag-oci-artifacts"
+      params:
+        - name: rc-version
+          value: "$(params.version)-pre"
+        - name: ga-version
+          value: $(params.version)
+      taskSpec:
+        params:
+          - name: rc-version
+          - name: ga-version
+          - name: tiup-tool-version
+            default: "v1.14.1"
+        steps:
+          - name: wait
+            image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
+            workingDir: /workspace
+            timeout: 30m0s
+            script: |
+              #! /usr/bin/env bash
+              set -exo pipefail
+
+              # install tiup tool.
+              TIUP_HOME=~/.tiup
+              bin_dir=$TIUP_HOME/bin
+              mkdir -vp "$bin_dir"
+              ARCH=$([ "$(arch)" = "x86_64" ] && echo amd64 || echo arm64)
+              download_url=https://tiup-mirrors.pingcap.com/tiup-$(params.tiup-tool-version)-linux-${ARCH}.tar.gz
+              wget -q -O - "$download_url" | tar -zxvf - -C "$bin_dir"
+              chmod 755 "$bin_dir/tiup"
+              export PATH=$bin_dir:$PATH
+              which tiup
+
+              tiup_check_ver="$(params.ga-version)"
+              tiup_mirror="http://tiup.pingcap.net:8987"
+              oci_registry="hub.pingcap.net"
+
+              # set mirror, Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988
+              tiup mirror set $tiup_mirror
+
+              # check the tiup pkgs
+              wget --tries 3 -c -O check-tiup.sh https://github.com/PingCAP-QE/ci/raw/main/scripts/artifacts/check-tiup.sh
+              chmod +x check-tiup.sh
+
+              while true; do
+                if ./check-tiup.sh "$tiup_check_ver" "$tiup_mirror" "$oci_registry" true; then
+                  echo "🏅🏅🏅 Check TiUP package delivery succeeded!"
+                  break
+                else
+                  echo "Command failed, retrying in 1 minute..."
+                  sleep 60
+                fi
+              done
+
+              cat results.yaml || true
+
+    - name: compose-offline-pkgs-amd64-community
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: amd64 }
+        - { name: edition, value: community }
+    - name: upload-offline-pkgs-to-buckets-amd64-community
+      runAfter:
+        - "compose-offline-pkgs-amd64-community"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: community }
+        - { name: os, value: linux }
+        - { name: arch, value: amd64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-amd64-enterprise
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: amd64 }
+        - { name: edition, value: enterprise }
+    - name: upload-offline-pkgs-to-buckets-amd64-enterprise
+      runAfter:
+        - "compose-offline-pkgs-amd64-enterprise"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: enterprise }
+        - { name: os, value: linux }
+        - { name: arch, value: amd64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-amd64-dm
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: amd64 }
+        - { name: edition, value: dm }
+    - name: upload-offline-pkgs-to-buckets-amd64-dm
+      runAfter:
+        - "compose-offline-pkgs-amd64-dm"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      workspaces:
+        - { name: aws-secrets, workspace: aws-secrets }
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: dm }
+        - { name: os, value: linux }
+        - { name: arch, value: amd64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-arm64-community
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: arm64 }
+        - { name: edition, value: community }
+    - name: upload-offline-pkgs-to-buckets-arm64-community
+      runAfter:
+        - "compose-offline-pkgs-arm64-community"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: community }
+        - { name: os, value: linux }
+        - { name: arch, value: arm64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-arm64-enterprise
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: arm64 }
+        - { name: edition, value: enterprise }
+    - name: upload-offline-pkgs-to-buckets-arm64-enterprise
+      runAfter:
+        - "compose-offline-pkgs-arm64-enterprise"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: enterprise }
+        - { name: os, value: linux }
+        - { name: arch, value: arm64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-arm64-dm
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: arm64 }
+        - { name: edition, value: dm }
+    - name: upload-offline-pkgs-to-buckets-arm64-dm
+      runAfter:
+        - "compose-offline-pkgs-arm64-dm"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      workspaces:
+        - { name: aws-secrets, workspace: aws-secrets }
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: dm }
+        - { name: os, value: linux }
+        - { name: arch, value: arm64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: upload-plugin-tarballs
+      runAfter:
+        - ga-tag-oci-artifacts
+      taskRef:
+        name: pingcap-upload-enterprise-plugins
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }

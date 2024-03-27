@@ -160,7 +160,7 @@ spec:
     - name: release-mac-machine
       taskRef:
         name: boskos-release
-      timeout: 2m0s
+      timeout: 5m0s
       params:
         - name: server-url
           value: http://boskos.apps.svc
