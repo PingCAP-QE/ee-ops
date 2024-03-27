@@ -1,0 +1,368 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pingcap-release-ga
+spec:
+  params:
+    - name: version
+      type: string
+    - name: os
+      default: linux
+    - name: qiniu-creds-secret-name
+      default: qiniu-creds
+  workspaces:
+    # TODO: why need to push dm offline pkgs to another bucket?
+    - name: aws-secrets
+      optional: true
+  tasks:
+    - name: ga-tag-oci-artifacts
+      params:
+        - name: rc-version
+          value: "$(params.version)-pre"
+        - name: ga-version
+          value: $(params.version)
+      taskSpec:
+        description: include images and non-image artifacts.
+        params:
+          - name: rc-version
+          - name: ga-version
+        steps:
+          - name: run
+            image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
+            script: |
+              #! /usr/bin/env bash
+
+              set -ex
+              registry="hub.pingcap.net"
+              rc_ver="$(params.rc-version)"
+              ga_ver="$(params.ga-version)"
+
+              # TODO: gen it in a script.
+              # For tiup pkgs
+              echo "🚀 Prepare for tiup packages..."
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/tidb/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/tidb/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/tidb/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/tidb/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ctl/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/ctl/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ctl/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/ctl/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ctl/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/ctl/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ctl/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/ctl/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/monitoring/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/monitoring/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/monitoring/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/monitoring/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/monitoring/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/monitoring/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/monitoring/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/monitoring/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ng-monitoring/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/ng-monitoring/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ng-monitoring/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/ng-monitoring/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ng-monitoring/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/ng-monitoring/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ng-monitoring/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/ng-monitoring/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-binlog/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/tidb-binlog/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-binlog/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/tidb-binlog/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-binlog/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/tidb-binlog/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-binlog/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/tidb-binlog/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/tidb-dashboard/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflash/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/tiflash/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflash/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/tiflash/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflash/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/tiflash/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflash/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/tiflash/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflow/package:${rc_ver}_linux_amd64 && oras tag $registry/pingcap/tiflow/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflow/package:${rc_ver}_linux_arm64 && oras tag $registry/pingcap/tiflow/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflow/package:${rc_ver}_darwin_amd64 && oras tag $registry/pingcap/tiflow/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflow/package:${rc_ver}_darwin_arm64 && oras tag $registry/pingcap/tiflow/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/pd/package:${rc_ver}_linux_amd64 && oras tag $registry/tikv/pd/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/pd/package:${rc_ver}_linux_arm64 && oras tag $registry/tikv/pd/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/pd/package:${rc_ver}_darwin_amd64 && oras tag $registry/tikv/pd/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/pd/package:${rc_ver}_darwin_arm64 && oras tag $registry/tikv/pd/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/tikv/package:${rc_ver}_linux_amd64 && oras tag $registry/tikv/tikv/package:${rc_ver}_linux_amd64 ${ga_ver}_linux_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/tikv/package:${rc_ver}_linux_arm64 && oras tag $registry/tikv/tikv/package:${rc_ver}_linux_arm64 ${ga_ver}_linux_arm64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/tikv/package:${rc_ver}_darwin_amd64 && oras tag $registry/tikv/tikv/package:${rc_ver}_darwin_amd64 ${ga_ver}_darwin_amd64
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/tikv/package:${rc_ver}_darwin_arm64 && oras tag $registry/tikv/tikv/package:${rc_ver}_darwin_arm64 ${ga_ver}_darwin_arm64
+
+              # for images
+              echo "🚀 Prepare for images..."
+              # community
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/br:${rc_ver} && oras tag $registry/pingcap/tidb/images/br:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/dumpling:${rc_ver} && oras tag $registry/pingcap/tidb/images/dumpling:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/tidb-lightning:${rc_ver} && oras tag $registry/pingcap/tidb/images/tidb-lightning:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/tidb-server:${rc_ver} && oras tag $registry/pingcap/tidb/images/tidb-server:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/monitoring/image:${rc_ver} && oras tag $registry/pingcap/monitoring/image:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/ng-monitoring/image:${rc_ver} && oras tag $registry/pingcap/ng-monitoring/image:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-binlog/image:${rc_ver} && oras tag $registry/pingcap/tidb-binlog/image:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb-dashboard/image:${rc_ver} && oras tag $registry/pingcap/tidb-dashboard/image:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflash/image:${rc_ver} && oras tag $registry/pingcap/tiflash/image:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflow/images/cdc:${rc_ver} && oras tag $registry/pingcap/tiflow/images/cdc:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflow/images/dm:${rc_ver} && oras tag $registry/pingcap/tiflow/images/dm:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflow/images/tiflow:${rc_ver} && oras tag $registry/pingcap/tiflow/images/tiflow:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/pd/image:${rc_ver} && oras tag $registry/tikv/pd/image:${rc_ver} ${ga_ver}
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/tikv/image:${rc_ver} && oras tag $registry/tikv/tikv/image:${rc_ver} ${ga_ver}
+              # enterprise
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/br:${rc_ver}-enterprise && oras tag $registry/pingcap/tidb/images/br:${rc_ver}-enterprise ${ga_ver}-enterprise
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/dumpling:${rc_ver}-enterprise && oras tag $registry/pingcap/tidb/images/dumpling:${rc_ver}-enterprise ${ga_ver}-enterprise
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/tidb-lightning:${rc_ver}-enterprise && oras tag $registry/pingcap/tidb/images/tidb-lightning:${rc_ver}-enterprise ${ga_ver}-enterprise
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tidb/images/tidb-server:${rc_ver}-enterprise && oras tag $registry/pingcap/tidb/images/tidb-server:${rc_ver}-enterprise ${ga_ver}-enterprise
+              oras discover --distribution-spec v1.1-referrers-tag $registry/pingcap/tiflash/image:${rc_ver}-enterprise && oras tag $registry/pingcap/tiflash/image:${rc_ver}-enterprise ${ga_ver}-enterprise
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/pd/image:${rc_ver}-enterprise && oras tag $registry/tikv/pd/image:${rc_ver}-enterprise ${ga_ver}-enterprise
+              oras discover --distribution-spec v1.1-referrers-tag $registry/tikv/tikv/image:${rc_ver}-enterprise && oras tag $registry/tikv/tikv/image:${rc_ver}-enterprise ${ga_ver}-enterprise
+    - name: wait-tiup-delivery
+      runAfter:
+        - "ga-tag-oci-artifacts"
+      params:
+        - name: rc-version
+          value: "$(params.version)-pre"
+        - name: ga-version
+          value: $(params.version)
+      taskSpec:
+        params:
+          - name: rc-version
+          - name: ga-version
+          - name: tiup-tool-version
+            default: "v1.14.1"
+        steps:
+          - name: wait
+            image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
+            workingDir: /workspace
+            script: |
+              #! /usr/bin/env bash
+              set -exo pipefail
+
+              # install tiup tool.
+              TIUP_HOME=~/.tiup
+              bin_dir=$TIUP_HOME/bin
+              mkdir -vp "$bin_dir"
+              ARCH=$([ "$(arch)" = "x86_64" ] && echo amd64 || echo arm64)
+              download_url=https://tiup-mirrors.pingcap.com/tiup-$(params.tiup-tool-version)-linux-${ARCH}.tar.gz
+              wget -q -O - "$download_url" | tar -zxvf - -C "$bin_dir"
+              chmod 755 "$bin_dir/tiup"
+              export PATH=$bin_dir:$PATH
+              which tiup
+
+              tiup_mirror="http://tiup.pingcap.net:8987"
+              tiup_check_ver="$(params.ga-version)"
+              # set mirror, Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988
+              tiup mirror set $tiup_mirror
+
+              # check the tiup pkgs
+              VERSION="$tiup_check_ver"
+              failure=0
+
+              function record_failure() {
+                  if [ "$1" -eq 0 ]; then
+                      echo "✅ success"
+                  else
+                      echo "❌ failure"
+                      failure=1
+                  fi
+              }
+
+              function gather_results() {
+                  : >results.yaml
+
+                  # check tiup
+                  for com in 'br' 'cdc' 'ctl' 'dm-master' 'dm-worker' 'dmctl' 'drainer' 'dumpling' 'grafana' 'grafana' 'pd' 'pd-recover' 'prometheus' 'prometheus' 'pump' 'tidb' 'tidb-lightning' 'tiflash' 'tikv' 'tidb-dashboard'; do
+                      echo "🚧 check tiup $com:$VERSION"
+                      platforms=$(tiup list $com | grep -E "^$VERSION\b\s+")
+                      echo $platforms
+                      echo $platforms | grep "darwin/amd64" | grep "darwin/arm64" | grep "linux/amd64" | grep -q "linux/arm64"
+                      record_failure $?
+                      publish_time=$(echo "$platforms" | awk '{print $2}')
+                      yq -i ".tiup[\"${com}\"].published = \"$publish_time\"" results.yaml
+                  done
+
+                  # record tiup built git-sha
+                  for source_oci_pkg_repo in \
+                      pingcap/ctl/package \
+                      pingcap/monitoring/package \
+                      pingcap/ng-monitoring/package \
+                      pingcap/tidb-binlog/package \
+                      pingcap/tidb-dashboard/package \
+                      pingcap/tidb/package \
+                      pingcap/tiflash/package \
+                      pingcap/tiflow/package \
+                      tikv/pd/package \
+                      tikv/tikv/package; do
+                      for platform in linux_amd64 linux_arm64 darwin_amd64 darwin_arm64; do
+                          repo="hub.pingcap.net/${source_oci_pkg_repo}:${VERSION}_${platform}"
+                          oras manifest fetch-config $repo >tmp-oci-artifact-config.yaml
+                          yq '.["net.pingcap.tibuild.git-sha"]' tmp-oci-artifact-config.yaml
+                          git_sha=$(yq .'["net.pingcap.tibuild.git-sha"]' tmp-oci-artifact-config.yaml)
+                          oci_published_at=$(oras manifest fetch $repo | yq '.annotations["org.opencontainers.image.created"]')
+                          for f in $(yq '.["net.pingcap.tibuild.tiup"][].file' tmp-oci-artifact-config.yaml); do
+                              tiup_pkg_name="${f%-v*}"
+                              yq -i ".tiup[\"${tiup_pkg_name}\"].git_sha[\"${platform}\"] = \"$git_sha\"" results.yaml
+                              yq -i ".tiup[\"${tiup_pkg_name}\"].oci_published[\"${platform}\"] = \"$oci_published_at\"" results.yaml
+                          done
+                          rm -rf tmp-oci-artifact-config.yaml
+                      done
+                  done
+              }
+
+              ##### check the results files
+              function check_results() {
+                  # check tiup git_sha and published time
+                  for pkg in $(yq '.tiup | keys | .[]' results.yaml); do
+                      echo "🚧 check tiup built on git-sha for $pkg ..."
+                      yq -e ".tiup[\"$pkg\"].git_sha | map(.) | unique | length == 1" results.yaml
+                      record_failure $?
+
+                      echo "🚧 check tiup published time for $pkg ..."
+                      yq -e ".tiup[\"$pkg\"].published > (.tiup[\"$pkg\"].oci_published | map(.) | sort | .[0])" results.yaml
+                      record_failure $?
+                  done
+              }
+
+              function main() {
+                  gather_results && check_results
+
+                  if [ $failure -eq 0 ]; then
+                      echo '======='
+                      echo "check success"
+                      exit 0
+                  else
+                      echo '======='
+                      echo "check failure"
+                      exit 1
+                  fi
+              }
+
+              main
+    - name: compose-offline-pkgs-amd64-community
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: amd64 }
+        - { name: edition, value: community }
+    - name: upload-offline-pkgs-to-buckets-amd64-community
+      runAfter:
+        - "compose-offline-pkgs-amd64-community"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: community }
+        - { name: os, value: linux }
+        - { name: arch, value: amd64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-amd64-enterprise
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: amd64 }
+        - { name: edition, value: enterprise }
+    - name: upload-offline-pkgs-to-buckets-amd64-enterprise
+      runAfter:
+        - "compose-offline-pkgs-amd64-enterprise"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: enterprise }
+        - { name: os, value: linux }
+        - { name: arch, value: amd64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-amd64-dm
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: amd64 }
+        - { name: edition, value: dm }
+    - name: upload-offline-pkgs-to-buckets-amd64-dm
+      runAfter:
+        - "compose-offline-pkgs-amd64-dm"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      workspaces:
+        - { name: aws-secrets, workspace: aws-secrets }
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: dm }
+        - { name: os, value: linux }
+        - { name: arch, value: amd64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-arm64-community
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: arm64 }
+        - { name: edition, value: community }
+    - name: upload-offline-pkgs-to-buckets-arm64-community
+      runAfter:
+        - "compose-offline-pkgs-arm64-community"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: community }
+        - { name: os, value: linux }
+        - { name: arch, value: arm64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-arm64-enterprise
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: arm64 }
+        - { name: edition, value: enterprise }
+    - name: upload-offline-pkgs-to-buckets-arm64-enterprise
+      runAfter:
+        - "compose-offline-pkgs-arm64-enterprise"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: enterprise }
+        - { name: os, value: linux }
+        - { name: arch, value: arm64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: compose-offline-pkgs-arm64-dm
+      runAfter: [wait-tiup-delivery]
+      taskRef: { name: pingcap-compose-offline-pkgs }
+      params:
+        - { name: os, value: linux }
+        - { name: version, value: "$(params.version)" }
+        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: push, value: "true" }
+        - { name: arch, value: arm64 }
+        - { name: edition, value: dm }
+    - name: upload-offline-pkgs-to-buckets-arm64-dm
+      runAfter:
+        - "compose-offline-pkgs-arm64-dm"
+      taskRef:
+        name: pingcap-upload-offline-pacakges
+      workspaces:
+        - { name: aws-secrets, workspace: aws-secrets }
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: edition, value: dm }
+        - { name: os, value: linux }
+        - { name: arch, value: arm64 }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+    - name: upload-plugin-tarballs
+      runAfter:
+        - ga-tag-oci-artifacts
+      taskRef:
+        name: pingcap-upload-enterprise-plugins
+      params:
+        - { name: version, value: "$(params.version)" }
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }

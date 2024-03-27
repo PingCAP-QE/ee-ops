@@ -1,0 +1,118 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-upload-offline-pacakges
+  labels:
+    app.kubernetes.io/version: "0.2"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.17.0"
+    tekton.dev/categories: CLI
+    tekton.dev/tags: cli
+    tekton.dev/displayName: "aws cli"
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
+spec:
+  description: >-
+    This task performs upload for pingcap's offline packages.
+  params:
+    - name: version
+      type: string
+    - name: edition
+      type: string
+      default: community
+    - name: os
+      default: linux
+    - name: arch
+      type: string
+      default: amd64
+    - name: env-secret-name
+      type: string
+    - name: oci-repo
+      default: "hub.pingcap.net/pingcap/offline-package"
+    - name: dry-run
+      default: 'false'
+  workspaces:
+    - name: aws-secrets
+      optional: true
+  steps:
+    - name: upload-offline-tarballs
+      workingDir: /workspace
+      image: python:3.9.9
+      envFrom:
+        - secretRef:
+            name: $(params.env-secret-name)
+      script: |
+        #!/usr/bin/env bash
+        set -e
+
+        repo="$(params.oci-repo)"
+        dl_svr_url="https://internal-do.pingcap.net/dl"
+        FILE_SERVER_URL="http://fileserver.pingcap.net"
+
+        # prepare script for uploading to QiNiu.
+        pip3 install qiniu
+        wget -O upload_qiniu.py https://github.com/PingCAP-QE/ci/raw/main/scripts/artifacts/upload_qiniu.py
+        apt-get update -y && apt-get install jq -y
+
+        tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
+        echo "🚀 uploading for ${tag} ..."
+
+        curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
+        for f in $(curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}" | jq -r '.[]'); do
+          # download from oci artifact.
+          echo "🚀 Downloading $f from ${repo}:${tag} ..."
+          wget -q -O "$f" "${dl_svr_url}/oci-file/${repo}?tag=${tag}&file=$f"
+          echo "✅ Downloaded $f from ${repo}:${tag} ."
+
+          # upload it.
+          echo "🚀 Uploading $f ..."
+          if [ "$(params.dry-run)" == "true" ]; then
+            echo "🧪🩺 DRY run mode enabled."
+            python upload_qiniu.py $f fake-release/$f
+            curl --fail -F fake-release/$f=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
+          else
+            python upload_qiniu.py $f $f
+            curl --fail -F release/$f=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
+          fi
+
+          echo "✅ Uploaded $f ."
+        done
+        echo "✅ Uploaded for ${tag} ."
+
+    - name: upload-dm-tarballs-to-s3
+      image: docker.io/amazon/aws-cli:2.15.6
+      workingDir: /workspace
+      script: |
+        #!/usr/bin/env bash
+        set -e
+
+        if [ "$(params.edition)" != "dm" ]; then
+          exit 0
+        fi
+        if [ ! -f "$(workspaces.aws-secrets.path)/credentials" ]; then
+          echo "Error: aws-secrets workspace is not bound."
+          exit 1
+        fi
+
+        repo="$(params.oci-repo)"
+        dl_svr_url="https://internal-do.pingcap.net/dl"
+        tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
+
+        yum install jq -y
+
+        echo "🚀 uploading for ${tag} ..."
+        cp -r $(workspaces.aws-secrets.path) ~/.aws
+
+        # no need to download it again, it is downloaded in previous step.
+        curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
+        for f in $(curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}" | jq -r '.[]'); do
+          # upload it.
+          echo "🚀 Uploading $f ..."
+          if [ "$(params.dry-run)" == "true" ]; then
+            echo "🧪🩺 DRY run mode enabled."
+            aws s3 cp $f s3://download.pingcap.org/fake-release/$f --acl public-read
+          else
+            aws s3 cp $f s3://download.pingcap.org/$f --acl public-read
+          fi
+          echo "✅ Uploaded $f ."
+        done
+        echo "✅ Uploaded for ${tag} ."
