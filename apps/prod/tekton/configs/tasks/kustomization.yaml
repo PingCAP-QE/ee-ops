@@ -33,6 +33,8 @@ resources:
   - pingcap-get-release-version.yaml
   - pingcap-get-set-release-version.yaml
   - pingcap-git-clone-ext.yaml
+  - pingcap-upload-enterprise-plugins.yaml
+  - pingcap-upload-offline-packages.yaml
   - publish-tiup-from-oci-artifact.yaml
   - restore-cache-with-ks3.yaml
   - save-cache-with-ks3.yaml

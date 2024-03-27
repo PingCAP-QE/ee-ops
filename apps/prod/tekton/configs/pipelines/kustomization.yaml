@@ -6,3 +6,4 @@ resources:
   - ko-build-test-infra.yaml
   - pingcap-build-package.yaml
   - pingcap-build-package-darwin.yaml
+  - pingcap-release-ga.yaml
