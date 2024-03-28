@@ -36,9 +36,7 @@ async function generateEventPayload(
   const owner = url.pathname.split("/")[1];
   const repoName = url.pathname.split("/").pop()?.replace(/\.git$/, "");
   const isTag = ref.startsWith("refs/tags/");
-  const refName = isTag
-    ? ref.replace("refs/tags/", "")
-    : ref.replace("refs/heads/", "");
+  const refName = isTag ? ref.replace("refs/tags/", "") : ref;
 
   const payload: Payload = {
     ref: refName,
