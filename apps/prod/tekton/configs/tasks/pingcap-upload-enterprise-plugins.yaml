@@ -55,6 +55,8 @@ spec:
 
             # upload it.
             target_f="enterprise-plugin-v${f#*-v}"
+            target_f=$(echo "$target_f" | sed 's/-pre//')
+
             echo "🚀 Uploading $f => $target_f ..."
             if [ "$(params.dry-run)" == "true" ]; then
               echo "🧪🩺 DRY run mode enabled."

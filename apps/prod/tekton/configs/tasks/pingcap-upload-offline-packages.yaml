@@ -64,14 +64,15 @@ spec:
           echo "✅ Downloaded $f from ${repo}:${tag} ."
 
           # upload it.
+          target_f=$(echo "$f" | sed 's/-pre//')
           echo "🚀 Uploading $f ..."
           if [ "$(params.dry-run)" == "true" ]; then
             echo "🧪🩺 DRY run mode enabled."
-            python upload_qiniu.py $f fake-release/$f
-            curl --fail -F fake-release/$f=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
+            python upload_qiniu.py $f fake-release/$target_f
+            curl --fail -F fake-release/$f=@${target_f} ${FILE_SERVER_URL}/upload | grep -E 'success'
           else
-            python upload_qiniu.py $f $f
-            curl --fail -F release/$f=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
+            python upload_qiniu.py $f $target_f
+            curl --fail -F release/$target_f=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
           fi
 
           echo "✅ Uploaded $f ."
@@ -106,12 +107,13 @@ spec:
         curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
         for f in $(curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}" | jq -r '.[]'); do
           # upload it.
+          target_f=$(echo "$f" | sed 's/-pre//')
           echo "🚀 Uploading $f ..."
           if [ "$(params.dry-run)" == "true" ]; then
             echo "🧪🩺 DRY run mode enabled."
-            aws s3 cp $f s3://download.pingcap.org/fake-release/$f --acl public-read
+            aws s3 cp $f s3://download.pingcap.org/fake-release/$target_f --acl public-read
           else
-            aws s3 cp $f s3://download.pingcap.org/$f --acl public-read
+            aws s3 cp $f s3://download.pingcap.org/$target_f --acl public-read
           fi
           echo "✅ Uploaded $f ."
         done
