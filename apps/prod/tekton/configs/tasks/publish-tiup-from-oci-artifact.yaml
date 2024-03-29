@@ -122,3 +122,5 @@ spec:
       description: Includes a docker `config.json`
       mountPath: /root/.docker
       optional: true
+    - name: lock-tiup
+      optional: true
