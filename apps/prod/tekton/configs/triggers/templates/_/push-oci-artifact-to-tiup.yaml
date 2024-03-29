@@ -26,6 +26,9 @@ spec:
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8988
         workspaces:
+          - name: lock-tiup
+            persistentVolumeClaim:
+              claimName: pvc-lock-tiup-staging
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
@@ -49,6 +52,9 @@ spec:
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8987
         workspaces:
+          - name: lock-tiup
+            persistentVolumeClaim:
+              claimName: pvc-lock-tiup-prod
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
@@ -82,6 +88,9 @@ spec:
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8988
         workspaces:
+          - name: lock-tiup
+            persistentVolumeClaim:
+              claimName: pvc-lock-tiup-staging
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
@@ -115,6 +124,9 @@ spec:
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8988
         workspaces:
+          - name: lock-tiup
+            persistentVolumeClaim:
+              claimName: pvc-lock-tiup-staging
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
@@ -136,6 +148,9 @@ spec:
           - name: tiup-mirror
             value: http://tiup.pingcap.net:8987
         workspaces:
+          - name: lock-tiup
+            persistentVolumeClaim:
+              claimName: pvc-lock-tiup-prod
           - name: dockerconfig
             secret:
               secretName: hub-pingcap-net-ee
