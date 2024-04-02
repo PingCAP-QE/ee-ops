@@ -1,7 +1,5 @@
 approvers:
   - wuhuizuo
   - purelind
-reviewers:
-  - lijie0123  
 labels:
   - env/prod
