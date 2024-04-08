@@ -29,9 +29,6 @@ spec:
         taskRef:
           kind: Task
           name: create-pr-to-sync-owners
-        podTemplate:
-            nodeSelector:
-              kubernetes.io/arch: "amd64"       
         workspaces:
           - name: github
             secret:
