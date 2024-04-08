@@ -55,5 +55,6 @@ resources:
   - tikv/pd/git-push.yaml
   - tikv/tikv/fake-git-create-tag.yaml
   - tikv/tikv/fake-git-push.yaml
-  # - tikv/tikv/git-create-tag.yaml
+  - tikv/tikv/git-create-branch.yaml
+  - tikv/tikv/git-create-tag.yaml
   - tikv/tikv/git-push.yaml
