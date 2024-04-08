@@ -15,8 +15,8 @@ spec:
     - name: src-image-url
       description: URL of the image to be copied to the destination registry
   steps:
-    - name: gen-commands      
-      image: docker.io/denoland/deno:alpine-1.40.3 # it has `wget` tool.
+    - name: gen-commands
+      image: docker.io/denoland/deno:alpine-1.42.1 # it has `wget` tool.
       script: |
         cfg_yaml_file="https://raw.githubusercontent.com/PingCAP-QE/artifacts/main/packages/delivery.yaml"
         gen_script_url="https://raw.githubusercontent.com/PingCAP-QE/artifacts/main/packages/scripts/gen-delivery-image-commands.ts"
