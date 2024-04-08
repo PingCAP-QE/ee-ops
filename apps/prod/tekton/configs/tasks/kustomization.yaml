@@ -36,5 +36,7 @@ resources:
   - pingcap-upload-enterprise-plugins.yaml
   - pingcap-upload-offline-packages.yaml
   - publish-tiup-from-oci-artifact.yaml
+  - release/create-pr-to-add-release-anchor-commit.yaml
+  - release/create-pr-to-bump-tikv-version.yaml
   - restore-cache-with-ks3.yaml
   - save-cache-with-ks3.yaml

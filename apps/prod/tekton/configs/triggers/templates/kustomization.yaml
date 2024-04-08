@@ -8,3 +8,4 @@ resources:
   - _/push-oci-artifact-to-tiup.yaml
   - pingcap/sync-owners-for-hotfix-branch.yaml
   - pingcap/tidb/update-gomod-for-hotfix-branch.yaml
+  - tikv/tikv/bump-tikv-cargo-pkg-version.yaml
