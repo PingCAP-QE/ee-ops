@@ -6,10 +6,9 @@ metadata:
     type: github-tag-create
     github-owner: tikv
     github-repo: tikv
-    profile: community
 spec:
   interceptors:
-    - name: filter on repo owner and tags
+    - name: filter on repo owner and name and branches
       ref: { name: cel }
       params:
         - name: filter
@@ -18,47 +17,8 @@ spec:
             &&
             body.repository.name == 'tikv'
             &&
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-alpha)?$')
   bindings:
     - ref: github-tag-create
-    - { name: component, value: $(body.repository.name) }
-    - { name: profile, value: release }
-    - { name: timeout, value: 2h30m }
-    - { name: source-ws-size, value: 100Gi }
-    - { name: builder-resources-memory, value: 64Gi }
-    - { name: builder-resources-cpu, value: "16" }
   template:
-    ref: build-component-all-platforms
----
-apiVersion: triggers.tekton.dev/v1beta1
-kind: Trigger
-metadata:
-  name: tag-create-tikv-tikv-enterprise
-  labels:
-    type: github-tag-create
-    github-owner: tikv
-    github-repo: tikv
-    profile: enterprise
-spec:
-  interceptors:
-    - name: filter on repo owner and name and tags
-      ref: { name: cel }
-      params:
-        - name: filter
-          value: >-
-            body.repository.owner.login == 'tikv'
-            &&
-            body.repository.name == 'tikv'
-            &&
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
-  bindings:
-    - ref: github-tag-create
-    - { name: component, value: $(body.repository.name) }
-    - { name: os, value: linux }
-    - { name: profile, value: enterprise }
-    - { name: timeout, value: 2h30m }
-    - { name: source-ws-size, value: 100Gi }
-    - { name: builder-resources-memory, value: 64Gi }
-    - { name: builder-resources-cpu, value: "16" }
-  template:
-    ref: build-component
+    ref: bump-tikv-cargo-pkg-version

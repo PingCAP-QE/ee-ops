@@ -28,19 +28,17 @@ async function getCommitSha(
   return commit.sha;
 }
 
-async function generateEventPayload(
+async function generatePushEventPayload(
   gitUrl: string,
   ref: string,
-): Promise<Payload> {
+) {
   const url = new URL(gitUrl);
   const owner = url.pathname.split("/")[1];
   const repoName = url.pathname.split("/").pop()?.replace(/\.git$/, "");
-  const isTag = ref.startsWith("refs/tags/");
-  const refName = isTag ? ref.replace("refs/tags/", "") : ref;
 
-  const payload: Payload = {
-    ref: refName,
-    ref_type: isTag ? "tag" : "branch",
+  return {
+    before: "0000000000000000000000000000000000000000",
+    after: await getCommitSha(owner, repoName!, ref),
     repository: {
       name: repoName!,
       full_name: `${owner}/${repoName}`,
@@ -50,41 +48,66 @@ async function generateEventPayload(
       clone_url: gitUrl,
     },
   };
-
-  if (!isTag) {
-    const lastCommitSha = await getCommitSha(owner, repoName!, ref);
-    payload.before = "0000000000000000000000000000000000000000";
-    payload.after = lastCommitSha;
-  }
-
-  return payload;
 }
 
-async function sendEvent(
+function generateCreatePayload(
+  gitUrl: string,
+  ref: string,
+  ref_type = "branch",
+) {
+  const url = new URL(gitUrl);
+  const owner = url.pathname.split("/")[1];
+  const repoName = url.pathname.split("/").pop()?.replace(/\.git$/, "");
+
+  return {
+    ref,
+    ref_type,
+    repository: {
+      name: repoName!,
+      owner: {
+        login: owner,
+      },
+      clone_url: gitUrl,
+    },
+  };
+}
+
+async function sendGithubEvent(
+  eventType: string,
   gitUrl: string,
   ref: string,
   eventUrl: string,
 ): Promise<void> {
-  const payload = await generateEventPayload(gitUrl, ref);
-  const eventType = payload.ref_type === "branch" ? "push" : "create";
+  let eventPayload;
+  switch (eventType) {
+    case "create":
+      eventPayload = generateCreatePayload(
+        gitUrl,
+        ref.replace("refs/tags/", "").replace("refs/heads/", ""),
+        ref.startsWith("refs/tags/") ? "tag" : "branch",
+      );
+      break;
+    case "push":
+      eventPayload = await generatePushEventPayload(
+        gitUrl,
+        `refs/heads/${ref.replace("refs/heads/", "")}`,
+      );
+      break;
+    default:
+      break;
+  }
 
-  console.debug(payload);
-
-  const response = await fetch(eventUrl, {
+  const fetchInit = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-GitHub-Event": eventType,
     },
-    body: JSON.stringify(payload),
-  });
+    body: JSON.stringify(eventPayload),
+  };
+  console.debug(fetchInit);
 
-  if (!response.ok) {
-    console.error(`Request failed with status ${response.status}`);
-    Deno.exit(1);
-  }
-
-  console.log("Request succeeded");
+  await fetch(eventUrl, fetchInit);
 }
 
 async function main() {
@@ -92,15 +115,16 @@ async function main() {
   const gitUrl = args.url;
   const ref = args.ref || "refs/heads/master";
   const eventUrl = args.eventUrl || "https://example.com";
+  const eventType = args.eventType;
 
   if (!gitUrl) {
     console.error(
-      "Usage: deno run script.ts --url <git-url> [--ref <ref>] [--eventUrl <event-url>]",
+      "Usage: deno run script.ts --url <git-url> --eventType push|create [--ref <ref>] [--eventUrl <event-url>]",
     );
     Deno.exit(1);
   }
 
-  await sendEvent(gitUrl, ref, eventUrl);
+  await sendGithubEvent(eventType, gitUrl, ref, eventUrl);
 }
 
 await main();
