@@ -6,6 +6,7 @@ resources:
   - _/build-component.yaml
   - _/image-push.yaml
   - _/push-oci-artifact-to-tiup.yaml
+  - pingcap/bump-placeholder-version-in-readme.yaml
   - pingcap/sync-owners-for-hotfix-branch.yaml
   - pingcap/tidb/update-gomod-for-hotfix-branch.yaml
   - tikv/tikv/bump-tikv-cargo-pkg-version.yaml
