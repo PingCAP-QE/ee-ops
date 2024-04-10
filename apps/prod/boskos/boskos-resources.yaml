@@ -23,14 +23,14 @@ resources:
       type: MacMachineConfig
       content: |
         {"TODO": "yes"}
-  - names:
-      - darwin-amd64-4
-    state: free
-    type: mac-machine-amd64
-    config:
-      type: MacMachineConfig
-      content: |
-        {"TODO": "yes"}
+  # - names:
+  #     - darwin-amd64-4
+  #   state: free
+  #   type: mac-machine-amd64
+  #   config:
+  #     type: MacMachineConfig
+  #     content: |
+  #       {"TODO": "yes"}
   - names:
       - darwin-arm64-1
     state: free
