@@ -99,10 +99,6 @@ spec:
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
-    statusReconciler:
-      image:
-        repository: ticommunityinfra/status-reconciler
-        tag: v20240412-ac4df4b
     jenkinsOperator:
       enabled: true
       image:
