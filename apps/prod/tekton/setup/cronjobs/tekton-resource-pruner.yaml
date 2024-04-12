@@ -6,7 +6,7 @@ metadata:
   name: tekton-resource-pruner
   namespace: tekton-pipelines
 spec:
-  schedule: */15 * * * * # every 15 minutes
+  schedule: "*/15 * * * *" # every 15 minutes
   concurrencyPolicy: Forbid
   failedJobsHistoryLimit: 1
   successfulJobsHistoryLimit: 3
