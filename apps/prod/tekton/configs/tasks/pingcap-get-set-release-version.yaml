@@ -20,7 +20,10 @@ spec:
         set -e
 
         echo "Delete the none-standard tags"
-        git tag | grep -vE "v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|fips))?$" | xargs git tag -d || true
+        if git tag | grep -E "v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|fips))?$" > /dev/null; then
+          # Only delete the none-standard tags when the repo has standard semver tags.
+          git tag | grep -vE "v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|fips))?$" | xargs git tag -d || true
+        fi
 
         RESULT_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
         echo "Draft version got with git: $RESULT_VERSION"
