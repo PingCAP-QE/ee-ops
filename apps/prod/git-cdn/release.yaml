@@ -43,6 +43,8 @@ spec:
         emptyDir: {}
     configuration:
       GITSERVER_UPSTREAM: https://github.com/
-      PACK_CACHE_SIZE_GB: 20
+      PACK_CACHE_SIZE_GB: 100
       # directory where to put cache files
       WORKING_DIRECTORY: /data
+      PACK_CACHE_MULTI: true
+      PACK_CACHE_DEPTH: true
