@@ -64,3 +64,25 @@ spec:
     namespace: flux-system
   path: ./apps/prod/tekton/setup/results
   prune: true
+  patches:
+    - target:
+        kind: Deployment
+        namespace: tekton-pipelines
+        name: tekton-results-api
+      patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_HOST
+                name: tekton-results-postgres
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_DB_NAME
+                name: tekton-results-postgres

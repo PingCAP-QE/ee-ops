@@ -16,4 +16,4 @@ spec:
     - tekton-results-api-service.tekton-pipelines.svc.cluster.local
   secretName: tekton-results-tls
   issuerRef:
-    name: tekton-results-selfsigned
+    name: tekton-results
