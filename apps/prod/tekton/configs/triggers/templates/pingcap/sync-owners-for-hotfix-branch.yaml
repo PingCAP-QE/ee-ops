@@ -16,8 +16,6 @@ spec:
         generateName: create-pr-to-sync-owners-for-hotfix-
         annotations:
           "tekton.dev/git-status": "true"
-          "tekton.dev/status-target-url":
-            "https://do.pingcap.net/tekton/#/namespaces/{{ .Namespace }}/pipelineruns/{{ .Name }}"
           "tekton.dev/git-repo": $(tt.params.git-url)
           "tekton.dev/git-revision": $(tt.params.git-ref)
       spec:
