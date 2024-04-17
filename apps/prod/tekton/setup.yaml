@@ -64,7 +64,26 @@ spec:
     namespace: flux-system
   path: ./apps/prod/tekton/setup/results
   prune: true
+  healthChecks:
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-results-api
+      namespace: tekton-pipelines
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: tekton-results-watcher
+      namespace: tekton-pipelines
   patches:
+    - target:
+        kind: Deployment
+        namespace: tekton-pipelines
+        name: tekton-results-watcher
+      patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            - name: KUBERNETES_MIN_VERSION
+              value: v1.23.7
     - target:
         kind: Deployment
         namespace: tekton-pipelines
