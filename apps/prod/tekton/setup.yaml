@@ -20,52 +20,6 @@ spec:
           value:
             scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated", "value": "test-infra"}]'
             scheduler.alpha.kubernetes.io/node-selector: enable-ci=true,kubernetes.io/arch=amd64
-    - target:
-        kind: Deployment
-        namespace: tekton-pipelines
-        name: tekton-triggers-core-interceptors        
-      patch: &patch_with_min_k8s_ver_env_var |-
-        - op: add
-          path: /spec/template/spec/containers/0/env/-
-          value:
-            name: KUBERNETES_MIN_VERSION
-            value: v1.23.7
-    - target:
-        kind: Deployment
-        namespace: tekton-pipelines
-        name: tekton-results-watcher
-      patch: *patch_with_min_k8s_ver_env_var
-    - target:
-        kind: Deployment
-        namespace: tekton-pipelines
-        name: tekton-triggers-controller
-      patch: *patch_with_min_k8s_ver_env_var
-    - target:
-        kind: Deployment
-        namespace: tekton-pipelines
-        name: tekton-triggers-webhook
-      patch: *patch_with_min_k8s_ver_env_var
-    - target:
-        kind: Deployment
-        namespace: tekton-pipelines
-        name: tekton-results-api
-      patch: |-
-        - op: add
-          path: /spec/template/spec/containers/0/env/-
-          value:
-            name: DB_HOST
-            valueFrom:
-              secretKeyRef:
-                key: POSTGRES_HOST
-                name: tekton-results-postgres
-        - op: add
-          path: /spec/template/spec/containers/0/env/-
-          value:
-            name: DB_NAME
-            valueFrom:
-              secretKeyRef:
-                key: POSTGRES_DB_NAME
-                name: tekton-results-postgres
 
   prune: true
   healthChecks:
@@ -93,6 +47,24 @@ spec:
       kind: Deployment
       name: tekton-dashboard
       namespace: tekton-pipelines
+  timeout: 5m0s
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: tekton-results-setup
+  namespace: apps
+spec:
+  dependsOn:
+    - name: tekton-setup
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/prod/tekton/setup/results
+  prune: true
+  healthChecks:
     - apiVersion: apps/v1
       kind: Deployment
       name: tekton-results-api
@@ -101,3 +73,35 @@ spec:
       kind: Deployment
       name: tekton-results-watcher
       namespace: tekton-pipelines
+  patches:
+    - target:
+        kind: Deployment
+        namespace: tekton-pipelines
+        name: tekton-results-watcher
+      patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: KUBERNETES_MIN_VERSION
+            value: v1.23.7
+    - target:
+        kind: Deployment
+        namespace: tekton-pipelines
+        name: tekton-results-api
+      patch: |
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_HOST
+                name: tekton-results-postgres
+        - op: add
+          path: /spec/template/spec/containers/0/env/-
+          value:
+            name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                key: POSTGRES_DB_NAME
+                name: tekton-results-postgres

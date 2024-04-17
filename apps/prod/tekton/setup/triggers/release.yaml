@@ -1374,6 +1374,8 @@ spec:
           image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/controller:v0.24.1@sha256:d928774533783ce98fdc95f1fa2b7ac3b2c519e8366512a2e65ed9f540e3c0bb"
           args: ["-logtostderr", "-stderrthreshold", "INFO", "-el-image", "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/eventlistenersink:v0.24.1@sha256:37d41d06d0c306e7b875baa594b9e1ff51ad56d2828703144680b547d56ec2ef", "-el-port", "8080", "-el-security-context=true", "-el-events", "disable", "-el-readtimeout", "5", "-el-writetimeout", "40", "-el-idletimeout", "120", "-el-timeouthandler", "30", "-el-httpclient-readtimeout", "30", "-el-httpclient-keep-alive", "30", "-el-httpclient-tlshandshaketimeout", "10", "-el-httpclient-responseheadertimeout", "10", "-el-httpclient-expectcontinuetimeout", "1", "-period-seconds", "10", "-failure-threshold", "1"]
           env:
+            - name: KUBERNETES_MIN_VERSION
+              value: v1.23.7
             - name: SYSTEM_NAMESPACE
               valueFrom:
                 fieldRef:
@@ -1496,6 +1498,8 @@ spec:
           # and substituted here.
           image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/webhook:v0.24.1@sha256:314d28791b9adeee9e38c6fb0b1ed40deeee097f495f73a82e5831ff6393dfcc"
           env:
+            - name: KUBERNETES_MIN_VERSION
+              value: v1.23.7          
             - name: SYSTEM_NAMESPACE
               valueFrom:
                 fieldRef:
