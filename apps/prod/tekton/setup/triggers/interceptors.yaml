@@ -82,6 +82,8 @@ spec:
             - containerPort: 8443
           args: ["-logtostderr", "-stderrthreshold", "INFO"]
           env:
+            - name: KUBERNETES_MIN_VERSION
+              value: v1.23.7          
             - name: SYSTEM_NAMESPACE
               valueFrom:
                 fieldRef:
