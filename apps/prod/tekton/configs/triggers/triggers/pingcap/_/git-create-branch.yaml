@@ -37,3 +37,27 @@ spec:
     - ref: github-branch-create
   template:
     ref: sync-owners-for-hotfix-branch
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: branch-create-pingcap-org-bump-placeholder
+  labels:
+    type: github-branch-create
+    github-owner: pingcap
+spec:
+  interceptors:
+    - name: filter on repo owner and name and branches
+      ref: { name: cel }
+      params:
+        - name: filter
+          value: >-
+            body.repository.owner.login == 'pingcap'
+            &&
+            body.repository.name in ['monitoring', 'ng-monitoring', 'tidb-binlog', 'tidb-dashboard']
+            &&
+            body.ref.matches('^release-[0-9]+[.][0-9]+$')
+  bindings:
+    - ref: github-branch-create
+  template:
+    ref: bump-placeholder-version-in-readme
