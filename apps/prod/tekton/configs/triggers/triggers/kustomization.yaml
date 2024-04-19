@@ -7,26 +7,21 @@ resources:
   - _/image-push-on-harbor.yaml
   - pingcap/_/git-create-branch-gomod-update.yaml
   - pingcap/_/git-create-branch.yaml
+  - pingcap/_/git-create-tag.yaml
   - pingcap/advanced-statefulset/fake-git-create-tag.yaml
   - pingcap/advanced-statefulset/fake-git-push.yaml
   - pingcap/advanced-statefulset/git-create-tag.yaml
   - pingcap/advanced-statefulset/git-push.yaml
   - pingcap/monitoring/fake-git-create-tag.yaml
   - pingcap/monitoring/fake-git-push.yaml
-  # - pingcap/monitoring/git-create-tag.yaml
   - pingcap/monitoring/git-push.yaml
   - pingcap/ng-monitoring/fake-git-create-tag.yaml
   - pingcap/ng-monitoring/fake-git-push.yaml
-  # - pingcap/ng-monitoring/git-create-tag.yaml
   - pingcap/ng-monitoring/git-push.yaml
-  - pingcap/tidb-binlog/git-create-branch.yaml
-  - pingcap/tidb-binlog/git-create-tag.yaml
   - pingcap/tidb-binlog/git-push.yaml
   - pingcap/tidb-ctl/git-create-tag.yaml
   - pingcap/tidb-ctl/git-push.yaml
   - pingcap/tidb-dashboard/fake-git-create-tag.yaml
-  - pingcap/tidb-dashboard/fake-git-push.yaml
-  # - pingcap/tidb-dashboard/git-create-tag.yaml
   - pingcap/tidb-dashboard/git-push.yaml
   # - pingcap/tidb-tools/git-create-tag.yaml
   - pingcap/tidb-tools/git-push.yaml
