@@ -89,6 +89,8 @@ spec:
           value: 'http://goproxy.apps.svc,direct'
         - name: CARGO_HOME
           value: /workspace/.cargo
+        - name: NPM_CONFIG_REGISTRY
+          value: https://registry.npmmirror.com
       script: |
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then
