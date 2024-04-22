@@ -25,8 +25,16 @@ spec:
     - name: analyse
       image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-14-gdd4a4cf
       workingDir: /workspace
+      env:
+        - name: CACHE_READ_SERVER_BASE_URL
+          value: "http://fileserver.pingcap.net/download"
       script: |
-        wget -O gen.sh https://raw.githubusercontent.com/PingCAP-QE/artifacts/main/packages/scripts/gen-delivery-tiup-script.sh && chmod +x gen.sh
+        gen_script_github_raw_path_url="PingCAP-QE/artifacts/main/packages/scripts/gen-delivery-tiup-script.sh"
+        gen_script_url="https://raw.githubusercontent.com/$gen_script_github_raw_path_url"
+        if wget -q --spider "$CACHE_READ_SERVER_BASE_URL/raw.githubusercontent.com/$gen_script_github_raw_path_url"; then
+          gen_script_url="$CACHE_READ_SERVER_BASE_URL/raw.githubusercontent.com/$gen_script_github_raw_path_url"
+        fi
+        wget -O gen.sh "$gen_script_url" && chmod +x gen.sh
         ./gen.sh $(params.artifact-url) $(params.nightly) publish.sh
 
         # download the artifact
