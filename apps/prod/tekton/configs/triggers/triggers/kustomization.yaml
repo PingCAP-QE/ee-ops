@@ -5,6 +5,7 @@ resources:
   - _/ctl/artifact-push-on-harbor.yaml
   # - _/git-push-on-fips-branches.yaml
   - _/image-push-on-harbor.yaml
+  - PingCAP-QE/artifacts/git-push.yaml
   - pingcap/_/git-create-branch-gomod-update.yaml
   - pingcap/_/git-create-branch.yaml
   - pingcap/_/git-create-tag.yaml
