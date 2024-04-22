@@ -88,6 +88,7 @@ spec:
             pingcap/docs
             pingcap/docs-cn
             pingcap/docs-tidb-operator
+            pingcap-inc/tiflash-scripts
     pcm:
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
