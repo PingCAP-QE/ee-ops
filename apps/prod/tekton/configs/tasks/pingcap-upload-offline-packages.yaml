@@ -36,7 +36,7 @@ spec:
   steps:
     - name: upload-offline-tarballs
       workingDir: /workspace
-      image: python:3.9.9
+      image: python:3.12.3
       envFrom:
         - secretRef:
             name: $(params.env-secret-name)
