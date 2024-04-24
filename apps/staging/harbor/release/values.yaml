@@ -581,7 +581,7 @@ notary:
     automountServiceAccountToken: false
     image:
       repository: goharbor/notary-server-photon
-      tag: v2.8.4
+      tag: v2.8.6
     replicas: 1
     # resources:
     #  requests:
