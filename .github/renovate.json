@@ -9,8 +9,7 @@
   "regexManagers": [
     {
       "fileMatch": [
-        "apps/.*-plugins\\.yaml$$",
-        "apps/.*/release\\.yaml$$",
+        "apps/.*/jenkins.*/release/.*-plugins\\.yaml$$",
         "charts/jenkins/values\\.yaml$$"
       ],
       "matchStrings": [
