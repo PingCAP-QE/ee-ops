@@ -61,7 +61,7 @@ controller:
     - artifactId: workflow-cps-global-lib
       source:
         # renovate: datasource=jenkins-plugins depName=workflow-cps-global-lib
-        version: 609.vd95673f149b_b
+        version: 612.v55f2f80781ef
     - artifactId: jenkins-pipeline-cache
       source:
         # renovate: datasource=github-releases depName=j3t/jenkins-pipeline-cache-plugin versioning=semver
