@@ -342,7 +342,7 @@ nginx:
 portal:
   image:
     repository: goharbor/harbor-portal
-    tag: v2.9.1
+    tag: v2.10.2
   # set the service account to be used, default if left empty
   serviceAccountName: ""
   # mount the service account token
