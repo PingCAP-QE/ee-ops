@@ -37,8 +37,8 @@ spec:
       kubernetes.io/arch: amd64
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/dl
-      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl
-      tag: 9872f1e
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
+      tag: v20240228-25-g1214fb5
     server:
       args: [--ks3-config=/config/ks3.yaml]
       volumeMounts:
