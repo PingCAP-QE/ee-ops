@@ -37,6 +37,10 @@ spec:
         wget -O gen.sh "$gen_script_url" && chmod +x gen.sh
         ./gen.sh $(params.artifact-url) $(params.nightly) publish.sh
 
+        if [ ! -f publish.sh ]; then
+          exit 0
+        fi
+
         # download the artifact
         oras pull $(params.artifact-url)
 
