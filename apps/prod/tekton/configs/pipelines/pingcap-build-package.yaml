@@ -9,6 +9,9 @@ spec:
     - name: git-ref
       type: string
       default: master
+    - name: git-refspec
+      default: +refs/heads/*:refs/heads/*
+      type: string
     - name: git-revision
       default: master
       type: string
@@ -67,7 +70,7 @@ spec:
         - name: depth
           value: "0"
         - name: refspec
-          value: +refs/heads/*:refs/heads/*
+          value: $(params.git-refspec)
         - name: subdirectory
           value: $(params.component)
       workspaces:
