@@ -6,7 +6,7 @@ metadata:
 spec:
   serviceAccountName: tekton-trigger-eventlistener
   triggerGroups:
-    - name: tibuild-fake-github-branch-push
+    - name: tibuild-fake-github-pr
       interceptors:
         - name: "filter on eventType"
           ref:
@@ -14,22 +14,34 @@ spec:
           params:
             - name: filter
               value: >-
-                header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.push', 'net.pingcap.tibuild.hotfix.push']
-        # "refs/heads/main" => "main"
-        - name: shortten the git REF
+                header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.pull_request', 'net.pingcap.tibuild.hotfix.pull_request']
+        - name: "validate PR state and add field"
           ref:
             name: cel
           params:
+            - name: filter
+              value: body.action in ['opened', 'synchronize', 'reopened']
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: fake-github-pr
+    - name: tibuild-fake-github-branch-push
+      interceptors:
+        - name: filter on event type and extract cloud event context
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: >-
+                header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.push', 'net.pingcap.tibuild.hotfix.push']
             - name: overlays
               value:
                 - key: short-ref
+                  # "refs/heads/main" => "main"
                   expression: body.ref.replace('refs/heads/', '')
-        - name: extract cloud event context.
-          ref:
-            name: cel
-          params:
-            - name: overlays
-              value:
                 - key: ce-context
                   expression: |
                     {
@@ -49,7 +61,7 @@ spec:
             type: fake-github-branch-push
     - name: tibuild-fake-github-tag-create
       interceptors:
-        - name: "filter on eventType and refs"
+        - name: filter on eventType and refs and extract cloud event context
           ref:
             name: cel
           params:
@@ -58,6 +70,18 @@ spec:
                 header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.create', 'net.pingcap.tibuild.hotfix.create']
                 &&
                 body.ref_type == 'tag'
+            - name: overlays
+              value:
+                - key: ce-context
+                  expression: |
+                    {
+                      "type": header.canonical('ce-type'),
+                      "source": header.canonical('ce-source'),
+                      "subject": header.canonical('ce-subject'),
+                      "user": header.canonical('ce-user'),
+                    }.marshalJSON()
+                - key: ce-context-user
+                  expression: header.canonical('ce-user')
       triggerSelector:
         namespaceSelector:
           matchNames:
