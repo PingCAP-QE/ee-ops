@@ -44,6 +44,8 @@ spec:
     - name: push
       type: string
       default: 'false'
+    - name: registry
+      default: hub.pingcap.net
     - name: mac-builder-resource
       type: string
   steps:
@@ -68,7 +70,8 @@ spec:
           $git_ref \
           "$git_sha" \
           /workspace/artifacts/packages/packages.yaml.tmpl \
-          "$out_script"
+          "$out_script" \
+          $(params.registry)
 
         if [ -f "$out_script" ]; then
           cat "$out_script"
@@ -136,7 +139,7 @@ spec:
         - name: REMOTE_BUILDER_INFO_DIR
           value: /workspace/remote-builder
       workingDir: $(workspaces.source.path)/$(params.component)
-      # TODO: get the user and host by better way. 
+      # TODO: get the user and host by better way.
       script: |
         #!/usr/bin/env bash
         set -exo pipefail
@@ -146,7 +149,7 @@ spec:
           echo "No build script, skip build."
           exit 0
         fi
-        
+
         ##### Build mac targets in tekton task (k8s pod) ####
         # 1. Set ssh credentials
         if [ "${WORKSPACE_SSH_DIRECTORY_BOUND}" != "true" ] ; then
@@ -167,7 +170,7 @@ spec:
         # 2.1 create a randon workspace dir in the remote host:
         remote_workspace_dir="${workspace_base_dir}/$(context.taskRun.name)"
         ssh ${username}@${host} "mkdir -p '$remote_workspace_dir'"
-        
+
         # 2.2 copy the build shell to the remote host by ssh.
         scp "$script" /workspace/remote.env ${username}@${host}:"$remote_workspace_dir/"
 
