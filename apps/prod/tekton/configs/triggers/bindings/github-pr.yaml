@@ -5,19 +5,19 @@ metadata:
 spec:
   params:
     - name: git-url
-      value: $(body.pull_request.base.repo.clone_url)
+      value: $(body.repository.clone_url)
     - name: git-refspec
-      value: "refs/pull/$(body.pull_request.number)/head"
+      value: "refs/pull/$(body.pull_request.number)/head:pull/$(body.pull_request.number)"
     - name: git-revision
       value: $(body.pull_request.head.sha)
     - name: git-ref
       value: $(body.pull_request.base.ref)
     - name: pr-number
       value: $(body.pull_request.number)
-    - name: pr-head-ref
-      value: $(body.pull_request.head.ref)
-    - name: pr-base-ref
-      value: $(body.pull_request.base.ref)
+    # - name: pr-head-ref
+    #   value: $(body.pull_request.head.ref)
+    # - name: pr-base-ref
+    #   value: $(body.pull_request.base.ref)
     # - name: pr-title
     #   value: $(body.pull_request.title)
     # - name: pr-body
