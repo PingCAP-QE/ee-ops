@@ -16,8 +16,6 @@ spec:
     - name: nightly
       description: publish as nightly version.
       default: "false"
-    - name: tiup-tool-version
-      default: "v1.14.1"
     - name: tiup-mirror
       description: Staging is http://tiup.pingcap.net:8988, product is http://tiup.pingcap.net:8987.
       default: http://tiup.pingcap.net:8988
@@ -64,7 +62,7 @@ spec:
         cp $(workspaces.tiup-keys.path)/private.json $TIUP_HOME/keys/
 
         # set mirror.
-        tiup mirror set $(params.tiup-mirror)
+        tiup -v && tiup mirror set $(params.tiup-mirror)
 
         # publish the tiup packages
         chmod +x publish.sh && ./publish.sh

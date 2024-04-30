@@ -29,13 +29,13 @@ spec:
     - name: push
       type: string
       default: 'false'
-    - name: tiup-tool-version
-      default: "v1.14.1"
+    - name: registry
+      default: hub.pingcap.net
     - name: tiup-mirror
-      description: Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988, 
+      description: Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988,
       default: http://tiup.pingcap.net:8988
   stepTemplate:
-    image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+    image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-14-gdd4a4cf
     env:
       - name: OUT_SCRIPT
         value: /workspace/compose-offline-packages-artifacts.sh
@@ -55,7 +55,8 @@ spec:
           $(params.edition) \
           /workspace/artifacts/packages/offline-packages.yaml.tmpl \
           "$OUT_SCRIPT" \
-          $(params.tiup-mirror)
+          $(params.tiup-mirror) \
+          $(params.registry)
 
         if [ -f "$OUT_SCRIPT" ]; then
           cat "$OUT_SCRIPT"
@@ -72,19 +73,10 @@ spec:
         #! /usr/bin/env bash
         set -exo pipefail
 
-        # install tiup tool.
-        TIUP_HOME=~/.tiup
-        bin_dir=$TIUP_HOME/bin
-        mkdir -vp "$bin_dir"
-        ARCH=$([ "$(arch)" = "x86_64" ] && echo amd64 || echo arm64)
-        download_url=https://tiup-mirrors.pingcap.com/tiup-$(params.tiup-tool-version)-linux-${ARCH}.tar.gz
-        wget -q -O - "$download_url" | tar -zxvf - -C "$bin_dir"
-        chmod 755 "$bin_dir/tiup"
-        export PATH=$bin_dir:$PATH
-        which tiup
+        mkdir -vp ~/.tiup/{keys,bin}
 
         # set mirror.
-        tiup mirror set $(params.tiup-mirror)
+        tiup -v && tiup mirror set $(params.tiup-mirror)
 
         if $(params.push); then
           "$OUT_SCRIPT" -c -r -w build -p -o $(results.pushed.path)

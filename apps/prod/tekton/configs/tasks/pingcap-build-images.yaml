@@ -40,6 +40,8 @@ spec:
     - name: build
       default: 'false'
       description: Does it need to build the binaries before packing the images?
+    - name: registry
+      default: hub.pingcap.net
   steps:
     - name: generate
       image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
@@ -62,7 +64,8 @@ spec:
           $git_ref \
           "$git_sha" \
           /workspace/artifacts/packages/packages.yaml.tmpl \
-          "$out_script" || true
+          "$out_script" \
+          $(params.registry) || true
 
         if [ -f "$out_script" ]; then
           cat "$out_script"

@@ -6,6 +6,8 @@ spec:
   params:
     - name: git-url
       value: $(body.repository.clone_url)
+    - name: git-refspec
+      value: "+$(body.ref):$(body.ref)"
     - name: git-revision
       value: $(body.after)
     - name: git-ref
