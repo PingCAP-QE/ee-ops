@@ -62,7 +62,7 @@ spec:
         cp $(workspaces.tiup-keys.path)/private.json $TIUP_HOME/keys/
 
         # set mirror.
-        tiup -v && tiup mirror set $(params.tiup-mirror)
+        tiup mirror set $(params.tiup-mirror) && tiup -v
 
         # publish the tiup packages
         chmod +x publish.sh && ./publish.sh
