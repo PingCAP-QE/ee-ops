@@ -76,7 +76,7 @@ spec:
         mkdir -vp ~/.tiup/{keys,bin}
 
         # set mirror.
-        tiup -v && tiup mirror set $(params.tiup-mirror)
+        tiup mirror set $(params.tiup-mirror) && tiup -v
 
         if $(params.push); then
           "$OUT_SCRIPT" -c -r -w build -p -o $(results.pushed.path)
