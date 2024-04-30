@@ -9,6 +9,9 @@ spec:
     - name: git-ref
       type: string
       default: master
+    - name: git-refspec
+      default: +refs/heads/*:refs/heads/*
+      type: string
     - name: git-revision
       default: master
       type: string
@@ -33,6 +36,9 @@ spec:
       default: release
     - name: push
       default: "true"
+    - name: registry
+      description: the base OCI registry server for store artifacts, it can be set with prefix repo path.
+      default: "hub.pingcap.net"
   results:
     - name: pushed-binaries
       description: pushed binaries.
@@ -64,7 +70,7 @@ spec:
         - name: depth
           value: "0"
         - name: refspec
-          value: +refs/heads/*:refs/heads/*
+          value: $(params.git-refspec)
         - name: subdirectory
           value: $(params.component)
       workspaces:
@@ -117,7 +123,6 @@ spec:
         - checkout-ext
       taskRef:
         name: pingcap-build-binaries
-      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
         - name: os
           value: "$(params.os)"
@@ -139,6 +144,8 @@ spec:
           value: build
         - name: push
           value: "$(params.push)"
+        - name: registry
+          value: "$(params.registry)"
       workspaces:
         - name: source
           workspace: source
@@ -175,6 +182,8 @@ spec:
           value: build
         - name: build
           value: "false"
+        - name: registry
+          value: "$(params.registry)"
       workspaces:
         - name: source
           workspace: source

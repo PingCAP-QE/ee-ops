@@ -6,6 +6,8 @@ spec:
   params:
     - name: git-url
       description: The git repository full url
+    - name: git-refspec
+      default: +refs/heads/*:refs/heads/*
     - name: git-revision
       description: The git revision
     - name: git-ref
@@ -15,6 +17,8 @@ spec:
     - name: profile
       description: build target profile
       default: release
+    - name: registry
+      default: hub.pingcap.net
     - name: timeout
       description: pipeline run timeout
       default: 2h
@@ -47,6 +51,8 @@ spec:
         params:
           - name: git-url
             value: $(tt.params.git-url)
+          - name: git-refspec
+            value: $(tt.params.git-refspec)
           - name: git-revision
             value: $(tt.params.git-revision)
           - name: git-ref
@@ -59,6 +65,8 @@ spec:
             value: linux
           - name: arch
             value: amd64
+          - name: registry
+            value: $(tt.params.registry)
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -113,6 +121,8 @@ spec:
         params:
           - name: git-url
             value: $(tt.params.git-url)
+          - name: git-refspec
+            value: $(tt.params.git-refspec)
           - name: git-revision
             value: $(tt.params.git-revision)
           - name: git-ref
@@ -125,6 +135,8 @@ spec:
             value: linux
           - name: arch
             value: arm64
+          - name: registry
+            value: $(tt.params.registry)
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -179,6 +191,8 @@ spec:
         params:
           - name: git-url
             value: $(tt.params.git-url)
+          - name: git-refspec
+            value: $(tt.params.git-refspec)
           - name: git-revision
             value: $(tt.params.git-revision)
           - name: git-ref
@@ -189,6 +203,8 @@ spec:
             value: $(tt.params.profile)
           - name: arch
             value: amd64
+          - name: registry
+            value: $(tt.params.registry)
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
@@ -238,6 +254,8 @@ spec:
         params:
           - name: git-url
             value: $(tt.params.git-url)
+          - name: git-refspec
+            value: $(tt.params.git-refspec)
           - name: git-revision
             value: $(tt.params.git-revision)
           - name: git-ref
@@ -248,6 +266,8 @@ spec:
             value: $(tt.params.profile)
           - name: arch
             value: arm64
+          - name: registry
+            value: $(tt.params.registry)
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:

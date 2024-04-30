@@ -47,6 +47,8 @@ spec:
     - name: push
       type: string
       default: 'false'
+    - name: registry
+      default: hub.pingcap.net
     - name: mac-builder-resource
       type: string
       default: ''
@@ -72,7 +74,8 @@ spec:
           $git_ref \
           "$git_sha" \
           /workspace/artifacts/packages/packages.yaml.tmpl \
-          "$out_script"
+          "$out_script" \
+          $(params.registry)
 
         if [ -f "$out_script" ]; then
           cat "$out_script"
