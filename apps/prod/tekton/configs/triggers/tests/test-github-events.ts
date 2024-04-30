@@ -105,7 +105,8 @@ async function sendGithubEvent(
     },
     body: JSON.stringify(eventPayload),
   };
-  console.debug(fetchInit);
+  console.dir(fetchInit);
+  console.dir(fetchInit.body);
 
   await fetch(eventUrl, fetchInit);
 }

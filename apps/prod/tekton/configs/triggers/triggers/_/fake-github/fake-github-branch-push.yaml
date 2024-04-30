@@ -6,34 +6,50 @@ metadata:
     type: fake-github-branch-push
 spec:
   interceptors:
-    - name: filter on repo owner and name and branches
+    - name: filter on repo
       ref: { name: cel }
       params:
         - name: filter
-          # support branches:
-          # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
-            (
-            (body.repository.owner.login == 'pingcap' && body.repository.name in ['tidb', 'tiflow', 'tiflash', 'tidb-dashboard'])
-            ||
-            (body.repository.owner.login == 'tikv' && body.repository.name in ['tikv', 'pd'])
-            ) &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.repository.full_name in ['pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'tikv/tikv', 'tikv/pd']
         - name: overlays
           value:
           - key: timeout
             expression: >-
-              { 'tidb': '30m', 'tiflash': '2h', 'tiflow': '30m', 'pd': '30m', 'tikv': '2h30m' }[body.repository.name]
+              {
+              'pingcap/tidb': '30m',
+              'pingcap/tiflash': '2h',
+              'pingcap/tiflow': '30m',
+              'tikv/pd': '30m',
+              'tikv/tikv': '2h30m',
+              }[body.repository.full_name]
           - key: source-ws-size
             expression: >-
-              { 'tidb': '50Gi', 'tiflash': '100Gi', 'tiflow': '50Gi', 'pd': '50Gi', 'tikv': '100Gi' }[body.repository.name]
+              {
+              'pingcap/tidb': '50Gi',
+              'pingcap/tiflash': '100Gi',
+              'pingcap/tiflow': '50Gi',
+              'tikv/pd': '50Gi',
+              'tikv/tikv': '100Gi',
+              }[body.repository.full_name]
           - key: builder-resources-cpu
             expression: >-
-              { 'tidb': '8', 'tiflash': '16', 'tiflow': '8', 'pd': '8', 'tikv': '16' }[body.repository.name]
+              {
+              'pingcap/tidb': '8',
+              'pingcap/tiflash': '16',
+              'pingcap/tiflow': '8',
+              'tikv/pd': '8',
+              'tikv/tikv': '16',
+              }[body.repository.full_name]
           - key: builder-resources-memory
             expression: >-
-              { 'tidb': '32Gi', 'tiflash': '64Gi', 'tiflow': '32Gi', 'pd': '32Gi', 'tikv': '64Gi' }[body.repository.name]
+              {
+              'pingcap/tidb': '32Gi',
+              'pingcap/tiflash': '64Gi',
+              'pingcap/tiflow': '32Gi',
+              'tikv/pd': '32Gi',
+              'tikv/tikv': '64Gi',
+              }[body.repository.full_name]
   bindings:
     - ref: github-branch-push
     - ref: ce-context
