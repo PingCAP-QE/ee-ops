@@ -27,6 +27,20 @@ spec:
         - name: CACHE_READ_SERVER_BASE_URL
           value: "http://fileserver.pingcap.net/download"
       script: |
+        #!/usr/bin/env bash
+        set -exo pipefail
+
+        # limit the nightly publish
+        if [ "$(workspaces.lock-tiup.bound)" == "true" ] ; then
+          if [ "$(params.nightly)" == "true" ]; then
+            to_match_record="$(params.artifact-url) => $(date +%Y%m%d)"
+            if grep "$to_match_record" $(workspaces.lock-tiup.path)/nigtly-records; then
+              echo "nightly have published tody, skip the rest publish tody."
+              exit 0
+            fi
+          fi
+        fi
+
         gen_script_github_raw_path_url="PingCAP-QE/artifacts/main/packages/scripts/gen-delivery-tiup-script.sh"
         gen_script_url="https://raw.githubusercontent.com/$gen_script_github_raw_path_url"
         if wget -q --spider "$CACHE_READ_SERVER_BASE_URL/raw.githubusercontent.com/$gen_script_github_raw_path_url"; then
@@ -66,6 +80,14 @@ spec:
 
         # publish the tiup packages
         chmod +x publish.sh && ./publish.sh
+
+        # add the nightly published record.
+        if [ "$(workspaces.lock-tiup.bound)" == "true" ] ; then
+          if [ "$(params.nightly)" == "true" ]; then
+            record="$(params.artifact-url) => $(date +%Y%m%d)"
+            echo "$record" >> $(workspaces.lock-tiup.path)/nigtly-records
+          fi
+        fi
   workspaces:
     - description: Includes a TiUP private key `private.json`
       name: tiup-keys
