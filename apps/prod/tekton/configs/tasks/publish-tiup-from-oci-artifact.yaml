@@ -35,7 +35,7 @@ spec:
           if [ "$(params.nightly)" == "true" ]; then
             to_match_record="$(params.artifact-url) => $(date +%Y%m%d)"
             if grep "$to_match_record" $(workspaces.lock-tiup.path)/nigtly-records; then
-              echo "nightly have published tody, skip the rest publish tody."
+              echo "nightly have published today, skip the rest publish today."
               exit 0
             fi
           fi
