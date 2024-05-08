@@ -1,12 +1,12 @@
 resources:
-  - names:
-      - darwin-amd64-1
-    state: free
-    type: mac-machine-amd64
-    config:
-      type: MacMachineConfig
-      content: |
-        {"TODO": "yes"}
+  # - names:
+  #     - darwin-amd64-1
+  #   state: free
+  #   type: mac-machine-amd64
+  #   config:
+  #     type: MacMachineConfig
+  #     content: |
+  #       {"TODO": "yes"}
   - names:
       - darwin-amd64-2
     state: free
