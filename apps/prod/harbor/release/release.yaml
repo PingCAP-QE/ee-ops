@@ -1,0 +1,111 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: harbor
+  namespace: apps
+spec:
+  releaseName: harbor
+  targetNamespace: apps
+  chart:
+    spec:
+      chart: harbor
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      version: "21.1.2"
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    global:
+      storageClass: ceph-block
+    adminPassword: ${ADMIN_PASSWORD}
+    externalURL: https://${DOMAIN_NAME}
+    postgresql:
+      enabled: false
+    externalDatabase:
+      host: ${PG_HOST}
+      port: ${PG_PORT}
+      coreDatabase: "${PG_DB}"
+      user: ${PG_USER}
+      password: "${PG_PASSWORD}"
+      sslmode: disable
+    persistence:
+      imageChartStorage:
+        disableredirect: true
+        type: s3
+        s3:
+          accesskey: ${KS3_ACCESS_KEY}
+          secretkey: ${KS3_SECRET_KEY}
+          bucket: ${KS3_BUCKET}
+          region: ${KS3_REGION}
+          regionendpoint: ${KS3_REGION_ENDPOINT}
+          rootdirectory: harbor
+      persistentVolumeClaim:
+        jobservice:
+          size: 30Gi
+        trivy:
+          size: 5Gi
+    exposureType: ingress
+    ingress:
+      core:
+        annotations:
+          ingress.kubernetes.io/ssl-redirect: "false"
+          nginx.ingress.kubernetes.io/ssl-redirect: "false"
+        hostname: ${DOMAIN_NAME}
+        ingressClassName: nginx
+        pathType: ImplementationSpecific
+    core:
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+    exporter:
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+    jobservice:
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
+    metrics:
+      enabled: false
+    portal:
+      resources:
+        limits:
+          cpu: 500m
+          memory: 1Gi
+    redis:
+      master:
+        resourcesPreset: medium
+    registry:
+      controller:
+        resources:
+          limits:
+            cpu: 100m
+            memory: 200Mi
+      replicaCount: 2
+      server:
+        image:
+          registry: hub.pingcap.net
+          repository: lijie/registry
+          tag: v3
+        resources:
+          limits:
+            cpu: "4"
+            memory: 4Gi
+    trivy:
+      resources:
+        limits:
+          cpu: "1"
+          memory: 1Gi
