@@ -137,6 +137,15 @@ spec:
           EXT_REVERSION=$(echo "$MAJOR_MINOR_PATCH" | sed -E 's/^v/release-/')
         elif [[ $origin_ref =~ "^(master|main|feature/.*)$" ]]; then
           EXT_REVERSION="master"
+        elif [[ "$origin_ref" == "" ]]; then
+          echo "$RELEASE_VERSION"
+          # empty branch, may be pull request cases, judge it from $RELEASE_VERSION
+          if [[ $RELEASE_VERSION =~ "^v[0-9]+\.[0-9]+\.[0-9]+-alpha-[0-9]+-" ]]; then
+            EXT_REVERSION="master"
+          else
+            MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+            EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
+          fi
         else
           # GA version tags and RC release branches
           EXT_REVERSION="$origin_ref"
