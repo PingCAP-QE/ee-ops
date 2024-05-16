@@ -127,6 +127,11 @@ spec:
 
         # 3. set npm mirror
         echo 'export NPM_CONFIG_REGISTRY="https://registry.npmmirror.com"' >> /workspace/remote.env
+
+        # 4. optional set for rust
+        echo 'export CARGO_NET_GIT_FETCH_WITH_CLI=true' >> /workspace/remote.env
+        echo 'export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static' >> /workspace/remote.env
+
     - name: build
       image: ghcr.io/pingcap-qe/cd/utils/remote:v20231216-51-g3bb25fd
       env:
