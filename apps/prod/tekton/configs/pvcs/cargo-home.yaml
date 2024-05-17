@@ -30,7 +30,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              cat << EOF | tee -a /cargo/config
+              cat << EOF | tee /cargo/config
               [source.crates-io]
               replace-with = 'mirror'
 
