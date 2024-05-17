@@ -10,3 +10,37 @@ spec:
   accessModes:
     - ReadWriteMany
   storageClassName: nfs
+---
+# Add a k8s job to add cargo config file in the PVC, please help me to add it.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: add-cargo-config-in-pvc
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: add-cargo-config
+          image: busybox:1.36.1
+          env:
+            - name: CRATES_IO_REGISTRY_MIRROR
+              value: "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cat << EOF | tee -a /cargo/config
+              [source.crates-io]
+              replace-with = 'mirror'
+
+              [source.mirror]
+              registry = "${CRATES_IO_REGISTRY_MIRROR}"
+              EOF
+          volumeMounts:
+            - name: cargo-home
+              mountPath: /cargo
+      volumes:
+        - name: cargo-home
+          persistentVolumeClaim:
+            claimName: cargo-home
