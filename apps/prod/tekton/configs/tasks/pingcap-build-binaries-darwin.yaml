@@ -131,7 +131,6 @@ spec:
         # 4. optional set for rust
         echo 'export CARGO_NET_GIT_FETCH_WITH_CLI=true' >> /workspace/remote.env
         echo 'export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static' >> /workspace/remote.env
-
     - name: build
       image: ghcr.io/pingcap-qe/cd/utils/remote:v20231216-51-g3bb25fd
       env:
@@ -175,6 +174,10 @@ spec:
         # 2.1 create a randon workspace dir in the remote host:
         remote_workspace_dir="${workspace_base_dir}/$(context.taskRun.name)"
         ssh ${username}@${host} "mkdir -p '$remote_workspace_dir'"
+        # trap the timeout and error signal and clean the workspace dir.
+        # This ensures that the workspace directory is always cleaned up, 
+        # even if the task fails or times out or exits normally.
+        trap "ssh ${username}@${host} rm -rf '$remote_workspace_dir'" EXIT TERM KILL
 
         # 2.2 copy the build shell to the remote host by ssh.
         scp "$script" /workspace/remote.env ${username}@${host}:"$remote_workspace_dir/"
@@ -192,9 +195,6 @@ spec:
 
         # 2.5 copy the artifacts from the mac hosts to the workspace `source`, we need deliver them internal firstly.
         scp -r ${username}@${host}:"$remote_workspace_source_path/$(params.release-dir)" ./
-
-        # 3. clean the workspace dir(it will be a random name) on the ssh mac host.
-        ssh ${username}@${host} "rm -rf '$remote_workspace_dir'"
     - name: publish
       image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       workingDir: $(workspaces.source.path)/$(params.component)
