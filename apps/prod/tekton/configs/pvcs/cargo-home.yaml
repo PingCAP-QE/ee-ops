@@ -21,11 +21,11 @@ spec:
     spec:
       restartPolicy: Never
       containers:
-        - name: add-cargo-config-with-git-type-mirror
+        - name: add-cargo-config
           image: busybox:1.36.1
           env:
             - name: CRATES_IO_REGISTRY_MIRROR
-              value: "https://mirrors.tuna.tsinghua.edu.cn/git/crates.io-index.git"
+              value: "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
           command:
             - /bin/sh
             - -c
