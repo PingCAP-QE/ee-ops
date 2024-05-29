@@ -34,17 +34,16 @@ spec:
             secret:
               secretName: tiup-credentials-staging
         podTemplate:
-          spec:
-            affinity:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: "tekton.dev/task"
-                          operator: In
-                          values:
-                            - publish-tiup-from-oci-artifact
-                    topologyKey: "kubernetes.io/hostname"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: "tekton.dev/task"
+                        operator: In
+                        values:
+                          - publish-tiup-from-oci-artifact
+                  topologyKey: "kubernetes.io/hostname"
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
       metadata:
@@ -70,17 +69,16 @@ spec:
             secret:
               secretName: tiup-credentials-prod
         podTemplate:
-          spec:
-            affinity:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: "tekton.dev/task"
-                          operator: In
-                          values:
-                            - publish-tiup-from-oci-artifact
-                    topologyKey: "kubernetes.io/hostname"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: "tekton.dev/task"
+                        operator: In
+                        values:
+                          - publish-tiup-from-oci-artifact
+                  topologyKey: "kubernetes.io/hostname"
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
@@ -116,17 +114,16 @@ spec:
             secret:
               secretName: tiup-credentials-staging
         podTemplate:
-          spec:
-            affinity:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: "tekton.dev/task"
-                          operator: In
-                          values:
-                            - publish-tiup-from-oci-artifact
-                    topologyKey: "kubernetes.io/hostname"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: "tekton.dev/task"
+                        operator: In
+                        values:
+                          - publish-tiup-from-oci-artifact
+                  topologyKey: "kubernetes.io/hostname"
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
@@ -162,17 +159,16 @@ spec:
             secret:
               secretName: tiup-credentials-staging
         podTemplate:
-          spec:
-            affinity:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: "tekton.dev/task"
-                          operator: In
-                          values:
-                            - publish-tiup-from-oci-artifact
-                    topologyKey: "kubernetes.io/hostname"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: "tekton.dev/task"
+                        operator: In
+                        values:
+                          - publish-tiup-from-oci-artifact
+                  topologyKey: "kubernetes.io/hostname"
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
       metadata:
@@ -196,14 +192,13 @@ spec:
             secret:
               secretName: tiup-credentials-prod
         podTemplate:
-          spec:
-            affinity:
-              podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: "tekton.dev/task"
-                          operator: In
-                          values:
-                            - publish-tiup-from-oci-artifact
-                    topologyKey: "kubernetes.io/hostname"
+          affinity:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: "tekton.dev/task"
+                        operator: In
+                        values:
+                          - publish-tiup-from-oci-artifact
+                  topologyKey: "kubernetes.io/hostname"
