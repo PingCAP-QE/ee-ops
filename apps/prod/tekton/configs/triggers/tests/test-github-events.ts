@@ -9,7 +9,7 @@ interface Payload {
   ref_type: string;
   repository: {
     name: string;
-    full_name?: string;
+    full_name: string;
     clone_url: string;
     owner: {
       login: string;
@@ -39,6 +39,7 @@ async function generatePushEventPayload(
   return {
     before: "0000000000000000000000000000000000000000",
     after: await getCommitSha(owner, repoName!, ref),
+    ref,
     repository: {
       name: repoName!,
       full_name: `${owner}/${repoName}`,
