@@ -13,6 +13,8 @@ spec:
       kind: TaskRun
       metadata:
         generateName: publish-tiup-from-oci-artifact-staging-
+        labels:
+          server: staging
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact
@@ -41,13 +43,17 @@ spec:
                     matchExpressions:
                       - key: "tekton.dev/task"
                         operator: In
-                        values:
-                          - publish-tiup-from-oci-artifact
+                        values: [publish-tiup-from-oci-artifact]
+                      - key: server
+                        operator: In
+                        values: [staging]
                   topologyKey: "kubernetes.io/hostname"
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
       metadata:
         generateName: publish-tiup-from-oci-artifact-prod-
+        labels:
+          server: prod
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact
@@ -76,8 +82,10 @@ spec:
                     matchExpressions:
                       - key: "tekton.dev/task"
                         operator: In
-                        values:
-                          - publish-tiup-from-oci-artifact
+                        values: [publish-tiup-from-oci-artifact]
+                      - key: server
+                        operator: In
+                        values: [prod]
                   topologyKey: "kubernetes.io/hostname"
 ---
 apiVersion: triggers.tekton.dev/v1beta1
@@ -95,6 +103,8 @@ spec:
       kind: TaskRun
       metadata:
         generateName: publish-tiup-from-oci-artifact-staging-
+        labels:
+          server: staging
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact
@@ -121,8 +131,10 @@ spec:
                     matchExpressions:
                       - key: "tekton.dev/task"
                         operator: In
-                        values:
-                          - publish-tiup-from-oci-artifact
+                        values: [publish-tiup-from-oci-artifact]
+                      - key: server
+                        operator: In
+                        values: [staging]
                   topologyKey: "kubernetes.io/hostname"
 ---
 apiVersion: triggers.tekton.dev/v1beta1
@@ -140,6 +152,8 @@ spec:
       kind: TaskRun
       metadata:
         generateName: publish-tiup-from-oci-artifact-staging-
+        labels:
+          server: staging
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact
@@ -166,13 +180,17 @@ spec:
                     matchExpressions:
                       - key: "tekton.dev/task"
                         operator: In
-                        values:
-                          - publish-tiup-from-oci-artifact
+                        values: [publish-tiup-from-oci-artifact]
+                      - key: server
+                        operator: In
+                        values: [staging]
                   topologyKey: "kubernetes.io/hostname"
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
       metadata:
         generateName: publish-tiup-from-oci-artifact-prod-
+        labels:
+          server: prod
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact
@@ -199,6 +217,8 @@ spec:
                     matchExpressions:
                       - key: "tekton.dev/task"
                         operator: In
-                        values:
-                          - publish-tiup-from-oci-artifact
+                        values: [publish-tiup-from-oci-artifact]
+                      - key: server
+                        operator: In
+                        values: [prod]
                   topologyKey: "kubernetes.io/hostname"
