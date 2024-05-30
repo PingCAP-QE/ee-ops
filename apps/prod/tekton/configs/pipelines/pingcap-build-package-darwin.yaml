@@ -169,6 +169,7 @@ spec:
       taskRef:
         name: boskos-release
       timeout: 5m0s
+      retries: 1
       params:
         - name: server-url
           value: http://boskos.apps.svc
