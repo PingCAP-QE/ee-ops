@@ -33,10 +33,12 @@ spec:
         # limit the nightly publish
         if [ "$(workspaces.lock-tiup.bound)" == "true" ] ; then
           if [ "$(params.nightly)" == "true" ]; then
-            to_match_record="$(params.artifact-url) => $(date +%Y%m%d)"
-            if grep "$to_match_record" $(workspaces.lock-tiup.path)/nigtly-records; then
-              echo "nightly have published today, skip the rest publish today."
-              exit 0
+            if [ "$(params.tiup-mirror)" == "http://tiup.pingcap.net:8987" ]; then
+              to_match_record="$(params.artifact-url) => $(date +%Y%m%d)"
+              if grep "$to_match_record" $(workspaces.lock-tiup.path)/nigtly-records; then
+                echo "nightly have published today, skip the rest publish today to save cash."
+                exit 0
+              fi
             fi
           fi
         fi
