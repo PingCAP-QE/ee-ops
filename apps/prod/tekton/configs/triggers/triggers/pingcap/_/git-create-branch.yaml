@@ -6,33 +6,25 @@ metadata:
     type: github-branch-create
 spec:
   interceptors:
-    - name: filter on repo owner and name
+    - name: filter on repo and branches
       ref:
         name: cel
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name in [
-              'tidb',
-              'tiflash',
-              'tiflow',
-              'tidb-binlog',
-              'tidb-dashboard',
-              'tidb-tools'
+            body.repository.full_name in [
+            'pingcap/tidb',
+            'pingcap/tiflash',
+            'pingcap/tiflow',
+            'pingcap/tidb-binlog',
+            'pingcap/tidb-dashboard',
+            'pingcap/tidb-tools',
+            'tikv/tikv',
+            'tikv/pd',
             ]
-    # filter git refs that match regexp: ^release-\d+\.\d+-\d+-v\d+\.\d+\.\d+$
-    # example values of `body.ref`:
-    #   release-6.5-20231020-v6.5.5
-    #   release-6.5-20231020-v6.5.5-1
-    # regular use re2: https://github.com/google/re2/wiki/Syntax
-    - name: filter on branch names
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            &&
             body.ref.matches('^release-[0-9]+[.][0-9]+-[0-9]+-v[0-9]+[.][0-9]+[.][0-9]+(-.+)?$')
-            
+
   bindings:
     - ref: github-branch-create
   template:
@@ -52,9 +44,12 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap'
-            &&
-            body.repository.name in ['monitoring', 'ng-monitoring', 'tidb-binlog', 'tidb-dashboard']
+            body.repository.full_name in [
+            'pingcap/monitoring',
+            'pingcap/ng-monitoring',
+            'pingcap/tidb-binlog',
+            'pingcap/tidb-dashboard',
+            ]
             &&
             body.ref.matches('^release-[0-9]+[.][0-9]+$')
   bindings:

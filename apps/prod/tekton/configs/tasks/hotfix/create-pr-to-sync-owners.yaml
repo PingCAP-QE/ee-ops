@@ -38,21 +38,32 @@ spec:
         echo "owner=${owner}"
         echo "repo=${repo}"
 
-        deno run --allow-all https://github.com/PingCAP-QE/ci/raw/main/scripts/pingcap/community/update-prow-owners.ts \
-          --force \
-          --owner=${owner} \
-          --github_private_token=$(cat /etc/github/token) \
-          --only_repo.repo=${repo} \
-          --only_repo.branch=$(params.branch) \
-          --inputs=teams/diagnostic/membership.json \
-          --inputs=teams/docs/membership.json \
-          --inputs=teams/tiunimanager/membership.json \
-          --inputs=teams/tidb/membership.json \
-          --inputs=teams/tiflash/membership.json \
-          --inputs=teams/tiup/membership.json \
-          --inputs=teams/kubernetes/membership.json \
-          --inputs=teams/migration/membership.json \
-          --inputs=teams/bigdata/membership.json
+        if [ "$owner" == "pingcap" ]; then
+          deno run --allow-all https://github.com/PingCAP-QE/ci/raw/main/scripts/pingcap/community/update-prow-owners.ts \
+            --force \
+            --owner=${owner} \
+            --github_private_token=$(cat /etc/github/token) \
+            --only_repo.repo=${repo} \
+            --only_repo.branch=$(params.branch) \
+            --inputs=teams/diagnostic/membership.json \
+            --inputs=teams/docs/membership.json \
+            --inputs=teams/tiunimanager/membership.json \
+            --inputs=teams/tidb/membership.json \
+            --inputs=teams/tiflash/membership.json \
+            --inputs=teams/tiup/membership.json \
+            --inputs=teams/kubernetes/membership.json \
+            --inputs=teams/migration/membership.json \
+            --inputs=teams/bigdata/membership.json
+        elif [ "$owner" == "tikv" ]; then
+          deno run --allow-all https://github.com/PingCAP-QE/ci/raw/main/scripts/pingcap/community/update-prow-owners.ts \
+            --force \
+            --owner=${owner} \
+            --github_private_token=$(cat /etc/github/token) \
+            --only_repo.repo=${repo} \
+            --only_repo.branch=$(params.branch) \
+            --inputs=teams/pd/team.json \
+            --inputs=teams/tikv/team.json
+        fi
   workspaces:
     - name: github
       description: Must includes a key `token`
