@@ -14,7 +14,7 @@ spec:
   prune: true
   postBuild:
     substitute:
-      DOMAIN_NAME: hub-mig.pingcap.net
+      DOMAIN_NAME: hub-mig2.pingcap.net
       KS3_REGION: BEIJING
       KS3_REGION_ENDPOINT: ks3-cn-beijing-internal.ksyuncs.com
     substituteFrom:
