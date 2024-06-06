@@ -85,10 +85,13 @@ spec:
             pingcap/tiflow
             pingcap/tidb
             pingcap/tidb-binlog
+            pingcap/tidb-engine-ext
             pingcap/docs
             pingcap/docs-cn
             pingcap/docs-tidb-operator
             pingcap-inc/tiflash-scripts
+            tikv/pd
+            tikv/tikv
     pcm:
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
