@@ -71,7 +71,7 @@ spec:
         cargo set-version --package tikv $(cat /workspace/inner-results-version)
         if git diff --exit-code --name-status Cargo.toml; then
           echo "🤷 No need to update the go.mod file, they are updated."
-          exit 1      
+          exit 1
         fi
     - name: create-pr
       image: bitnami/git:2.43.0
@@ -117,11 +117,11 @@ spec:
         EOF
 
         base_branch="$(cat /workspace/inner-results-branch)"
-        label_options="--label status/can-merge"
+        label_options="--label lgtm --label approved"
         if [ "$base_branch" != "master" ]; then
           label_options="$label_options --label cherry-pick-approved"
         fi
-        
+
         gh pr create -B "$base_branch" -H "$head_branch" -t "$commit_msg" -F pr_body.txt $label_options
   workspaces:
     - name: github
