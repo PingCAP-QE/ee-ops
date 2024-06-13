@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: ko-build-test-infra
+  name: ko-build-prow
 spec:
   workspaces:
     - name: git-source
@@ -39,7 +39,7 @@ spec:
       runAfter:
         - fetch-from-git
       taskRef:
-        name: ko-test-infra
+        name: ko-prow
       params:
         - name: REGISTRY
           value: "$(params.REGISTRY)"

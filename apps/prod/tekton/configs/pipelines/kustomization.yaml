@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: ee-cd
 resources:
   - kaniko-build.yaml
-  - ko-build-test-infra.yaml
+  - ko-build-prow.yaml
   - pingcap-build-package.yaml
   - pingcap-build-package-darwin.yaml
   - pingcap-release-ga.yaml
