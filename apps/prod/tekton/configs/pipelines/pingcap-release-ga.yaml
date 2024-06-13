@@ -62,7 +62,7 @@ spec:
           - name: wait
             image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
             workingDir: /workspace
-            timeout: 30m0s
+            timeout: 1h0s
             script: |
               #! /usr/bin/env bash
               set -exo pipefail
