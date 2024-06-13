@@ -1,14 +1,14 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: ko-test-infra
+  name: ko-prow
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
     tekton.dev/pipelines.minVersion: "0.17.0"
     tekton.dev/categories: Image Build
     tekton.dev/tags: image-build
-    tekton.dev/displayName: "Build and upload container image for test-infra"
+    tekton.dev/displayName: "Build and upload container image for prow"
     tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
   description: >-
