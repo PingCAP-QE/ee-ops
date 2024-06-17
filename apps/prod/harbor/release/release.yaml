@@ -49,6 +49,7 @@ spec:
           region: ${KS3_REGION}
           regionendpoint: ${KS3_REGION_ENDPOINT}
           rootdirectory: harbor
+          chunksize: "5242880"
       persistentVolumeClaim:
         jobservice:
           size: 30Gi
