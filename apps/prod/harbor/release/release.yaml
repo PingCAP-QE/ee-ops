@@ -55,15 +55,12 @@ spec:
           size: 30Gi
         trivy:
           size: 5Gi
-    exposureType: ingress
-    ingress:
-      core:
-        annotations:
-          ingress.kubernetes.io/ssl-redirect: "false"
-          nginx.ingress.kubernetes.io/ssl-redirect: "false"
-        hostname: ${DOMAIN_NAME}
-        ingressClassName: nginx
-        pathType: ImplementationSpecific
+    exposureType: proxy
+    servivce:
+      type: NodePort
+      nodePorts:
+        http: 31080
+        https: 31443
     core:
       resources:
         limits:
