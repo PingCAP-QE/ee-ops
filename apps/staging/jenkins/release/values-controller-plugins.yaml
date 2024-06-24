@@ -49,7 +49,7 @@ controller:
     - artifactId: pipeline-utility-steps
       source:
         # renovate: datasource=jenkins-plugins depName=pipeline-utility-steps
-        version: 2.16.0
+        version: 2.17.0
     - artifactId: http_request
       source:
         # renovate: datasource=jenkins-plugins depName=http_request
