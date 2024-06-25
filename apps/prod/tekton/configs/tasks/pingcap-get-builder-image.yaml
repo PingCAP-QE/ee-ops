@@ -3,7 +3,7 @@ kind: Task
 metadata:
   name: pingcap-get-builder-image
   labels:
-    app.kubernetes.io/version: "0.1"
+    app.kubernetes.io/version: "0.2"
   annotations:
     tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
@@ -28,10 +28,22 @@ spec:
       default: release
       description: >
         supports: 'release' or 'failpoint' or others.
+    - name: force-builder-image
+      type: string
+      description: >
+        force to use a specific builder image, it will be used as the base
+        image for building binaries.
+      default: ""
   steps:
     - name: get
       image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
       script: |
+        if [ -n "$(params.force-builder-image)" ]; then
+          echo "use force builder image: $(params.force-builder-image)"
+          printf "%s" "$(params.force-builder-image)" > $(results.image-url.path)
+          exit 0
+        fi
+
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
         out="/workspace/builder-package-artifacts.txt"
