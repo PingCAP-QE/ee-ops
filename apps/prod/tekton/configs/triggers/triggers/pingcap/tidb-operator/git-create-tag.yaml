@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: tag-create-pingcap-advanced-statefulset
+  name: tag-create-pingcap-operator
   labels:
     type: github-tag-create
     github-owner: pingcap
-    github-repo: advanced-statefulset
+    github-repo: operator
 spec:
   interceptors:
     - name: filter on repo owner and name and tags
@@ -14,7 +14,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.full_name == 'pingcap/advanced-statefulset'
+            body.repository.full_name == 'pingcap/tidb-operator'
             &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
   bindings:
