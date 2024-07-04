@@ -8,19 +8,14 @@ metadata:
     github-repo: tidb-operator
 spec:
   interceptors:
-    - name: filter on repo owner and name
+    - name: filter on repo and branches
       ref:
         name: cel
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.full_name == 'pingcap/tidb-operator'
-    - name: filter on branches
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.full_name == 'pingcap/tidb-operator'
+            &&
             body.ref.matches('^refs/heads/(master|release-.*)$')
   bindings:
     - ref: github-branch-push
