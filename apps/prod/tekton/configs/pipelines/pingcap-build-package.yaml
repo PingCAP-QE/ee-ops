@@ -126,9 +126,6 @@ spec:
           value: "$(tasks.get-release-ver.results.version)"
         - name: force-builder-image
           value: "$(params.force-builder-image)"
-    - name: acquire-mac-machine
-      runAfter:
-        - get-binaries-builder
     - name: build-binaries
       runAfter:
         - checkout-ext
