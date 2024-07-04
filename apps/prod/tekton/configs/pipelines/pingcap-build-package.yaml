@@ -42,7 +42,7 @@ spec:
     - name: force-builder-image
       description: > 
         The builder image to use for building binaries by force, if empty.
-        Defalt the task will complete one from config in artifacts.git repo.
+        Default the task will complete one from config in artifacts.git repo.
       type: string
       default: ""
   results:
