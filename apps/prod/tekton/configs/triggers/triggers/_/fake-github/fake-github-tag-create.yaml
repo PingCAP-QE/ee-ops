@@ -52,6 +52,11 @@ spec:
               'tikv/pd': '32Gi',
               'tikv/tikv': '64Gi',
               }[body.repository.full_name]
+          - key: custom-params
+            expression: >-
+              {                
+                'builder-image': header.canonical('ce-param-builder-image'),
+              }              
   bindings:
     - ref: github-tag-create
     - ref: ce-context
@@ -63,5 +68,6 @@ spec:
     - { name: builder-resources-cpu, value: $(extensions.builder-resources-cpu) }
     - { name: builder-resources-memory, value: $(extensions.builder-resources-memory) }
     - { name: registry, value: hub.pingcap.net/devbuild }
+    - { name: force-builder-image, value: $(extensions.custom-params.force-builder-image) }
   template:
     ref: build-component

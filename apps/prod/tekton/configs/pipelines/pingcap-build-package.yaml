@@ -39,6 +39,12 @@ spec:
     - name: registry
       description: the base OCI registry server for store artifacts, it can be set with prefix repo path.
       default: "hub.pingcap.net"
+    - name: force-builder-image
+      description: > 
+        The builder image to use for building binaries by force, if empty.
+        Default the task will complete one from config in artifacts.git repo.
+      type: string
+      default: ""
   results:
     - name: pushed-binaries
       description: pushed binaries.
@@ -118,6 +124,8 @@ spec:
           value: "$(params.profile)"
         - name: version
           value: "$(tasks.get-release-ver.results.version)"
+        - name: force-builder-image
+          value: "$(params.force-builder-image)"
     - name: build-binaries
       runAfter:
         - checkout-ext
