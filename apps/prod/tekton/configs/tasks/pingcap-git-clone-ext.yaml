@@ -117,7 +117,7 @@ spec:
         # Get the URL of the origin remote of current workspace.
         origin_url=$(git remote get-url origin)
         # Check if the URL contains "pingcap/tidb"
-        if [[ $origin_url != *"pingcap/tidb"* ]]; then
+        if [[ $origin_url != *"pingcap/tidb.git" && $origin_url != *"pingcap/tidb" ]]; then
             echo "🏃 The repo is not 'pingcap/tidb', exit now."
             exit 0
         fi
