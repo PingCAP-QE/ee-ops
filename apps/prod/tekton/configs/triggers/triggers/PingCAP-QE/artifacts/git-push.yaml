@@ -48,7 +48,7 @@ spec:
 
                   wget "https://github.com/${org}/${repo}/archive/${branch}.zip" -O - | unzip -
 
-                  ks3util sync "${repo}-${branch}" ks3://ee-fileserver/download/raw.githubusercontent.com/${org}/${repo}/${branch}
+                  ks3util sync "${repo}-${branch}" ks3://ee-fileserver/download/raw.githubusercontent.com/${org}/${repo}/${branch} --delete -f
               - name: ARGS
                 value: []
             workspaces:
