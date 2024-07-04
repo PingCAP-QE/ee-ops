@@ -24,6 +24,9 @@ async function getCommitSha(
 ): Promise<string> {
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${ref}`;
   const response = await fetch(apiUrl);
+  if (!response.ok) {
+    throw new Error(`status: ${response.status}`);
+  }
   const commit = await response.json();
   return commit.sha;
 }
