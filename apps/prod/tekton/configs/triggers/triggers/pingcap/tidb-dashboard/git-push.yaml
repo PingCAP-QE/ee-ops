@@ -25,7 +25,7 @@ spec:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
-    - { name: timeout, value: 30m }
+    - { name: timeout, value: 40m }
     - { name: source-ws-size, value: 8Gi }
     - { name: builder-resources-memory, value: 4Gi }
     - { name: builder-resources-cpu, value: "2" }

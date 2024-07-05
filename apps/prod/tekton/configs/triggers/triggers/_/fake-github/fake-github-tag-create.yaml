@@ -19,10 +19,10 @@ spec:
           - key: timeout
             expression: >-
               {
-              'pingcap/tidb': '30m',
+              'pingcap/tidb': '40m',
               'pingcap/tiflash': '2h',
-              'pingcap/tiflow': '30m',
-              'tikv/pd': '30m',
+              'pingcap/tiflow': '40m',
+              'tikv/pd': '40m',
               'tikv/tikv': '2h30m',
               }[body.repository.full_name]
           - key: source-ws-size
