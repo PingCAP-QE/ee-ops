@@ -24,7 +24,7 @@ spec:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
-    - { name: timeout, value: 30m }
+    - { name: timeout, value: 40m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
     - { name: builder-resources-cpu, value: "8" }
@@ -58,7 +58,7 @@ spec:
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: enterprise }
-    - { name: timeout, value: 30m }
+    - { name: timeout, value: 40m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
     - { name: builder-resources-cpu, value: "8" }
@@ -95,7 +95,7 @@ spec:
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: failpoint }
-    - { name: timeout, value: 30m }
+    - { name: timeout, value: 40m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
     - { name: builder-resources-cpu, value: "8" }
