@@ -36,7 +36,7 @@ spec:
       default: ""
   steps:
     - name: get
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
       script: |
         if [ -n "$(params.force-builder-image)" ]; then
           echo "use force builder image: $(params.force-builder-image)"
