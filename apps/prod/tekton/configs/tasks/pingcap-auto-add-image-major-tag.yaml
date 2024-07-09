@@ -11,7 +11,7 @@ spec:
     - name: image_url
       description: The image full url for pull
   stepTemplate:
-    image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+    image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
   steps:
     - name: add-nightly-tag
       script: |

@@ -28,7 +28,7 @@ spec:
           - name: ga-version
         steps:
           - name: run
-            image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
+            image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
             script: |
               #! /usr/bin/env bash
               set -ex
@@ -60,7 +60,7 @@ spec:
             default: "v1.14.1"
         steps:
           - name: wait
-            image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
+            image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
             workingDir: /workspace
             timeout: 1h0s
             script: |

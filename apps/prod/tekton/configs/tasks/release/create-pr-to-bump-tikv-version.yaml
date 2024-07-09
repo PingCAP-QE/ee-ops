@@ -25,7 +25,7 @@ spec:
       default: "0.12.2"
   steps:
     - name: analyse
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-101-ge3815f8
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
       script: |
         #!/bin/bash
 

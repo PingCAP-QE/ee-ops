@@ -21,7 +21,7 @@ spec:
       default: http://tiup.pingcap.net:8988
   steps:
     - name: analyse
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-14-gdd4a4cf
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
       workingDir: /workspace
       env:
         - name: CACHE_READ_SERVER_BASE_URL
@@ -61,7 +61,7 @@ spec:
         echo "✅ Done, the generated script content:"
         cat publish.sh
     - name: publish
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-14-gdd4a4cf
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
       workingDir: /workspace
       script: |
         #! /usr/bin/env bash

@@ -44,7 +44,7 @@ spec:
       default: hub.pingcap.net
   steps:
     - name: generate
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -102,7 +102,7 @@ spec:
           "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path)
         fi
     - name: add-more-tags
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20231216-37-g8e0ca7e
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
       script: |
         script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then
