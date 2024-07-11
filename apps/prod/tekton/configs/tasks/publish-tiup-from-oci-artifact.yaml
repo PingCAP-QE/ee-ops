@@ -56,7 +56,7 @@ spec:
         fi
 
         # download the artifact
-        oras pull $(params.artifact-url)
+        oras pull --concurrency 1 $(params.artifact-url)
 
         echo "✅ Done, the generated script content:"
         cat publish.sh
