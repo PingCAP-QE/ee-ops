@@ -43,21 +43,15 @@ spec:
               # force add the tag on repos:
               # ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry" true
               ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry"
-
     - name: wait-tiup-delivery
       runAfter:
         - "ga-tag-oci-artifacts"
       params:
-        - name: rc-version
-          value: "$(params.version)-pre"
-        - name: ga-version
+        - name: version
           value: $(params.version)
       taskSpec:
         params:
-          - name: rc-version
-          - name: ga-version
-          - name: tiup-tool-version
-            default: "v1.14.1"
+          - name: version
         steps:
           - name: wait
             image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
@@ -67,18 +61,7 @@ spec:
               #! /usr/bin/env bash
               set -exo pipefail
 
-              # install tiup tool.
-              TIUP_HOME=~/.tiup
-              bin_dir=$TIUP_HOME/bin
-              mkdir -vp "$bin_dir"
-              ARCH=$([ "$(arch)" = "x86_64" ] && echo amd64 || echo arm64)
-              download_url=https://tiup-mirrors.pingcap.com/tiup-$(params.tiup-tool-version)-linux-${ARCH}.tar.gz
-              wget -q -O - "$download_url" | tar -zxvf - -C "$bin_dir"
-              chmod 755 "$bin_dir/tiup"
-              export PATH=$bin_dir:$PATH
-              which tiup
-
-              tiup_check_ver="$(params.ga-version)"
+              tiup_check_ver="$(params.version)"
               tiup_mirror="http://tiup.pingcap.net:8987"
               oci_registry="hub.pingcap.net"
 
@@ -101,6 +84,21 @@ spec:
 
               cat results.yaml || true
 
+    - name: wait-image-delivery
+      runAfter:
+        - ga-tag-oci-artifacts
+      params:
+        - name: version
+          value: $(params.version)
+      taskSpec:
+        params:
+          - name: version
+        steps:
+          - name: wait
+            image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+            script: |
+              check_ver="$(params.version)"
+              echo "🤷 This step is not implement yet."
     - name: compose-offline-pkgs-amd64-community
       runAfter: [wait-tiup-delivery]
       taskRef: { name: pingcap-compose-offline-pkgs }
