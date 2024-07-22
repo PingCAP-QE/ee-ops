@@ -38,7 +38,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/dl
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
-      tag: v20240228-25-g1214fb5
+      tag: v20240228-70-g599d9c5
     server:
       args: [--ks3-config=/config/ks3.yaml]
       volumeMounts:
