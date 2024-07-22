@@ -24,6 +24,7 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+
   test:
     enable: true
     ignoreFailures: false
@@ -59,3 +60,6 @@ spec:
           paths:
             - path: /dl(/|$)(.*)
               pathType: Prefix
+    serviceAccount:
+      create: false
+      name: dl-reg-downloader
