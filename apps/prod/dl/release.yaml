@@ -38,9 +38,9 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/dl
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
-      tag: v20240228-70-g599d9c5
+      tag: v20240228-71-g6dcfc9c
     server:
-      args: [--ks3-config=/config/ks3.yaml]
+      args: [--ks3-config=/config/ks3.yaml, --oci-config=/config/oci.yaml]
       volumeMounts:
         - name: config
           mountPath: /config
