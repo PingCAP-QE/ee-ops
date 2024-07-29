@@ -18,7 +18,7 @@ spec:
             &&
             body.repository.name == 'tiflash'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
   bindings:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
@@ -50,7 +50,7 @@ spec:
             &&
             body.repository.name == 'tiflash'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
   bindings:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
