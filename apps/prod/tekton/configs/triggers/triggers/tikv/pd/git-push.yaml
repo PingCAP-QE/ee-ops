@@ -18,7 +18,7 @@ spec:
             &&
             body.repository.name == 'pd'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
 
   bindings:
     - ref: github-branch-push
@@ -51,7 +51,7 @@ spec:
             &&
             body.repository.name == 'pd'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
 
   bindings:
     - ref: github-branch-push
@@ -88,7 +88,7 @@ spec:
             &&
             body.repository.name == 'pd'
             &&
-            body.ref.matches('^refs/heads/(master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
 
   bindings:
     - ref: github-branch-push
