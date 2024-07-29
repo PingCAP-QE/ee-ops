@@ -20,7 +20,7 @@ spec:
             &&
             body.repository.name == 'tidb-tools'
             &&
-            body.ref.matches('^refs/heads/(main|master|release-[7-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(main|master|release-[6-9][.][0-9]+)$')
 
   bindings:
     - ref: github-branch-push
