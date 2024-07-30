@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka-opeator
+  annotations:
+    scheduler.alpha.kubernetes.io/defaultTolerations:
+      '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated",
+      "value": "test-infra"}]'
+    scheduler.alpha.kubernetes.io/node-selector: enable-ci=true
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kafka
+  annotations:
+    scheduler.alpha.kubernetes.io/defaultTolerations:
+      '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated",
+      "value": "test-infra"}]'
+    scheduler.alpha.kubernetes.io/node-selector: enable-ci=true
