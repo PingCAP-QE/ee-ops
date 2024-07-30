@@ -1,5 +1,0 @@
-namespace: apps
-resources:
-  - https://github.com/triggermesh/triggermesh/releases/download/v1.27.0/triggermesh-crds.yaml
-  # Download from: https://github.com/triggermesh/triggermesh/releases/download/v1.27.0/triggermesh.yaml, and we delete the namespace resource.
-  - triggermesh.yaml
