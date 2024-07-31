@@ -56,7 +56,9 @@ spec:
         fi
 
         # download the artifact
-        oras pull --concurrency 1 $(params.artifact-url)
+        artifact_url="$(params.artifact-url)"
+        # replace hub.pingcap.net to hub-mig.pingcap.net in for traffic sharing.
+        oras pull "${artifact_url/hub.pingcap.net/hub-mig.pingcap.net}"
 
         echo "✅ Done, the generated script content:"
         cat publish.sh
