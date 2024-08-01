@@ -81,15 +81,16 @@ spec:
       additionalEnv:
         - name: STICKY_REPOS
           value: >-
-            pingcap/tiflash
-            pingcap/tiflow
-            pingcap/tidb
-            pingcap/tidb-binlog
-            pingcap/tidb-engine-ext
+            pingcap-inc/tiflash-scripts
             pingcap/docs
             pingcap/docs-cn
             pingcap/docs-tidb-operator
-            pingcap-inc/tiflash-scripts
+            pingcap/tidb
+            pingcap/tidb-binlog
+            pingcap/tidb-engine-ext
+            pingcap/tidb-tools
+            pingcap/tiflash
+            pingcap/tiflow
             tikv/pd
             tikv/tikv
     pcm:
