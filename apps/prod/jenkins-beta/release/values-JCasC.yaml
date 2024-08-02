@@ -39,7 +39,6 @@ controller:
     - { name: docs-cn, keyName: qiniu-sk }
     - { name: docs-cn, keyName: qiniu-bn }
 
-
   additionalSecrets: []
   #  - name: nameOfSecret
   #    value: secretText
@@ -254,7 +253,7 @@ controller:
           gitHubConfiguration:
             apiRateLimitChecker: ThrottleOnOver
           gitHubPluginConfig:
-            hookUrl: "http://internal.do.pingcap.net:30080/jenkins/github-webhook/"
+            hookUrl: "https://internal-do.pingcap.net/jenkins-beta/github-webhook/"
       pipeline-cache: |
         unclassified:
           pipeline-cache:
