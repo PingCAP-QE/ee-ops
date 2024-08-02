@@ -8,10 +8,11 @@ spec:
   targetNamespace: apps
   chart:
     spec:
-      chart: ./charts/jenkins
+      chart: jenkins
+      version: 5.0.13
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: jenkins
         namespace: flux-system
   interval: 1h0m0s
   timeout: 15m
