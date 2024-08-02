@@ -1,9 +1,7 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  image:
-    registry: "docker.io"
-    repository: "jenkins/jenkins"
-    tag: "2.426.3-jdk17"
+  image: "hub.pingcap.net/jenkins/jenkins-with-plugins"
+  tag: "2.426.3-lts-jdk11"
   resources:
     requests:
       cpu: "16"
@@ -35,21 +33,7 @@ controller:
     -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
     -XX:+UnlockDiagnosticVMOptions
     -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
-
-  # Optionally specify additional init-containers
-  customInitContainers:
-    - name: init-create-logs-dir
-      image: "alpine:3.20.2"
-      imagePullPolicy: Always
-      command: ["mkdir", "-p", "/var/jenkins_home/logs"]
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        runAsGroup: 1000
-        runAsUser: 1000
-      volumeMounts:
-        - mountPath: /var/jenkins_home
-          name: jenkins-home
+  
 
   # jenkinsOpts: ""
   # If you are using the ingress definitions provided by this chart via the `controller.ingress` block the configured hostname will be the ingress hostname starting with `https://` or `http://` depending on the `tls` configuration.
@@ -64,20 +48,32 @@ controller:
 
   ingress:
     enabled: true
+    # Override for the default paths that map requests to the backend
+    paths: []
+    # - backend:
+    #     serviceName: ssl-redirect
+    #     servicePort: use-annotation
+    # - backend:
+    #     serviceName: >-
+    #       {{ template "jenkins.fullname" . }}
+    #     # Don't use string here, use only integer value!
+    #     servicePort: 8080
+    # For Kubernetes v1.14+, use 'networking.k8s.io/v1beta1'
+    # For Kubernetes v1.19+, use 'networking.k8s.io/v1'
     apiVersion: networking.k8s.io/v1
+    kubernetes.io/ingress.class: nginx
     kubernetes.io/tls-acme: "true"
+    # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
+    # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     ingressClassName: nginx
+    # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
     path: "/jenkins"
     # configures the hostname e.g. jenkins.example.com
     hostName: do.pingcap.net
-  secondaryingress:
-    enabled: false
-    apiVersion: networking.k8s.io/v1
-    kubernetes.io/tls-acme: "true"
-    ingressClassName: nginx
-    path: "/jenkins"
-    # configures the hostname e.g. jenkins.example.com
-    hostName: internal-do.pingcap.net
+    tls:
+    # - secretName: jenkins.cluster.local
+    #   hosts:
+    #     - jenkins.cluster.local
 
   # Expose Prometheus metrics
   prometheus:
@@ -86,3 +82,16 @@ controller:
     enabled: true
     # Additional labels to add to the ServiceMonitor object
     serviceMonitorAdditionalLabels: { release: kps }
+    # Set a custom namespace where to deploy ServiceMonitor resource
+    # serviceMonitorNamespace: monitoring
+    scrapeInterval: 60s
+    # This is the default endpoint used by the prometheus plugin
+    scrapeEndpoint: /prometheus
+    # Additional labels to add to the PrometheusRule object
+    alertingRulesAdditionalLabels: {}
+    # An array of prometheus alerting rules
+    # See here: https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/
+    # The `groups` root object is added by default, simply add the rule entries
+    alertingrules: []
+    # Set a custom namespace where to deploy PrometheusRule resource
+    prometheusRuleNamespace: ""

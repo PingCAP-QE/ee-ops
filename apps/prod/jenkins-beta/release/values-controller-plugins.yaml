@@ -17,7 +17,7 @@ controller:
     - workflow-aggregator:596.v8c21c963d92d
     - git:5.2.1
     - configuration-as-code:1810.v9b_c30a_249a_4c
-
+  
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
