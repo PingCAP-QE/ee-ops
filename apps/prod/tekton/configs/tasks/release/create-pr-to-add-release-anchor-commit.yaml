@@ -74,7 +74,7 @@ spec:
           exit 1
         fi
     - name: create-pull-request
-      image: denoland/deno:1.42.1
+      image: denoland/deno:1.45.5
       script: |
         owner=$(basename $(dirname $(params.git-url)))
         repo=$(basename $(params.git-url) .git)
