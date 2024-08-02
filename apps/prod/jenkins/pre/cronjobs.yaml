@@ -12,7 +12,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: deno
-              image: "denoland/deno:1.42.1"
+              image: "denoland/deno:1.45.5"
               tty: true
               args:
                 - run
