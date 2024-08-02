@@ -59,7 +59,7 @@ controller:
   # jenkinsUrl: ""
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
   jenkinsUriPrefix: /jenkins-beta
-  jenkinsUrl: http://internal-do.pingcap.net/jenkins-beta
+  jenkinsUrl: https://internal-do.pingcap.net/jenkins-beta
   jenkinsAdminEmail: lifu.wu@pingcap.net
 
   ingress:

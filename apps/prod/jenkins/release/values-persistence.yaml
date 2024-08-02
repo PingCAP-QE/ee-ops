@@ -14,14 +14,4 @@ persistence:
   #   GKE, AWS & OpenStack)
   #
   storageClass: ceph-block
-  annotations: {}
-  labels: {}
-  accessMode: "ReadWriteOnce"
   size: "600Gi"
-  volumes:
-  #  - name: nothing
-  #    emptyDir: {}
-  mounts:
-  #  - mountPath: /var/nothing
-  #    name: nothing
-  #    readOnly: true
