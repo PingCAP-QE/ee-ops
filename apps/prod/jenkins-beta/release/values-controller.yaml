@@ -37,7 +37,7 @@ controller:
   # Optionally specify additional init-containers
   customInitContainers:
     - name: init-create-logs-dir
-      image: "alpine:3.18.3"
+      image: "alpine:3.20.2"
       imagePullPolicy: Always
       command: ["mkdir", "-p", "/var/jenkins_home/logs"]
       securityContext:
@@ -56,8 +56,8 @@ controller:
   # If you are not using the provided ingress you can specify `controller.jenkinsUrl` to change the url definition.
   # jenkinsUrl: ""
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
-  jenkinsUriPrefix: /jenkins
-  jenkinsUrl: http://internal.do.pingcap.net:30080/jenkins
+  jenkinsUriPrefix: /jenkins-beta
+  jenkinsUrl: http://internal-do.pingcap.net/jenkins-beta
   jenkinsAdminEmail: lifu.wu@pingcap.net
 
   ingress:
@@ -81,9 +81,9 @@ controller:
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
     ingressClassName: nginx
     # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
-    path: "/jenkins"
+    path: "/jenkins-beta"
     # configures the hostname e.g. jenkins.example.com
-    hostName: internal.do.pingcap.net
+    hostName: internal-do.pingcap.net
     tls:
     # - secretName: jenkins.cluster.local
     #   hosts:
