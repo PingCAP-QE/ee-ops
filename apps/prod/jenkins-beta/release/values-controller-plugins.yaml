@@ -11,8 +11,29 @@ controller:
     - name: JENKINS_UC_DOWNLOAD
       value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
-  # all plugins are installed in the image already
-  installPlugins: false
+  installLatestPlugins: true
+  # List of plugins to install in addition to those listed in controller.installPlugins
+  additionalPlugins:
+    # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
+    # but without outer `plugin` key.
+    - kubernetes:4029.v5712230ccb_f8
+    - kubernetes-client-api:6.8.1-224.vd388fca_4db_3b_
+    - configuration-as-code:1763.vb_fe9c1b_83f7b
+    - prometheus:2.4.1
+    - blueocean:1.27.8
+    - job-dsl:1.87
+    - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
+    - pipeline-utility-steps:2.16.0
+    - http_request:1.18
+    - workflow-aggregator:596.v8c21c963d92d
+    - instance-identity:185.v303dc7c645f9
+    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
+    - ghprb:1.42.2
+    - generic-webhook-trigger:1.88.2
+    - ssh-agent:346.vda_a_c4f2c8e50
+    - cloud-events:1.0.0
+    - json-path-api:2.8.0-5.v07cb_a_1ca_738c
+  initializeOnce: true
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus

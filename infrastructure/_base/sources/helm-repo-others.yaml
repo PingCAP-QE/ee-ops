@@ -17,3 +17,12 @@ spec:
   interval: 24h
   type: oci
   url: oci://quay.io/strimzi-helm
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: jenkins
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://charts.jenkins.io
