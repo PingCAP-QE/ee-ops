@@ -3,7 +3,7 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.426.3-lts-jdk11"
+    tag: "2.426.3-lts-jdk17"
   resources:
     requests:
       cpu: "16"
