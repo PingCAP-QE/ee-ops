@@ -12,30 +12,21 @@ controller:
       value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
   installLatestPlugins: false
-  installPlugins:
-    - kubernetes:4186.v1d804571d5d4
-    - workflow-aggregator:596.v8c21c963d92d
-    - git:5.2.1
-    - configuration-as-code:1810.v9b_c30a_249a_4c
 
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - kubernetes-client-api:6.10.0-240.v57880ce8b_0b_2
-    - prometheus:2.4.1
-    - blueocean:1.27.8
+    - prometheus:780.v7c50a_d288424
+    - blueocean:1.27.14
     - job-dsl:1.87
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - pipeline-utility-steps:2.16.0
+    - pipeline-utility-steps:2.17.0
     - http_request:1.18
-    - instance-identity:185.v303dc7c645f9
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
-    - ghprb:1.42.2
-    - generic-webhook-trigger:1.88.2
-    - ssh-agent:346.vda_a_c4f2c8e50
-    - cloudevents:1.0.0
-    - json-path-api:2.8.0-5.v07cb_a_1ca_738c
+    - generic-webhook-trigger:2.2.2
+    - ssh-agent:376.v8933585c69d3
+    - cdevents:1-40.vb_3d2c94f2379
   initializeOnce: true
 
   # for plugin build-failure-analyzer
