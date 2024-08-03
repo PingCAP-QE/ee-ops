@@ -226,11 +226,11 @@ controller:
       pipeline-cache: |
         unclassified:
           pipeline-cache:
-            region: ${jenkins-cache-region}
-            bucket: ${jenkins-cache-bucket}
-            endpoint: ${jenkins-cache-endpoint}
-            username: ${jenkins-cache-access-key}
-            password: ${jenkins-cache-access-secret}
+            region: ${jenkins-beta-cache-region}
+            bucket: ${jenkins-beta-cache-bucket}
+            endpoint: ${jenkins-beta-cache-endpoint}
+            username: ${jenkins-beta-cache-access-key}
+            password: ${jenkins-beta-cache-access-secret}
             threshold: 400000 # limit to 400GiB
       # for global env variables
       env-vars: |
