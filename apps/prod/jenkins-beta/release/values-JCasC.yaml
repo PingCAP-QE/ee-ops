@@ -217,37 +217,6 @@ controller:
               }
 
               queue('seed')
-      github-pull-request-builder-trigger: |
-        unclassified:
-          ghprbTrigger:
-            autoCloseFailedPullRequests: false
-            cron: "H/5 * * * *"
-            extensions:
-              - ghprbSimpleStatus:
-                  addTestResults: false
-                  completedStatus:
-                    - message: "Build passed"
-                      result: SUCCESS
-                    - message: "Build failed"
-                      result: FAILURE
-                    - message: "Build error"
-                      result: ERROR
-                  showMatrixStatus: false
-                  startedStatus: "Build started"
-                  triggeredStatus: "Build triggered"
-            githubAuth:
-              - credentialsId: github-bot-token
-                description: "ti-chi-bot"
-                secret: ""
-                serverAPIUrl: "https://api.github.com" # replace with github proxy.
-            manageWebhooks: true
-            okToTestPhrase: ".*ok\\W+to\\W+test.*"
-            requestForTestingPhrase: "Can one of the admins verify this patch?"
-            retestPhrase: ".*test\\W+this\\W+please.*"
-            skipBuildPhrase: ".*\\[skip\\W+ci\\].*"
-            useComments: false
-            useDetailedComments: false
-            whitelistPhrase: ".*add\\W+to\\W+whitelist.*"
       github-plugin-config: |
         unclassified:
           gitHubConfiguration:
