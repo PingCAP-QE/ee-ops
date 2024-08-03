@@ -3,7 +3,7 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.426.3-jdk17"
+    tag: "2.426.3-lts-jdk11"
   resources:
     requests:
       cpu: "16"
@@ -71,7 +71,7 @@ controller:
     # configures the hostname e.g. jenkins.example.com
     hostName: do.pingcap.net
   secondaryingress:
-    enabled: true
+    enabled: false
     apiVersion: networking.k8s.io/v1
     kubernetes.io/tls-acme: "true"
     ingressClassName: nginx
