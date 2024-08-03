@@ -18,6 +18,11 @@ controller:
     - { name: codecov-token, keyName: tiproxy}
     # for coveralls uploading
     - { name: coveralls-token, keyName: tiflow }
+
+    # for harbor
+    - { name: harbor, keyName: tiflow-engine-username }
+    - { name: harbor, keyName: tiflow-engine-password }
+
     # for ci cache, no need create manually.
     - { name: jenkins-cache, keyName: region }
     - { name: jenkins-cache, keyName: bucket }
@@ -26,9 +31,7 @@ controller:
     - { name: jenkins-cache, keyName: access-secret }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
     - { name: mongodb, keyName: mongodb-root-password }
-    # for harbor
-    - { name: harbor, keyName: tiflow-engine-username }
-    - { name: harbor, keyName: tiflow-engine-password }
+
     # for s3 upload
     - { name: docs-cn, keyName: aws-ak }
     - { name: docs-cn, keyName: aws-sk }
