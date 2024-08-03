@@ -11,7 +11,9 @@ controller:
     - name: JENKINS_UC_DOWNLOAD
       value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
+  overwritePlugins: true
   installLatestPlugins: false
+  initializeOnce: true
 
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
@@ -27,7 +29,6 @@ controller:
     - generic-webhook-trigger:2.2.2
     - ssh-agent:376.v8933585c69d3
     - cdevents:1-40.vb_3d2c94f2379
-  initializeOnce: true
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
