@@ -22,9 +22,9 @@ spec:
                 - --keep-size-g=1000
               envFrom:
                 - secretRef:
-                    name: ci-pipeline-cache
+                    name: ci-pipeline-cache2
                 - configMapRef:
-                    name: ci-pipeline-cache
+                    name: ci-pipeline-cache2
               resources:
                 requests:
                   memory: "128Mi"
