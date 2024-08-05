@@ -30,7 +30,7 @@ controller:
     - artifactId: configuration-as-code
       source:
         # renovate: datasource=jenkins-plugins depName=configuration-as-code
-        version: 1763.vb_fe9c1b_83f7b
+        version: 1836.vccda_4a_122a_a_e
     - artifactId: prometheus
       source:
         # renovate: datasource=jenkins-plugins depName=prometheus
