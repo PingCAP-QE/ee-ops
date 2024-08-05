@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: jenkins-tikv
+  annotations:
+    scheduler.alpha.kubernetes.io/defaultTolerations:
+      '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated",
+      "value": "test-infra"}]'
+    scheduler.alpha.kubernetes.io/node-selector: enable-ci=true,ci-nvme-high-performance=true
