@@ -18,7 +18,7 @@ controller:
     - artifactId: kubernetes
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes
-        version: 3845.va_9823979a_744
+        version: 4280.vd919fa_528c7e
     - artifactId: kubernetes-client-api
       source:
         # renovate: datasource=jenkins-plugins depName=kubernetes-client-api
