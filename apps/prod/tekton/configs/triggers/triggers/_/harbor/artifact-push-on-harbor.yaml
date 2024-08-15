@@ -17,6 +17,8 @@ spec:
             body.event_data.repository.repo_full_name.matches('/package(s)?')
             &&
             body.event_data.resources[0].tag.matches('^(master|main)_(darwin|linux)_(amd64|arm64)$')
+            &&
+            body.event_data.resources[0].resource_url.startsWith('hub.pingcap.net/')
   bindings:
     - ref: harbor-image-push
     - { name: nightly, value: "true" }
@@ -42,6 +44,8 @@ spec:
             body.event_data.repository.repo_full_name.matches('/package(s)?')
             &&
             body.event_data.resources[0].tag.matches('^(release-[0-9]+[.][0-9]+)_(linux|darwin)_(amd64|arm64)$')
+            &&
+            body.event_data.resources[0].resource_url.startsWith('hub.pingcap.net/')
   bindings:
     - ref: harbor-image-push
   template:
@@ -66,6 +70,8 @@ spec:
             body.event_data.repository.repo_full_name.matches('/package(s)?')
             &&
             body.event_data.resources[0].tag.matches('^v[0-9]+[.][0-9]+[.][0-9]+_(linux|darwin)_(amd64|arm64)$')
+            &&
+            body.event_data.resources[0].resource_url.startsWith('hub.pingcap.net/')
   bindings:
     - ref: harbor-image-push
   template:
