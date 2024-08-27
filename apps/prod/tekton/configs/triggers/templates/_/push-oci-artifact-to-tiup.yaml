@@ -157,6 +157,7 @@ spec:
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact
+        timeout: 2h
         params:
           - name: artifact-url
             value: "$(tt.params.image_url)"
@@ -194,6 +195,7 @@ spec:
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact
+        timeout: 2h
         params:
           - name: artifact-url
             value: "$(tt.params.image_url)"
