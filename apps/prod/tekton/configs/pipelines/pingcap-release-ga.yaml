@@ -14,6 +14,8 @@ spec:
     # TODO: why need to push dm offline pkgs to another bucket?
     - name: aws-secrets
       optional: true
+    - name: github
+      description: for creating github release
   tasks:
     - name: ga-tag-oci-artifacts
       params:
@@ -43,12 +45,18 @@ spec:
               # force add the tag on repos:
               # ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry" true
               ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry"
-    - name: wait-tiup-delivery
-      runAfter:
-        - "ga-tag-oci-artifacts"
+    - name: create-releases
+      runAfter: [ga-tag-oci-artifacts]
+      taskRef:
+        name: pingcap-create-github-releases
       params:
-        - name: version
-          value: $(params.version)
+        - { name: version, value: $(params.version) }
+      workspaces:
+        - { name: github,  workspace: github }
+    - name: wait-tiup-delivery
+      runAfter: [ga-tag-oci-artifacts]
+      params:
+        - { name: version, value: $(params.version) }
       taskSpec:
         params:
           - name: version
@@ -83,7 +91,6 @@ spec:
               done
 
               cat results.yaml || true
-
     - name: wait-image-delivery
       runAfter:
         - ga-tag-oci-artifacts
@@ -119,7 +126,7 @@ spec:
         - { name: edition, value: community }
         - { name: os, value: linux }
         - { name: arch, value: amd64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-amd64-enterprise
       runAfter: [wait-tiup-delivery]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -140,7 +147,7 @@ spec:
         - { name: edition, value: enterprise }
         - { name: os, value: linux }
         - { name: arch, value: amd64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-amd64-dm
       runAfter: [wait-tiup-delivery]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -163,7 +170,7 @@ spec:
         - { name: edition, value: dm }
         - { name: os, value: linux }
         - { name: arch, value: amd64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-community
       runAfter: [wait-tiup-delivery]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -184,7 +191,7 @@ spec:
         - { name: edition, value: community }
         - { name: os, value: linux }
         - { name: arch, value: arm64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-enterprise
       runAfter: [wait-tiup-delivery]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -205,7 +212,7 @@ spec:
         - { name: edition, value: enterprise }
         - { name: os, value: linux }
         - { name: arch, value: arm64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-dm
       runAfter: [wait-tiup-delivery]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -228,7 +235,7 @@ spec:
         - { name: edition, value: dm }
         - { name: os, value: linux }
         - { name: arch, value: arm64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)"}
+        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: upload-plugin-tarballs
       runAfter:
         - ga-tag-oci-artifacts
