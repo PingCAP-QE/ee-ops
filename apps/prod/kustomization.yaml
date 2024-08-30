@@ -21,3 +21,4 @@ resources:
   - tibuild
   - dl
   - harbor
+  - coder
