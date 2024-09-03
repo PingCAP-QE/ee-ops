@@ -16,6 +16,11 @@ spec:
     - name: nightly
       description: publish as nightly version.
       default: "false"
+    - name: force-version
+      description: >
+        Force set the version.
+        Default is the artifact version read from `org.opencontainers.image.version` of the manifest config.
+      default: ""
     - name: tiup-mirror
       description: Staging is http://tiup.pingcap.net:8988, product is http://tiup.pingcap.net:8987.
       default: http://tiup.pingcap.net:8988
@@ -49,7 +54,7 @@ spec:
           gen_script_url="$CACHE_READ_SERVER_BASE_URL/raw.githubusercontent.com/$gen_script_github_raw_path_url"
         fi
         wget -O gen.sh "$gen_script_url" && chmod +x gen.sh
-        ./gen.sh $(params.artifact-url) $(params.nightly) publish.sh
+        ./gen.sh $(params.artifact-url) $(params.nightly) publish.sh $(params.force-version)
 
         if [ ! -f publish.sh ]; then
           exit 0
