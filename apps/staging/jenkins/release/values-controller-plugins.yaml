@@ -77,7 +77,7 @@ controller:
     - artifactId: timestamper
       source:
         # renovate: datasource=jenkins-plugins depName=timestamper
-        version: 1.26
+        version: 1.27
     - artifactId: ssh-agent
       source:
         # renovate: datasource=jenkins-plugins depName=ssh-agent
