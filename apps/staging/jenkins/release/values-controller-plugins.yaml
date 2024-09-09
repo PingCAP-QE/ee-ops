@@ -34,7 +34,7 @@ controller:
     - artifactId: prometheus
       source:
         # renovate: datasource=jenkins-plugins depName=prometheus
-        version: 2.5.3
+        version: 784.vea_eca_f6592eb_
     - artifactId: blueocean
       source:
         # renovate: datasource=jenkins-plugins depName=blueocean
