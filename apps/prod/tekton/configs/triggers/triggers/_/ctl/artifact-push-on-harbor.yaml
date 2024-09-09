@@ -17,7 +17,7 @@ spec:
             'pingcap/tiflow/package', 
             'pingcap/tidb-binlog/package', 
             'pingcap/tidb-ctl/package',
-            'tikv/pd/pacakge',
+            'tikv/pd/package',
             'tikv/tikv/package'
             ] &&
             body.event_data.resources[0].tag.matches('^(master|main)(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')
@@ -66,7 +66,7 @@ spec:
             'pingcap/tiflow/package', 
             'pingcap/tidb-binlog/package', 
             'pingcap/tidb-ctl/package',
-            'tikv/pd/pacakge',
+            'tikv/pd/package',
             'tikv/tikv/package'
             ] &&
             body.event_data.resources[0].tag.matches('^release-[0-9]+[.][0-9]+(-[0-9a-f]{7,10})_(darwin|linux)_(amd64|arm64)$')

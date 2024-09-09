@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: pingcap-upload-offline-pacakges
+  name: pingcap-upload-offline-package
   labels:
     app.kubernetes.io/version: "0.2"
   annotations:
