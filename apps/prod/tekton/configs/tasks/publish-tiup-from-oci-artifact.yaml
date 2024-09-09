@@ -73,7 +73,7 @@ spec:
         set -exo pipefail
 
         if [ ! -f  /workspace/publish.sh ]; then
-          echo "No tiup pacakges are need to published."
+          echo "No tiup packages are need to published."
           exit 0
         fi
 

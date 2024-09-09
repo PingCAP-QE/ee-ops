@@ -120,7 +120,7 @@ spec:
       runAfter:
         - "compose-offline-pkgs-amd64-community"
       taskRef:
-        name: pingcap-upload-offline-pacakges
+        name: pingcap-upload-offline-package
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: community }
@@ -141,7 +141,7 @@ spec:
       runAfter:
         - "compose-offline-pkgs-amd64-enterprise"
       taskRef:
-        name: pingcap-upload-offline-pacakges
+        name: pingcap-upload-offline-package
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: enterprise }
@@ -162,7 +162,7 @@ spec:
       runAfter:
         - "compose-offline-pkgs-amd64-dm"
       taskRef:
-        name: pingcap-upload-offline-pacakges
+        name: pingcap-upload-offline-package
       workspaces:
         - { name: aws-secrets, workspace: aws-secrets }
       params:
@@ -185,7 +185,7 @@ spec:
       runAfter:
         - "compose-offline-pkgs-arm64-community"
       taskRef:
-        name: pingcap-upload-offline-pacakges
+        name: pingcap-upload-offline-package
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: community }
@@ -206,7 +206,7 @@ spec:
       runAfter:
         - "compose-offline-pkgs-arm64-enterprise"
       taskRef:
-        name: pingcap-upload-offline-pacakges
+        name: pingcap-upload-offline-package
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: enterprise }
@@ -227,7 +227,7 @@ spec:
       runAfter:
         - "compose-offline-pkgs-arm64-dm"
       taskRef:
-        name: pingcap-upload-offline-pacakges
+        name: pingcap-upload-offline-package
       workspaces:
         - { name: aws-secrets, workspace: aws-secrets }
       params:
