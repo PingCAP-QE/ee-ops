@@ -103,6 +103,9 @@ spec:
           - name: cargo-home
             persistentVolumeClaim:
               claimName: cargo-home
+          - name: cypress-cache
+            persistentVolumeClaim:
+              claimName: cypress-cache
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -173,6 +176,9 @@ spec:
           - name: cargo-home
             persistentVolumeClaim:
               claimName: cargo-home
+          - name: cypress-cache
+            persistentVolumeClaim:
+              claimName: cypress-cache
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
