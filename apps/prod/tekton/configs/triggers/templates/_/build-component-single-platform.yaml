@@ -107,3 +107,6 @@ spec:
           - name: cargo-home
             persistentVolumeClaim:
               claimName: cargo-home
+          - name: cypress-cache
+            persistentVolumeClaim:
+              claimName: cypress-cache
