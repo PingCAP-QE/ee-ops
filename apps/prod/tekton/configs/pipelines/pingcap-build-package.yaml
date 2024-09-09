@@ -61,7 +61,7 @@ spec:
       description: secret containing a .gitconfig and .git-credentials file.
       optional: true
     - name: cargo-home
-      description: cache for cargo pacakges when build binaries
+      description: cache for cargo packages when build binaries
       optional: true
     - name: cypress-cache
       description: cache for cypress installation files when building frontend projects.
@@ -164,8 +164,8 @@ spec:
           workspace: dockerconfig
         - name: cargo-home
           workspace: cargo-home
-        - name: crypress-cache
-          workspace: crypress-cache
+        - name: cypress-cache
+          workspace: cypress-cache
     - name: build-images
       when:
         - input: "$(params.push)"
