@@ -80,12 +80,12 @@ spec:
               name: kubeconfig
               readOnly: true
             {{- end }}
-          startupProbe:
-            httpGet:
-              path: /healthz
-              port: 8080
-            failureThreshold: 60
-            periodSeconds: 10
+          # startupProbe:
+          #   httpGet:
+          #     path: /healthz
+          #     port: 8080
+          #   failureThreshold: 60
+          #   periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /healthz
