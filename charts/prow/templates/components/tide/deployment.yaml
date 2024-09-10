@@ -80,6 +80,13 @@ spec:
               name: kubeconfig
               readOnly: true
             {{- end }}
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 60
           livenessProbe:
             httpGet:
               path: /healthz
