@@ -1,9 +1,0 @@
-presubmits:
-  PingCAP-QE/ee-ops:
-    - name: verifyCI1
-      always_run: true
-      max_concurrency: 2
-      spec:
-        containers:
-          - image: alpine
-            command: ["/bin/date"]
