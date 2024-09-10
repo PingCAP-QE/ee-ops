@@ -34,7 +34,7 @@ controller:
     - artifactId: prometheus
       source:
         # renovate: datasource=jenkins-plugins depName=prometheus
-        version: 2.5.3
+        version: 784.vea_eca_f6592eb_
     - artifactId: blueocean
       source:
         # renovate: datasource=jenkins-plugins depName=blueocean
@@ -42,7 +42,7 @@ controller:
     - artifactId: job-dsl
       source:
         # renovate: datasource=jenkins-plugins depName=job-dsl
-        version: 1.87
+        version: 1.88
     - artifactId: build-failure-analyzer
       source:
         url: https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.1-jobname/build-failure-analyzer.hpi
@@ -77,11 +77,11 @@ controller:
     - artifactId: timestamper
       source:
         # renovate: datasource=jenkins-plugins depName=timestamper
-        version: 1.26
+        version: 1.27
     - artifactId: ssh-agent
       source:
         # renovate: datasource=jenkins-plugins depName=ssh-agent
-        version: 346.vda_a_c4f2c8e50
+        version: 376.v8933585c69d3
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
   #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md

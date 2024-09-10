@@ -73,7 +73,7 @@ spec:
           echo "🤷 no output script generated!"
         fi
     - name: build-and-publish
-      image: gcr.io/kaniko-project/executor:v1.22.0-debug
+      image: gcr.io/kaniko-project/executor:v1.23.2-debug
       workingDir: $(workspaces.source.path)/$(params.component)
       env:
         - name: KANIKO_EXECUTOR
