@@ -90,17 +90,17 @@ spec:
             httpGet:
               path: /healthz
               port: http
-            timeoutSeconds: 5
-            periodSeconds: 20
             failureThreshold: 3
-            initialDelaySeconds: 300
+            initialDelaySeconds: 30 # "300" maybe it will cause ci failed.
+            periodSeconds: 20
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /healthz/ready
               port: http
-            timeoutSeconds: 5
-            periodSeconds: 10
             failureThreshold: 3
+            periodSeconds: 10
+            timeoutSeconds: 5
           resources:
             {{- toYaml .Values.tide.resources | nindent 12 }}
       volumes:

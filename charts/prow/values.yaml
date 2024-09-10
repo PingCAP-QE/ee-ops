@@ -392,13 +392,13 @@ tide:
     roleBinding:
       create: true
       name: ""
-  resources:
-    requests:
-      cpu: 1000m
-      memory: 4Gi
-    limits:
-      cpu: 1000m
-      memory: 4Gi
+  resources: {}
+    # requests:
+    #   cpu: 1000m
+    #   memory: 4Gi
+    # limits:
+    #   cpu: 1000m
+    #   memory: 4Gi
   kubeconfigSecret: ""
 
 pipeline:
