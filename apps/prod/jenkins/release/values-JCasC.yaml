@@ -66,7 +66,7 @@ controller:
           name: "Jenkins Admin"
           password: "${chart-admin-password}"
 
-    # REF Doc: https://github.com/PingCAP-QE/ee-ops/blob/main/charts/jenkins/README.md
+    # REF Doc: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/README.md
     #
     # Notable: if you want delete some key, first please delete the conetnt but keep the key.
     #   after deployed, then create other commit and push to delete the key.
