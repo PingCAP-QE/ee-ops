@@ -126,8 +126,9 @@ spec:
           echo "export PATH=${go_bin_path}:\$PATH" >> /workspace/remote.env
         fi
 
-        # 3. set npm mirror
+        # 3. set npm mirror and node options
         echo 'export NPM_CONFIG_REGISTRY="https://registry.npmmirror.com"' >> /workspace/remote.env
+        echo 'export NODE_OPTIONS="--max_old_space_size=8192"' >> /workspace/remote.env
 
         # 4. optional set for rust
         echo 'export CARGO_NET_GIT_FETCH_WITH_CLI=true' >> /workspace/remote.env
