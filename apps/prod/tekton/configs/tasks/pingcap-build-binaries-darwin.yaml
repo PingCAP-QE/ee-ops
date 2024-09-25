@@ -131,7 +131,8 @@ spec:
 
         # 4. optional set for rust
         echo 'export CARGO_NET_GIT_FETCH_WITH_CLI=true' >> /workspace/remote.env
-        echo 'export RUSTUP_DIST_SERVER=https://mirrors.ustc.edu.cn/rust-static' >> /workspace/remote.env
+        echo 'export RUSTUP_UPDATE_ROOT=https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup' >> /workspace/remote.env
+        echo 'export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup' >> /workspace/remote.env
     - name: build
       image: ghcr.io/pingcap-qe/cd/utils/remote:v20231216-51-g3bb25fd
       env:
