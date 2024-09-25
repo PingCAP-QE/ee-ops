@@ -63,7 +63,9 @@ spec:
         - name: CARGO_NET_GIT_FETCH_WITH_CLI
           value: 'true'
         - name: RUSTUP_DIST_SERVER
-          value: https://mirrors.ustc.edu.cn/rust-static
+          value: https://mirrors.tuna.tsinghua.edu.cn/rustup
+        - name: RUSTUP_UPDATE_ROOT
+          value: https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup
         - name: CARGO_HOME
           value: /workspace/.cargo
       script: |
