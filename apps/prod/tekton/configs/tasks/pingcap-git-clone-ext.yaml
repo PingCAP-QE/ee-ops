@@ -133,7 +133,7 @@ spec:
           EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
         elif [[ $origin_ref =~ "^release-[0-9]+\.[0-9]+-.*-v[0-9]+\.[0-9]+\.[0-9]+" ]]; then
           # hotfix branches
-          MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2 "." $3}')
+          MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")
           EXT_REVERSION=$(echo "$MAJOR_MINOR_PATCH" | sed -E 's/^v/release-/')
         elif [[ $origin_ref =~ "^(master|main|feature/.*)$" ]]; then
           EXT_REVERSION="master"
