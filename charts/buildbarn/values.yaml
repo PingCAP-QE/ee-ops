@@ -443,7 +443,7 @@ worker:
       # worker.volumeInitContainer.image.repository -- image repository
       repository: busybox
       # worker.volumeInitContainer.image.tag -- image tag
-      tag: 1.36.1-uclibc
+      tag: 1.37.0-uclibc
 
   workerContainer:
     image:
