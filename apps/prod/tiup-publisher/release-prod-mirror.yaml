@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: tiup-publisher-prod-mirror
+  namespace: apps
+spec:
+  chart:
+    spec:
+      chart: tiup-publisher
+      version: 0.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+  test:
+    enable: false
+  values:
+    # Additional volumes on the output Deployment definition.
+    image:
+      tag: v20240228-83-g645b571
+    args:
+      - --config=/etc/config/config.yaml
+    volumes:
+      - name: tiup-config
+        secret:
+          secretName: tiup-config
+      - name: tiup-credentials
+        secret:
+          secretName: tiup-credentials-prod
+
+    volumeMounts:
+      - name: tiup-config
+        subPath: config-prod.yaml
+        mountPath: /etc/config/config.yaml
+        readOnly: true
+      - name: tiup-credentials
+        subPath: private.json
+        mountPath: /root/.tiup/keys/private.json
+
+    nodeSelector:
+      kubernetes.io/arch: amd64
