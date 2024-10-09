@@ -6,6 +6,7 @@ resources:
   - _/fake-github/fake-github-pr.yaml
   - _/fake-github/fake-github-tag-create.yaml
   - _/git-push-on-fips-branches.yaml
+  - _/github-pr-labeled.yaml
   - _/harbor/artifact-push-on-harbor.yaml
   - _/harbor/image-push-on-harbor.yaml
   - PingCAP-QE/artifacts/git-push.yaml
