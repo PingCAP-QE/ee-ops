@@ -23,7 +23,7 @@ spec:
   values:
     # Additional volumes on the output Deployment definition.
     image:
-      tag: v20240228-85-g0b8b9f9
+      tag: v20240228-86-gc1947d9
     args:
       - --config=/etc/config/config.yaml
     volumes:
