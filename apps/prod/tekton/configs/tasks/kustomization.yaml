@@ -5,6 +5,7 @@ resources:
   - aws-cli.yaml # from and hacked: https://hub.tekton.dev/tekton/task/aws-cli
   - boskos-acquire.yaml # from: https://hub.tekton.dev/tekton/task/boskos-acquire
   - boskos-release.yaml # from: https://hub.tekton.dev/tekton/task/boskos-release
+  - ci/ci-helper-for-pr.yaml
   - crane-copy.yaml # crane copy task
   - echo.yaml ##### an example task.
   - gen-build-binaries-scripts.yaml

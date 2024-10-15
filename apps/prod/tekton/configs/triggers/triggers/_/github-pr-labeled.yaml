@@ -1,0 +1,25 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: pr-labeled-with-needs-ok-to-test
+  labels:
+    type: github-pr
+    github-owner: pingcap
+spec:
+  interceptors:
+    - name: filter on repo owner and name and tags
+      ref: { name: cel }
+      params:
+        - name: filter
+          value: >-
+            body.action == 'labeled'
+            &&
+            body.label.name in ['needs-ok-to-test']
+            &&
+            body.pull_request.user.login in ['wuhuizuo', 'purlind']
+            &&
+            body.repository.owner.login == 'pingcap'
+  bindings:
+    - ref: github-pr
+  template:
+    ref: ci-helper-for-pr

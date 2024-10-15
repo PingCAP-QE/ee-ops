@@ -4,6 +4,7 @@ resources:
   - _/build-component-all-platforms.yaml
   - _/build-component-single-platform.yaml
   - _/build-component.yaml
+  - _/ci-helper-for-pr.yaml
   - _/image-push.yaml
   - _/push-oci-artifact-to-tiup.yaml
   - pingcap/bump-placeholder-version-in-readme.yaml

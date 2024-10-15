@@ -19,7 +19,7 @@ spec:
             name: cel
           params:
             - name: filter
-              value: body.action in ['opened', 'synchronize', 'reopened']
+              value: body.action in ['opened', 'synchronize', 'reopened', 'labeled']
       triggerSelector:
         namespaceSelector:
           matchNames:
