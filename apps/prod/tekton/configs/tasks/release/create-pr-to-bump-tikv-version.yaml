@@ -21,8 +21,6 @@ spec:
     - name: rust-image
       description: the image to run go mod edit and go mod tidy
       default: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
-    - name: cargo-edit-ver
-      default: "0.12.2"
   steps:
     - name: analyse
       image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
@@ -69,7 +67,12 @@ spec:
         - name: CARGO_HOME
           value: /workspace/.cargo
       script: |
-        cargo install cargo-edit --version $(params.cargo-edit-ver) --locked --features vendored-openssl || exit 1
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        # Note: rust toolchain was upgraded in v7.6.0
+        cargo_edit_ver=$(if [[ "$(cat /workspace/inner-results-branch)" < "release-7.6" ]]; then echo "0.11.11"; else echo "0.12.2"; fi)
+        cargo install cargo-edit --version ${cargo_edit_ver} --locked --features vendored-openssl || exit 1
         cargo set-version --package tikv $(cat /workspace/inner-results-version)
         if git diff --exit-code --name-status Cargo.toml; then
           echo "🤷 No need to update the go.mod file, they are updated."
