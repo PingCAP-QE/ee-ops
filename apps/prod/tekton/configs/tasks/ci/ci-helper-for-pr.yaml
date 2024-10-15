@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: ci-helper-for-pr
+spec:
+  description: >-
+    Create pull request to update version placeholder "README.md" to github repository branch.
+  params:
+    - name: owner
+      description: repo owner
+    - name: repo
+      description: repo short name
+    - name: number
+      description: pull request number
+      type: integer
+  steps:
+    - name: create-pull-request
+      image: denoland/deno:1.45.5
+      script: |
+        echo "owner: $(params.owner)"
+        echo "repo: $(params.repo)"
+        echo "number: $(params.number)"
+  workspaces:
+    - name: github
+      description: Must includes a key `token`
+      mountPath: /etc/github

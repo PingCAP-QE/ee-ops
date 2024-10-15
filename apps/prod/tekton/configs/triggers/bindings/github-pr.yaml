@@ -22,8 +22,14 @@ spec:
     #   value: $(body.pull_request.title)
     # - name: pr-body
     #   value: $(body.pull_request.body)
-    # - name: pr-user
-    #   value: $(body.pull_request.user.login)
+    - name: pr-author
+      value: $(body.pull_request.user.login)
+    - name: pr-owner
+      value: $(body.repository.owner.login)
+    - name: pr-repo
+      value: $(body.repository.name)
+    - name: pr-full-repo
+      value: $(body.repository.full_name)
     # - name: pr-head-owner
     #   value: $(body.pull_request.head.user.login)
     # - name: pr-head-repo
