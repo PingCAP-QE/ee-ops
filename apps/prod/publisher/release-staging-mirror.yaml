@@ -24,19 +24,22 @@ spec:
     # Additional volumes on the output Deployment definition.
     image:
       tag: v2024.10.14-2-g00c2f08
-    args:
-      - --config=/etc/config/config.yaml
-    volumes:
-      - name: config
-        secret:
+    servers:
+      publisher:
+        config:
           secretName: publisher-config-staging
+          secretKey: service.yaml
+          debug: true
+      worker:
+        config:
+          secretName: publisher-config-staging
+          secretKey: worker.yaml
+          debug: true
+    volumes:
       - name: tiup-credentials
         secret:
           secretName: tiup-credentials-staging
     volumeMounts:
-      - name: config
-        mountPath: /config
-        readOnly: true
       - name: tiup-credentials
         subPath: private.json
         mountPath: /root/.tiup/keys/private.json
