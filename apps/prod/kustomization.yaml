@@ -22,4 +22,5 @@ resources:
   - dl
   - harbor
   - coder
-  - tiup-publisher
+  - redis
+  - publisher
