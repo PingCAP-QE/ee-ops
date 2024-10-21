@@ -23,7 +23,7 @@ spec:
   values:
     # Additional volumes on the output Deployment definition.
     image:
-      tag: v2024.10.14-2-g00c2f08
+      tag: v2024.10.14-3-ged099a3
     servers:
       publisher:
         config:
