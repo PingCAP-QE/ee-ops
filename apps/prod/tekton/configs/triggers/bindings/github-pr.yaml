@@ -13,7 +13,7 @@ spec:
     - name: git-ref
       value: $(body.pull_request.base.ref)
     - name: pr-number
-      value: $(body.pull_request.number)
+      value: "$(body.pull_request.number)"
     # - name: pr-head-ref
     #   value: $(body.pull_request.head.ref)
     # - name: pr-base-ref

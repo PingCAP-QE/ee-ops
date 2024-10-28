@@ -7,7 +7,6 @@ spec:
     - name: pr-owner
     - name: pr-repo
     - name: pr-number
-      type: integer
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
@@ -18,7 +17,7 @@ spec:
           - name: owner
             value: $(tt.params.pr-owner)
           - name: repo
-            value: $(tt.params.repo)
+            value: $(tt.params.pr-repo)
           - name: number
             value: $(tt.params.pr-number)
         taskRef:

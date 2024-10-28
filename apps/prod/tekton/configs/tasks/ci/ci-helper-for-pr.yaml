@@ -12,7 +12,6 @@ spec:
       description: repo short name
     - name: number
       description: pull request number
-      type: integer
   steps:
     - name: create-pull-request
       image: denoland/deno:1.45.5
