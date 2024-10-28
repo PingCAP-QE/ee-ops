@@ -31,37 +31,13 @@ spec:
           server: prod
       spec:
         taskRef:
-          name: publish-tiup-from-oci-artifact
+          name: publish-tiup-from-oci-artifact-v2
+        timeout: 1h
         params:
           - name: artifact-url
             value: "$(tt.params.image_url)"
-          - name: nightly
-            value: "true"
-          - name: tiup-mirror
-            value: http://tiup.pingcap.net:8987
-        workspaces:
-          - name: lock-tiup
-            persistentVolumeClaim:
-              claimName: pvc-lock-tiup-prod
-          - name: dockerconfig
-            secret:
-              secretName: hub-pingcap-net-ee
-          - name: tiup-keys
-            secret:
-              secretName: tiup-credentials-prod
-        podTemplate:
-          affinity:
-            podAntiAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                - labelSelector:
-                    matchExpressions:
-                      - key: "tekton.dev/task"
-                        operator: In
-                        values: [publish-tiup-from-oci-artifact]
-                      - key: server
-                        operator: In
-                        values: [prod]
-                  topologyKey: "kubernetes.io/hostname"
+          - name: publisher-url
+            value: http://publisher-prod-mirror.apps.svc
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
@@ -109,7 +85,7 @@ spec:
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact-v2
-        timeout: 2h
+        timeout: 1h
         params:
           - name: artifact-url
             value: "$(tt.params.image_url)"
@@ -124,7 +100,7 @@ spec:
       spec:
         taskRef:
           name: publish-tiup-from-oci-artifact-v2
-        timeout: 2h
+        timeout: 1h
         params:
           - name: artifact-url
             value: "$(tt.params.image_url)"
