@@ -26,7 +26,7 @@ spec:
       type: array
   steps:
     - name: request-and-wait
-      image: ghcr.io/pingcap-qe/ee-apps/publisher:v2024.10.14-5-ge877e83
+      image: ghcr.io/pingcap-qe/ee-apps/publisher:v2024.10.14-6-g2e1e85d
       script: |
         #!/usr/bin/env bash
         set -eo pipefail
@@ -39,15 +39,23 @@ spec:
           echo "🔍 query for request id: ${request_id} ..."
           while true; do
             status=$(/app/publisher-cli --url $(params.publisher-url) tiup query-publishing-status --request-id "$request_id" | jq -r .)
-            if [ "$status" = "failed" ]; then
-              echo "❌ $status"
-              exit 1
-            elif [ "$status" = "success" ]; then
-              echo "✅ $status"
-              break
-            else
-              echo "⌛️ $status"
-              sleep 10
-            fi
+            case "${status}" in
+              "failed")
+                echo "❌ Publishing failed"
+                exit 1
+                ;;
+              "success")
+                echo "✅ Publishing successful"
+                break
+                ;;
+              "canceled")
+                echo "💤 Publishing canceled"
+                break
+                ;;
+              *)
+                echo "⌛️ Status: ${status}"
+                sleep 10
+                ;;
+            esac
           done
         done
