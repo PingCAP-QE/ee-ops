@@ -36,6 +36,7 @@ resources:
   - pingcap-git-clone-ext.yaml
   - pingcap-upload-enterprise-plugins.yaml
   - pingcap-upload-offline-package.yaml
+  - publish-tiup-from-oci-artifact-v2.yaml
   - publish-tiup-from-oci-artifact.yaml
   - release/create-pr-to-add-release-anchor-commit.yaml
   - release/create-pr-to-bump-tikv-version.yaml
