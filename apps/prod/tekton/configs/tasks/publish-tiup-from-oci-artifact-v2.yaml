@@ -32,7 +32,7 @@ spec:
         set -eo pipefail
 
         # send event
-        /app/publisher-cli --url $(params.publisher-url) tiup request-to-publish --body '{ "artifact_url": "$(params.artifact-url)" }' | tee $(results.request-ids.path)
+        /app/publisher-cli --url $(params.publisher-url) tiup request-to-publish --body '{ "artifact_url": "$(params.artifact-url)" }' | jq '. // []' | tee $(results.request-ids.path)
 
         # wait for request statuses
         for request_id in $(jq -r '.[]' $(results.request-ids.path)); do
