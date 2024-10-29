@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: artifact-push-on-harbor-with-trunk-branch-tags
+  name: artifact-push-on-harbor-with-trunk-branch-tags-forward-to-tiup
   labels:
     type: image-push
 spec:
@@ -28,7 +28,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: artifact-push-on-harbor-with-trunk-branch-tags
+  name: artifact-push-on-harbor-with-trunk-branch-tags-forward-to-fileserver
   labels:
     type: image-push
 spec:
@@ -54,7 +54,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: artifact-push-on-harbor-with-release-branch-tags
+  name: artifact-push-on-harbor-with-release-branch-tags-forward-to-tiup
   labels:
     type: image-push
 spec:
@@ -80,7 +80,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: artifact-push-on-harbor-with-git-tags
+  name: artifact-push-on-harbor-with-git-tags-forward-to-tiup
   labels:
     type: image-push
 spec:
