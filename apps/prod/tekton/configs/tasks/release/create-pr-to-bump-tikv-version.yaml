@@ -71,7 +71,17 @@ spec:
         set -euo pipefail
 
         # Note: rust toolchain was upgraded in v7.6.0
-        cargo_edit_ver=$(if [[ "$(cat /workspace/inner-results-branch)" < "release-7.6" ]]; then echo "0.11.11"; else echo "0.12.2"; fi)
+        case "$(cat /workspace/inner-results-branch)" in
+          "master")
+            cargo_edit_ver="0.12.2"
+            ;;
+          release-[0-6].*|release-7.[0-5])
+            cargo_edit_ver="0.11.11"
+            ;;
+          *)
+            cargo_edit_ver="0.12.2"
+            ;;
+        esac
         cargo install cargo-edit --version ${cargo_edit_ver} --locked --features vendored-openssl || exit 1
         cargo set-version --package tikv $(cat /workspace/inner-results-version)
         if git diff --exit-code --name-status Cargo.toml; then
@@ -128,7 +138,7 @@ spec:
         fi
 
         gh pr create -B "$base_branch" -H "$head_branch" -t "$commit_msg" -F pr_body.txt $label_options
-        
+
         # solve the problem that the prow plugin will remove the approved label.
         sleep 10
         pr_url=$(gh pr list --repo $(params.git-url) --base "$base_branch" --head "$head_branch"  --json url --jq .[].url | head -1)
