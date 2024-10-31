@@ -59,7 +59,6 @@ spec:
     - ref: github-branch-push
     - ref: ce-context
     - { name: component, value: $(body.repository.name) }
-    - { name: os, value: linux }
     - { name: profile, value: release }
     - { name: timeout, value: $(extensions.timeout) }
     - { name: source-ws-size, value: $(extensions.source-ws-size) }
@@ -68,4 +67,4 @@ spec:
     - { name: registry, value: hub.pingcap.net/devbuild }
     - { name: force-builder-image, value: $(extensions.custom-params.builder-image) }
   template:
-    ref: build-component
+    ref: build-component-all-platforms
