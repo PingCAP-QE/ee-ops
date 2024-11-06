@@ -55,7 +55,7 @@ spec:
           - key: custom-params
             expression: >-
               {                
-                'builder-image': header.canonical('ce-param-builder-image')
+                'builder-image': header.canonical('ce-paramBuilderImage')
               }
   bindings:
     - ref: github-tag-create
