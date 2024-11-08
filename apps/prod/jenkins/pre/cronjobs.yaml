@@ -36,7 +36,7 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: monitor-ci-code-cache-size
+  name: fix-ci-code-cache-size
   namespace: apps
 spec:
   schedule: "*/30 * * * *"
