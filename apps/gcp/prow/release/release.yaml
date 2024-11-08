@@ -72,6 +72,9 @@ spec:
       image:
         repository: ticommunityinfra/tide
         tag: v20230706-5546ede
+      additionalArgs:
+        - --sync-hourly-tokens=1200 # default is 800
+        - --status-hourly-tokens=600 # default is 400
       resources:
         requests:
           cpu: 1000m
