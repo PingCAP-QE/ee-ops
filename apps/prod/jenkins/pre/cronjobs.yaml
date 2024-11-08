@@ -32,3 +32,41 @@ spec:
                 limits:
                   memory: "512Mi"
                   cpu: "500m"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fix-ci-code-cache-size
+  namespace: apps
+spec:
+  schedule: "*/30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: deno
+              image: "denoland/deno:2.0.5"
+              tty: true
+              args:
+                - run
+                - --allow-net
+                - --allow-env
+                - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/monitor-s3-object-size.ts
+                - --path="git/PingCAP-QE/tidb-test"
+                - --threshold-mb=2500
+                - --feishu-webhook="${CI_MONITOR_FEISHU_WEBHOOK_URL}"
+                - --cleanup
+              envFrom:
+                - secretRef:
+                    name: ci-pipeline-cache2
+                - configMapRef:
+                    name: s3-ci-pipeline-cache2
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "500m"
