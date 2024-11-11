@@ -13,12 +13,23 @@ spec:
       description: pull request number
   steps:
     - name: create-pull-request
-      image: denoland/deno:1.45.5
+      image: bitnami/git:2.43.0
       script: |
-        echo "owner: $(params.owner)"
-        echo "repo: $(params.repo)"
-        echo "number: $(params.number)"
+        #!/usr/bin/env bash
+        set -exo pipefail
+
+        # install `gh` tool
+        type -p curl >/dev/null || ( apt update &&  apt install curl -y)
+        curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |  dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+        && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+        && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" |  tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+        && apt update \
+        && apt install gh -y
+
+        # truct the pull request
+        echo "pull request url: https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)"
+        gh auth login --with-token < $(workspaces.github.path)/token
+        gh pr edit --add-label ok-to-test --remove-label needs-ok-to-test https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)        
   workspaces:
     - name: github
       description: Must includes a key `token`
-      mountPath: /etc/github
