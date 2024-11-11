@@ -15,7 +15,9 @@ spec:
             &&
             body.label.name in ['needs-ok-to-test']
             &&
-            body.repository.owner.login in ['pingcap', 'tikv', "PingCAP-QE"]
+            body.repository.owner.login in ["PingCAP-QE", "pingcap", "tikv"]
+            &&
+            body.pull_request.user.login in ["wuhuizuo", "purelind", "VelocityLight"]
   bindings:
     - ref: github-pr
   template:
