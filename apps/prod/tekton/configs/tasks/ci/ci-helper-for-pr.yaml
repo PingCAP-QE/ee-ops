@@ -3,8 +3,7 @@ kind: Task
 metadata:
   name: ci-helper-for-pr
 spec:
-  description: >-
-    Create pull request to update version placeholder "README.md" to github repository branch.
+  description: CI helper for contribution pull requests
   params:
     - name: owner
       description: repo owner
