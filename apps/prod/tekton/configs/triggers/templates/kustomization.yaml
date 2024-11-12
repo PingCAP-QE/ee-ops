@@ -6,6 +6,7 @@ resources:
   - _/build-component.yaml
   - _/ci-helper-for-pr.yaml
   - _/image-push.yaml
+  - _/push-oci-artifact-to-fileserver.yaml
   - _/push-oci-artifact-to-tiup.yaml
   - pingcap/bump-placeholder-version-in-readme.yaml
   - pingcap/sync-owners-for-hotfix-branch.yaml
