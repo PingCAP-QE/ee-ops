@@ -189,7 +189,7 @@ spec:
           - --plugin-config=/etc/prow-plugin/plugins.yaml
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
-          - --update-period=5m
+          - --update-period=24h # default is 24 hours.
         service:
           type: ClusterIP
       ti-community-autoresponder:
