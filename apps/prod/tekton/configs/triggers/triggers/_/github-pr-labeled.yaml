@@ -17,7 +17,7 @@ spec:
             &&
             body.repository.owner.login in ["PingCAP-QE", "pingcap", "tikv"]
             &&
-            body.pull_request.user.login in ["wuhuizuo", "purelind", "VelocityLight"]
+            body.pull_request.user.login in ["wuhuizuo", "purelind", "VelocityLight", "alex-quan-001"]
   bindings:
     - ref: github-pr
   template:
