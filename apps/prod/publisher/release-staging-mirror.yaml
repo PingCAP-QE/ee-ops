@@ -24,7 +24,7 @@ spec:
     # Additional volumes on the output Deployment definition.
     image:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher versioning=semver
-      tag: v2024.11.4-10-g93bf843
+      tag: v2024.11.4-9-g76c6429
     servers:
       publisher:
         config:
