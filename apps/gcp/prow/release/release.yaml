@@ -86,8 +86,8 @@ spec:
       ingress:
         enabled: false
       image:
-        repository: ticommunityinfra/hook
-        tag: v20240301-09ad8bf
+        repository: ghcr.io/ti-community-infra/prow/hook
+        tag: v20241118-c96901f3d
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
