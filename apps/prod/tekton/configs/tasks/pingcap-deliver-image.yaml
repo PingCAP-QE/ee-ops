@@ -16,7 +16,7 @@ spec:
       description: URL of the image to be copied to the destination registry
   steps:
     - name: gen-commands
-      image: docker.io/denoland/deno:alpine-1.42.1 # it has `wget` tool.
+      image: docker.io/denoland/deno:alpine-2.0.6 # it has `wget` tool.
       env:
         - name: CACHE_READ_SERVER_BASE_URL
           value: "http://fileserver.pingcap.net/download"

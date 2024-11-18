@@ -11,9 +11,16 @@ spec:
     - name: github
       description: Must includes a key `token`
   steps:
-    - name: run
-      image: docker.io/denoland/deno:alpine-1.46.1
+    - name: create-releases
+      image: docker.io/denoland/deno:alpine-2.0.6
       script: |
         deno run --allow-all https://github.com/PingCAP-QE/ci/raw/main/scripts/flow/ga/create_github_release.ts \
-         --version="$(params.version)" \
-         --token="$(cat $(workspaces.github.path)/token)"
+          --version="$(params.version)" \
+          --token="$(cat $(workspaces.github.path)/token)"
+    - name: create-branches
+      image: docker.io/denoland/deno:alpine-2.0.6
+      onError: continue # it's not so important.
+      script: |
+        deno run --allow-net https://github.com/PingCAP-QE/ci/raw/main/scripts/flow/ga/create-patch-release-branches.ts \
+          --version="$(params.version)" \
+          --token="$(cat $(workspaces.github.path)/token)"
