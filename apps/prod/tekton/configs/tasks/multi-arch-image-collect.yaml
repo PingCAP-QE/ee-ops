@@ -63,7 +63,7 @@ spec:
         # [..., master-00595b4] => [..., master-00595b4, master]
         semver_pattern="^v?[0-9]+\.[0-9]+\.[0-9]+([-+][a-zA-Z0-9]+)*$"
         if [[ "$tag" =~ $semver_pattern ]]; then
-          echo "🤷 it is an semver tag, skip to trim the commit SHA suffix part."
+          echo "🤷 it is a semver tag, skip to trim the commit SHA suffix part."
         else
           echo "🎯 it is an <branch>-<commit> tag, I will trim the commit SHA suffix part."
           tags+=($(echo ${tag##* } | sed -E 's/[-][0-9a-f]{7,40}//g'))
