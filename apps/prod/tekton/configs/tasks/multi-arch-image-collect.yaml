@@ -13,6 +13,8 @@ spec:
       - master-00595b4-release-linux-arm64 => master-00595b4-release => master-00595b4 => master
       - master-00595b4-release_arm64       => master-00595b4-release => master-00595b4 => master
       - master-00595b4-release-arm64       => master-00595b4-release => master-00595b4 => master
+      - v6.5.7-20241119-4f2073d_linux_amd64 => v6.5.7-20241119-4f2073d
+      - v8.1.0-alpha-123-g1234567_linux_amd64 => v8.1.0-alpha-123-g0234567
   params:
     - name: image_url
       description: |
@@ -55,14 +57,20 @@ spec:
         yq -i ".image = \"$pushed_repo\"" manifest.yaml
 
         # tags
-        tags="$tag"
+        tags=("$tag")
         # [master-00595b4-release] => [master-00595b4-release, master-00595b4]
-        tags="$tags $(echo $tag | sed -E 's/[-_]$(params.release_tag_suffix)$//g')"
+        tags+=($(echo $tag | sed -E 's/[-_]$(params.release_tag_suffix)$//g'))
         # [..., master-00595b4] => [..., master-00595b4, master]
-        tags="$tags $(echo ${tags##* } | sed -E 's/[-][0-9a-f]{7,40}//g')"
+        semver_pattern="^v?[0-9]+\.[0-9]+\.[0-9]+([-+][a-zA-Z0-9]+)*$"
+        if [[ "$tag" =~ $semver_pattern ]]; then
+          echo "🤷 it is an semver tag, skip to trim the commit SHA suffix part."
+        else
+          echo "🎯 it is an <branch>-<commit> tag, I will trim the commit SHA suffix part."
+          tags+=($(echo ${tag##* } | sed -E 's/[-][0-9a-f]{7,40}//g'))
+        fi
 
         # for tags
-        for t in $tags; do
+        for t in "${tags[@]}"; do
           yq -i ".tags = (.tags + [\"$t\"] | unique)" manifest.yaml
         done
 
