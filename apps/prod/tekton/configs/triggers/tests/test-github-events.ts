@@ -1,6 +1,15 @@
 #!/usr/bin/env deno run --allow-net
 
-import { parseArgs } from "https://deno.land/std@0.220.1/cli/parse_args.ts";
+import { parseArgs } from "jsr:@std/cli@^1.0.1";
+import { Octokit } from "https://esm.sh/octokit@4.0.2?dts";
+
+interface CliParams {
+  token: string; // github private token
+  url: string; // repo url: https://github.com/pingcap/tidb.git
+  ref?: string; // refs/heads/master
+  eventUrl?: string; // https://example.com
+  eventType?: string; // push | create
+}
 
 interface Payload {
   ref: string;
@@ -21,19 +30,16 @@ async function getCommitSha(
   owner: string,
   repo: string,
   ref: string,
+  client: Octokit,
 ): Promise<string> {
-  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits/${ref}`;
-  const response = await fetch(apiUrl);
-  if (!response.ok) {
-    throw new Error(`status: ${response.status}`);
-  }
-  const commit = await response.json();
-  return commit.sha;
+  const response = await client.rest.repos.getCommit({ owner, repo, ref });
+  return response.data.sha;
 }
 
 async function generatePushEventPayload(
   gitUrl: string,
   ref: string,
+  client: Octokit,
 ) {
   const url = new URL(gitUrl);
   const owner = url.pathname.split("/")[1];
@@ -41,7 +47,7 @@ async function generatePushEventPayload(
 
   return {
     before: "0000000000000000000000000000000000000000",
-    after: await getCommitSha(owner, repoName!, ref),
+    after: await getCommitSha(owner, repoName!, ref, client),
     ref,
     repository: {
       name: repoName!,
@@ -81,6 +87,7 @@ async function sendGithubEvent(
   gitUrl: string,
   ref: string,
   eventUrl: string,
+  client: Octokit,
 ): Promise<void> {
   let eventPayload;
   switch (eventType) {
@@ -95,6 +102,7 @@ async function sendGithubEvent(
       eventPayload = await generatePushEventPayload(
         gitUrl,
         `refs/heads/${ref.replace("refs/heads/", "")}`,
+        client,
       );
       break;
     default:
@@ -115,21 +123,26 @@ async function sendGithubEvent(
   await fetch(eventUrl, fetchInit);
 }
 
-async function main() {
-  const args = parseArgs(Deno.args);
+async function main(args: CliParams) {
   const gitUrl = args.url;
   const ref = args.ref || "refs/heads/master";
   const eventUrl = args.eventUrl || "https://example.com";
-  const eventType = args.eventType;
+  const eventType = args.eventType || "push";
 
-  if (!gitUrl) {
-    console.error(
-      "Usage: deno run script.ts --url <git-url> --eventType push|create [--ref <ref>] [--eventUrl <event-url>]",
-    );
+  const usage =
+    "Usage: deno run script.ts --token <github-token> --url <git-url> --eventType push|create [--ref <ref>] [--eventUrl <event-url>]";
+  if (!gitUrl || !args.token) {
+    console.error(usage);
     Deno.exit(1);
   }
 
-  await sendGithubEvent(eventType, gitUrl, ref, eventUrl);
+  const octokit = new Octokit({
+    auth: args.token,
+  });
+
+  await sendGithubEvent(eventType, gitUrl, ref, eventUrl, octokit);
 }
 
-await main();
+const args = parseArgs(Deno.args) as CliParams;
+await main(args);
+Deno.exit();
