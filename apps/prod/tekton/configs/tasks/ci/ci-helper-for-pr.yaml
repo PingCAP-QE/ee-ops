@@ -26,10 +26,12 @@ spec:
         && apt update \
         && apt install gh -y
 
+        gh auth login --with-token < $(workspaces.github.path)/token
+
         # truct the pull request
         echo "pull request url: https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)"
-        gh auth login --with-token < $(workspaces.github.path)/token
-        gh pr edit --add-label ok-to-test --remove-label needs-ok-to-test https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)        
+        gh pr edit --add-label ok-to-test --remove-label needs-ok-to-test https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)
+        gh pr comment --body 'Now you can start all CI jobs with `/test all` in comment or query the triggers with `/test ?`' https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)
   workspaces:
     - name: github
       description: Must includes a key `token`
