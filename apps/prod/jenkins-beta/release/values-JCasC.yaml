@@ -88,6 +88,12 @@ controller:
         credentials:
           system:
             domainCredentials:
+              - credentials:
+                  - file:
+                      scope: GLOBAL
+                      id: "ks3util-config"
+                      fileName: "ks3util.conf"
+                      secretBytes: "${base64:${readFile:${KS3UTIL_SECRET_FILE_PATH}}}" # secretBytes requires base64 encoded content
               - domain:
                   name: github.com
                   description: github ssh and open api
