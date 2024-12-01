@@ -41,9 +41,6 @@ controller:
     - { name: docs-cn, keyName: qiniu-sk }
     - { name: docs-cn, keyName: qiniu-bn }
 
-    # for ks3util
-    - { name: ks3util, keyName: config }
-
   additionalSecrets: []
   #  - name: nameOfSecret
   #    value: secretText
@@ -93,12 +90,6 @@ controller:
         credentials:
           system:
             domainCredentials:
-              - credentials:
-                  - file:
-                      scope: GLOBAL
-                      id: "ks3util-config"
-                      fileName: "ks3util.conf"
-                      secretBytes: "${ks3util-config}"
               - domain:
                   name: github.com
                   description: github ssh and open api
