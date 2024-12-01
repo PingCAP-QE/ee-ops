@@ -288,19 +288,19 @@ controller:
       # for cloudevents plugin config.
       # FIXME: should use cdevents plugin when the issue solved:
       #   https://github.com/jenkinsci/cdevents-plugin/issues/9
-      cloudevents: |
-        unclassified:
-          cloudEventsGlobalConfig:
-            sinkType: "http"
-            sinkURL: "http://cloudevents-server.apps.svc/events"
-            completed: true
-            created: true
-            enteredWaiting: true
-            failed: true
-            finalized: true
-            left: true
-            started: true
-            updated: true
-            # nodes
-            offline: true
-            online: true
+      # cloudevents: |
+      #   unclassified:
+      #     cloudEventsGlobalConfig:
+      #       sinkType: "http"
+      #       sinkURL: "http://cloudevents-server.apps.svc/events"
+      #       completed: true
+      #       created: true
+      #       enteredWaiting: true
+      #       failed: true
+      #       finalized: true
+      #       left: true
+      #       started: true
+      #       updated: true
+      #       # nodes
+      #       offline: true
+      #       online: true
