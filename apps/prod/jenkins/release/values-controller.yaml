@@ -34,6 +34,7 @@ controller:
     -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled
     -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
     -XX:+UnlockDiagnosticVMOptions
+    -XX:+HeapDumpOnOutOfMemoryError
     -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
 
   # Optionally specify additional init-containers
