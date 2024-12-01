@@ -98,7 +98,7 @@ controller:
                       scope: GLOBAL
                       id: "ks3util-config"
                       fileName: "ks3util.conf"
-                      secretBytes: "${ks3util-config}"
+                      secretBytes: "${base64:${ks3util-config}}"
               - domain:
                   name: github.com
                   description: github ssh and open api
