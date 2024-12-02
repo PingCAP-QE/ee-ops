@@ -26,7 +26,7 @@ spec:
       type: array
   steps:
     - name: request-and-wait
-      image: ghcr.io/pingcap-qe/ee-apps/publisher:v2024.11.4-10-g93bf843
+      image: ghcr.io/pingcap-qe/ee-apps/publisher:v2024.11.4-15-gf0b4200
       script: |
         #!/usr/bin/env bash
         set -eo pipefail
