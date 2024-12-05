@@ -80,7 +80,7 @@ spec:
         echo "✅ Uploaded for ${tag} ."
 
     - name: upload-dm-tarballs-to-s3
-      image: docker.io/amazon/aws-cli:2.22.8
+      image: docker.io/amazon/aws-cli:2.22.12
       workingDir: /workspace
       script: |
         #!/usr/bin/env bash
