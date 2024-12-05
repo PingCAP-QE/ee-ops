@@ -28,7 +28,7 @@ spec:
     description: A string that identifies the owner of the leased resource to request.
   steps:
   - name: boskosctl-release
-    image: gcr.io/k8s-staging-boskos/boskosctl@sha256:a7fc984732c5dd0b4e0fe0a92e2730fa4b6bddecd0f6f6c7c6b5501abe4ab105
+    image: gcr.io/k8s-staging-boskos/boskosctl@sha256:2cbb424272fdb3ed802e78aef3b6d5f628245c10405121f9ef2d58f10989422b
     args:
     - "release"
     - "--server-url=$(params.server-url)"
