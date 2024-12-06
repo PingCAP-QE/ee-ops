@@ -1,0 +1,74 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: pr-to-feature-branches-labeled-with-lgtm
+  labels:
+    type: github-pr
+spec:
+  interceptors:
+    - name: filter on repo owner and name and tags
+      ref: { name: cel }
+      params:
+        - name: filter
+          value: >-
+            body.action == 'labeled'
+            &&
+            body.label.name in ['lgtm']
+            &&
+            body.repository.full_name in ['pingcap/tidb']
+            &&
+            body.pull_request.base.ref in ['feature/release-8.5-oracle-func-impl']
+  bindings:
+    - ref: github-pr
+  template:
+    spec:
+      params:
+        - name: pr-owner
+        - name: pr-repo
+        - name: pr-number
+      resourcetemplates:
+        - apiVersion: tekton.dev/v1beta1
+          kind: TaskRun
+          metadata:
+            generateName: auto-add-approved-label-to-pr-on-special-branch-
+          spec:
+            params:
+              - name: owner
+                value: $(tt.params.pr-owner)
+              - name: repo
+                value: $(tt.params.pr-repo)
+              - name: number
+                value: $(tt.params.pr-number)
+            taskSpec:
+              description: CI helper for contribution pull requests
+              params:
+                - name: owner
+                  description: repo owner
+                - name: repo
+                  description: repo short name
+                - name: number
+                  description: pull request number
+              steps:
+                - name: create-pull-request
+                  image: bitnami/git:2.43.0
+                  script: |
+                    #!/usr/bin/env bash
+                    set -exo pipefail
+
+                    # install `gh` tool
+                    type -p curl >/dev/null || ( apt update &&  apt install curl -y)
+                    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |  dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+                    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+                    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" |  tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+                    && apt update \
+                    && apt install gh -y
+
+                    gh auth login --with-token < $(workspaces.github.path)/token
+                    gh pr edit --add-label approved https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)
+              workspaces:
+                - name: github
+                  description: Must includes a key `token`
+            workspaces:
+              - name: github
+                secret:
+                  secretName: github
