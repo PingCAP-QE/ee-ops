@@ -1,9 +1,9 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: pingcap-build-binaries-darwin
+  name: pingcap-build-binaries-darwin-v2
   labels:
-    app.kubernetes.io/version: "0.2"
+    app.kubernetes.io/version: "2.0"
   annotations:
     tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
@@ -19,12 +19,12 @@ spec:
     - name: ssh-directory
       description: ssh credential for remote building on mac.
   results:
-    - description: Just built and pushed images, it will be a yaml content.
+    - description: Just built and pushed artifacts, it will be a yaml content.
       name: pushed
   params:
     - name: component
     - name: os
-      default: linux
+      default: darwin
     - name: arch
       default: amd64
     - name: version
@@ -46,8 +46,9 @@ spec:
       default: 'false'
     - name: registry
       default: hub.pingcap.net
-    - name: mac-builder-resource
-      type: string
+    - name: boskos-server-url
+      description: The URL of the running boskos server
+      default: "http://boskos.test-pods.svc.cluster.local"
   steps:
     - name: generate-build-script
       image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
@@ -79,40 +80,7 @@ spec:
         else
           echo "🤷 no output script generated!"
         fi
-    - name: prepare-remote-builder
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
-      env:
-        - name: WORKSPACE_SSH_DIRECTORY_BOUND
-          value: $(workspaces.ssh-directory.bound)
-        - name: WORKSPACE_SSH_DIRECTORY_PATH
-          value: $(workspaces.ssh-directory.path)
-        - name: REMOTE_BUILDER_INFO_DIR
-          value: /workspace/remote-builder
-      script: |
-        #!/usr/bin/env bash
-        set -exo pipefail
-
-        if [ "${WORKSPACE_SSH_DIRECTORY_BOUND}" != "true" ] ; then
-          exit 0
-        fi
-
-        if [ "$(params.os)" != "darwin" ]; then
-          exit 0
-        fi
-
-        if [ ! -f "${WORKSPACE_SSH_DIRECTORY_PATH}/hosts.yaml" ]; then
-          echo "No ~/.ssh/hosts.yaml found, we need it to get the address and other insecret configurations."
-          exit 1
-        fi
-
-        which yq || (echo "No yq tool found, I need it!"; exit 1)
-        mkdir -p "$REMOTE_BUILDER_INFO_DIR"
-
-        ######### checks and sets #########
-        yq '.["$(params.mac-builder-resource)"].host'   "${WORKSPACE_SSH_DIRECTORY_PATH}/hosts.yaml" > "$REMOTE_BUILDER_INFO_DIR/ssh_host"
-        yq '.["$(params.mac-builder-resource)"].config.workspace_dir'   "${WORKSPACE_SSH_DIRECTORY_PATH}/hosts.yaml" > "$REMOTE_BUILDER_INFO_DIR/ssh_workspace"
-        # TODO: do more pre-check or pre-set.
-    - name: pre-build
+    - name: prepare-remote-env-file
       image: "$(params.builder-image)"
       script: |
         :> /workspace/remote.env
@@ -135,69 +103,36 @@ spec:
         echo 'export RUSTUP_DIST_SERVER="https://rsproxy.cn"' >> /workspace/remote.env
         echo 'export RUSTUP_UPDATE_ROOT="https://rsproxy.cn/rustup"' >> /workspace/remote.env
     - name: build
-      image: ghcr.io/pingcap-qe/cd/utils/remote:v20231216-51-g3bb25fd
+      image: docker.io/denoland/deno:alpine-2.1.3
       env:
         - name: WORKSPACE_SSH_DIRECTORY_BOUND
           value: $(workspaces.ssh-directory.bound)
         - name: WORKSPACE_SSH_DIRECTORY_PATH
           value: $(workspaces.ssh-directory.path)
-        - name: MAC_MACHINE_RES_ID
-          value: "(params.mac-builder-resource)"
-        - name: REMOTE_BUILDER_INFO_DIR
-          value: /workspace/remote-builder
       workingDir: $(workspaces.source.path)/$(params.component)
       # TODO: get the user and host by better way.
       script: |
-        #!/usr/bin/env bash
-        set -exo pipefail
-
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then
-          echo "No build script, skip build."
+          echo "No build script, skip it."
           exit 0
         fi
-
-        ##### Build mac targets in tekton task (k8s pod) ####
-        # 1. Set ssh credentials
         if [ "${WORKSPACE_SSH_DIRECTORY_BOUND}" != "true" ] ; then
-          echo "❌: No ssh credential volume mounted, it's required!"
+          echo "No ssh directory bound, we need it."
           exit 1
         fi
-        cp -R "${WORKSPACE_SSH_DIRECTORY_PATH}" ~/.ssh
-        chmod 700 ~/.ssh
-        chmod -R 400 ~/.ssh/*
-        username=$(cat ~/.ssh/username)
-        host=$(cat "$REMOTE_BUILDER_INFO_DIR/ssh_host")
-        ssh-keyscan -H $host >> ~/.ssh/known_hosts
-        workspace_base_dir=$(cat "$REMOTE_BUILDER_INFO_DIR/ssh_workspace")
 
-        # 2. login to the remote builder with ssh and then execute the shell.
-        # TODO: we need some pre-check scripts: such as get git version...
-
-        # 2.1 create a randon workspace dir in the remote host:
-        remote_workspace_dir="${workspace_base_dir}/$(context.taskRun.name)"
-        ssh ${username}@${host} "mkdir -p '$remote_workspace_dir'"
-        # trap the timeout and error signal and clean the workspace dir.
-        # This ensures that the workspace directory is always cleaned up, 
-        # even if the task fails or times out or exits normally.
-        trap "ssh ${username}@${host} rm -rf '$remote_workspace_dir'" EXIT TERM KILL
-
-        # 2.2 copy the build shell to the remote host by ssh.
-        scp "$script" /workspace/remote.env ${username}@${host}:"$remote_workspace_dir/"
-
-        # 2.3 copy source codes from workspace `source` to the remote host by ssh.
-        rsync --ignore-errors --progress -azh -e ssh $(workspaces.source.path) ${username}@${host}:"$remote_workspace_dir"
-        remote_workspace_source_path="$remote_workspace_dir/$(basename $(workspaces.source.path))/$(params.component)"
-
-        # 2.4 run the shell on the mac host by ssh.
-        ssh $username@$host -t  "bash -lc '
-          cd "$remote_workspace_source_path";
-          source ${remote_workspace_dir}/remote.env;
-          ${remote_workspace_dir}/build-package-artifacts.sh -b -a -w $(params.release-dir)
-        '"
-
-        # 2.5 copy the artifacts from the mac hosts to the workspace `source`, we need deliver them internal firstly.
-        scp -r ${username}@${host}:"$remote_workspace_source_path/$(params.release-dir)" ./
+        env_file="/workspace/remote.env"
+        deno run --allow-all https://github.com/PingCAP-QE/artifacts/raw/refs/heads/main/packages/scripts/build-in-darwin-boskos.ts \
+          --sshInfoDir ${WORKSPACE_SSH_DIRECTORY_PATH} \
+          --sourcePath $(workspaces.source.path) \
+          --envFile ${env_file} \
+          --scriptFile ${script} \
+          --component $(params.component) \
+          --boskos.serverUrl $(params.boskos-server-url) \
+          --boskos.type mac-machine-$(params.arch) \
+          --boskos.owner $(context.taskRun.name) \
+          --releaseDir $(params.release-dir)
     - name: publish
       image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
       workingDir: $(workspaces.source.path)/$(params.component)
