@@ -223,18 +223,8 @@ spec:
             value: $(tt.params.force-builder-image)
           - name: boskos-server-url
             value: http://boskos.apps.svc
-        taskRunSpecs:
-          - pipelineTaskName: acquire-mac-machine
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
-          - pipelineTaskName: release-mac-machine
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
         timeouts:
           pipeline: $(tt.params.timeout)
-          finally: 5m0s # reserve for darwin machine resource releasing.
         workspaces:
           - name: dockerconfig
             secret:
@@ -292,18 +282,8 @@ spec:
             value: $(tt.params.force-builder-image)
           - name: boskos-server-url
             value: http://boskos.apps.svc
-        taskRunSpecs:
-          - pipelineTaskName: acquire-mac-machine
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
-          - pipelineTaskName: release-mac-machine
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
         timeouts:
           pipeline: $(tt.params.timeout)
-          finally: 5m0s # reserve for darwin machine resource releasing.
         workspaces:
           - name: dockerconfig
             secret:
