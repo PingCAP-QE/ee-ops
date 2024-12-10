@@ -12,6 +12,10 @@ spec:
   workspaces:
     - name: source
       description: source code.
+    - name: dockerconfig
+      description: Includes a docker `config.json`
+      mountPath: /root/.docker
+      optional: true
     - name: cargo-home
       description: Cache for cargo packages.
       mountPath: /workspace/.cargo
@@ -20,14 +24,9 @@ spec:
       description: Cache for cypress installation files.
       mountPath: /workspace/.cache/Cypress
       optional: true
-    - name: dockerconfig
-      description: Includes a docker `config.json`
-      mountPath: /root/.docker
-      optional: true
   results:
     - description: Just built and pushed artifacts, it will be a yaml content.
       name: pushed
-      type: string
   params:
     - name: component
     - name: os
@@ -53,9 +52,6 @@ spec:
       default: 'false'
     - name: registry
       default: hub.pingcap.net
-    - name: mac-builder-resource
-      type: string
-      default: ''
   steps:
     - name: generate-build-script
       image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
