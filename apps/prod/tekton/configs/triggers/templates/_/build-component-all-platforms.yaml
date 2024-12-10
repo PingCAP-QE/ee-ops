@@ -145,7 +145,7 @@ spec:
           - name: registry
             value: $(tt.params.registry)
           - name: force-builder-image
-            value: $(tt.params.force-builder-image)            
+            value: $(tt.params.force-builder-image)
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -199,7 +199,7 @@ spec:
           "tibuild.pingcap.net/platform": darwin/amd64
       spec:
         pipelineRef:
-          name: pingcap-build-package-darwin
+          name: pingcap-build-package-darwin-v2
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -211,14 +211,18 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: $(tt.params.component)
-          - name: profile
-            value: $(tt.params.profile)
+          - name: os
+            value: darwin
           - name: arch
             value: amd64
+          - name: profile
+            value: $(tt.params.profile)
           - name: registry
             value: $(tt.params.registry)
           - name: force-builder-image
-            value: $(tt.params.force-builder-image)            
+            value: $(tt.params.force-builder-image)
+          - name: boskos-server-url
+            value: http://boskos.apps.svc
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
@@ -264,7 +268,7 @@ spec:
           "tibuild.pingcap.net/platform": darwin/arm64
       spec:
         pipelineRef:
-          name: pingcap-build-package-darwin
+          name: pingcap-build-package-darwin-v2
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -276,14 +280,18 @@ spec:
             value: $(tt.params.git-ref)
           - name: component
             value: $(tt.params.component)
-          - name: profile
-            value: $(tt.params.profile)
+          - name: os
+            value: darwin
           - name: arch
             value: arm64
+          - name: profile
+            value: $(tt.params.profile)
           - name: registry
             value: $(tt.params.registry)
           - name: force-builder-image
-            value: $(tt.params.force-builder-image)            
+            value: $(tt.params.force-builder-image)
+          - name: boskos-server-url
+            value: http://boskos.apps.svc
         taskRunSpecs:
           - pipelineTaskName: acquire-mac-machine
             taskPodTemplate:
