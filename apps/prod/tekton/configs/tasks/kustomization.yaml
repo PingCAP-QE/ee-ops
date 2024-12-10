@@ -25,6 +25,7 @@ resources:
   - multi-arch-image-collect.yaml
   - multi-arch-image-push.yaml
   - pingcap-auto-add-image-major-tag.yaml
+  - pingcap-build-binaries-darwin-v2.yaml
   - pingcap-build-binaries-darwin.yaml
   - pingcap-build-binaries.yaml
   - pingcap-build-images.yaml

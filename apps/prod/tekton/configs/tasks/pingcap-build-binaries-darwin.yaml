@@ -3,14 +3,15 @@ kind: Task
 metadata:
   name: pingcap-build-binaries-darwin
   labels:
-    app.kubernetes.io/version: "0.1"
+    app.kubernetes.io/version: "0.2"
   annotations:
-    tekton.dev/platforms: "linux/amd64"
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
   description: >-
     Build binaries for the component.
   workspaces:
     - name: source
+      description: source code.
     - name: dockerconfig
       description: Includes a docker `config.json`
       mountPath: /root/.docker
@@ -20,7 +21,6 @@ spec:
   results:
     - description: Just built and pushed images, it will be a yaml content.
       name: pushed
-      type: string
   params:
     - name: component
     - name: os

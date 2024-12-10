@@ -28,6 +28,8 @@ spec:
 
         May be it is an idea to judge it by git-url, but it maybe
         not a generic way for forked repositories with custom names.
+    - name: os
+      default: darwin
     - name: arch
       default: amd64
     - name: profile
@@ -42,7 +44,7 @@ spec:
         The builder image to use for building binaries by force, if empty.
         Default the task will complete one from config in artifacts.git repo.
       type: string
-      default: ""      
+      default: ""
   results:
     - name: pushed-binaries
       description: pushed binaries.
@@ -111,7 +113,7 @@ spec:
         - name: component
           value: "$(params.component)"
         - name: os
-          value: darwin
+          value: "$(params.os)"
         - name: arch
           value: "$(params.arch)"
         - name: profile
@@ -119,7 +121,7 @@ spec:
         - name: version
           value: "$(tasks.get-release-ver.results.version)"
         - name: force-builder-image
-          value: "$(params.force-builder-image)"          
+          value: "$(params.force-builder-image)"
     - name: acquire-mac-machine
       runAfter:
         - checkout
@@ -142,7 +144,7 @@ spec:
       # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
         - name: os
-          value: darwin
+          value: "$(params.os)"
         - name: arch
           value: "$(params.arch)"
         - name: profile
