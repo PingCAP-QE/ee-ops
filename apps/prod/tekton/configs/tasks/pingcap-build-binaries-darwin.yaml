@@ -178,7 +178,7 @@ spec:
         remote_workspace_dir="${workspace_base_dir}/$(context.taskRun.name)"
         ssh ${username}@${host} "mkdir -p '$remote_workspace_dir'"
         # trap the timeout and error signal and clean the workspace dir.
-        # This ensures that the workspace directory is always cleaned up, 
+        # This ensures that the workspace directory is always cleaned up,
         # even if the task fails or times out or exits normally.
         trap "ssh ${username}@${host} rm -rf '$remote_workspace_dir'" EXIT TERM KILL
 
@@ -208,6 +208,10 @@ spec:
           printf '"{}"' > $(results.pushed.path)
           exit 0
         fi
+
+        for f in $(find $(params.release-dir) -name "*.tar.gz"); do
+          tar -tf $f
+        done
 
         oras version
         # try 2 times.
