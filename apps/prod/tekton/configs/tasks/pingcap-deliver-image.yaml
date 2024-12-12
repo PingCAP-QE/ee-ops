@@ -39,7 +39,7 @@ spec:
           --yaml_file=delivery.yaml \
           --outfile=/workspace/delivery.sh
     - name: run-commands
-      image: gcr.io/go-containerregistry/crane/debug:v0.15.2
+      image: gcr.io/go-containerregistry/crane/debug:latest
       script: |
         #!/busybox/sh
         set -e
