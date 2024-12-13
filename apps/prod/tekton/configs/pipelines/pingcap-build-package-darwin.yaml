@@ -132,7 +132,7 @@ spec:
       runAfter:
         - checkout-ext
       taskRef:
-        name: pingcap-build-binaries-darwin-v2
+        name: pingcap-build-binaries-darwin
       params:
         - name: os
           value: "$(params.os)"
