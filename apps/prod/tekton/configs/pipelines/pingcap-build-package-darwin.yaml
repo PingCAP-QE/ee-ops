@@ -45,10 +45,16 @@ spec:
         Default the task will complete one from config in artifacts.git repo.
       type: string
       default: ""
+    - name: boskos-server-url
+      description: The URL of the running boskos server
+      default: http://boskos.apps.svc
   results:
     - name: pushed-binaries
       description: pushed binaries.
       value: "$(tasks.build-binaries.results.pushed)"
+    - name: pushed-images
+      description: pushed images.
+      value: "$(tasks.build-images.results.printed)"
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
@@ -122,26 +128,11 @@ spec:
           value: "$(tasks.get-release-ver.results.version)"
         - name: force-builder-image
           value: "$(params.force-builder-image)"
-    - name: acquire-mac-machine
-      runAfter:
-        - checkout
-      taskRef:
-        name: boskos-acquire
-      params:
-        - name: server-url
-          value: http://boskos.apps.svc
-        - name: timeout
-          value: 15m
-        - name: type
-          value: "mac-machine-$(params.arch)"
-        - name: owner-name
-          value: "$(context.pipelineRun.name)"
     - name: build-binaries
       runAfter:
         - checkout-ext
       taskRef:
-        name: pingcap-build-binaries-darwin
-      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
+        name: pingcap-build-binaries-darwin-v2
       params:
         - name: os
           value: "$(params.os)"
@@ -165,8 +156,8 @@ spec:
           value: "$(params.push)"
         - name: registry
           value: "$(params.registry)"
-        - name: mac-builder-resource
-          value: "$(tasks.acquire-mac-machine.results.leased-resource)"
+        - name: boskos-server-url
+          value: $(params.boskos-server-url)
       workspaces:
         - name: source
           workspace: source
@@ -174,16 +165,13 @@ spec:
           workspace: dockerconfig
         - name: ssh-directory
           workspace: mac-ssh-credentials
-  finally:
-    - name: release-mac-machine
+    - name: build-images
+      when:
+        - input: "$(params.push)"
+          operator: in
+          values: ["true"]
       taskRef:
-        name: boskos-release
-      timeout: 5m0s
-      retries: 1
+        name: echo
       params:
-        - name: server-url
-          value: http://boskos.apps.svc
-        - name: leased-resource
-          value: "$(tasks.acquire-mac-machine.results.leased-resource)"
-        - name: owner-name
-          value: "$(context.pipelineRun.name)"
+        - name: message
+          value: "'{}'"
