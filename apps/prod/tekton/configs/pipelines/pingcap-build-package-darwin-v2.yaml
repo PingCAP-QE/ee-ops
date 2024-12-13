@@ -52,6 +52,9 @@ spec:
     - name: pushed-binaries
       description: pushed binaries.
       value: "$(tasks.build-binaries.results.pushed)"
+    - name: pushed-images
+      description: pushed images.
+      value: "$(tasks.build-images.results.printed)"
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
@@ -162,4 +165,13 @@ spec:
           workspace: dockerconfig
         - name: ssh-directory
           workspace: mac-ssh-credentials
-
+    - name: build-images
+      when:
+        - input: "$(params.push)"
+          operator: in
+          values: ["true"]
+      taskRef:
+        name: echo
+      params:
+        - name: message
+          value: '{}'
