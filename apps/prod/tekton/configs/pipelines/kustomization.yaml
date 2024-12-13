@@ -5,5 +5,5 @@ resources:
   - kaniko-build.yaml
   - ko-build-prow.yaml
   - pingcap-build-package-darwin.yaml
-  - pingcap-build-package.yaml
+  - pingcap-build-package-linux.yaml
   - pingcap-release-ga.yaml
