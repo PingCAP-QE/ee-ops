@@ -56,7 +56,7 @@ spec:
                 - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/monitor-s3-object-size.ts
                 - --path=git/PingCAP-QE/tidb-test
                 - --threshold-mb=2500
-                - --feishu-webhook="${CI_MONITOR_FEISHU_WEBHOOK_URL}"
+                - --feishu-webhook=$(CI_MONITOR_FEISHU_WEBHOOK_URL)
                 - --cleanup
               envFrom:
                 - secretRef:
