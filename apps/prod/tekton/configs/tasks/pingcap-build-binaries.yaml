@@ -89,10 +89,10 @@ spec:
       env:
         - name: CARGO_NET_GIT_FETCH_WITH_CLI
           value: 'true'
-        - name: RUSTUP_DIST_SERVER
-          value: https://rsproxy.cn
-        - name: RUSTUP_UPDATE_ROOT
-          value: https://rsproxy.cn/rustup
+        # - name: RUSTUP_DIST_SERVER
+        #   value: https://rsproxy.cn
+        # - name: RUSTUP_UPDATE_ROOT
+        #   value: https://rsproxy.cn/rustup
         - name: GOPROXY
           value: 'http://goproxy.apps.svc,direct'
         - name: CARGO_HOME

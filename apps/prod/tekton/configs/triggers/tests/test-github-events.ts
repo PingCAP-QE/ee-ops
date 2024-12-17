@@ -1,4 +1,4 @@
-#!/usr/bin/env deno run --allow-net
+#!/usr/bin/env -S  deno run --allow-net
 
 import { parseArgs } from "jsr:@std/cli@^1.0.1";
 import { Octokit } from "https://esm.sh/octokit@4.0.2?dts";
