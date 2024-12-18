@@ -6,5 +6,5 @@ resources:
   - ko-build-prow.yaml
   - pingcap-build-package-darwin-v2.yaml
   - pingcap-build-package-darwin.yaml
-  - pingcap-build-package.yaml
+  - pingcap-build-package-linux.yaml
   - pingcap-release-ga.yaml
