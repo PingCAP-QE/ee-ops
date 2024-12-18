@@ -51,7 +51,7 @@ spec:
           "tibuild.pingcap.net/platform": $(tt.params.os)/$(tt.params.arch)
       spec:
         pipelineRef:
-          name: pingcap-build-package
+          name: pingcap-build-package-linux
         params:
           - name: git-url
             value: $(tt.params.git-url)

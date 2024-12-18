@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pingcap-build-package
+  name: pingcap-build-package-linux
 spec:
   params:
     - name: git-url
@@ -133,7 +133,7 @@ spec:
       runAfter:
         - checkout-ext
       taskRef:
-        name: pingcap-build-binaries
+        name: pingcap-build-binaries-linux
       params:
         - name: os
           value: "$(params.os)"
