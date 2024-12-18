@@ -199,7 +199,7 @@ spec:
           "tibuild.pingcap.net/platform": darwin/amd64
       spec:
         pipelineRef:
-          name: pingcap-build-package-darwin-v2
+          name: pingcap-build-package-darwin
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -258,7 +258,7 @@ spec:
           "tibuild.pingcap.net/platform": darwin/arm64
       spec:
         pipelineRef:
-          name: pingcap-build-package-darwin-v2
+          name: pingcap-build-package-darwin
         params:
           - name: git-url
             value: $(tt.params.git-url)

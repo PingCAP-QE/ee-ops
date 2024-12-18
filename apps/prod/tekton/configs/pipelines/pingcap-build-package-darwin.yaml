@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pingcap-build-package-darwin-v2
+  name: pingcap-build-package-darwin
 spec:
   params:
     - name: git-url
