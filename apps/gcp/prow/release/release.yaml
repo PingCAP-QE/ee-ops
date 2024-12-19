@@ -51,8 +51,8 @@ spec:
           configMapName: prow-job-config
     crier:
       image:
-        repository: ticommunityinfra/crier
-        tag: v20221227-9bc8171e1d
+        repository: ghcr.io/ti-community-infra/prow/crier
+        tag: v20241218-c96901f3d
     deck:
       ingress:
         enabled: false
