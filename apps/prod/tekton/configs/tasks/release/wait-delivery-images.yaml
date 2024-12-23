@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: wait-delivery-image
+spec:
+  description: include images and non-image artifacts.
+  params:
+    - name: version
+      type: string
+      description: the version to wait for delivery.
+  steps:
+    - name: wait
+      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      script: |
+        check_ver="$(params.version)"
+        echo "🤷 This step is not implement yet."
