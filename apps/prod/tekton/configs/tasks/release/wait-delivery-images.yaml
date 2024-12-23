@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: wait-delivery-image
+  name: wait-delivery-images
 spec:
   description: include images and non-image artifacts.
   params:

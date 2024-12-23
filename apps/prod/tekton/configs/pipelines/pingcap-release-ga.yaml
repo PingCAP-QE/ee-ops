@@ -33,23 +33,23 @@ spec:
         - { name: version, value: $(params.version) }
       workspaces:
         - { name: github,  workspace: github }
-    - name: wait-tiup-delivery
+    - name: wait-delivery-tiup
       runAfter: [ga-tag-oci-artifacts]
       params:
         - { name: version, value: $(params.version) }
       taskRef:
-        name: wait-tiup-delivery
+        name: wait-delivery-tiup
       timeout: 2h0s
-    - name: wait-image-delivery
+    - name: wait-delivery-images
       runAfter:
         - ga-tag-oci-artifacts
       params:
         - name: version
           value: $(params.version)
       taskRef:
-        name: wait-delivery-image
+        name: wait-delivery-images
     - name: compose-offline-pkgs-amd64-community
-      runAfter: [wait-tiup-delivery]
+      runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
       params:
         - { name: os, value: linux }
@@ -70,7 +70,7 @@ spec:
         - { name: arch, value: amd64 }
         - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-amd64-enterprise
-      runAfter: [wait-tiup-delivery]
+      runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
       params:
         - { name: os, value: linux }
@@ -91,7 +91,7 @@ spec:
         - { name: arch, value: amd64 }
         - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-amd64-dm
-      runAfter: [wait-tiup-delivery]
+      runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
       params:
         - { name: os, value: linux }
@@ -114,7 +114,7 @@ spec:
         - { name: arch, value: amd64 }
         - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-community
-      runAfter: [wait-tiup-delivery]
+      runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
       params:
         - { name: os, value: linux }
@@ -135,7 +135,7 @@ spec:
         - { name: arch, value: arm64 }
         - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-enterprise
-      runAfter: [wait-tiup-delivery]
+      runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
       params:
         - { name: os, value: linux }
@@ -156,7 +156,7 @@ spec:
         - { name: arch, value: arm64 }
         - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-dm
-      runAfter: [wait-tiup-delivery]
+      runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
       params:
         - { name: os, value: linux }
