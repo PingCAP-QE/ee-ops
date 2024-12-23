@@ -23,28 +23,8 @@ spec:
           value: "$(params.version)-pre"
         - name: ga-version
           value: $(params.version)
-      taskSpec:
-        description: include images and non-image artifacts.
-        params:
-          - name: rc-version
-          - name: ga-version
-        steps:
-          - name: run
-            image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
-            script: |
-              #! /usr/bin/env bash
-              set -ex
-
-              rc_ver="$(params.rc-version)"
-              ga_ver="$(params.ga-version)"
-              registry="hub.pingcap.net"
-
-              wget -c --tries=3 https://github.com/PingCAP-QE/ci/raw/main/scripts/artifacts/tag-rc2ga-on-repos.sh
-              chmod +x tag-rc2ga-on-repos.sh
-
-              # force add the tag on repos:
-              # ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry" true
-              ./tag-rc2ga-on-repos.sh "$rc_ver" "$ga_ver" "$registry"
+      taskRef:
+        name: tag-rc2ga-on-oci-artifacts
     - name: create-releases
       runAfter: [ga-tag-oci-artifacts]
       taskRef:
@@ -57,55 +37,17 @@ spec:
       runAfter: [ga-tag-oci-artifacts]
       params:
         - { name: version, value: $(params.version) }
-      taskSpec:
-        params:
-          - name: version
-        steps:
-          - name: wait
-            image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
-            workingDir: /workspace
-            timeout: 2h0s
-            script: |
-              #! /usr/bin/env bash
-              set -exo pipefail
-
-              tiup_check_ver="$(params.version)"
-              tiup_mirror="http://tiup.pingcap.net:8987"
-              oci_registry="hub.pingcap.net"
-
-              # set mirror, Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988
-              tiup mirror set $tiup_mirror
-
-              # check the tiup pkgs
-              wget --tries 3 -c -O check-tiup.sh https://github.com/PingCAP-QE/ci/raw/main/scripts/artifacts/check-tiup.sh
-              chmod +x check-tiup.sh
-
-              while true; do
-                if ./check-tiup.sh "$tiup_check_ver" "$tiup_mirror" "$oci_registry" true; then
-                  echo "🏅🏅🏅 Check TiUP package delivery succeeded!"
-                  break
-                else
-                  echo "Command failed, retrying in 1 minute..."
-                  sleep 60
-                fi
-              done
-
-              cat results.yaml || true
+      taskRef:
+        name: wait-tiup-delivery
+      timeout: 2h0s
     - name: wait-image-delivery
       runAfter:
         - ga-tag-oci-artifacts
       params:
         - name: version
           value: $(params.version)
-      taskSpec:
-        params:
-          - name: version
-        steps:
-          - name: wait
-            image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
-            script: |
-              check_ver="$(params.version)"
-              echo "🤷 This step is not implement yet."
+      taskRef:
+        name: wait-delivery-image
     - name: compose-offline-pkgs-amd64-community
       runAfter: [wait-tiup-delivery]
       taskRef: { name: pingcap-compose-offline-pkgs }
