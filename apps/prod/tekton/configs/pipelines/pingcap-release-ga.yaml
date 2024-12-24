@@ -6,8 +6,12 @@ spec:
   params:
     - name: version
       type: string
-    - name: os
-      default: linux
+    - name: tiup-mirror
+      default: http://tiup.pingcap.net:8987
+      description: the product tiup mirror site.
+    - name: oci-registry
+      default: hub.pingcap.net
+      description: The OCI registry stored the origin artifacts.
     - name: qiniu-creds-secret-name
       default: qiniu-creds
   workspaces:
@@ -32,20 +36,25 @@ spec:
       params:
         - { name: version, value: $(params.version) }
       workspaces:
-        - { name: github,  workspace: github }
+        - { name: github, workspace: github }
     - name: wait-delivery-tiup
       runAfter: [ga-tag-oci-artifacts]
+      timeout: 2h0s
       params:
         - { name: version, value: $(params.version) }
+        - { name: mirror, value: $(params.tiup-mirror) }
+        - { name: oci-registry, value: $(params.oci-registry) }
       taskRef:
         name: wait-delivery-tiup
-      timeout: 2h0s
     - name: wait-delivery-images
       runAfter:
         - ga-tag-oci-artifacts
+      timeout: 1h0s
       params:
-        - name: version
-          value: $(params.version)
+        - { name: version, value: $(params.version) }
+        - { name: oci-registry, value: $(params.oci-registry) }
+        - name: delivery-config
+          value: https://github.com/PingCAP-QE/artifacts/raw/main/packages/delivery.yaml
       taskRef:
         name: wait-delivery-images
     - name: compose-offline-pkgs-amd64-community
@@ -54,7 +63,7 @@ spec:
       params:
         - { name: os, value: linux }
         - { name: version, value: "$(params.version)" }
-        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: tiup-mirror, value: "$(params.tiup-mirror)" }
         - { name: push, value: "true" }
         - { name: arch, value: amd64 }
         - { name: edition, value: community }
@@ -75,7 +84,7 @@ spec:
       params:
         - { name: os, value: linux }
         - { name: version, value: "$(params.version)" }
-        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: tiup-mirror, value: "$(params.tiup-mirror)" }
         - { name: push, value: "true" }
         - { name: arch, value: amd64 }
         - { name: edition, value: enterprise }
@@ -96,7 +105,7 @@ spec:
       params:
         - { name: os, value: linux }
         - { name: version, value: "$(params.version)" }
-        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: tiup-mirror, value: "$(params.tiup-mirror)" }
         - { name: push, value: "true" }
         - { name: arch, value: amd64 }
         - { name: edition, value: dm }
@@ -119,7 +128,7 @@ spec:
       params:
         - { name: os, value: linux }
         - { name: version, value: "$(params.version)" }
-        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: tiup-mirror, value: "$(params.tiup-mirror)" }
         - { name: push, value: "true" }
         - { name: arch, value: arm64 }
         - { name: edition, value: community }
@@ -140,7 +149,7 @@ spec:
       params:
         - { name: os, value: linux }
         - { name: version, value: "$(params.version)" }
-        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: tiup-mirror, value: "$(params.tiup-mirror)" }
         - { name: push, value: "true" }
         - { name: arch, value: arm64 }
         - { name: edition, value: enterprise }
@@ -161,7 +170,7 @@ spec:
       params:
         - { name: os, value: linux }
         - { name: version, value: "$(params.version)" }
-        - { name: tiup-mirror, value: "http://tiup.pingcap.net:8987" }
+        - { name: tiup-mirror, value: "$(params.tiup-mirror)" }
         - { name: push, value: "true" }
         - { name: arch, value: arm64 }
         - { name: edition, value: dm }

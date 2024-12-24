@@ -2,24 +2,33 @@ apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: wait-delivery-tiup
-spec: 
+spec:
   description: wait for tiup delivery to complete.
   params:
     - name: version
       type: string
       description: the version to wait for delivery.
+    - name: mirror
+      default: http://tiup.pingcap.net:8987
+      description: >
+        Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988
+    - name: oci-registry
+      default: hub.pingcap.net
+      description: The OCI registry stored the origin tarball files.
   steps:
     - name: wait
       image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      env:
+        - name: tiup_check_ver
+          value: $(params.version)
+        - name: tiup_mirror
+          value: $(params.mirror)
+        - name: oci_registry
+          value: $(params.oci-registry)
       script: |
         #! /usr/bin/env bash
         set -exo pipefail
 
-        tiup_check_ver="$(params.version)"
-        tiup_mirror="http://tiup.pingcap.net:8987"
-        oci_registry="hub.pingcap.net"
-
-        # set mirror, Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988
         tiup mirror set $tiup_mirror
 
         # check the tiup pkgs
