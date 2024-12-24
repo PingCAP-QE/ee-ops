@@ -41,6 +41,7 @@ resources:
   - publish-tiup-from-oci-artifact.yaml
   - release/create-pr-to-add-release-anchor-commit.yaml
   - release/create-pr-to-bump-tikv-version.yaml
+  - release/pingcap-create-github-alpha-tags.yaml
   - release/pingcap-create-github-releases.yaml
   - release/tag-rc2ga-on-oci-artifacts.yaml
   - release/wait-delivery-images.yaml
