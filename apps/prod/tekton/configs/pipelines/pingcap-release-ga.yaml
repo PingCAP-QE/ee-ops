@@ -39,16 +39,17 @@ spec:
         - { name: github, workspace: github }
     - name: wait-delivery-tiup
       runAfter: [ga-tag-oci-artifacts]
+      timeout: 2h0s
       params:
         - { name: version, value: $(params.version) }
         - { name: mirror, value: $(params.tiup-mirror) }
         - { name: oci-registry, value: $(params.oci-registry) }
       taskRef:
         name: wait-delivery-tiup
-      timeout: 2h0s
     - name: wait-delivery-images
       runAfter:
         - ga-tag-oci-artifacts
+      timeout: 1h0s
       params:
         - { name: version, value: $(params.version) }
         - { name: oci-registry, value: $(params.oci-registry) }
