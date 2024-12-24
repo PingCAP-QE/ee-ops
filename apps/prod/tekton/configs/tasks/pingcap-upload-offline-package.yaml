@@ -29,35 +29,43 @@ spec:
     - name: oci-repo
       default: "hub.pingcap.net/pingcap/offline-package"
     - name: dry-run
-      default: 'false'
+      default: "false"
   workspaces:
     - name: aws-secrets
       optional: true
+    - name: aws-secrets-qiniu
   steps:
     - name: upload-offline-tarballs
+      image: docker.io/amazon/aws-cli:2.22.18
       workingDir: /workspace
-      image: python:3.13.1
-      envFrom:
-        - secretRef:
-            name: $(params.env-secret-name)
+      env:
+        - name: bucket_name
+          value: tidb
       script: |
         #!/usr/bin/env bash
         set -e
 
+        if [ ! -f "$(workspaces.aws-secrets-qiniu.path)/credentials" ]; then
+          echo "Error: aws-secrets-qiniu workspace is not bound."
+          exit 1
+        fi
+
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
         FILE_SERVER_URL="http://fileserver.pingcap.net"
-
-        # prepare script for uploading to QiNiu.
-        pip3 install qiniu
-        wget -O upload_qiniu.py https://github.com/PingCAP-QE/ci/raw/main/scripts/artifacts/upload_qiniu.py
-        apt-get update -y && apt-get install jq -y
+        yum install jq -y
+        # TODO: we need the `endpoint` plugin
+        # pip3 install awscli-plugin-endpoint
 
         tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
         echo "🚀 uploading for ${tag} ..."
+        cp -r $(workspaces.aws-secrets-qiniu.path) ~/.aws
 
+        # download the files.
         curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
         for f in $(curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}" | jq -r '.[]'); do
+          # TODO: skip it if it is uploaded remotely.
+
           # download from oci artifact.
           echo "🚀 Downloading $f from ${repo}:${tag} ..."
           wget -q -O "$f" "${dl_svr_url}/oci-file/${repo}?tag=${tag}&file=$f"
@@ -68,20 +76,22 @@ spec:
           echo "🚀 Uploading $f ..."
           if [ "$(params.dry-run)" == "true" ]; then
             echo "🧪🩺 DRY run mode enabled."
-            python upload_qiniu.py $f fake-release/$target_f
+            aws s3 cp $f s3://${bucket_name}/fake-release/$target_f --acl public-read
             curl --fail -F fake-release/$f=@${target_f} ${FILE_SERVER_URL}/upload | grep -E 'success'
           else
             python upload_qiniu.py $f $target_f
+            aws s3 cp $f s3://${bucket_name}/$target_f --acl public-read
             curl --fail -F release/$target_f=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
           fi
-
           echo "✅ Uploaded $f ."
         done
         echo "✅ Uploaded for ${tag} ."
-
     - name: upload-dm-tarballs-to-s3
       image: docker.io/amazon/aws-cli:2.22.18
       workingDir: /workspace
+      env:
+        - name: bucket_name
+          value: tidb
       script: |
         #!/usr/bin/env bash
         set -e
@@ -96,24 +106,24 @@ spec:
 
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
-        tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
-
         yum install jq -y
 
+        tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
         echo "🚀 uploading for ${tag} ..."
         cp -r $(workspaces.aws-secrets.path) ~/.aws
 
         # no need to download it again, it is downloaded in previous step.
-        curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
+
+        # upload them.
         for f in $(curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}" | jq -r '.[]'); do
           # upload it.
           target_f=$(echo "$f" | sed 's/-pre//')
           echo "🚀 Uploading $f ..."
           if [ "$(params.dry-run)" == "true" ]; then
             echo "🧪🩺 DRY run mode enabled."
-            aws s3 cp $f s3://download.pingcap.org/fake-release/$target_f --acl public-read
+            aws s3 cp $f s3://${bucket_name}/fake-release/$target_f --acl public-read
           else
-            aws s3 cp $f s3://download.pingcap.org/$target_f --acl public-read
+            aws s3 cp $f s3://${bucket_name}/$target_f --acl public-read
           fi
           echo "✅ Uploaded $f ."
         done
