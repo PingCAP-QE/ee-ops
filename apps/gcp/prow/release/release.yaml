@@ -104,6 +104,7 @@ spec:
             pingcap/tidb-tools
             pingcap/tiflash
             pingcap/tiflow
+            pingcap/ticdc
             tikv/pd
             tikv/tikv
     pcm:
