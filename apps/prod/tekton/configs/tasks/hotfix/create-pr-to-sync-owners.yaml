@@ -47,7 +47,7 @@ spec:
             --only_repo.branch=$(params.branch) \
             --inputs=teams/diagnostic/membership.json \
             --inputs=teams/docs/membership.json \
-            --inputs=teams/tiunimanager/membership.json \
+            --inputs=teams/ticdc/membership.json \
             --inputs=teams/tidb/membership.json \
             --inputs=teams/tiflash/membership.json \
             --inputs=teams/tiup/membership.json \
