@@ -91,6 +91,9 @@ spec:
     - name: create-pr
       image: bitnami/git:2.43.0
       workingDir: /workspace/src
+      env:
+        - name: REF_ISSUE_NUMBER
+          value: "15990"
       script: |
         git config --global --add safe.directory `pwd`
         git config --global user.email "ti-community-prow-bot@tidb.io"
@@ -118,12 +121,22 @@ spec:
         # commit and push the changes.
         head_branch="build/$(cat /workspace/inner-results-branch)/bump-tikv-version"
         git checkout -b "$head_branch"
-        commit_msg="build: bump tikv pkg version"
+        commit_msg="build: bump tikv pkg version to $(cat /workspace/inner-results-version)"
         git commit -am "$commit_msg" --signoff
         git push origin "$head_branch" --force
 
         # create pull request
         cat <<EOF > pr_body.txt
+        ### What is changed and how it works?
+
+        Issue Number: ref #${REF_ISSUE_NUMBER}
+
+        What's Changed:
+
+        \`\`\`commit-message
+        build: bump tikv pkg version
+        \`\`\`
+
         ### Release note
 
         \`\`\`release-note
