@@ -20,7 +20,7 @@ spec:
           --token="$(cat $(workspaces.github.path)/token)" \
           --pushEventUrl=http://el-public:8080
     - name: reset-tiup-rate-limit
-      image: ghcr.io/pingcap-qe/ee-apps/publisher:v2024.12.12-5-g63c6b7f
+      image: ghcr.io/pingcap-qe/ee-apps/publisher:v2024.12.12-6-g069f4f2
       command:
         - /app/publisher-cli
       args:
