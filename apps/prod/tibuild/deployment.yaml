@@ -20,34 +20,34 @@ spec:
         app: tibuild
     spec:
       containers:
-      - image: ghcr.io/pingcap-qe/ee-apps/tibuild:v2024.11.4-4-g31622fb
-        imagePullPolicy: Always
-        name: tibuild
-        ports:
-        - containerPort: 8080
-          protocol: TCP
-        resources:
-          requests:
-            cpu: "1"
-            memory: 1Gi
-          limits:
-            cpu: "1"
-            memory: 1Gi
-        livenessProbe:
-          httpGet:
-            path: /swagger/index.html
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          timeoutSeconds: 3
-        volumeMounts:
-        - name: configs
-          mountPath: "/app/configs"
-          readOnly: true
+        - image: ghcr.io/pingcap-qe/ee-apps/tibuild:v2024.12.12-7-g7b83308
+          imagePullPolicy: Always
+          name: tibuild
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: "1"
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /swagger/index.html
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: configs
+              mountPath: "/app/configs"
+              readOnly: true
       nodeSelector:
         kubernetes.io/arch: "amd64"
       volumes:
-      - name: configs
-        secret:
-          secretName: tibuild-configs
+        - name: configs
+          secret:
+            secretName: tibuild-configs
       terminationGracePeriodSeconds: 30
