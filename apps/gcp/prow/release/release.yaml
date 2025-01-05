@@ -125,8 +125,8 @@ spec:
     jenkinsOperator:
       enabled: true
       image:
-        repository: ticommunityinfra/jenkins-operator
-        tag: v20230630-a19314f
+        repository: ghcr.io/ti-community-infra/prow/jenkins-operator
+        tag: v20250105-d73428bb3
       skipReport: true
       dryRun: false
       jenkinsUrl: ${JENKINS_BASE_URL}
