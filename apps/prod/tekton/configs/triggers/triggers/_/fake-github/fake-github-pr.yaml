@@ -11,54 +11,58 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.full_name in ['pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'pingcap/tidb-dashboard', 'tikv/tikv', 'tikv/pd']
+            body.repository.full_name in ['pingcap/ticdc', 'pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'pingcap/tidb-dashboard', 'tikv/tikv', 'tikv/pd']
         - name: overlays
           value:
-          - key: timeout
-            expression: >-
-              {
-              'pingcap/tidb': '40m',
-              'pingcap/tiflash': '2h',
-              'pingcap/tiflow': '40m',
-              'pingcap/tidb-dashboard': '40m',
-              'tikv/pd': '40m',
-              'tikv/tikv': '2h30m',
-              }[body.repository.full_name]
-          - key: source-ws-size
-            expression: >-
-              {
-              'pingcap/tidb': '50Gi',
-              'pingcap/tiflash': '100Gi',
-              'pingcap/tiflow': '50Gi',
-              'pingcap/tidb-dashboard': '8Gi',
-              'tikv/pd': '50Gi',
-              'tikv/tikv': '100Gi',
-              }[body.repository.full_name]
-          - key: builder-resources-cpu
-            expression: >-
-              {
-              'pingcap/tidb': '8',
-              'pingcap/tiflash': '16',
-              'pingcap/tiflow': '8',
-              'pingcap/tidb-dashboard': '2',
-              'tikv/pd': '8',
-              'tikv/tikv': '16',
-              }[body.repository.full_name]
-          - key: builder-resources-memory
-            expression: >-
-              {
-              'pingcap/tidb': '32Gi',
-              'pingcap/tiflash': '64Gi',
-              'pingcap/tiflow': '32Gi',
-              'pingcap/tidb-dashboard': '4Gi',
-              'tikv/pd': '32Gi',
-              'tikv/tikv': '64Gi',
-              }[body.repository.full_name]
-          - key: custom-params
-            expression: >-
-              {                
-                'builder-image': header.canonical('ce-paramBuilderImage')
-              }
+            - key: timeout
+              expression: >-
+                {
+                'pingcap/ticdc: '20m',
+                'pingcap/tidb': '40m',
+                'pingcap/tiflash': '2h',
+                'pingcap/tiflow': '40m',
+                'pingcap/tidb-dashboard': '40m',
+                'tikv/pd': '40m',
+                'tikv/tikv': '2h30m',
+                }[body.repository.full_name]
+            - key: source-ws-size
+              expression: >-
+                {
+                'pingcap/ticdc': '50Gi',
+                'pingcap/tidb': '50Gi',
+                'pingcap/tiflash': '100Gi',
+                'pingcap/tiflow': '50Gi',
+                'pingcap/tidb-dashboard': '8Gi',
+                'tikv/pd': '50Gi',
+                'tikv/tikv': '100Gi',
+                }[body.repository.full_name]
+            - key: builder-resources-cpu
+              expression: >-
+                {
+                'pingcap/ticdc': '4',
+                'pingcap/tidb': '8',
+                'pingcap/tiflash': '16',
+                'pingcap/tiflow': '8',
+                'pingcap/tidb-dashboard': '2',
+                'tikv/pd': '8',
+                'tikv/tikv': '16',
+                }[body.repository.full_name]
+            - key: builder-resources-memory
+              expression: >-
+                {
+                'pingcap/ticdc': '16Gi',
+                'pingcap/tidb': '32Gi',
+                'pingcap/tiflash': '64Gi',
+                'pingcap/tiflow': '32Gi',
+                'pingcap/tidb-dashboard': '4Gi',
+                'tikv/pd': '32Gi',
+                'tikv/tikv': '64Gi',
+                }[body.repository.full_name]
+            - key: custom-params
+              expression: >-
+                {
+                  'builder-image': header.canonical('ce-paramBuilderImage')
+                }
   bindings:
     - ref: github-pr
     - ref: ce-context
@@ -66,9 +70,18 @@ spec:
     - { name: profile, value: release }
     - { name: timeout, value: $(extensions.timeout) }
     - { name: source-ws-size, value: $(extensions.source-ws-size) }
-    - { name: builder-resources-cpu, value: $(extensions.builder-resources-cpu) }
-    - { name: builder-resources-memory, value: $(extensions.builder-resources-memory) }
+    - {
+        name: builder-resources-cpu,
+        value: $(extensions.builder-resources-cpu),
+      }
+    - {
+        name: builder-resources-memory,
+        value: $(extensions.builder-resources-memory),
+      }
     - { name: registry, value: hub.pingcap.net/devbuild }
-    - { name: force-builder-image, value: $(extensions.custom-params.builder-image) }
+    - {
+        name: force-builder-image,
+        value: $(extensions.custom-params.builder-image),
+      }
   template:
     ref: build-component-all-platforms
