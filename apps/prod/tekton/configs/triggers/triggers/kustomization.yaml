@@ -18,6 +18,7 @@ resources:
   - pingcap/advanced-statefulset/git-push.yaml
   - pingcap/monitoring/git-push.yaml
   - pingcap/ng-monitoring/git-push.yaml
+  - pingcap/ticdc/git-push.yaml
   - pingcap/tidb-binlog/git-push.yaml
   - pingcap/tidb-ctl/git-create-tag.yaml
   - pingcap/tidb-ctl/git-push.yaml

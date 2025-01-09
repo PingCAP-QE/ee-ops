@@ -16,6 +16,7 @@ spec:
             'pingcap/tidb',
             'pingcap/tiflash',
             'pingcap/tiflow',
+            'pingcap/ticdc',
             'pingcap/tidb-binlog',
             'pingcap/tidb-dashboard',
             'pingcap/tidb-tools',

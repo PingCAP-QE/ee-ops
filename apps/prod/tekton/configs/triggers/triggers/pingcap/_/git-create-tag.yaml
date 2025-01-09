@@ -12,9 +12,12 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap'
-            &&
-            body.repository.name in ['monitoring', 'ng-monitoring', 'tidb-binlog', 'tidb-dashboard']
+            body.repository.full_name in [
+            'pingcap/monitoring',
+            'pingcap/ng-monitoring',
+            'pingcap/tidb-binlog',
+            'pingcap/tidb-dashboard',
+            ]
             &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-alpha)?$')
   bindings:
