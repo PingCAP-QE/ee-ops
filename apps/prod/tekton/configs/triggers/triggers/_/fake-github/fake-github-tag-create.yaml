@@ -19,7 +19,7 @@ spec:
             - key: timeout
               expression: >-
                 {
-                'pingcap/ticdc: '20m',
+                'pingcap/ticdc': '20m',
                 'pingcap/tidb': '40m',
                 'pingcap/tiflash': '2h',
                 'pingcap/tiflow': '40m',
