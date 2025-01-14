@@ -105,6 +105,7 @@ spec:
             pingcap/tiflash
             pingcap/tiflow
             pingcap/ticdc
+            tikv/client-c
             tikv/pd
             tikv/tikv
     pcm:
