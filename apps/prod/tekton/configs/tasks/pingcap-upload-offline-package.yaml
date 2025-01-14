@@ -24,8 +24,6 @@ spec:
     - name: arch
       type: string
       default: amd64
-    - name: env-secret-name
-      type: string
     - name: oci-repo
       default: "hub.pingcap.net/pingcap/offline-package"
     - name: dry-run
@@ -33,22 +31,21 @@ spec:
   workspaces:
     - name: aws-secrets
       optional: true
-    - name: aws-secrets-qiniu
+    - name: aws-secrets-tencent
   steps:
     - name: upload-offline-tarballs
       image: docker.io/amazon/aws-cli:2.22.18
       workingDir: /workspace
-      env:
-        - name: bucket_name
-          value: tidb
       script: |
         #!/usr/bin/env bash
         set -e
 
-        if [ ! -f "$(workspaces.aws-secrets-qiniu.path)/credentials" ]; then
-          echo "Error: aws-secrets-qiniu workspace is not bound."
+        if [ ! -f "$(workspaces.aws-secrets-tencent.path)/credentials" ]; then
+          echo "Error: aws-secrets-tencent workspace is not bound."
           exit 1
         fi
+
+        bucket_name=$(cat $(workspaces.aws-secrets-tencent.path)/bucket_name)
 
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
@@ -59,7 +56,7 @@ spec:
 
         tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
         echo "🚀 uploading for ${tag} ..."
-        cp -r $(workspaces.aws-secrets-qiniu.path) ~/.aws
+        cp -r $(workspaces.aws-secrets-tencent.path) ~/.aws
 
         # download the files.
         curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
@@ -79,7 +76,6 @@ spec:
             aws s3 cp $f s3://${bucket_name}/fake-release/$target_f --acl public-read
             curl --fail -F fake-release/$f=@${target_f} ${FILE_SERVER_URL}/upload | grep -E 'success'
           else
-            python upload_qiniu.py $f $target_f
             aws s3 cp $f s3://${bucket_name}/$target_f --acl public-read
             curl --fail -F release/$target_f=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
           fi
@@ -89,9 +85,6 @@ spec:
     - name: upload-dm-tarballs-to-s3
       image: docker.io/amazon/aws-cli:2.22.18
       workingDir: /workspace
-      env:
-        - name: bucket_name
-          value: tidb
       script: |
         #!/usr/bin/env bash
         set -e
@@ -103,6 +96,8 @@ spec:
           echo "Error: aws-secrets workspace is not bound."
           exit 1
         fi
+
+        bucket_name=$(cat $(workspaces.aws-secrets.path)/bucket_name)
 
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"

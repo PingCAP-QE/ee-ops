@@ -16,14 +16,12 @@ spec:
   params:
     - name: version
       type: string
-    - name: env-secret-name
-      type: string
     - name: dry-run
-      default: 'false'
+      default: "false"
     - name: oci-repo
       default: hub.pingcap.net/pingcap/tidb/package
   workspaces:
-    - name: aws-secrets-qiniu
+    - name: aws-secrets-tencent
       optional: true
   steps:
     - name: upload-offline-tarballs

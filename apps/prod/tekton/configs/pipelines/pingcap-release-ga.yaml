@@ -12,13 +12,11 @@ spec:
     - name: oci-registry
       default: hub.pingcap.net
       description: The OCI registry stored the origin artifacts.
-    - name: qiniu-creds-secret-name
-      default: qiniu-creds
   workspaces:
     # TODO: why need to push dm offline pkgs to another bucket?
     - name: aws-secrets
       optional: true
-    - name: aws-secrets-qiniu
+    - name: aws-secrets-tencent
       optional: true
     - name: github
       description: for creating github release
@@ -75,7 +73,7 @@ spec:
       taskRef:
         name: pingcap-upload-offline-package
       workspaces:
-        - { name: aws-secrets-qiniu, workspace: aws-secrets-qiniu }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: community }
@@ -102,7 +100,7 @@ spec:
         - { name: os, value: linux }
         - { name: arch, value: amd64 }
       workspaces:
-        - { name: aws-secrets-qiniu, workspace: aws-secrets-qiniu }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
     - name: compose-offline-pkgs-amd64-dm
       runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -120,7 +118,7 @@ spec:
         name: pingcap-upload-offline-package
       workspaces:
         - { name: aws-secrets, workspace: aws-secrets }
-        - { name: aws-secrets-qiniu, workspace: aws-secrets-qiniu }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: dm }
@@ -142,7 +140,7 @@ spec:
       taskRef:
         name: pingcap-upload-offline-package
       workspaces:
-        - { name: aws-secrets-qiniu, workspace: aws-secrets-qiniu }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: community }
@@ -164,7 +162,7 @@ spec:
       taskRef:
         name: pingcap-upload-offline-package
       workspaces:
-        - { name: aws-secrets-qiniu, workspace: aws-secrets-qiniu }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: enterprise }
@@ -187,7 +185,7 @@ spec:
         name: pingcap-upload-offline-package
       workspaces:
         - { name: aws-secrets, workspace: aws-secrets }
-        - { name: aws-secrets-qiniu, workspace: aws-secrets-qiniu }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: dm }
@@ -199,6 +197,6 @@ spec:
       taskRef:
         name: pingcap-upload-enterprise-plugins
       workspaces:
-        - { name: aws-secrets-qiniu, workspace: aws-secrets-qiniu }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
