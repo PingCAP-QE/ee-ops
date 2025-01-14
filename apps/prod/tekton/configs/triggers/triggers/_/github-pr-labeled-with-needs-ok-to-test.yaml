@@ -15,7 +15,16 @@ spec:
             &&
             body.label.name in ['needs-ok-to-test']
             &&
-            body.repository.full_name in ['pingcap/tidb', 'tikv/tikv', 'tikv/pd']
+            body.repository.full_name in [
+            'pingcap/tidb',
+            'pingcap/tidb-dashboard',
+            'pingcap/tidb-operator',
+            'pingcap/tiflow',
+            'tikv/client-go',
+            'tikv/pd',
+            'tikv/raft-engine',
+            'tikv/tikv',
+            ]
             &&
             body.pull_request.user.login in ['mittalrishabh', 'Tema', 'HaoW30']
   bindings:
