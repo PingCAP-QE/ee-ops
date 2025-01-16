@@ -16,31 +16,34 @@ spec:
   params:
     - name: version
       type: string
-    - name: env-secret-name
-      type: string
     - name: dry-run
-      default: 'false'
+      default: "false"
     - name: oci-repo
       default: hub.pingcap.net/pingcap/tidb/package
+  workspaces:
+    - name: aws-secrets-tencent
   steps:
     - name: upload-offline-tarballs
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       workingDir: /workspace
-      image: python:3.13.1
-      envFrom:
-        - secretRef:
-            name: $(params.env-secret-name)
       script: |
         #!/usr/bin/env bash
         set -e
 
+        if [ ! -f "$(workspaces.aws-secrets-tencent.path)/credentials" ]; then
+          echo "Error: aws-secrets-tencent workspace is not bound."
+          exit 1
+        fi
+        cp -r $(workspaces.aws-secrets-tencent.path) ~/.aws
+        aws configure set plugins.cli_legacy_plugin_path $(find /usr/lib -name site-packages -type d | head -1)
+        aws configure set plugins.endpoint awscli_plugin_endpoint
+
+        bucket_name=$(cat $(workspaces.aws-secrets-tencent.path)/bucket_name)
+
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
         FILE_SERVER_URL="http://fileserver.pingcap.net"
-
-        # prepare script for uploading to QiNiu.
-        pip3 install qiniu
-        wget -O upload_qiniu.py https://github.com/PingCAP-QE/ci/raw/main/scripts/artifacts/upload_qiniu.py
-        apt-get update -y && apt-get install jq -y
+        yum install jq -y
 
         for platform in linux_amd64 linux_arm64; do
           tag="$(params.version)-enterprise_${platform}"
@@ -48,6 +51,8 @@ spec:
 
           curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
           for f in $(curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}" | jq -r '.[]' | grep "plugins-v"); do
+            # TODO: skip it if it is uploaded remotely.
+
             # download from oci artifact.
             echo "🚀 Downloading $f from ${repo}:${tag} ..."
             wget -q -O "$f" "${dl_svr_url}/oci-file/${repo}?tag=${tag}&file=$f"
@@ -60,10 +65,10 @@ spec:
             echo "🚀 Uploading $f => $target_f ..."
             if [ "$(params.dry-run)" == "true" ]; then
               echo "🧪🩺 DRY run mode enabled."
-              python upload_qiniu.py $f fake-release/$target_f
+              aws s3 cp $f s3://${bucket_name}/fake-release/$target_f --acl public-read
               curl --fail -F fake-release/${target_f}=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
             else
-              python upload_qiniu.py $f $target_f
+              aws s3 cp $f s3://${bucket_name}/$target_f --acl public-read
               curl --fail -F release/${target_f}=@${f} ${FILE_SERVER_URL}/upload | grep -E 'success'
             fi
             echo "✅ Uploaded $f => $target_f."

@@ -23,7 +23,7 @@ spec:
       default: ghcr.io/pingcap-qe/cd/builders/tikv:v20231116-e1c4b43
   steps:
     - name: analyse
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       script: |
         #!/bin/bash
 
@@ -59,7 +59,7 @@ spec:
       workingDir: /workspace/src
       env:
         - name: CARGO_NET_GIT_FETCH_WITH_CLI
-          value: 'true'
+          value: "true"
         - name: RUSTUP_DIST_SERVER
           value: https://rsproxy.cn
         - name: RUSTUP_UPDATE_ROOT

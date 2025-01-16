@@ -12,11 +12,11 @@ spec:
     - name: oci-registry
       default: hub.pingcap.net
       description: The OCI registry stored the origin artifacts.
-    - name: qiniu-creds-secret-name
-      default: qiniu-creds
   workspaces:
     # TODO: why need to push dm offline pkgs to another bucket?
     - name: aws-secrets
+      optional: true
+    - name: aws-secrets-tencent
       optional: true
     - name: github
       description: for creating github release
@@ -72,12 +72,13 @@ spec:
         - "compose-offline-pkgs-amd64-community"
       taskRef:
         name: pingcap-upload-offline-package
+      workspaces:
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: community }
         - { name: os, value: linux }
         - { name: arch, value: amd64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-amd64-enterprise
       runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -98,7 +99,8 @@ spec:
         - { name: edition, value: enterprise }
         - { name: os, value: linux }
         - { name: arch, value: amd64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
+      workspaces:
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
     - name: compose-offline-pkgs-amd64-dm
       runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -116,12 +118,12 @@ spec:
         name: pingcap-upload-offline-package
       workspaces:
         - { name: aws-secrets, workspace: aws-secrets }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: dm }
         - { name: os, value: linux }
         - { name: arch, value: amd64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-community
       runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -137,12 +139,13 @@ spec:
         - "compose-offline-pkgs-arm64-community"
       taskRef:
         name: pingcap-upload-offline-package
+      workspaces:
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: community }
         - { name: os, value: linux }
         - { name: arch, value: arm64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-enterprise
       runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -158,12 +161,13 @@ spec:
         - "compose-offline-pkgs-arm64-enterprise"
       taskRef:
         name: pingcap-upload-offline-package
+      workspaces:
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: enterprise }
         - { name: os, value: linux }
         - { name: arch, value: arm64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: compose-offline-pkgs-arm64-dm
       runAfter: [wait-delivery-tiup]
       taskRef: { name: pingcap-compose-offline-pkgs }
@@ -181,17 +185,18 @@ spec:
         name: pingcap-upload-offline-package
       workspaces:
         - { name: aws-secrets, workspace: aws-secrets }
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
         - { name: edition, value: dm }
         - { name: os, value: linux }
         - { name: arch, value: arm64 }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
     - name: upload-plugin-tarballs
       runAfter:
         - ga-tag-oci-artifacts
       taskRef:
         name: pingcap-upload-enterprise-plugins
+      workspaces:
+        - { name: aws-secrets-tencent, workspace: aws-secrets-tencent }
       params:
         - { name: version, value: "$(params.version)" }
-        - { name: env-secret-name, value: "$(params.qiniu-creds-secret-name)" }
