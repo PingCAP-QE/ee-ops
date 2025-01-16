@@ -17,7 +17,7 @@ spec:
       description: The OCI registry stored the origin tarball files.
   steps:
     - name: wait
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       env:
         - name: tiup_check_ver
           value: $(params.version)

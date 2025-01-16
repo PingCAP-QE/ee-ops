@@ -44,17 +44,17 @@ spec:
     - name: git-ref
     - name: git-sha
     - name: builder-image
-      default: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      default: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
     - name: release-dir
       default: build
     - name: push
       type: string
-      default: 'false'
+      default: "false"
     - name: registry
       default: hub.pingcap.net
   steps:
     - name: generate-build-script
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -88,13 +88,13 @@ spec:
       workingDir: $(workspaces.source.path)/$(params.component)
       env:
         - name: CARGO_NET_GIT_FETCH_WITH_CLI
-          value: 'true'
+          value: "true"
         # - name: RUSTUP_DIST_SERVER
         #   value: https://rsproxy.cn
         # - name: RUSTUP_UPDATE_ROOT
         #   value: https://rsproxy.cn/rustup
         - name: GOPROXY
-          value: 'http://goproxy.apps.svc,direct'
+          value: "http://goproxy.apps.svc,direct"
         - name: CARGO_HOME
           value: /workspace/.cargo
         - name: NPM_CONFIG_REGISTRY
@@ -110,7 +110,7 @@ spec:
 
         "$script" -b -a -w "$(params.release-dir)"
     - name: publish
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       workingDir: $(workspaces.source.path)/$(params.component)
       script: |
         script="/workspace/build-package-artifacts.sh"

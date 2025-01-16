@@ -5,13 +5,13 @@ metadata:
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
-    tekton.dev/platforms: "linux/amd64,linux/arm64"  
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
   params:
     - name: image_url
       description: The image full url for pull
   stepTemplate:
-    image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+    image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
   steps:
     - name: add-nightly-tag
       script: |
@@ -29,27 +29,27 @@ spec:
 
     - name: add-latest-tag
       script: |
-          pushed_repo="$(echo $(params.image_url) | cut -d ':' -f 1)"
-          pushed_tag="$(echo $(params.image_url) | cut -d ':' -f 2)"
+        pushed_repo="$(echo $(params.image_url) | cut -d ':' -f 1)"
+        pushed_tag="$(echo $(params.image_url) | cut -d ':' -f 2)"
 
-          # Check if the tag is the latest version and add "latest"
-          if [ "$(echo $pushed_tag | grep -E '^v\d+\.\d+\.+\d+$')"  ]; then
-            echo "Checking if tag is the latest version"
-            # Retrieve existing tags
-            EXISTING_TAGS=$(oras repo tags ${pushed_repo} | grep -E '^v\d+\.\d+\.+\d+$')
+        # Check if the tag is the latest version and add "latest"
+        if [ "$(echo $pushed_tag | grep -E '^v\d+\.\d+\.+\d+$')"  ]; then
+          echo "Checking if tag is the latest version"
+          # Retrieve existing tags
+          EXISTING_TAGS=$(oras repo tags ${pushed_repo} | grep -E '^v\d+\.\d+\.+\d+$')
 
-            # Determine if the tag is the latest version
-            LATEST_TAG=$(echo "$EXISTING_TAGS" | sort -V | tail -n 1)
-            if [ "$LATEST_TAG" == "$pushed_tag" ]; then
-              echo "🚀 Adding latest tag"
-              oras tag $(params.image_url) latest
-              echo "✅ Added latest tag"
-            else
-              echo "🤚 Tag is not the latest version"
-            fi
+          # Determine if the tag is the latest version
+          LATEST_TAG=$(echo "$EXISTING_TAGS" | sort -V | tail -n 1)
+          if [ "$LATEST_TAG" == "$pushed_tag" ]; then
+            echo "🚀 Adding latest tag"
+            oras tag $(params.image_url) latest
+            echo "✅ Added latest tag"
           else
-            echo "🤚 Pushed tag is not a version tag"
+            echo "🤚 Tag is not the latest version"
           fi
+        else
+          echo "🤚 Pushed tag is not a version tag"
+        fi
   workspaces:
     - description: Includes a docker `config.json`
       mountPath: /root/.docker
