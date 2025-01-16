@@ -38,12 +38,12 @@ spec:
     - name: git-ref
     - name: git-sha
     - name: builder-image
-      default: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      default: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
     - name: release-dir
       default: build
     - name: push
       type: string
-      default: 'false'
+      default: "false"
     - name: registry
       default: hub.pingcap.net
     - name: boskos-server-url
@@ -51,7 +51,7 @@ spec:
       default: "http://boskos.test-pods.svc.cluster.local"
   steps:
     - name: generate-build-script
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -134,7 +134,7 @@ spec:
           --boskos.owner $(context.taskRun.name) \
           --releaseDir $(params.release-dir)
     - name: publish
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       workingDir: $(workspaces.source.path)/$(params.component)
       script: |
         script="/workspace/build-package-artifacts.sh"

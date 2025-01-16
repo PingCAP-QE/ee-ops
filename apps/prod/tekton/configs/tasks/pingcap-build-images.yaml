@@ -38,13 +38,13 @@ spec:
     - name: release-dir
       default: build
     - name: build
-      default: 'false'
+      default: "false"
       description: Does it need to build the binaries before packing the images?
     - name: registry
       default: hub.pingcap.net
   steps:
     - name: generate
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -102,7 +102,7 @@ spec:
           "$script" -w "$(params.release-dir)" -k ${KANIKO_EXECUTOR} -o $(results.pushed.path)
         fi
     - name: add-more-tags
-      image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       script: |
         script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then

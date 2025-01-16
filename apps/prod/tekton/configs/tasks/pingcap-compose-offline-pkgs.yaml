@@ -28,14 +28,14 @@ spec:
         supports: 'community' or 'enterprise'.
     - name: push
       type: string
-      default: 'false'
+      default: "false"
     - name: registry
       default: hub.pingcap.net
     - name: tiup-mirror
       description: Product is http://tiup.pingcap.net:8987, Staging is http://tiup.pingcap.net:8988,
       default: http://tiup.pingcap.net:8988
   stepTemplate:
-    image: ghcr.io/pingcap-qe/cd/utils/release:v20240325-60-gb6f8928
+    image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
     env:
       - name: OUT_SCRIPT
         value: /workspace/compose-offline-packages-artifacts.sh
