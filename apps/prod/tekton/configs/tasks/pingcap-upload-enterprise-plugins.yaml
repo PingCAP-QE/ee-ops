@@ -22,24 +22,28 @@ spec:
       default: hub.pingcap.net/pingcap/tidb/package
   workspaces:
     - name: aws-secrets-tencent
-      optional: true
   steps:
     - name: upload-offline-tarballs
-      image: docker.io/amazon/aws-cli:2.22.18
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       workingDir: /workspace
-      env:
-        - name: bucket_name
-          value: tidb
       script: |
         #!/usr/bin/env bash
         set -e
+
+        if [ ! -f "$(workspaces.aws-secrets-tencent.path)/credentials" ]; then
+          echo "Error: aws-secrets-tencent workspace is not bound."
+          exit 1
+        fi
+        cp -r $(workspaces.aws-secrets-tencent.path) ~/.aws
+        aws configure set plugins.cli_legacy_plugin_path $(find /usr/lib -name site-packages -type d | head -1)
+        aws configure set plugins.endpoint awscli_plugin_endpoint
+
+        bucket_name=$(cat $(workspaces.aws-secrets-tencent.path)/bucket_name)
 
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
         FILE_SERVER_URL="http://fileserver.pingcap.net"
         yum install jq -y
-        # TODO: we need the `endpoint` plugin
-        # pip3 install awscli-plugin-endpoint
 
         for platform in linux_amd64 linux_arm64; do
           tag="$(params.version)-enterprise_${platform}"

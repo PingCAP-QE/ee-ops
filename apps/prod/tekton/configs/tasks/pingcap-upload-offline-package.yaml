@@ -34,7 +34,7 @@ spec:
     - name: aws-secrets-tencent
   steps:
     - name: upload-offline-tarballs
-      image: docker.io/amazon/aws-cli:2.22.18
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       workingDir: /workspace
       script: |
         #!/usr/bin/env bash
@@ -44,6 +44,9 @@ spec:
           echo "Error: aws-secrets-tencent workspace is not bound."
           exit 1
         fi
+        cp -r $(workspaces.aws-secrets-tencent.path) ~/.aws
+        aws configure set plugins.cli_legacy_plugin_path $(find /usr/lib -name site-packages -type d | head -1)
+        aws configure set plugins.endpoint awscli_plugin_endpoint
 
         bucket_name=$(cat $(workspaces.aws-secrets-tencent.path)/bucket_name)
 
@@ -51,12 +54,9 @@ spec:
         dl_svr_url="https://internal-do.pingcap.net/dl"
         FILE_SERVER_URL="http://fileserver.pingcap.net"
         yum install jq -y
-        # TODO: we need the `endpoint` plugin
-        # pip3 install awscli-plugin-endpoint
 
         tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
         echo "🚀 uploading for ${tag} ..."
-        cp -r $(workspaces.aws-secrets-tencent.path) ~/.aws
 
         # download the files.
         curl "${dl_svr_url}/oci-files/${repo}?tag=${tag}"
@@ -83,7 +83,7 @@ spec:
         done
         echo "✅ Uploaded for ${tag} ."
     - name: upload-dm-tarballs-to-s3
-      image: docker.io/amazon/aws-cli:2.22.18
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       workingDir: /workspace
       script: |
         #!/usr/bin/env bash
@@ -96,6 +96,7 @@ spec:
           echo "Error: aws-secrets workspace is not bound."
           exit 1
         fi
+        cp -r $(workspaces.aws-secrets.path) ~/.aws
 
         bucket_name=$(cat $(workspaces.aws-secrets.path)/bucket_name)
 
@@ -105,7 +106,6 @@ spec:
 
         tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
         echo "🚀 uploading for ${tag} ..."
-        cp -r $(workspaces.aws-secrets.path) ~/.aws
 
         # no need to download it again, it is downloaded in previous step.
 
