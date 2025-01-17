@@ -43,7 +43,6 @@ spec:
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
         FILE_SERVER_URL="http://fileserver.pingcap.net"
-        yum install jq -y
 
         for platform in linux_amd64 linux_arm64; do
           tag="$(params.version)-enterprise_${platform}"
