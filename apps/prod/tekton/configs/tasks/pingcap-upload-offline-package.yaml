@@ -40,11 +40,16 @@ spec:
         #!/usr/bin/env bash
         set -e
 
+        apk add curl
+
         if [ ! -f "$(workspaces.aws-secrets-tencent.path)/credentials" ]; then
           echo "Error: aws-secrets-tencent workspace is not bound."
           exit 1
         fi
-        cp -r $(workspaces.aws-secrets-tencent.path) ~/.aws
+
+        mkdir -p ~/.aws
+        cat $(workspaces.aws-secrets-tencent.path)/credentials > ~/.aws/credentials
+        cat $(workspaces.aws-secrets-tencent.path)/config > ~/.aws/config
         aws configure set plugins.cli_legacy_plugin_path $(find /usr/lib -name site-packages -type d | head -1)
         aws configure set plugins.endpoint awscli_plugin_endpoint
 
@@ -53,7 +58,6 @@ spec:
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
         FILE_SERVER_URL="http://fileserver.pingcap.net"
-        yum install jq -y
 
         tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
         echo "🚀 uploading for ${tag} ..."
@@ -92,17 +96,20 @@ spec:
         if [ "$(params.edition)" != "dm" ]; then
           exit 0
         fi
+
+        apk add curl
         if [ ! -f "$(workspaces.aws-secrets.path)/credentials" ]; then
           echo "Error: aws-secrets workspace is not bound."
           exit 1
         fi
-        cp -r $(workspaces.aws-secrets.path) ~/.aws
+        mkdir -p ~/aws
+        cat $(workspaces.aws-secrets.path)/credentials > ~/.aws/credentials
+        cat $(workspaces.aws-secrets.path)/config > ~/.aws/config
 
         bucket_name=$(cat $(workspaces.aws-secrets.path)/bucket_name)
 
         repo="$(params.oci-repo)"
         dl_svr_url="https://internal-do.pingcap.net/dl"
-        yum install jq -y
 
         tag="$(params.version)-$(params.edition)_$(params.os)_$(params.arch)"
         echo "🚀 uploading for ${tag} ..."
