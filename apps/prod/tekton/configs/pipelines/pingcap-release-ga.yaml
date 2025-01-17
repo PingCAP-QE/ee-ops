@@ -17,7 +17,6 @@ spec:
     - name: aws-secrets
       optional: true
     - name: aws-secrets-tencent
-      optional: true
     - name: github
       description: for creating github release
   tasks:
