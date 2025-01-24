@@ -61,16 +61,20 @@ spec:
             - key: custom-params
               expression: >-
                 {
-                  'builder-image': header.canonical('ce-paramBuilderImage')
+                  'builder-image': header.canonical('ce-paramBuilderImage'),
+                  'profile': header.canonical('ce-paramProfile') || 'release',
                 }
   bindings:
     - ref: github-branch-push
     - ref: ce-context
     - { name: component, value: $(body.repository.name) }
-    - { name: profile, value: release }
+    - { name: profile, value: $(extensions.custom-params.profile) }
     - { name: timeout, value: $(extensions.timeout) }
     - { name: source-ws-size, value: $(extensions.source-ws-size) }
-    - { name: builder-resources-cpu, value: $(extensions.builder-resources-cpu) }
+    - {
+        name: builder-resources-cpu,
+        value: $(extensions.builder-resources-cpu),
+      }
     - {
         name: builder-resources-memory,
         value: $(extensions.builder-resources-memory),
