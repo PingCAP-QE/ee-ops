@@ -107,7 +107,7 @@ spec:
         The epoch timestamp of the commit that was fetched by this Task.
   steps:
     - name: get
-      image: alpine/git:v2.47.1
+      image: alpine/git:v2.47.2
       workingDir: $(workspaces.output.path)/$(params.master-directory)
       resources:
         requests:
