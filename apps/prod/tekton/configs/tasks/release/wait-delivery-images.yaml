@@ -38,7 +38,7 @@ spec:
             if oras manifest fetch $image > /dev/null; then
               echo "🏅 delivery succeeded!"
             else
-              echo "❌ $image is not found, retrying in 1 minute..."
+              echo "🤷 not found."
               check_success=false
             fi
           done
