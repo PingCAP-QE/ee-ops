@@ -20,7 +20,7 @@ spec:
         app: tibuild
     spec:
       containers:
-        - image: ghcr.io/pingcap-qe/ee-apps/tibuild:v2025.1.30-5-g2c737b7
+        - image: ghcr.io/pingcap-qe/ee-apps/tibuild:v2025.1.30-6-gffafe99
           imagePullPolicy: Always
           name: tibuild
           ports:
