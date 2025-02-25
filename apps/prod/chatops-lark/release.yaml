@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: chatops-lark
-      version: 0.1.0
+      version: 0.1.1
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -40,7 +40,7 @@ spec:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/chatops-lark versioning=semver
       tag: v2025.1.30-7-gce0dddc
     server:
-      secretKey: chatops-lark
+      secretName: chatops-lark
       appIdSecretKey: app-id
       appSecretSecretKey: app-secret
       configFileSecretKey: config.yaml
