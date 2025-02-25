@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: chatops-lark
-      version: 0.1.1
+      version: 0.1.2
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -25,7 +25,7 @@ spec:
     remediation:
       retries: 3
   test:
-    enable: false
+    enable: true
     ignoreFailures: false
   values:
     replicaCount: 1
@@ -38,7 +38,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/chatops-lark
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/chatops-lark versioning=semver
-      tag: v2025.1.30-7-gce0dddc
+      tag: v2025.1.30-11-g3b74562
     server:
       secretName: chatops-lark
       appIdSecretKey: app-id
