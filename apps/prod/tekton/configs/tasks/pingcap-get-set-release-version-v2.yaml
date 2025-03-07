@@ -1,0 +1,108 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: pingcap-get-set-release-version-v2
+spec:
+  results:
+    - description: The release version of the git repo
+      name: version
+      type: string
+  steps:
+    - name: cleanup-tags
+      image: alpine/git:2.40.1
+      workingDir: $(workspaces.source.path)
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: "100m"
+      script: |
+        #!/bin/sh
+        set -e
+
+        echo "Delete the none-standard tags"
+        # keep these the tags matched these styles:
+        # - v1.2.3-alpha
+        # - v1.2.3-beta
+        # - v1.2.3-beta.4
+        # - v1.2.3-rc
+        # - v1.2.3-rc.4
+        # - v1.2.3
+        # - v1.2.3-(fips|...), but currently we only allow "fips" for the range in `()`.
+        if git tag | grep -E "v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|fips)([.][0-9]+)?)?$" > /dev/null; then
+          # Only delete the none-standard tags when the repo has standard semver tags.
+
+          git tag | grep -vE "^v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|fips|202[1-9][0-1][0-9][0-3][0-9]-[0-9a-f]{7,10}))?$" | xargs git tag -d || true
+        fi
+        # Get raw version and save to file for next step
+        git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*' > /tekton/results/raw-version
+    - name: compute-version
+      image: denoland/deno:1.37.1
+      script: |
+        const rawVersion = await Deno.readTextFile("/tekton/results/raw-version");
+        const currentBranch = await Deno.readTextFile("/tekton/results/current-branch");
+
+        function parseVersion(version) {
+          const versionPart = version.split('-')[0];
+          const [major, minor, patch] = versionPart.split('.').map(v => v.replace('v', ''));
+          return { major, minor, patch };
+        }
+
+        function isReleaseBranch(branch) {
+          return /\brelease-[0-9]+[.][0-9]+/.test(branch);
+        }
+
+        function needsVersionBump(version) {
+          return version.match(/-[0-9]+-g[0-9a-f]{7,10}(-dirty)?$/);
+        }
+
+        function isAlphaVersion(version) {
+          return version.match(/v[0-9]+[.][0-9]+[.][0-9]+(-alpha)$/);
+        }
+
+        function hasPreReleaseTag(version) {
+          return version.match(/-(alpha|pre|beta|rc)([.][0-9]+)?-/);
+        }
+
+        let resultVersion = rawVersion.trim();
+        let newTag = null;
+
+        if (isReleaseBranch(currentBranch)) {
+          const parsedVersion = parseVersion(resultVersion);
+
+          if (needsVersionBump(resultVersion)) {
+            if (!hasPreReleaseTag(resultVersion)) {
+              // Increment patch version
+              parsedVersion.patch = String(Number(parsedVersion.patch) + 1);
+            }
+            newTag = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}`;
+            resultVersion = `${newTag}-pre`;
+          } else if (isAlphaVersion(resultVersion)) {
+            newTag = `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}`;
+            resultVersion = `${newTag}-pre`;
+          }
+        }
+
+        // Save results for next step
+        await Deno.writeTextFile("/tekton/results/final-version", resultVersion);
+        if (newTag) {
+          await Deno.writeTextFile("/tekton/results/new-tag", newTag);
+        }
+
+    - name: apply-tags
+      image: alpine/git:2.40.1
+      workingDir: $(workspaces.source.path)
+      script: |
+        #!/bin/sh
+        set -e
+
+        if [ -f "/tekton/results/new-tag" ]; then
+          NEW_TAG=$(cat /tekton/results/new-tag)
+          echo "Applying new tag: ${NEW_TAG}"
+          git tag --contains | xargs git tag -d
+          git tag -f "${NEW_TAG}"
+        fi
+
+        FINAL_VERSION=$(cat /tekton/results/final-version)
+        echo -n "${FINAL_VERSION}" > $(results.version.path)
+      workspaces:
+        - name: source
