@@ -13,8 +13,10 @@ spec:
       params:
         - name: filter
           # support branches:
+          # > X, Y, Z, M, N are number chars.
           # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5        
+          # - release-X.Y
+          # - release-X.Y-beta.M
           value: >-
             body.repository.owner.login == 'pingcap'
             &&
