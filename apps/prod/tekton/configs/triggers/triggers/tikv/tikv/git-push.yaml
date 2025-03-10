@@ -14,14 +14,16 @@ spec:
       params:
         - name: filter
           # support branches:
+          # > X, Y, Z, M, N are number chars.
           # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
+          # - release-X.Y
+          # - release-X.Y-beta.M
           value: >-
             body.repository.owner.login == 'tikv'
             &&
             body.repository.name == 'tikv'
             &&
-            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+(-beta[.][0-9]+)?)$')
 
   bindings:
     - ref: github-branch-push
@@ -50,14 +52,16 @@ spec:
       params:
         - name: filter
           # support branches:
+          # > X, Y, Z, M, N are number chars.
           # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
+          # - release-X.Y
+          # - release-X.Y-beta.M
           value: >-
             body.repository.owner.login == 'tikv'
             &&
             body.repository.name == 'tikv'
             &&
-            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+(-beta[.][0-9]+)?)$')
 
   bindings:
     - ref: github-branch-push
@@ -87,14 +91,16 @@ spec:
       params:
         - name: filter
           # support branches:
+          # > X, Y, Z, M, N are number chars.
           # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5
+          # - release-X.Y
+          # - release-X.Y-beta.M
           value: >-
             body.repository.owner.login == 'tikv'
             &&
             body.repository.name == 'tikv'
             &&
-            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+)$')
+            body.ref.matches('^refs/heads/(master|release-[6-9][.][0-9]+(-beta[.][0-9]+)?)$')
 
   bindings:
     - ref: github-branch-push
