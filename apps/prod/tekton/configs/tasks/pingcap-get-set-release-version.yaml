@@ -8,13 +8,13 @@ spec:
       name: version
       type: string
   steps:
-    - image: alpine/git:2.40.1
+    - image: alpine/git:v2.47.2
       name: git-describe
       workingDir: $(workspaces.source.path)
       resources:
         requests:
           memory: 512Mi
-          cpu: '100m'
+          cpu: "100m"
       script: |
         #!/bin/sh
         set -e
