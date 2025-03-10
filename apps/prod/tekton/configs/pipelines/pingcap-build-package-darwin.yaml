@@ -107,7 +107,7 @@ spec:
       runAfter:
         - checkout
       taskRef:
-        name: pingcap-get-set-release-version
+        name: pingcap-get-set-release-version-v2
       workspaces:
         - name: source
           workspace: source

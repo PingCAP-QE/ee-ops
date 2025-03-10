@@ -33,7 +33,7 @@ spec:
         if git tag | grep -E "v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|fips)([.][0-9]+)?)?$" > /dev/null; then
           # Only delete the none-standard tags when the repo has standard semver tags.
 
-          git tag | grep -vE "^v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|fips|202[1-9][0-1][0-9][0-3][0-9]-[0-9a-f]{7,10}))?$" | xargs git tag -d || true
+          git tag | grep -vE "^v[0-9]+[.][0-9]+[.][0-9]+(-(((alpha|beta|rc)([.].+)?)|fips|202[1-9][0-1][0-9][0-3][0-9]-[0-9a-f]{7,10}))?$" | xargs git tag -d || true
         fi
         # Get raw version and save to file for next step
         git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*' > /workspace/raw-version.txt
