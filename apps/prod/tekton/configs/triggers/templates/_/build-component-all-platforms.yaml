@@ -50,7 +50,7 @@ spec:
           "tibuild.pingcap.net/platform": linux/amd64
       spec:
         pipelineRef:
-          name: pingcap-build-package-linux-v2
+          name: pingcap-build-package-linux-exp
         params:
           - name: git-url
             value: $(tt.params.git-url)
