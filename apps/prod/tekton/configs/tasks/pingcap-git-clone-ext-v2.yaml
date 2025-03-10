@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: pingcap-git-clone-ext
+  name: pingcap-git-clone-ext-v2
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
@@ -103,17 +103,17 @@ spec:
     - name: url
       description: The precise URL that was fetched by this Task.
     - name: committer-date
-      description:
-        The epoch timestamp of the commit that was fetched by this Task.
+      description: The epoch timestamp of the commit that was fetched by this Task.
   steps:
     - name: get
-      image: alpine/git:v2.47.1
+      image: alpine/git:v2.47.2
       workingDir: $(workspaces.output.path)/$(params.master-directory)
       resources:
         requests:
           memory: 512Mi
-          cpu: '100m'
+          cpu: "100m"
       script: |
+
         # Get the URL of the origin remote of current workspace.
         origin_url=$(git remote get-url origin)
         # Check if the URL contains "pingcap/tidb"
@@ -129,6 +129,7 @@ spec:
         origin_ref="$(git branch --contains | grep -v 'HEAD detached' | sed 's/^ *//'| sed 's/^* //' | grep -E '^(master|main|release-.*|feature/.*)$' | head -1)"
 
         if [[ $origin_ref =~ "^feature/release-[0-9]+\.[0-9]+" ]]; then
+          # feature branches based on released version.
           MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
           EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
         elif [[ $origin_ref =~ "^release-[0-9]+\.[0-9]+-.*-v[0-9]+\.[0-9]+\.[0-9]+" ]]; then
@@ -136,6 +137,7 @@ spec:
           MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")
           EXT_REVERSION=$(echo "$MAJOR_MINOR_PATCH" | sed -E 's/^v/release-/')
         elif [[ $origin_ref =~ "^(master|main|feature/.*)$" ]]; then
+          # trunk and common feature branches.
           EXT_REVERSION="master"
         elif [[ "$origin_ref" == "" ]]; then
           echo "$RELEASE_VERSION"
@@ -143,8 +145,15 @@ spec:
           if [[ $RELEASE_VERSION =~ "^v[0-9]+\.[0-9]+\.[0-9]+-alpha-[0-9]+-" ]]; then
             EXT_REVERSION="master"
           else
-            MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
-            EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
+            # if it seems like 'vX.Y.0-beta.M*', then set the EXT_REVERSION as 'release-X.Y-beta.M'.
+            if [[ "$RELEASE_VERSION" =~ "^v[0-9]+[.][0-9]+[.]0-beta[.][0-9]+" ]]; then
+              MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+              BETA_VERSION=$(echo "$RELEASE_VERSION" | sed -E 's/.*-beta\.//' | sed -E 's/[.-].*$//')
+              EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')-beta.$BETA_VERSION
+            else
+              MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+              EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
+            fi
           fi
         else
           # GA version tags and RC release branches
