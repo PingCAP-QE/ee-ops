@@ -13,7 +13,7 @@ spec:
           value: >-
             body.repository.full_name in ['pingcap/ticdc', 'pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'pingcap/tidb-dashboard', 'tikv/tikv', 'tikv/pd']
             &&
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
+            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|rc)([.][0-9]+)?)?$')
         - name: overlays
           value:
             - key: timeout
