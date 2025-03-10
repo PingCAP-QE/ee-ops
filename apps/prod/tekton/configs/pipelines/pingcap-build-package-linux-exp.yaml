@@ -89,7 +89,7 @@ spec:
           workspace: source
         - name: basic-auth
           workspace: git-basic-auth
-    - name: get-release-ver-v2
+    - name: get-release-ver
       runAfter:
         - checkout
       taskRef:
