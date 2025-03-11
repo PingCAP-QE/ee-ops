@@ -35,6 +35,9 @@ spec:
         if [[ "$branch" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-alpha$ ]]; then
             echo -n "master" > /workspace/inner-results-branch
             echo -n "${branch#v}" > /workspace/inner-results-version
+        elif [[ "$branch" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)[.][0-9]+[.]pre$ ]]; then
+            echo -n "master" > /workspace/inner-results-branch
+            echo -n "${branch#v}" | sed 's/.pre$//' > /workspace/inner-results-version
         elif [[ "$branch" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           major_minor_version=$(echo "$branch" | cut -d'.' -f1-2)
           echo -n "release-${major_minor_version#v}" > /workspace/inner-results-branch
