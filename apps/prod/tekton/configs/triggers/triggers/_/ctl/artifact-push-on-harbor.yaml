@@ -78,9 +78,9 @@ spec:
               expression: >-
                 "https://github.com/" + body.event_data.repository.repo_full_name.replace('/package', '.git')
             - key: git-ref
-              expression: body.event_data.resources[0].tag.split("_")[0].split("-")[0] + "-" + body.event_data.resources[0].tag.split("_")[0].split("-")[1]
+              expression: body.event_data.resources[0].tag.split("_")[0].replace('-' + body.event_data.resources[0].tag.split("_")[0].split('-').last(), '')
             - key: git-revision
-              expression: body.event_data.resources[0].tag.split('_')[0].split('-')[2]
+              expression: body.event_data.resources[0].tag.split("_")[0].split('-').last()
             - key: os
               expression: body.event_data.resources[0].tag.split('_')[1]
             - key: arch
