@@ -37,6 +37,7 @@ spec:
             echo -n "${branch#v}" > /workspace/inner-results-version
         elif [[ "$branch" =~ ^v[0-9]+\.[0-9]+\.[0-9]+-(beta|rc)[.][0-9]+[.]pre$ ]]; then
             echo -n "master" > /workspace/inner-results-branch
+            # Remove the ".pre" suffix from the version string
             echo -n "${branch#v}" | sed 's/.pre$//' > /workspace/inner-results-version
         elif [[ "$branch" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
           major_minor_version=$(echo "$branch" | cut -d'.' -f1-2)
