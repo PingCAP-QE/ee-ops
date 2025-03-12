@@ -60,8 +60,8 @@ spec:
         #!/bin/sh
         set -e
 
-        if [ -f "/tekton/results/new-tag" ]; then
-          NEW_TAG=$(cat /tekton/results/new-tag)
+        if [ -f "/workspace/new-tag" ]; then
+          NEW_TAG=$(cat /workspace/new-tag)
           echo "Applying new tag: ${NEW_TAG}"
           git tag --contains | xargs git tag -d
           git tag -f "${NEW_TAG}"
