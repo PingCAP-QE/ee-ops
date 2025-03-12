@@ -14,11 +14,9 @@ spec:
         - name: filter
           # support branches:
           # - master
-          # - release-6.1, release-6.5, release-7.1, release-7.5        
+          # - release-6.1, release-6.5, release-7.1, release-7.5
           value: >-
-            body.repository.owner.login == 'pingcap'
-            &&
-            body.repository.name == 'tidb-tools'
+            body.repository.full_name == 'pingcap/tidb-tools'
             &&
             body.ref.matches('^refs/heads/(main|master|release-[6-9][.][0-9]+)$')
 

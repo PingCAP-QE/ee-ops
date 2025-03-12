@@ -18,9 +18,7 @@ spec:
           # - release-X.Y
           # - release-X.Y-beta.M
           value: >-
-            body.repository.owner.login == 'pingcap'
-            &&
-            body.repository.name == 'tidb-binlog'
+            body.repository.full_name == 'pingcap/tidb-binlog'
             &&
             body.ref.matches('^refs/heads/(master|release-[6-8][.][0-9]+(-beta[.][0-9]+)?)$')
 
