@@ -14,9 +14,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap'
-            &&
-            body.repository.name == 'tiproxy'
+            body.repository.full_name == 'pingcap/tiproxy'
             &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+$')
   bindings:

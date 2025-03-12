@@ -14,14 +14,10 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.name == 'tiflow-operator'
-    - name: filter on version tags
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.full_name == 'pingcap/tiflow-operator'
+            &&
             body.ref.matches('^v.+')
+
   bindings:
     - ref: github-tag-create
     - { name: component, value: $(body.repository.name) }
