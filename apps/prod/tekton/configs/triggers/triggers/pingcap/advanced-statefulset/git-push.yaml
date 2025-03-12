@@ -14,13 +14,8 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.owner.login == 'pingcap' && body.repository.full_name == 'pingcap/advanced-statefulset'
-    - name: filter on branches
-      ref:
-        name: cel
-      params:
-        - name: filter
-          value: >-
+            body.repository.full_name == 'pingcap/advanced-statefulset'
+            &&
             body.ref.matches('^refs/heads/(master)$')
   bindings:
     - ref: github-branch-push
