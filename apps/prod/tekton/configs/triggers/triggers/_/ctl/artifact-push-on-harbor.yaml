@@ -30,16 +30,15 @@ spec:
                 'https://github.com/' + body.event_data.repository.repo_full_name.replace('/package', '.git')
             - key: git-ref
               expression: body.event_data.resources[0].tag.split('_')[0].split('-')[0]
-            - key: git-revision
-              expression: body.event_data.resources[0].tag.split('_')[0].split('-')[1]
             - key: os
               expression: body.event_data.resources[0].tag.split('_')[1]
             - key: arch
-              expression: body.event_data.resources[0].tag.split('_')[2]
+              expression: body.event_data.resources[0].tag.split('_').last()
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
     - { name: git-url, value: https://github.com/tikv/pd.git } # no need the repo to build but need it to compute version routes.
+    # Both git-ref and git-revision intentionally use the same extension value
     - { name: git-ref, value: $(extensions.git-ref) }
     - { name: git-revision, value: $(extensions.git-ref) }
     - { name: os, value: $(extensions.os) }
@@ -79,16 +78,15 @@ spec:
                 "https://github.com/" + body.event_data.repository.repo_full_name.replace('/package', '.git')
             - key: git-ref
               expression: body.event_data.resources[0].tag.split("_")[0].replace('-' + body.event_data.resources[0].tag.split("_")[0].split('-').last(), '')
-            - key: git-revision
-              expression: body.event_data.resources[0].tag.split("_")[0].split('-').last()
             - key: os
               expression: body.event_data.resources[0].tag.split('_')[1]
             - key: arch
-              expression: body.event_data.resources[0].tag.split('_')[2]
+              expression: body.event_data.resources[0].tag.split('_').last()
   bindings:
     - { name: component, value: ctl }
     - { name: profile, value: release }
     - { name: git-url, value: https://github.com/tikv/pd.git } # no need the repo to build but need it to compute version routes.
+    # Both git-ref and git-revision intentionally use the same extension value
     - { name: git-ref, value: $(extensions.git-ref) }
     - { name: git-revision, value: $(extensions.git-ref) }
     - { name: os, value: $(extensions.os) }
