@@ -12,6 +12,8 @@ spec:
         - name: filter
           value: >-
             body.repository.full_name in ['pingcap/ticdc', 'pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'pingcap/tidb-dashboard', 'tikv/tikv', 'tikv/pd']
+            &&
+            ! (header.canonical('ce-paramPlatform') in ['linux/amd64', 'linux/arm64', 'darwin/amd64', 'darwin/arm64'])
         - name: overlays
           value:
             - key: timeout
@@ -62,7 +64,7 @@ spec:
               expression: >-
                 {
                   'builder-image': header.canonical('ce-paramBuilderImage'),
-                  'profile': header.canonical('ce-paramProfile') == '' ? 'release' : header.canonical('ce-paramProfile'),
+                  'profile': header.canonical('ce-paramProfile') == '' ? 'release' : (header.canonical('ce-paramProfile') == 'community' ? 'release' : header.canonical('ce-paramProfile')),
                 }
   bindings:
     - ref: github-branch-push
