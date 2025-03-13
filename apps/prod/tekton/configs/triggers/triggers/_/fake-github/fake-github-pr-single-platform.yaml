@@ -1,21 +1,19 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: fake-github-tag-create
+  name: fake-github-pr-single-platform
   labels:
-    type: fake-github-tag-create
+    type: fake-github-pr
 spec:
   interceptors:
-    - name: filter on repo owner and name and tags
+    - name: filter on repo
       ref: { name: cel }
       params:
         - name: filter
           value: >-
             body.repository.full_name in ['pingcap/ticdc', 'pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'pingcap/tidb-dashboard', 'tikv/tikv', 'tikv/pd']
             &&
-            body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta|rc)([.][0-9]+)?)?$')
-            &&
-            ! (header.canonical('ce-paramPlatform') in ['linux/amd64', 'linux/arm64', 'darwin/amd64', 'darwin/arm64'])
+            header.canonical('ce-paramPlatform') in ['linux/amd64', 'linux/arm64', 'darwin/amd64', 'darwin/arm64']
         - name: overlays
           value:
             - key: timeout
@@ -67,9 +65,11 @@ spec:
                 {
                   'builder-image': header.canonical('ce-paramBuilderImage'),
                   'profile': header.canonical('ce-paramProfile') == '' ? 'release' : (header.canonical('ce-paramProfile') == 'community' ? 'release' : header.canonical('ce-paramProfile')),
+                  'os': header.canonical('ce-paramPlatform').split('/')[0],
+                  'arch': header.canonical('ce-paramPlatform').split('/')[1],
                 }
   bindings:
-    - ref: github-tag-create
+    - ref: github-pr
     - ref: ce-context
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: $(extensions.custom-params.profile) }
@@ -88,5 +88,7 @@ spec:
         name: force-builder-image,
         value: $(extensions.custom-params.builder-image),
       }
+    - { name: os, value: $(extensions.custom-params.os) }
+    - { name: arch, value: $(extensions.custom-params.arch) }
   template:
-    ref: build-component-all-platforms
+    ref: build-component-single-platform
