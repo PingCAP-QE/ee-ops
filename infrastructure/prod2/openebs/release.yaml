@@ -22,28 +22,30 @@ spec:
     engines:
       local:
         lvm:
-          enabled: false
+          enabled: true
         zfs:
-          enabled: false
+          enabled: true
       replicated:
         mayastor:
           enabled: false
+    openebs-crds:
+      csi:
+        volumeSnapshots:
+          enabled: false
+    hostpathClass:
+      isDefaultClass: true
     localpv-provisioner:
       localpv:
         basePath: /data/openebs/local
     lvm-localpv:
       crds:
         lvmLocalPv:
-          enabled: false
+          enabled: true
       lvmNode:
         kubeletDir: /data/kubelet
     zfs-localpv:
       crds:
         zfsLocalPv:
-          enabled: false
+          enabled: true
       zfsNode:
         kubeletDir: /data/kubelet
-    openebs-crds:
-      csi:
-        volumeSnapshots:
-          enabled: false
