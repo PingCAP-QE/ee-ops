@@ -22,6 +22,15 @@ spec:
   values:
     controller:
       replicaCount: 2
+      image:
+        digest: ""
+        image: ksyun/ingress-nginx-controller
+        registry: hub.kce.ksyun.com
+      config:
+        compute-full-forwarded-for: "true"
+        enable-underscores-in-headers: "true"
+        forwarded-for-header: X-Forwarded-For
+        use-forwarded-headers: "true"
       service:
         type: LoadBalancer
         annotations:
@@ -29,5 +38,35 @@ spec:
           service.beta.kubernetes.io/ksc-loadbalancer-type: internal
       ingressClassResource:
         name: nginx
-        controllerValue: k8s.io/ingress-nginx
+        controllerValue: ksyun.com/ingress-nginx
         default: true
+      admissionWebhooks:
+        enabled: "true"
+        objectSelector:
+          matchLabels:
+            ksyun.com/kce-component-generated: nginx
+        patch:
+          enabled: "true"
+          image:
+            digest: ""
+            image: ksyun/ingress-nginx-kube-webhook-certgen
+            registry: hub.kce.ksyun.com
+    autoscaling:
+      enabled: "true"
+      maxReplicas: 3
+      minReplicas: 1
+      targetCPUUtilizationPercentage: ""
+      targetMemoryUtilizationPercentage: ""
+    autoscalingTemplate:
+      - resource:
+          name: cpu
+          target:
+            averageUtilization: 70
+            type: Utilization
+        type: Resource
+      - resource:
+          name: memory
+          target:
+            averageUtilization: 70
+            type: Utilization
+        type: Resource
