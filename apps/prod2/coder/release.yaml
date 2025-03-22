@@ -1,0 +1,82 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: coder
+  namespace: coder
+spec:
+  chart:
+    spec:
+      chart: coder
+      version: 2.18.5
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: coder-v2
+        namespace: coder
+  interval: 5m0s
+  values:
+    # coder -- Primary configuration for `coder server`.
+    coder:
+      # coder.env -- The environment variables to set for Coder. These can be used
+      # to configure all aspects of `coder server`. Please see `coder server --help`
+      # for information about what environment variables can be set.
+      # Note: The following environment variables are set by default and cannot be
+      # overridden:
+      # - CODER_HTTP_ADDRESS: set to 0.0.0.0:8080 and cannot be changed.
+      # - CODER_TLS_ADDRESS: set to 0.0.0.0:8443 if tls.secretName is not empty.
+      # - CODER_TLS_ENABLE: set if tls.secretName is not empty.
+      # - CODER_TLS_CERT_FILE: set if tls.secretName is not empty.
+      # - CODER_TLS_KEY_FILE: set if tls.secretName is not empty.
+      # - CODER_PROMETHEUS_ADDRESS: set to 0.0.0.0:2112 and cannot be changed.
+      #   Prometheus must still be enabled by setting CODER_PROMETHEUS_ENABLE.
+      # - KUBE_POD_IP
+      # - CODER_DERP_SERVER_RELAY_URL
+      #
+      # We will additionally set CODER_ACCESS_URL if unset to the cluster service
+      # URL, unless coder.envUseClusterAccessURL is set to false.
+      env:
+        - name: "CODER_ACCESS_URL"
+          value: "https://coder.pingcap.net"
+        - name: CODER_LOG_FILTER
+          value: ".*"
+      envFrom:
+        - secretRef:
+            # have keys:
+            # - CODER_PG_CONNECTION_URL
+            name: coder-release
+
+      # coder.resources -- The resources to request for Coder. These are optional
+      # and are not set by default.
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 4096Mi
+        requests:
+          cpu: 2000m
+          memory: 4096Mi
+
+      # coder.nodeSelector -- Node labels for constraining coder pods to nodes.
+      # See: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+      nodeSelector:
+        kubernetes.io/os: linux
+        kubernetes.io/arch: amd64
+
+      # coder.service -- The Service object to expose for Coder.
+      service:
+        # coder.service.enable -- Whether to create the Service object.
+        enable: true
+        # coder.service.type -- The type of service to expose. See:
+        # https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+        type: ClusterIP
+
+      # coder.ingress -- The Ingress object to expose for Coder.
+      ingress:
+        # coder.ingress.enable -- Whether to create the Ingress object. If using an
+        # Ingress, we recommend not specifying coder.tls.secretNames as the Ingress
+        # will handle TLS termination.
+        enable: true
+        # coder.ingress.className -- The name of the Ingress class to use.
+        className: "nginx"
+        # coder.ingress.host -- The hostname to match on.
+        # Be sure to also set CODER_ACCESS_URL within coder.env[]
+        host: "coder.pingcap.net"
