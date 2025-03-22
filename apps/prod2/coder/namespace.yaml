@@ -3,4 +3,4 @@ kind: Namespace
 metadata:
   name: coder
   annotations:
-    scheduler.alpha.kubernetes.io/node-selector: enable-ci=true,kubernetes.io/arch=amd64
+    scheduler.alpha.kubernetes.io/node-selector: kubernetes.io/arch=amd64
