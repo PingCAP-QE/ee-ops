@@ -1,0 +1,33 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ingress-nginx
+  namespace: nginx
+spec:
+  releaseName: ingress-nginx
+  targetNamespace: nginx
+  chart:
+    spec:
+      chart: ingress-nginx
+      sourceRef:
+        kind: HelmRepository
+        name: ingress-nginx
+        namespace: flux-system
+      version: "4.9.0"
+  interval: 1h0m0s
+  install:
+    remediation:
+      retries: 3
+  values:
+    controller:
+      replicaCount: 2
+      service:
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/ksc-loadbalancer-subnet-id: f1f58229-7b99-4b44-bd24-c419bb3ca581
+          service.beta.kubernetes.io/ksc-loadbalancer-type: internal
+      ingressClassResource:
+        name: nginx
+        controllerValue: k8s.io/ingress-nginx
+        default: true
