@@ -23,7 +23,7 @@ spec:
   workspaces:
     - name: aws-secrets-tencent
   steps:
-    - name: upload-offline-tarballs
+    - name: uploads
       image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
       workingDir: /workspace
       script: |
@@ -35,7 +35,7 @@ spec:
           echo "Error: aws-secrets-tencent workspace is not bound."
           exit 1
         fi
-        
+
         mkdir -p ~/.aws
         cat $(workspaces.aws-secrets-tencent.path)/credentials > ~/.aws/credentials
         cat $(workspaces.aws-secrets-tencent.path)/config > ~/.aws/config
@@ -63,7 +63,7 @@ spec:
 
             # upload it.
             target_f="enterprise-plugin-v${f#*-v}"
-            target_f=$(echo "$target_f" | sed 's/-pre//')
+            target_f=$(echo "$target_f" | sed 's/-pre//' | sed 's/.pre//')
 
             echo "🚀 Uploading $f => $target_f ..."
             if [ "$(params.dry-run)" == "true" ]; then
