@@ -6,6 +6,13 @@ spec:
   params:
     - name: version
       type: string
+    - name: pre-version
+      type: string
+      description: >
+        The version of the artifact to be released on, examples:
+        - v5.4.0-pre
+        - v9.0.0-beta.1.pre
+        - v9.0.0-rc.1.pre
     - name: tiup-mirror
       default: http://tiup.pingcap.net:8987
       description: the product tiup mirror site.
@@ -23,7 +30,7 @@ spec:
     - name: ga-tag-oci-artifacts
       params:
         - name: rc-version
-          value: "$(params.version)-pre"
+          value: "$(params.pre-version)"
         - name: ga-version
           value: $(params.version)
       taskRef:
