@@ -15,9 +15,9 @@ spec:
             &&
             body.label.name in ['lgtm']
             &&
-            body.repository.full_name in ['pingcap/tidb']
+            body.repository.full_name in [ 'pingcap/tidb', 'pingcap/tiflash', 'pingcap/tiflow', 'pingcap/ticdc', 'tikv/tikv', 'tikv/pd' ]
             &&
-            body.pull_request.base.ref in ['feature/release-8.5-oracle-func-impl']
+            body.pull_request.base.ref.startsWith('feature/')
   bindings:
     - ref: github-pr
   template:
@@ -49,22 +49,19 @@ spec:
                 - name: number
                   description: pull request number
               steps:
-                - name: create-pull-request
-                  image: bitnami/git:2.43.0
+                - name: edit-pull-request
+                  image: alpine:3.21.3
                   script: |
-                    #!/usr/bin/env bash
-                    set -exo pipefail
+                    #!/usr/bin/env sh
 
                     # install `gh` tool
-                    type -p curl >/dev/null || ( apt update &&  apt install curl -y)
-                    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |  dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-                    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
-                    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" |  tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-                    && apt update \
-                    && apt install gh -y
+                    apk add github-cli
 
                     gh auth login --with-token < $(workspaces.github.path)/token
-                    gh pr edit --add-label approved https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)
+                    pr_url="https://github.com/$(params.owner)/$(params.repo)/pull/$(params.number)"
+                    # TODO: Judge if we can add approved label by the comments from prow approve plugin
+                    # Add label only if there are sufficient approvals from trusted users```
+                    gh pr edit --add-label approved "$pr_url"
               workspaces:
                 - name: github
                   description: Must includes a key `token`
