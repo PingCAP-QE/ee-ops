@@ -32,11 +32,11 @@ spec:
       csi:
         volumeSnapshots:
           enabled: false
-    hostpathClass:
-      isDefaultClass: true
     localpv-provisioner:
       localpv:
         basePath: /data/openebs/local
+      hostpathClass:
+        isDefaultClass: true
     lvm-localpv:
       crds:
         lvmLocalPv:
