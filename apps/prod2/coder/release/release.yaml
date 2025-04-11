@@ -1,0 +1,69 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: coder
+  namespace: coder
+spec:
+  chart:
+    spec:
+      chart: coder
+      version: 2.18.5
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: coder-v2
+        namespace: coder
+  interval: 5m0s
+  values:
+    # coder -- Primary configuration for `coder server`.
+    coder:
+      env:
+        - name: "CODER_ACCESS_URL"
+          value: "https://${CODER_DOMAIN}"
+        - name: CODER_LOG_FILTER
+          value: ".*"
+        # For production deployments, we recommend configuring your own GitHub
+        # OAuth2 provider and disabling the default one.
+        # - name: CODER_OAUTH2_GITHUB_DEFAULT_PROVIDER_ENABLE
+        #   value: "false"
+      envFrom:
+        - secretRef:
+            # have keys:
+            # - CODER_PG_CONNECTION_URL
+            name: coder-release
+
+      # coder.resources -- The resources to request for Coder. These are optional
+      # and are not set by default.
+      resources:
+        limits:
+          cpu: 2000m
+          memory: 4096Mi
+        requests:
+          cpu: 2000m
+          memory: 4096Mi
+
+      # coder.nodeSelector -- Node labels for constraining coder pods to nodes.
+      # See: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector
+      nodeSelector:
+        kubernetes.io/os: linux
+        kubernetes.io/arch: amd64
+
+      # coder.service -- The Service object to expose for Coder.
+      service:
+        # coder.service.enable -- Whether to create the Service object.
+        enable: true
+        # coder.service.type -- The type of service to expose. See:
+        # https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+        type: ClusterIP
+
+      # coder.ingress -- The Ingress object to expose for Coder.
+      ingress:
+        # coder.ingress.enable -- Whether to create the Ingress object. If using an
+        # Ingress, we recommend not specifying coder.tls.secretNames as the Ingress
+        # will handle TLS termination.
+        enable: true
+        # coder.ingress.className -- The name of the Ingress class to use.
+        className: "nginx"
+        # coder.ingress.host -- The hostname to match on.
+        # Be sure to also set CODER_ACCESS_URL within coder.env[]
+        host: ${CODER_DOMAIN}

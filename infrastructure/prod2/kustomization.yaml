@@ -4,3 +4,4 @@ resources:
   - ../_base
   - openebs
   - nginx
+  - secret-generator
