@@ -18,7 +18,7 @@ spec:
             'pingcap/tiflash',
             ]
             &&
-            body.ref.matches('^refs/heads/(main|master|release-[6-9][.][0-9]+(-beta[.][0-9]+)?)$')
+            body.ref.matches('^refs/heads/(main|master|release-[6-9][.][0-9]+(-beta[.][0-9]+)?|feature/(fts|ng.+))$')
         - name: overlays
           value:
             - key: timeout
