@@ -18,3 +18,14 @@ spec:
     githubConfigUrl: https://github.com/PingCAP-QE
     githubConfigSecret: arc-runner-set-pingcap-qe-github-config
     runnerGroup: "EE-Group" # must be created first.
+    maxRunners: 10
+    template:
+      spec:
+        containers:
+          - name: runner
+            image: ghcr.io/actions/actions-runner:latest
+            command: ["/home/runner/run.sh"]
+            resources:
+              limits:
+                cpu: "6"
+                memory: 12Gi
