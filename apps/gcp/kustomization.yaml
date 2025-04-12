@@ -7,5 +7,6 @@ resources:
   - prow-crd.yaml
   - prow
   - gateways-dev.yaml
+  - acr-runners
   # - prow-dev
   # - tekton-dev
