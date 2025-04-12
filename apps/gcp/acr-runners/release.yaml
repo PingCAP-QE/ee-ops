@@ -16,5 +16,5 @@ spec:
   timeout: 10m
   values:
     githubConfigUrl: https://github.com/PingCAP-QE
-    githubConfigSecret: secretName
+    githubConfigSecret: arc-runner-set-pingcap-qe-github-config
     runnerGroup: "EE-Group" # must be created first.
