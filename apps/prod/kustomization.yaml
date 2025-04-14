@@ -21,7 +21,6 @@ resources:
   - tibuild
   - dl
   - harbor
-  - coder
   - redis
   - publisher
   - chatops-lark
