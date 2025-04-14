@@ -36,6 +36,8 @@ spec:
         annotations:
           service.beta.kubernetes.io/ksc-loadbalancer-subnet-id: f1f58229-7b99-4b44-bd24-c419bb3ca581
           service.beta.kubernetes.io/ksc-loadbalancer-type: internal
+      extraArgs:
+        default-ssl-certificate: "flux-system/default-ingress-tls"
       ingressClassResource:
         name: nginx
         controllerValue: ksyun.com/ingress-nginx
