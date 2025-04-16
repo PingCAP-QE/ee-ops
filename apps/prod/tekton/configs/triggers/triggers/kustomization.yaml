@@ -14,6 +14,8 @@ resources:
   - _/harbor/artifact-push-on-harbor.yaml
   - _/harbor/image-push-on-harbor.yaml
   - PingCAP-QE/artifacts/git-push.yaml
+  - pingcap-inc/tici/git-create-tag.yaml
+  - pingcap-inc/tici/git-push.yaml
   - pingcap/_/git-create-branch-gomod-update.yaml
   - pingcap/_/git-create-branch.yaml
   - pingcap/_/git-create-tag.yaml
