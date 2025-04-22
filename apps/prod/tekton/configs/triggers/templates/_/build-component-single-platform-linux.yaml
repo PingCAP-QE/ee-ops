@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: build-component-single-platform
+  name: build-component-single-platform-linux
 spec:
   params:
     - name: git-url
@@ -35,7 +35,9 @@ spec:
       default: "4"
     - name: ce-context
       description: cloud event context.
-      default: '{}'
+      default: "{}"
+    - name: force-builder-image
+      default: ""
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -51,7 +53,7 @@ spec:
           "tibuild.pingcap.net/platform": $(tt.params.os)/$(tt.params.arch)
       spec:
         pipelineRef:
-          name: pingcap-build-package-linux
+          name: pingcap-build-package-$(tt.params.os)
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -71,6 +73,8 @@ spec:
             value: $(tt.params.arch)
           - name: registry
             value: $(tt.params.registry)
+          - name: force-builder-image
+            value: $(tt.params.force-builder-image)
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
