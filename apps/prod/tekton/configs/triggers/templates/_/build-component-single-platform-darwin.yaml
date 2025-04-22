@@ -15,7 +15,7 @@ spec:
     - name: component
       description: component name, tidb|tikv|pd|tiflow|tiflash, etc...
     - name: os
-      default: linux
+      default: darwin
     - name: arch
       default: amd64
     - name: profile
