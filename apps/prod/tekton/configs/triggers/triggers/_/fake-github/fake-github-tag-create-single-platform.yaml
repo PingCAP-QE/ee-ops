@@ -93,4 +93,4 @@ spec:
     - { name: os, value: $(extensions.custom-params.os) }
     - { name: arch, value: $(extensions.custom-params.arch) }
   template:
-    ref: build-component-single-platform
+    ref: build-component-single-platform-$(extensions.custom-params.os)

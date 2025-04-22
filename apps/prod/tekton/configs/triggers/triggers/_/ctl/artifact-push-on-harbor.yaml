@@ -44,7 +44,7 @@ spec:
     - { name: os, value: $(extensions.os) }
     - { name: arch, value: $(extensions.arch) }
   template:
-    ref: build-component-single-platform
+    ref: build-component-single-platform-linux
 ---
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
@@ -92,4 +92,4 @@ spec:
     - { name: os, value: $(extensions.os) }
     - { name: arch, value: $(extensions.arch) }
   template:
-    ref: build-component-single-platform
+    ref: build-component-single-platform-linux
