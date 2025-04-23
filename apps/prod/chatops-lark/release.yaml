@@ -38,7 +38,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/chatops-lark
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/chatops-lark versioning=semver
-      tag: v2025.4.8-7-g297201e
+      tag: v2025.4.8-8-g6e98db8
     server:
       secretName: chatops-lark
       appIdSecretKey: app-id
