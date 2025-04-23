@@ -40,6 +40,8 @@ controller:
     - { name: docs-cn, keyName: qiniu-ak }
     - { name: docs-cn, keyName: qiniu-sk }
     - { name: docs-cn, keyName: qiniu-bn }
+    - { name: docs-cn, keyName: tencent-ak }
+    - { name: docs-cn, keyName: tencent-bn }
 
     # for ks3util
     - { name: ks3util, keyName: config }
@@ -190,6 +192,16 @@ controller:
                       description: qiniu token for docs-cn
                       scope: GLOBAL
                       secret: ${docs-cn-qiniu-bn}
+                  - string:
+                      id: docs-cn-tencent-ak
+                      description: tencent token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-tencent-ak}
+                  - string:
+                      id: docs-cn-tencent-bn
+                      description: tencent bucket for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-tencent-bn}
               - domain:
                   name: hub.pingcap.net
                 credentials:
