@@ -1,0 +1,30 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: Trigger
+metadata:
+  name: github-push-tiflash-cse-build-enterprise
+  labels:
+    type: github-branch-push
+    github-owner: tidbcloud
+    profile: enterprise
+spec:
+  interceptors:
+    - name: filter on repo
+      ref: { name: cel }
+      params:
+        - name: filter
+          value: >-
+            body.repository.full_name == 'tidbcloud/tiflash-cse'
+            &&
+            body.ref.matches('^refs/heads/(cloud-engine-on-release-8.5)$')
+
+  bindings:
+    - ref: github-branch-push
+    - { name: component, value: tiflash }
+    - { name: profile, value: enterprise }
+    - { name: timeout, value: 2h }
+    - { name: source-ws-size, value: 100Gi }
+    - { name: builder-resources-cpu, value: "16" }
+    - { name: builder-resources-memory, value: "64Gi" }
+
+  template:
+    ref: build-component
