@@ -1,11 +1,11 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: github-push-tiflash-cse-build-enterprise
+  name: github-push-tiflash-cse-build
   labels:
     type: github-branch-push
     github-owner: tidbcloud
-    profile: enterprise
+    profile: next-gen
 spec:
   interceptors:
     - name: filter on repo
@@ -20,7 +20,7 @@ spec:
   bindings:
     - ref: github-branch-push
     - { name: component, value: tiflash }
-    - { name: profile, value: enterprise }
+    - { name: profile, value: next-gen }
     - { name: timeout, value: 2h }
     - { name: source-ws-size, value: 100Gi }
     - { name: builder-resources-cpu, value: "16" }
