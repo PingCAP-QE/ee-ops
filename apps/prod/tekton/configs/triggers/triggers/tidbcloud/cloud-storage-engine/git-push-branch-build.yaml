@@ -15,7 +15,7 @@ spec:
           value: >-
             body.repository.full_name == 'tidbcloud/cloud-storage-engine'
             &&
-            body.ref.matches('^refs/heads/(dedicated|cloud-engine)$')
+            body.ref.matches('^refs/heads/(dedicated)$')
 
   bindings:
     - ref: github-branch-push
