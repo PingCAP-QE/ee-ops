@@ -49,7 +49,7 @@ spec:
       echo $RESOURCE > /workspace/full-resource-output.json
       echo $RESOURCE | jq -rj ".name" > $(results.leased-resource.path)
   - name: create-heartbeat-pod-yaml
-    image: docker.io/lachlanevenson/k8s-kubectl@sha256:be98414e6907f0e6913c54ad98cfa59ffb86b843d2d7cf10dd7107e4d1822866
+    image: docker.io/lachlanevenson/k8s-kubectl@sha256:6e16ad356091ddfc95cd90fb7145b927531b45798e89d397a4c5e8fb64f8a5f5
     script: |
       FULL_RESOURCE_OUTPUT=$(cat /workspace/full-resource-output.json)
       LEASED_RESOURCE=$(cat $(results.leased-resource.path))
