@@ -78,10 +78,11 @@ spec:
                 }
             - key: component
               expression: >-
-                {
+                body.repository.full_name.startsWith('tidbcloud/') ? {
                   'tidbcloud/tiflash-cse': 'tiflash',
                   'tidbcloud/cloud-storage-engine': 'tikv',
-                }[body.repository.full_name] || body.repository.name
+                }[body.repository.full_name]
+                : body.repository.name
   bindings:
     - ref: github-pr
     - ref: ce-context
