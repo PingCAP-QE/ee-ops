@@ -95,6 +95,7 @@ spec:
         - name: STICKY_REPOS
           value: >-
             pingcap-inc/tiflash-scripts
+            pingcap-inc/tici
             pingcap/docs
             pingcap/docs-cn
             pingcap/docs-tidb-operator
