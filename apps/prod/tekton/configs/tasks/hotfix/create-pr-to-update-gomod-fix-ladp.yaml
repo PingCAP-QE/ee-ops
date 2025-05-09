@@ -38,27 +38,27 @@ spec:
         # Check if the branch is a hotfix branch for specific hotfix release branch
         
         base_release_branch=""
-        needs_ldap_fix=false
+        does_need_ldap_fix=false
 
         case "$(params.branch)" in
           release-7.5-*)
             base_release_branch="release-7.5"
-            needs_ldap_fix=true
+            does_need_ldap_fix=true
             ;;
           release-8.1-*)
             base_release_branch="release-8.1"
-            needs_ldap_fix=true
+            does_need_ldap_fix=true
             ;;
           release-8.5-*)
             base_release_branch="release-8.5"
-            needs_ldap_fix=true
+            does_need_ldap_fix=true
             ;;
           *)
             echo "Branch $(params.branch) is not a designated hotfix release for ldap crt/key update (release-7.5-*, release-8.1-*, release-8.5-*)."
             ;;
         esac
 
-        if [ "$needs_ldap_fix" = "true" ] && [ -n "$base_release_branch" ]; then
+        if [ "$does_need_ldap_fix" = "true" ] && [ -n "$base_release_branch" ]; then
           echo "Branch $(params.branch) is a hotfix branch for $base_release_branch which may need to update the ldap crt/key."
           echo "Fetching base release branch: $base_release_branch..."
           git fetch origin $base_release_branch
