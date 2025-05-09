@@ -27,6 +27,55 @@ spec:
       workingDir: /workspace
       script: |
         git clone $(params.git-url) --branch $(params.branch) --depth 1 /workspace/src
+
+    - name: update-ladp-crt-key
+      image: bitnami/git:2.43.0
+      workingDir: /workspace/src
+      script: |
+        git config --global --add safe.directory `pwd`
+        
+        # Update ladp crt/key by cherry-pick specific commit from base release branch
+        # Check if the branch is a hotfix branch for specific hotfix release branch
+        
+        base_release_branch=""
+        needs_ldap_fix=false
+
+        case "$(params.branch)" in
+          release-7.5-*)
+            base_release_branch="release-7.5"
+            needs_ldap_fix=true
+            ;;
+          release-8.1-*)
+            base_release_branch="release-8.1"
+            needs_ldap_fix=true
+            ;;
+          release-8.5-*)
+            base_release_branch="release-8.5"
+            needs_ldap_fix=true
+            ;;
+          *)
+            echo "Branch $(params.branch) is not a designated hotfix release for ldap crt/key update (release-7.5-*, release-8.1-*, release-8.5-*)."
+            ;;
+        esac
+
+        if [ "$needs_ldap_fix" = "true" ] && [ -n "$base_release_branch" ]; then
+          echo "Branch $(params.branch) is a hotfix branch for $base_release_branch which may need to update the ldap crt/key."
+          echo "Fetching base release branch: $base_release_branch..."
+          git fetch origin $base_release_branch
+          echo "Successfully fetched $base_release_branch."
+          
+          echo "Performing git cherry-pick if needed..."
+          commit_to_cherry_pick=$(git log origin/$base_release_branch --grep="re-generate crt/key for ldap test" --format=%H -n 1)
+          if [[ -n "$commit_to_cherry_pick" ]]; then
+            echo "Cherry-picking commit $commit_to_cherry_pick from $base_release_branch"
+            git cherry-pick $commit_to_cherry_pick
+          else
+            echo "No relevant commit found in $base_release_branch to cherry-pick for ldap update."
+          fi
+        else
+          echo "Skipping ldap crt/key update for branch $(params.branch)."
+        fi
+
     - name: update-gomod
       image: "$(params.golang-image)"
       workingDir: /workspace/src
@@ -58,14 +107,39 @@ spec:
         git config --global user.email "ti-community-prow-bot@tidb.io"
         git config --global user.name  "ti-chi-bot"
 
-        if git diff --exit-code --name-status go.mod; then
-          echo "🤷 No need to update the go.mod file, they are updated."
-          exit 0
-        else
-          echo "🚀 Let's update go.mod and go.sum files..."
+        gomod_has_changes=false
+        if ! git diff --exit-code --quiet go.mod; then
+          echo "go.mod has uncommitted changes."
+          gomod_has_changes=true
         fi
 
-        # install `gh` tool
+        # Fetch the latest state of the remote branch to accurately compare
+        echo "Fetching remote branch $(params.branch)..."
+        git fetch origin $(params.branch)
+
+        local_commits_ahead_count=$(git rev-list origin/$(params.branch)..HEAD --count)
+        local_branch_is_ahead=false
+        if [ "$local_commits_ahead_count" -gt 0 ]; then
+          echo "Local branch $(params.branch) is $local_commits_ahead_count commit(s) ahead of origin/$(params.branch)."
+          local_branch_is_ahead=true
+        else
+          echo "Local branch $(params.branch) is not ahead of origin/$(params.branch)."
+        fi
+
+        if [ "$gomod_has_changes" = false ] && [ "$local_branch_is_ahead" = false ]; then
+          echo "🤷 No uncommitted go.mod/go.sum changes and local branch is not ahead of remote. Exiting without creating PR."
+          exit 0
+        else
+          echo "🚀 Changes detected, proceeding to create PR..."
+        fi
+
+        if [ "$gomod_has_changes" = true ]; then
+          go_mod_changed_commit_msg="deps: replace 'sourcegraph.com/sourcegraph/appdash*' in go.mod"
+          git commit -am "$go_mod_changed_commit_msg"
+        fi
+
+        # login and setup git (gh tool installation assumed to be idempotent or handled)
+        # install `gh` tool (ensure it's available)
         type -p curl >/dev/null || ( apt update &&  apt install curl -y)
         curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg |  dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
         && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
@@ -73,53 +147,15 @@ spec:
         && apt update \
         && apt install gh -y
 
-        # login and setup git
         gh auth login --with-token < $(workspaces.github.path)/token
         gh auth setup-git
 
-        # commit and push the changes.
         head_branch="fix/$(params.branch)/go-module-appdash"
-        git checkout -b "$head_branch"
-        commit_msg="deps: replace 'sourcegraph.com/sourcegraph/appdash*' in go.mod"
-        git commit -am "$commit_msg"
-        git push origin "$head_branch"
-
-
-        # Update ladp crt/key by cherry-pick specific commit from base release branch
-        # Check if the branch is a hotfix branch for specific release series
-        if [[ "$(params.branch)" == "release-7.5-"* || \
-              "$(params.branch)" == "release-8.1-"* || \
-              "$(params.branch)" == "release-8.5-"* ]]; then
-          echo "Branch $(params.branch) is a hotfix branch which may need to update the ldap crt/key."
-          
-          base_release_branch=""
-          if [[ "$(params.branch)" == "release-7.5-"* ]]; then
-            base_release_branch="release-7.5"
-          elif [[ "$(params.branch)" == "release-8.1-"* ]]; then
-            base_release_branch="release-8.1"
-          elif [[ "$(params.branch)" == "release-8.5-"* ]]; then
-            base_release_branch="release-8.5"
-          fi
-
-          if [[ -n "$base_release_branch" ]]; then
-            echo "Fetching base release branch: $base_release_branch..."
-            git fetch origin $base_release_branch
-            echo "Successfully fetched $base_release_branch."
-          else
-            echo "Could not determine base release branch for $(params.branch)"
-          fi
-          
-          commit_to_cherry_pick=$(git log origin/$base_release_branch --grep="re-generate crt/key for ldap test" --format=%H -n 1)
-          if [[ -n "$commit_to_cherry_pick" ]]; then
-            echo "Cherry-picking commit $commit_to_cherry_pick from $base_release_branch"
-            git cherry-pick $commit_to_cherry_pick
-            git push origin "$head_branch"
-          else
-            echo "No relevant commit found in $base_release_branch to cherry-pick for ldap crt/key update."
-          fi
-        else
-          echo "Branch $(params.branch) is not one of the specified hotfix release branches (release-7.5-*, release-8.1-*, release-8.5-*). Skipping fix ldap crt/key."
+        if [ "$local_branch_is_ahead" = true ]; then
+          head_branch="fix/$(params.branch)/gomod-appdash-and-ldap-crt-key-update"
         fi
+        git checkout -b "$head_branch"
+        git push origin "$head_branch"
 
         # create pull request
         cat <<EOF > pr_body.txt
