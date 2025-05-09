@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: update-pingcap-tidb-gomod-for-hotfix-branch
+  name: update-pingcap-tidb-gomod-fix-ladp-for-hotfix-branch
 spec:
   params:
     - name: git-url
@@ -15,7 +15,7 @@ spec:
     - apiVersion: tekton.dev/v1beta1
       kind: TaskRun
       metadata:
-        generateName: create-pr-to-fix-gomod-for-hotfix-
+        generateName: create-pr-to-update-gomod-fix-ladp-for-hotfix-
       spec:
         params:
           - name: git-url
@@ -26,7 +26,7 @@ spec:
             value: $(tt.params.golang-image)
         taskRef:
           kind: Task
-          name: create-pr-to-fix-gomod
+          name: create-pr-to-update-gomod-fix-ladp
         podTemplate:
             nodeSelector:
               kubernetes.io/arch: "amd64"

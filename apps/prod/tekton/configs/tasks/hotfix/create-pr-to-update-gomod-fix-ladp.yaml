@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: create-pr-to-fix-gomod
+  name: create-pr-to-update-gomod-fix-ladp
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
@@ -10,6 +10,7 @@ metadata:
 spec:
   description: >-
     Create pull request to fix `go.mod` file to github repository branch.
+    Also, update ldap crt/key if the branch is a hotfix branch for specific release series(release-7.5-*, release-8.1-*, release-8.5-*).
   params:
     - name: git-url
       description: repository clone url
@@ -35,6 +36,7 @@ spec:
       script: |
         git config --global --add safe.directory `pwd`
 
+        # replace appdash and update go.mod
         go mod edit -replace sourcegraph.com/sourcegraph/appdash=github.com/sourcegraph/appdash@v0.0.0-20190731080439-ebfcffb1b5c0
         go mod edit -replace sourcegraph.com/sourcegraph/appdash-data=github.com/sourcegraph/appdash-data@v0.0.0-20151005221446-73f23eafcf67
         go mod tidy
@@ -47,6 +49,7 @@ spec:
           echo 'build --remote_cache=http://ats.apps.svc/brc/tidb --remote_timeout="30s"' > ~/.bazelrc
           make bazel_prepare || true
         fi
+        
     - name: create-pr
       image: bitnami/git:2.43.0
       workingDir: /workspace/src
@@ -80,6 +83,43 @@ spec:
         commit_msg="deps: replace 'sourcegraph.com/sourcegraph/appdash*' in go.mod"
         git commit -am "$commit_msg"
         git push origin "$head_branch"
+
+
+        # Update ladp crt/key by cherry-pick specific commit from base release branch
+        # Check if the branch is a hotfix branch for specific release series
+        if [[ "$(params.branch)" == "release-7.5-"* || \
+              "$(params.branch)" == "release-8.1-"* || \
+              "$(params.branch)" == "release-8.5-"* ]]; then
+          echo "Branch $(params.branch) is a hotfix branch which may need to update the ldap crt/key."
+          
+          base_release_branch=""
+          if [[ "$(params.branch)" == "release-7.5-"* ]]; then
+            base_release_branch="release-7.5"
+          elif [[ "$(params.branch)" == "release-8.1-"* ]]; then
+            base_release_branch="release-8.1"
+          elif [[ "$(params.branch)" == "release-8.5-"* ]]; then
+            base_release_branch="release-8.5"
+          fi
+
+          if [[ -n "$base_release_branch" ]]; then
+            echo "Fetching base release branch: $base_release_branch..."
+            git fetch origin $base_release_branch
+            echo "Successfully fetched $base_release_branch."
+          else
+            echo "Could not determine base release branch for $(params.branch)"
+          fi
+          
+          commit_to_cherry_pick=$(git log origin/$base_release_branch --grep="re-generate crt/key for ldap test" --format=%H -n 1)
+          if [[ -n "$commit_to_cherry_pick" ]]; then
+            echo "Cherry-picking commit $commit_to_cherry_pick from $base_release_branch"
+            git cherry-pick $commit_to_cherry_pick
+            git push origin "$head_branch"
+          else
+            echo "No relevant commit found in $base_release_branch to cherry-pick for ldap crt/key update."
+          fi
+        else
+          echo "Branch $(params.branch) is not one of the specified hotfix release branches (release-7.5-*, release-8.1-*, release-8.5-*). Skipping fix ldap crt/key."
+        fi
 
         # create pull request
         cat <<EOF > pr_body.txt
