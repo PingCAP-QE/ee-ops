@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: build-component-single-platform-linux
+  name: build-component-single-platform
 spec:
   params:
     - name: git-url
@@ -75,6 +75,8 @@ spec:
             value: $(tt.params.registry)
           - name: force-builder-image
             value: $(tt.params.force-builder-image)
+          - name: boskos-server-url # for darwin platforms
+            value: http://boskos.apps.svc
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
@@ -108,9 +110,12 @@ spec:
           - name: git-basic-auth # fetch with git-cdn.
             secret:
               secretName: git-credentials-basic
-          - name: cargo-home
+          - name: cargo-home # for linux platforms
             persistentVolumeClaim:
               claimName: cargo-home
-          - name: cypress-cache
+          - name: cypress-cache # for linux platforms
             persistentVolumeClaim:
               claimName: cypress-cache
+          - name: mac-ssh-credentials # for darwin platforms
+            secret:
+              secretName: mac-ssh-credentials
