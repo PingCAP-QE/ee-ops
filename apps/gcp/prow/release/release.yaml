@@ -70,8 +70,8 @@ spec:
         size: 10Gi
     tide:
       image:
-        repository: ticommunityinfra/tide
-        tag: v20230706-5546ede
+        repository: ghcr.io/ti-community-infra/prow/tide
+        tag: v20250516-ceae038a4
       additionalArgs:
         - --sync-hourly-tokens=1200 # default is 800
         - --status-hourly-tokens=600 # default is 400
