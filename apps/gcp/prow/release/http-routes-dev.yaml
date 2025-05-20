@@ -1,0 +1,41 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: prow-dev
+  namespace: apps
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: apps-dev
+  hostnames:
+    - dev.prow.tidb.net
+  rules:
+    - backendRefs:
+        - name: prow-deck
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+    - backendRefs:
+        - name: prow-hook
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /hook
+    - backendRefs:
+        - name: prow-ti-community-owners
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /ti-community-owners
+    - backendRefs:
+        - name: prow-tichi-web
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: /tichi
