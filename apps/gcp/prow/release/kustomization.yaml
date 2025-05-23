@@ -4,4 +4,4 @@ resources:
   - release.yaml
   - frontend-config.yaml
   - gce-ingress.yaml
-  - http-routes-dev.yaml
+  - http-routes.yaml
