@@ -35,6 +35,13 @@ spec:
           params:
             - name: eventTypes
               value: ["push"]
+        - name: exclude the old branch when renaming
+          # Filter out the old branch when renaming to prevent unnecessary processing
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.after != '0000000000000000000000000000000000000000'
         # "refs/heads/main" => "main"
         - name: shortten the git REF
           ref:
