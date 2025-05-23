@@ -3,10 +3,10 @@ kind: Kustomization
 resources:
   - ../_base
   - namespace.yaml
-  - namespace-dev.yaml
+  - gateways.yaml
   - prow-crd.yaml
   - prow
-  - gateways-dev.yaml
   - acr-runners
+  # - namespace-dev.yaml
   # - prow-dev
   # - tekton-dev
