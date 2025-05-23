@@ -11,7 +11,7 @@ spec:
       tls:
         mode: Terminate
         certificateRefs:
-          - name: prow-tls
+          - name: prow-dev-tls
             namespace: apps
       allowedRoutes:
         kinds:
