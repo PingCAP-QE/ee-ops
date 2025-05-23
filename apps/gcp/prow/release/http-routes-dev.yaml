@@ -6,8 +6,8 @@ metadata:
 spec:
   parentRefs:
     - kind: Gateway
-      name: external-https
-      namespace: apps-dev
+      name: external-https-dev
+      namespace: apps
   hostnames:
     - dev.prow.tidb.net
   rules:
