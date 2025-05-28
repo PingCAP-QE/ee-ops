@@ -1,10 +1,10 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
-  name: github-push-tiflash-cse-build
+  name: github-push-tiflash-build-next-gen
   labels:
     type: github-branch-push
-    github-owner: tidbcloud
+    github-owner: pingcap
     profile: next-gen
 spec:
   interceptors:
@@ -13,13 +13,13 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.full_name == 'tidbcloud/tiflash-cse'
+            body.repository.full_name == 'pingcap/tiflash'
             &&
-            body.ref.matches('^refs/heads/(cloud-engine-on-release-8.5)$')
+            body.ref.matches('^refs/heads/(feature/next-gen)$')
 
   bindings:
     - ref: github-branch-push
-    - { name: component, value: tiflash }
+    - { name: component, value: $(body.repository.name) }
     - { name: profile, value: next-gen }
     - { name: timeout, value: 2h }
     - { name: source-ws-size, value: 100Gi }
