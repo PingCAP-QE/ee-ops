@@ -31,15 +31,16 @@ resources:
   - pingcap/tidb-operator/git-push.yaml
   - pingcap/tidb-tools/git-create-tag.yaml
   - pingcap/tidb-tools/git-push.yaml
-  - pingcap/tidb/git-push.yaml
+  - pingcap/tidb/git-push-branch-build.yaml
+  - pingcap/tiflash/git-push-branch-build.yaml
   - pingcap/tiflow-operator/git-create-tag.yaml
   - pingcap/tiflow-operator/git-push.yaml
   - pingcap/tiproxy/git-create-tag.yaml
   - pingcap/tiproxy/git-push.yaml
   - tidbcloud/cloud-storage-engine/git-push-branch-build.yaml
-  - tidbcloud/tiflash-cse/git-push-branch-build.yaml
   - tikv/_/git-push-branch-build-community.yaml
   - tikv/_/git-push-branch-build-enterprise.yaml
   - tikv/_/git-push-branch-build-failpoint.yaml
+  - tikv/pd/git-push-branch-build.yaml
   - tikv/tikv/git-create-branch.yaml
   - tikv/tikv/git-create-tag.yaml
