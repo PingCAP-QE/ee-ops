@@ -46,7 +46,7 @@ spec:
                   branch="$(tt.params.git-ref)"
                   echo "Downloading from: https://github.com/${org}/${repo}/archive/${branch}.zip"
 
-                  wget "https://github.com/${org}/${repo}/archive/${branch}.zip" -O - | unzip -
+                  wget "https://github.com/${org}/${repo}/archive/${branch}.zip" -O ${branch}.zip && unzip "${branch}.zip"
 
                   ks3util sync "${repo}-${branch}" ks3://ee-fileserver/download/raw.githubusercontent.com/${org}/${repo}/${branch} --delete -f
               - name: ARGS
