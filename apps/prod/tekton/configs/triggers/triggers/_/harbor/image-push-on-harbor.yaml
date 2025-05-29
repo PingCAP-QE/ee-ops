@@ -46,9 +46,10 @@ spec:
             body.event_data.repository.repo_full_name.matches('^(pingcap|tikv)/')
             && !
             body.event_data.repository.repo_full_name.matches('/package(s)?')
-            ) &&
-            (
+            ) && (
             body.event_data.resources[0].tag.matches('^(master|main|release-[0-9]+[.][0-9]+(-beta[.][0-9]+)?|v[0-9]+[.][0-9]+[.][0-9]+(-(beta|rc)[.][0-9]+)?([-.]pre)?)(-[0-9a-f]+)?(-(enterprise|failpoint))?$')
+            ||
+            body.event_data.resources[0].tag.matches('^(master|dedicated|feature_next-gen.*)(-.*)?-next-gen$')
             ||
             (
             body.event_data.repository.repo_full_name.matches('^pingcap/tidb-operator/')
