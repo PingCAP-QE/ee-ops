@@ -5,7 +5,7 @@ resources:
   - namespace.yaml
   - gateways.yaml
   - acr-runners
-  - cla-assistant
+  - cla-assitant
   - prow-crd.yaml
   - prow
   # - prow-dev
