@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: mongodb
+spec:
+  releaseName: mongodb
+  chart:
+    spec:
+      chart: mongodb
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+      version: "16.5.13"
+  interval: 24h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    image:
+      tag: 4.4.29
+    global:
+      storageClass: ceph-block
+    persistence:
+      storageClass: standard-rwo
+      size: 16Gi
+    resources:
+      requests:
+        cpu: "1"
+        memory: 4Gi
+      limits:
+        cpu: "2"
+        memory: 8Gi   

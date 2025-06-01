@@ -1,0 +1,31 @@
+apiVersion: v2
+name: cla-assistant
+description: A Helm chart for deploying CLA assistant, a Contributor License Agreement automation tool for GitHub repositories.
+type: application
+version: 0.1.0
+appVersion: "3.0.0"
+home: https://cla-assistant.io
+sources:
+  - https://github.com/cla-assistant/cla-assistant
+maintainers:
+  - name: SAP SE
+    email: opensource@sap.com
+icon: https://cla-assistant.io/favicon.ico
+keywords:
+  - CLA
+  - github
+  - contributor
+  - license
+  - agreement
+  - automation
+annotations:
+  artifacthub.io/links: |
+    - name: Documentation
+      url: https://github.com/cla-assistant/cla-assistant
+    - name: Project
+      url: https://cla-assistant.io
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/maintainers: |
+    - name: SAP SE
+      email: opensource@sap.com
+  artifacthub.io/source-url: https://github.com/cla-assistant/cla-assistant
