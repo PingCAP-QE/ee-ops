@@ -113,6 +113,32 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/buildbarn-0.0.2/buildbarn-0.0.2.tgz
     version: 0.0.2
+  cla-assistant:
+  - apiVersion: v2
+    appVersion: 3.0.0
+    created: "2025-06-01T15:18:07.13767021Z"
+    description: A Helm chart for deploying CLA assistant, a Contributor License Agreement
+      automation tool for GitHub repositories.
+    digest: a2991083e72342f9a26197757aaeadd9413d1ccccb8f895fb915604b0b662918
+    home: https://cla-assistant.io
+    icon: https://cla-assistant.io/favicon.ico
+    keywords:
+    - CLA
+    - github
+    - contributor
+    - license
+    - agreement
+    - automation
+    maintainers:
+    - email: wuhui.zuo@pingcap.com
+      name: wuhuizuo
+    name: cla-assistant
+    sources:
+    - https://github.com/cla-assistant/cla-assistant
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/cla-assistant-0.1.0/cla-assistant-0.1.0.tgz
+    version: 0.1.0
   git-cdn:
   - apiVersion: v2
     appVersion: 1.10.2
@@ -758,4 +784,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2024-09-10T10:13:09.258739423Z"
+generated: "2025-06-01T15:18:07.137800703Z"
