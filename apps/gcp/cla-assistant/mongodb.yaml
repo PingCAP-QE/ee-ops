@@ -9,9 +9,9 @@ spec:
       chart: mongodb
       sourceRef:
         kind: HelmRepository
-        name: bitnami
+        name: bitnami-legacy
         namespace: flux-system
-      version: "16.5.13"
+      version: "12.1.16"
   interval: 24h
   install:
     remediation:
@@ -24,9 +24,7 @@ spec:
     ignoreFailures: false
   values:
     image:
-      tag: 4.4.29
-    global:
-      storageClass: ceph-block
+      tag: 4.4.15
     persistence:
       storageClass: premium-rwo # SSD backend.
       size: 16Gi
