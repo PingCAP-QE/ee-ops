@@ -28,7 +28,7 @@ spec:
     global:
       storageClass: ceph-block
     persistence:
-      storageClass: standard-rwo
+      storageClass: premium-rwo # SSD backend.
       size: 16Gi
     resources:
       requests:
@@ -36,4 +36,4 @@ spec:
         memory: 4Gi
       limits:
         cpu: "2"
-        memory: 8Gi   
+        memory: 8Gi
