@@ -8,8 +8,8 @@ home: https://cla-assistant.io
 sources:
   - https://github.com/cla-assistant/cla-assistant
 maintainers:
-  - name: SAP SE
-    email: opensource@sap.com
+  - name: wuhuizuo
+    email: wuhui.zuo@pingcap.com
 icon: https://cla-assistant.io/favicon.ico
 keywords:
   - CLA
@@ -18,14 +18,3 @@ keywords:
   - license
   - agreement
   - automation
-annotations:
-  artifacthub.io/links: |
-    - name: Documentation
-      url: https://github.com/cla-assistant/cla-assistant
-    - name: Project
-      url: https://cla-assistant.io
-  artifacthub.io/license: Apache-2.0
-  artifacthub.io/maintainers: |
-    - name: SAP SE
-      email: opensource@sap.com
-  artifacthub.io/source-url: https://github.com/cla-assistant/cla-assistant
