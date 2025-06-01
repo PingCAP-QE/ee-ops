@@ -4,8 +4,9 @@ resources:
   - ../_base
   - namespace.yaml
   - gateways.yaml
+  - acr-runners
+  - cla-assistant
   - prow-crd.yaml
   - prow
-  - acr-runners
   # - prow-dev
   # - tekton-dev
