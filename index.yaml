@@ -116,6 +116,31 @@ entries:
   cla-assistant:
   - apiVersion: v2
     appVersion: 3.0.0
+    created: "2025-06-02T12:47:59.562833469Z"
+    description: A Helm chart for deploying CLA assistant, a Contributor License Agreement
+      automation tool for GitHub repositories.
+    digest: 419a62fdb2329a3c40b900f1170840bfc0ea9600650af3a510c00831889cad16
+    home: https://cla-assistant.io
+    icon: https://cla-assistant.io/favicon.ico
+    keywords:
+    - CLA
+    - github
+    - contributor
+    - license
+    - agreement
+    - automation
+    maintainers:
+    - email: wuhui.zuo@pingcap.com
+      name: wuhuizuo
+    name: cla-assistant
+    sources:
+    - https://github.com/cla-assistant/cla-assistant
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/cla-assistant-0.3.0/cla-assistant-0.3.0.tgz
+    version: 0.3.0
+  - apiVersion: v2
+    appVersion: 3.0.0
     created: "2025-06-02T12:36:51.151241325Z"
     description: A Helm chart for deploying CLA assistant, a Contributor License Agreement
       automation tool for GitHub repositories.
@@ -809,4 +834,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-02T12:36:51.151341495Z"
+generated: "2025-06-02T12:47:59.562936116Z"
