@@ -1,5 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ../_base/sources/helm-repo-bitnami.yaml
+  - ../_base
+  - secret-generator
   # TODO(wuhuizuo): move the gateway from `apps` folder to here.

@@ -22,6 +22,7 @@ spec:
   test:
     enable: true
     ignoreFailures: false
+
   values:
     image:
       tag: 4.4.15
@@ -35,3 +36,19 @@ spec:
       limits:
         cpu: "2"
         memory: 8Gi
+  valuesFrom:
+    - kind: Secret
+      name: mongodbdb-credentials
+      valuesKey: database
+      targetPath: auth.database
+      optional: true
+    - kind: Secret
+      name: mongodbdb-credentials
+      valuesKey: username
+      targetPath: auth.username
+      optional: true
+    - kind: Secret
+      name: mongodbdb-credentials
+      valuesKey: password
+      targetPath: auth.password
+      optional: true
