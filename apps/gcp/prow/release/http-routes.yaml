@@ -7,7 +7,7 @@ spec:
   parentRefs:
     - kind: Gateway
       name: external-https
-      namespace: apps
+      namespace: infra
   hostnames:
     - prow.tidb.net
   rules:
