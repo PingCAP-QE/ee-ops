@@ -22,7 +22,6 @@ spec:
   test:
     enable: true
     ignoreFailures: false
-
   values:
     image:
       tag: 4.4.15
@@ -38,17 +37,17 @@ spec:
         memory: 8Gi
   valuesFrom:
     - kind: Secret
-      name: mongodbdb-credentials
+      name: mongodb-credentials
       valuesKey: database
       targetPath: auth.database
       optional: true
     - kind: Secret
-      name: mongodbdb-credentials
+      name: mongodb-credentials
       valuesKey: username
       targetPath: auth.username
       optional: true
     - kind: Secret
-      name: mongodbdb-credentials
+      name: mongodb-credentials
       valuesKey: password
       targetPath: auth.password
       optional: true
