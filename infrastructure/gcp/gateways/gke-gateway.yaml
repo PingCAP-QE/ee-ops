@@ -1,0 +1,36 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: external-https
+spec:
+  gatewayClassName: gke-l7-global-external-managed
+  listeners:
+    - name: wildcard-tidb-net-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.tidb.net"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-tidb-net-cert
+      allowedRoutes:
+        kinds:
+          - kind: HTTPRoute
+        namespaces:
+          from: All
+    - name: wildcard-pingcap-net-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.pingcap.net"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-pingcap-net-cert
+      allowedRoutes:
+        kinds:
+          - kind: HTTPRoute
+        namespaces:
+          from: All
+  addresses:
+    - type: NamedAddress
+      value: gw-apps-ip

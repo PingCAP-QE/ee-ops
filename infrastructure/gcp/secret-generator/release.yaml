@@ -4,7 +4,6 @@ kind: HelmRelease
 metadata:
   name: secret-generator
 spec:
-  targetNamespace: secret-generator
   chart:
     spec:
       chart: kubernetes-secret-generator
