@@ -141,6 +141,9 @@ readinessProbe:
   httpGet:
     path: /health/readiness
     port: http
+    httpHeaders:
+      - name: x-health-check
+        value: check
   initialDelaySeconds: 10
   periodSeconds: 5
   timeoutSeconds: 3
