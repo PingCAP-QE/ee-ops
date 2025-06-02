@@ -31,7 +31,18 @@ spec:
     serviceAccount:
       create: false
     httpRoute:
-      enabled: false
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: external-https
+          namespace: infra
+      hostnames:
+        - cla-dev.pingcap.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
     envFromSecret: cla-credentials
     additionalEnv:
       - name: HOST
