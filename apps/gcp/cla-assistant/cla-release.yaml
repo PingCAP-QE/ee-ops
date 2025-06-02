@@ -45,3 +45,8 @@ spec:
       limits:
         cpu: "2"
         memory: 8Gi
+    readinessProbe:
+      httpGet:
+        httpHeaders:
+          - name: x-health-check
+            value: check
