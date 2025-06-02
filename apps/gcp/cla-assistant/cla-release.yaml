@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: cla-assistant
+spec:
+  releaseName: cla-assistant
+  chart:
+    spec:
+      chart: cla-assistant
+      sourceRef:
+        kind: HelmRepository
+        name: ee-ops
+        namespace: flux-system
+      version: "0.1.0"
+  dependsOn:
+    - name: mongodb
+  interval: 5m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    image:
+      pullPolicy: Always
+      tag: latest_linux_amd64
+    serviceAccount:
+      create: false
+    httpRoute:
+      enabled: false
+    envFromSecret: cla-credentials
+    additionalEnv:
+      - name: HOST
+        value: cla-dev.pingcap.net
+      - name: PROTOCOL
+        value: https
+    resources:
+      requests:
+        cpu: "1"
+        memory: 4Gi
+      limits:
+        cpu: "2"
+        memory: 8Gi

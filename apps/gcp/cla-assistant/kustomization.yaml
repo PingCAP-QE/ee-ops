@@ -5,3 +5,4 @@ resources:
   - namespace.yaml
   - mongodb-secret.yaml
   - mongodb-release.yaml
+  - cla-release.yaml
