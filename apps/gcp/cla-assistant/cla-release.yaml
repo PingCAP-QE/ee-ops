@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: ee-ops
         namespace: flux-system
-      version: "0.2.0"
+      version: "0.3.0"
   dependsOn:
     - name: mongodb
   interval: 5m

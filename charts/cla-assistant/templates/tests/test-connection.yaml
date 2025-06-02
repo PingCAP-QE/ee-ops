@@ -11,8 +11,5 @@ spec:
     - name: wget
       image: busybox
       command: ['wget']
-      args:
-        - --spider
-        - --header='x-health-check: check'
-        - '{{ include "cla-assistant.fullname" . }}:{{ .Values.service.port }}/health/readiness'
+      args: ['{{ include "cla-assistant.fullname" . }}:{{ .Values.service.port }}']
   restartPolicy: Never
