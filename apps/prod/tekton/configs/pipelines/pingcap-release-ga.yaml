@@ -6,7 +6,7 @@ spec:
   params:
     - name: version
       type: string
-    - name: pre-version
+    - name: rc-version
       type: string
       description: >
         The version of the artifact to be released on, examples:
@@ -30,7 +30,7 @@ spec:
     - name: ga-tag-oci-artifacts
       params:
         - name: rc-version
-          value: "$(params.pre-version)"
+          value: "$(params.rc-version)"
         - name: ga-version
           value: $(params.version)
       taskRef:
