@@ -15,7 +15,7 @@ spec:
           value: >-
             body.repository.full_name == 'pingcap/tiflash'
             &&
-            body.ref.matches('^refs/heads/(feature/next-gen)$')
+            body.ref.matches('^refs/heads/(master|feature/next-gen.*)$')
 
   bindings:
     - ref: github-branch-push
