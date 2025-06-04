@@ -29,9 +29,6 @@ spec:
         #! /usr/bin/env bash
         set -exo pipefail
 
-        # temp: sleep 1 hour
-        sleep 3600
-
         tiup mirror set $tiup_mirror
 
         # check the tiup pkgs
