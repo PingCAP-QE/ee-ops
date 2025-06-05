@@ -27,7 +27,7 @@ spec:
           enabled: true
       replicated:
         mayastor:
-          enabled: true
+          enabled: false
     openebs-crds:
       csi:
         volumeSnapshots:
@@ -49,7 +49,3 @@ spec:
           enabled: true
       zfsNode:
         kubeletDir: /data/kubelet
-    mayastor:
-      csi:
-        node:
-          kubeletDir: /data/kubelet
