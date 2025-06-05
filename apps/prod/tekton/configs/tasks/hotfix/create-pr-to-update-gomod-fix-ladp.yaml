@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: create-pr-to-update-gomod-fix-ladp-debug-by-wulifu
+  name: create-pr-to-update-gomod-fix-ladp
   labels:
     app.kubernetes.io/version: "0.1"
   annotations:
