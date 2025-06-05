@@ -37,7 +37,7 @@ spec:
           name: external-https
           namespace: infra
       hostnames:
-        - cla-dev.pingcap.net
+        - cla.pingcap.net
       rules:
         - matches:
             - path:
@@ -46,7 +46,7 @@ spec:
     envFromSecret: cla-credentials
     additionalEnv:
       - name: HOST
-        value: cla-dev.pingcap.net
+        value: cla.pingcap.net
       - name: PROTOCOL
         value: https
     resources:
