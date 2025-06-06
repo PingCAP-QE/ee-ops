@@ -96,9 +96,7 @@ spec:
               skip_reason="Current branch already has an ldap crt/key update commit: $existing_ldap_commit. Skipping cherry-pick to avoid duplicate changes."
             else
               # If no skip reason found, proceed with cherry-pick
-              if [ -z "$skip_reason" ]; then
-                should_cherry_pick=true
-              fi
+              should_cherry_pick=true
             fi
           fi
 
