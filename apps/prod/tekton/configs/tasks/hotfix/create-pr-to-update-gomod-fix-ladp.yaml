@@ -26,39 +26,41 @@ spec:
       image: bitnami/git:2.43.0
       workingDir: /workspace
       script: |
-        git clone $(params.git-url) --branch $(params.branch) --depth 1 /workspace/src
+        git clone $(params.git-url) --branch $(params.branch) /workspace/src
 
     - name: update-ladp-crt-key
       image: bitnami/git:2.43.0
       workingDir: /workspace/src
       script: |
         git config --global --add safe.directory `pwd`
+        git config --global user.email "ti-community-prow-bot@tidb.io"
+        git config --global user.name  "ti-chi-bot"
         
         # Update ladp crt/key by cherry-pick specific commit from base release branch
         # Check if the branch is a hotfix branch for specific hotfix release branch
         
         base_release_branch=""
-        does_need_ldap_fix=false
+        is_ldap_hotfix_candidate_branch=false
 
         case "$(params.branch)" in
           release-7.5-*)
             base_release_branch="release-7.5"
-            does_need_ldap_fix=true
+            is_ldap_hotfix_candidate_branch=true
             ;;
           release-8.1-*)
             base_release_branch="release-8.1"
-            does_need_ldap_fix=true
+            is_ldap_hotfix_candidate_branch=true
             ;;
           release-8.5-*)
             base_release_branch="release-8.5"
-            does_need_ldap_fix=true
+            is_ldap_hotfix_candidate_branch=true
             ;;
           *)
             echo "Branch $(params.branch) is not a designated hotfix release for ldap crt/key update (release-7.5-*, release-8.1-*, release-8.5-*)."
             ;;
         esac
 
-        if [ "$does_need_ldap_fix" = "true" ] && [ -n "$base_release_branch" ]; then
+        if [ "$is_ldap_hotfix_candidate_branch" = "true" ] && [ -n "$base_release_branch" ]; then
           echo "Branch $(params.branch) is a hotfix branch for $base_release_branch which may need to update the ldap crt/key."
           echo "Fetching base release branch: $base_release_branch..."
           git fetch origin $base_release_branch
@@ -69,11 +71,50 @@ spec:
           echo "Performing git cherry-pick if needed..."
           commit_to_cherry_pick=$(git log FETCH_HEAD --grep="re-generate crt/key for ldap test" --format=%H -n 1)
           echo "commit_to_cherry_pick: $commit_to_cherry_pick"
-          if [ -n "$commit_to_cherry_pick" ]; then
-            echo "Cherry-picking commit $commit_to_cherry_pick from $base_release_branch"
-            git cherry-pick $commit_to_cherry_pick
+          
+          # Debug: Show current branch's ldap related commits
+          echo "=== Debug: Current branch ldap commits ==="
+          git log HEAD --grep="re-generate crt/key for ldap test" --oneline -n 5 || echo "No ldap commits found in current branch"
+          
+          # Debug: Show base branch's ldap related commits  
+          echo "=== Debug: Base branch ldap commits ==="
+          git log FETCH_HEAD --grep="re-generate crt/key for ldap test" --oneline -n 5 || echo "No ldap commits found in base releasebranch"
+          
+          should_cherry_pick=false
+          skip_reason=""
+          
+          # Check 1: Is there a commit to cherry-pick?
+          if [ -z "$commit_to_cherry_pick" ]; then
+            skip_reason="No relevant commit found in $base_release_branch to cherry-pick for ldap update."
+          # Check 2: Is the exact commit already in current branch?
+          elif git merge-base --is-ancestor $commit_to_cherry_pick HEAD; then
+            skip_reason="Commit $commit_to_cherry_pick already exists in current branch, skipping cherry-pick."
           else
-            echo "No relevant commit found in $base_release_branch to cherry-pick for ldap update."
+            # Check 3: Does current branch already have similar ldap crt/key commits?
+            existing_ldap_commit=$(git log HEAD --grep="re-generate crt/key for ldap test" --format=%H -n 1)
+            if [ -n "$existing_ldap_commit" ]; then
+              skip_reason="Current branch already has an ldap crt/key update commit: $existing_ldap_commit. Skipping cherry-pick to avoid duplicate changes."
+            else
+              # If no skip reason found, proceed with cherry-pick
+              should_cherry_pick=true
+            fi
+          fi
+
+          echo "should_cherry_pick: $should_cherry_pick"
+          echo "skip_reason: $skip_reason"
+          
+          # Execute based on decision
+          if [ "$should_cherry_pick" = true ]; then
+            echo "Cherry-picking commit $commit_to_cherry_pick from $base_release_branch"
+            if git cherry-pick $commit_to_cherry_pick; then
+              echo "Successfully cherry-picked commit $commit_to_cherry_pick"
+            else
+              echo "Cherry-pick failed, possibly due to conflicts. Attempting to abort..."
+              git cherry-pick --abort || true
+              echo "Cherry-pick aborted. The ldap update may need manual intervention."
+            fi
+          else
+            echo "$skip_reason"
           fi
         else
           echo "Skipping ldap crt/key update for branch $(params.branch)."
@@ -120,6 +161,7 @@ spec:
         echo "Fetching remote branch $(params.branch)..."
         git fetch origin $(params.branch)
 
+        # Check if the local branch is ahead of the remote branch to determine if the update ldap crt/key cherry-pick has been processed
         local_commits_ahead_count=$(git rev-list origin/$(params.branch)..HEAD --count)
         local_branch_is_ahead=false
         if [ "$local_commits_ahead_count" -gt 0 ]; then
