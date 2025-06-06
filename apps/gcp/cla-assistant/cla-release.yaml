@@ -25,6 +25,7 @@ spec:
     enable: true
     ignoreFailures: false
   values:
+    replicaCount: 2
     image:
       pullPolicy: Always
       tag: pingcap
