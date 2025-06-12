@@ -5,3 +5,5 @@ resources:
   - namespace.yaml
   - source.yaml
   - release.yaml
+  - diskpools.yaml
+  - storageclass.yaml
