@@ -1,0 +1,80 @@
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool1-on-node-12-130
+  namespace: openebs
+spec:
+  node: 10.2.12.130 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.ace42e001637a9da"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool2-on-node-12-130
+  namespace: openebs
+spec:
+  node: 10.2.12.130 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.ace42e001637a9dc"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool3-on-node-12-130
+  namespace: openebs
+spec:
+  node: 10.2.12.130 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.ace42e001637a9d8"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool1-on-node-13-34
+  namespace: openebs
+spec:
+  node: 10.2.13.34 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.01000000010000005cd2e47ab9905451"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool2-on-node-13-34
+  namespace: openebs
+spec:
+  node: 10.2.13.34 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.01000000010000005cd2e4d5b8905451"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool3-on-node-13-34
+  namespace: openebs
+spec:
+  node: 10.2.13.34 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.01000000010000005cd2e499b9905451"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool1-on-node-14-108
+  namespace: openebs
+spec:
+  node: 10.2.14.108 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.01000000010000005cd2e43184935251"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool2-on-node-14-108
+  namespace: openebs
+spec:
+  node: 10.2.14.108 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.01000000010000005cd2e4355a705451"]
+---
+apiVersion: "openebs.io/v1beta2"
+kind: DiskPool
+metadata:
+  name: pool3-on-node-14-108
+  namespace: openebs
+spec:
+  node: 10.2.14.108 # internal ip
+  disks: ["aio:///dev/disk/by-id/nvme-eui.01000000010000005cd2e4a56d715451"]
