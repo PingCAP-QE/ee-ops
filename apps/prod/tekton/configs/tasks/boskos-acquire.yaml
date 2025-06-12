@@ -37,7 +37,7 @@ spec:
     description: The name of the leased resource
   steps:
   - name: boskosctl-acquire
-    image: gcr.io/k8s-staging-boskos/boskosctl@sha256:a7fc984732c5dd0b4e0fe0a92e2730fa4b6bddecd0f6f6c7c6b5501abe4ab105
+    image: gcr.io/k8s-staging-boskos/boskosctl@sha256:09a7e28e1d4ff629957de654b2d0ebb75f23ead8c3108574208385332ad4e61e
     script: |
       RESOURCE=$(boskosctl acquire \
         --server-url=$(params.server-url) \
@@ -64,7 +64,7 @@ spec:
           kubernetes.io/arch: amd64
         containers:
         - name: heartbeat
-          image: gcr.io/k8s-staging-boskos/boskosctl@sha256:a7fc984732c5dd0b4e0fe0a92e2730fa4b6bddecd0f6f6c7c6b5501abe4ab105
+          image: gcr.io/k8s-staging-boskos/boskosctl@sha256:09a7e28e1d4ff629957de654b2d0ebb75f23ead8c3108574208385332ad4e61e
           args:
           - heartbeat
           - --server-url=$(params.server-url)
