@@ -19,7 +19,7 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m0s
-  path: ./apps/prod/jenkins-gitee
+  path: ./apps/prod/jenkins
   prune: true
   wait: true
   sourceRef:
