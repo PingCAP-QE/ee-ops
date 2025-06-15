@@ -17,6 +17,8 @@ spec:
   values:
     persistence:
       size: 10Gi
+    primary:
+      resourcesPreset: micro
   valuesFrom:
     - kind: Secret
       name: coder-db-credentials
