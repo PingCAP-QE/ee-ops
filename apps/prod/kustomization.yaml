@@ -6,7 +6,7 @@ resources:
   - mongodb
   - jenkins
   - jenkins-beta
-  - jenkins-gitee.yaml
+  - jenkins-pingkai.yaml
   - greenhouse
   - ats
   - goproxy
