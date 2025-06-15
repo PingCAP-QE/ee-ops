@@ -17,8 +17,11 @@ spec:
   values:
     persistence:
       size: 10Gi
+    image:
+      debug: true
     primary:
-      resourcesPreset: micro
+      pdb:
+        create: false
   valuesFrom:
     - kind: Secret
       name: coder-db-credentials
