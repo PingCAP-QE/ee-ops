@@ -11,7 +11,22 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.full_name in ['pingcap/ng-monitoring', 'pingcap/tidb', 'pingcap/tidb-binlog', 'pingcap/tidb-dashboard', 'pingcap/tidb-operator', 'pingcap/tidb-tools', 'pingcap/ticdc', 'pingcap/tiflash', 'pingcap/tiflow', 'pingcap/tiproxy', 'tidbcloud/cloud-storage-engine', 'tidbcloud/tiflash-cse', 'tikv/pd', 'tikv/tikv']
+            body.repository.full_name in [
+              'pingcap/ng-monitoring',
+              'pingcap/tidb',
+              'pingcap/tidb-binlog',
+              'pingcap/tidb-dashboard',
+              'pingcap/tidb-operator',
+              'pingcap/tidb-tools',
+              'pingcap/ticdc',
+              'pingcap/tiflash',
+              'pingcap/tiflow',
+              'pingcap/tiproxy',
+              'tidbcloud/cloud-storage-engine',
+              'tidbcloud/tiflash-cse',
+              'tikv/pd',
+              'tikv/tikv'
+            ]
             &&
             header.canonical('ce-paramPlatform') in ['linux/amd64', 'linux/arm64', 'darwin/amd64', 'darwin/arm64']
         - name: overlays
