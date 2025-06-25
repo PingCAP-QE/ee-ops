@@ -16,7 +16,7 @@ spec:
               value: >-
                 body.type == 'PUSH_ARTIFACT'
                 &&
-                body.event_data.repository.namespace in ['pingcap', 'tikv', 'pingcap_enterprise', 'pingkai']
+                body.event_data.repository.namespace in ['pingcap', 'tikv', 'pingcap_enterprise', 'pingkai', 'devbuild']
                 &&
                 ! body.event_data.resources[0].tag.startsWith('sha256:')
       triggerSelector:
