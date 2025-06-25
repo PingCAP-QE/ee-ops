@@ -11,7 +11,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.repository.full_name in ['pingcap/ticdc', 'pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'pingcap/tidb-dashboard', 'pingcap/tiproxy', 'pingcap/tidb-operator', 'tikv/tikv', 'tikv/pd', 'tidbcloud/tiflash-cse', 'tidbcloud/cloud-storage-engine']
+            body.repository.full_name in ['pingcap/ticdc', 'pingcap/tidb', 'pingcap/tiflow', 'pingcap/tiflash', 'pingcap/tidb-dashboard', 'pingcap/tiproxy', 'pingcap/tidb-operator', 'pingcap/ng-monitoring', 'pingcap/tidb-binlog', 'pingcap/tidb-tools', 'tikv/tikv', 'tikv/pd', 'tidbcloud/tiflash-cse', 'tidbcloud/cloud-storage-engine']
             &&
             ! (header.canonical('ce-paramPlatform') in ['linux/amd64', 'linux/arm64', 'darwin/amd64', 'darwin/arm64'])
         - name: overlays
@@ -26,6 +26,9 @@ spec:
                 'pingcap/tidb-dashboard': '40m',
                 'pingcap/tiproxy': '30m',
                 'pingcap/tidb-operator': '30m',
+                'pingcap/ng-monitoring': '30m',
+                'pingcap/tidb-binlog': '2h',
+                'pingcap/tidb-tools': '1h',
                 'tikv/pd': '40m',
                 'tikv/tikv': '2h30m',
                 'tidbcloud/tiflash-cse': '2h',
@@ -41,6 +44,9 @@ spec:
                 'pingcap/tidb-dashboard': '8Gi',
                 'pingcap/tiproxy': '10Gi',
                 'pingcap/tidb-operator': '10Gi',
+                'pingcap/ng-monitoring': '8Gi',
+                'pingcap/tidb-binlog': '100Gi',
+                'pingcap/tidb-tools': '10Gi',
                 'tikv/pd': '50Gi',
                 'tikv/tikv': '100Gi',
                 'tidbcloud/tiflash-cse': '100Gi',
@@ -56,6 +62,9 @@ spec:
                 'pingcap/tidb-dashboard': '2',
                 'pingcap/tiproxy': '4',
                 'pingcap/tidb-operator': '2',
+                'pingcap/ng-monitoring': '2',
+                'pingcap/tidb-binlog': '8',
+                'pingcap/tidb-tools': '4',
                 'tikv/pd': '8',
                 'tikv/tikv': '16',
                 'tidbcloud/tiflash-cse': '16',
@@ -71,6 +80,9 @@ spec:
                 'pingcap/tidb-dashboard': '4Gi',
                 'pingcap/tiproxy': '16Gi',
                 'pingcap/tidb-operator': '8Gi',
+                'pingcap/ng-monitoring': '4Gi',
+                'pingcap/tidb-binlog': '32Gi',
+                'pingcap/tidb-tools': '16Gi',
                 'tikv/pd': '32Gi',
                 'tikv/tikv': '64Gi',
                 'tidbcloud/tiflash-cse': '64Gi',
