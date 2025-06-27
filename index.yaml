@@ -294,6 +294,20 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/jenkins-4.1.21/jenkins-4.1.21.tgz
     version: 4.1.21
+  mcp-tool:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2025-06-27T10:45:35.508341342Z"
+    description: A Helm chart for a generic MCP tool that serves over SSE protocol.
+    digest: 0af3f48afbc7501b9591d39ef851fdb17e7ef40513b12ee0cc40b680f18910a6
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: mcp-tool
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/mcp-tool-0.1.0/mcp-tool-0.1.0.tgz
+    version: 0.1.0
   prow:
   - apiVersion: v2
     appVersion: v20230418-23b5d25059
@@ -834,4 +848,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-02T12:47:59.562936116Z"
+generated: "2025-06-27T10:45:35.508429438Z"
