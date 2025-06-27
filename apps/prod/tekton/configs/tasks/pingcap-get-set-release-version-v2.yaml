@@ -45,7 +45,7 @@ spec:
         # Get the branches which contained the commits
         git branch --contains > /workspace/branches.txt
     - name: compute-version
-      image: denoland/deno:2.3.6
+      image: denoland/deno:2.3.7
       command:
         - deno
         - run
