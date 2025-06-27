@@ -3,4 +3,4 @@ kind: Kustomization
 namespace: apps
 resources:
   - release.yaml
-  - release-mcp-server-github.yaml
+  - release-mcp-tool-github.yaml
