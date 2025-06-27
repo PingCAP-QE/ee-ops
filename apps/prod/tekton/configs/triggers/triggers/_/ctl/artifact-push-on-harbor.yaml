@@ -1,3 +1,6 @@
+# Note: Tekton Triggers v0.24.x CEL implementation doesn't support the 'last()' method
+# See: https://tekton.dev/vault/triggers-v0.24.x-lts/cel_expressions/
+# Workaround: Use explicit array indexing instead of 'last()'
 apiVersion: triggers.tekton.dev/v1beta1
 kind: Trigger
 metadata:
@@ -33,6 +36,7 @@ spec:
             - key: os
               expression: body.event_data.resources[0].tag.split('_')[1]
             - key: arch
+              # Using explicit index instead of 'last()' which is not supported in Tekton CEL
               expression: body.event_data.resources[0].tag.split('_')[2]
   bindings:
     - { name: component, value: ctl }
@@ -77,10 +81,13 @@ spec:
               expression: >-
                 "https://github.com/" + body.event_data.repository.repo_full_name.replace('/package', '.git')
             - key: git-ref
+              # Fixed to avoid 'last()' method which is unsupported in Tekton v0.24.x CEL
+              # Using size()-1 pattern to get the last element as recommended in documentation
               expression: body.event_data.resources[0].tag.split("_")[0].replace('-' + body.event_data.resources[0].tag.split("_")[0].split('-')[body.event_data.resources[0].tag.split("_")[0].split('-').size()-1], '')
             - key: os
               expression: body.event_data.resources[0].tag.split('_')[1]
             - key: arch
+              # Using explicit index instead of 'last()' which is not supported in Tekton CEL
               expression: body.event_data.resources[0].tag.split('_')[2]
   bindings:
     - { name: component, value: ctl }
