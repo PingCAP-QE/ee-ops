@@ -1,6 +1,9 @@
 apiVersion: v2
 name: mcp-tool
 description: A Helm chart for a generic MCP tool that serves over SSE protocol.
+maintainers:
+  - name: wuhuizuo
+    email: wuhuizuo@126.com
 
 # A chart can be either an 'application' or a 'library' chart.
 #
