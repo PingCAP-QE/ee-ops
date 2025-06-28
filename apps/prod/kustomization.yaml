@@ -12,7 +12,6 @@ resources:
   - goproxy
   - tekton
   - brc
-  - buildbarn
   - prow-worker
   - kafka
   - cloudevents-server

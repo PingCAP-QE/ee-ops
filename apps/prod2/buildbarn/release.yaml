@@ -2,10 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: buildbarn
-  namespace: flux-system
 spec:
-  releaseName: buildbarn
-  targetNamespace: apps
   chart:
     spec:
       chart: buildbarn
@@ -14,7 +11,7 @@ spec:
         kind: HelmRepository
         name: ee-ops
         namespace: flux-system
-  interval: 1h
+  interval: 5m
   install:
     remediation:
       retries: 3
@@ -25,58 +22,18 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    browser:
-      nodeSelector:
-        kubernetes.io/arch: "amd64"
-      ingress:
-        enabled: true
-        className: nginx
-        annotations:
-          nginx.ingress.kubernetes.io/use-regex: "true"
-          nginx.ingress.kubernetes.io/rewrite-target: /$2
-        hosts:
-          - host: internal.do.pingcap.net
-            paths:
-              - path: /bb(/|$)(.*)
-                pathType: Prefix
-    frontend:
-      nodeSelector:
-        kubernetes.io/arch: "amd64"
-      ingress:
-        enabled: true
-        className: nginx
-        annotations:
-          nginx.ingress.kubernetes.io/ssl-redirect: "true"
-          nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
-          kubernetes.io/tls-acme: "true"
-          nginx.ingress.kubernetes.io/use-regex: "true"
-          nginx.ingress.kubernetes.io/rewrite-target: /$2
-        hosts:
-          - host: internal.do.pingcap.net
-            paths:
-              - path: /bf(/|$)(.*)
-                pathType: Prefix
-        tls:
-          # generatioin:
-          #   openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=nginxsvc/O=nginxsvc"
-          #   kubectl create secret tls internal-do-tls --key tls.key --cert tls.crt
-          - secretName: internal-do-tls
-            hosts:
-              - internal.do.pingcap.net
     storage:
-      nodeSelector:
-        kubernetes.io/arch: "amd64"    
       volumeClaims:
         # storage.volumeClaims.cas -- cas volume claim spec
         cas:
-          storageClassName: ceph-block
+          storageClassName: openebs-single-replica
           accessModes:
             - ReadWriteOnce
           resources:
             requests:
               storage: 500Gi
         ac:
-          storageClassName: ceph-block
+          storageClassName: openebs-single-replica
           accessModes:
             - ReadWriteOnce
           resources:
@@ -158,13 +115,6 @@ spec:
             putAuthorizer: { allow: {} },
           },
         }
-    scheduler:
-      enabled: true
-      nodeSelector:
-        kubernetes.io/arch: "amd64"
-    worker:
-      nodeSelector:
-        kubernetes.io/arch: "amd64"
     commonConf: |-
       {
         global: {
@@ -251,5 +201,3 @@ spec:
         maximumMessageSizeBytes: 16 * 1024 * 1024,
         httpListenAddress: ':80',
       }
-
-
