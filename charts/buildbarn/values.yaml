@@ -23,9 +23,9 @@ browser:
   replicaCount: 1
   image:
     # browser.image.repository -- image repository
-    repository: buildbarn/bb-browser
+    repository: ghcr.io/buildbarn/bb-browser
     # browser.image.tag -- image tag
-    tag: 20230208T101541Z-73a5362
+    tag: 20250414T180739Z-9b44996
     # browser.image.pullPolicy -- image pull policy
     pullPolicy: IfNotPresent
 
@@ -288,9 +288,9 @@ scheduler:
   replicaCount: 1
   image:
     # scheduler.image.repository -- image repository
-    repository: buildbarn/bb-scheduler
+    repository: ghcr.io/buildbarn/bb-scheduler
     # scheduler.image.tag -- image tag
-    tag: 20230213T172655Z-e0ae60c
+    tag: 20250411T124310Z-1c726bd
     # scheduler.image.pullPolicy -- image pull policy
     pullPolicy: IfNotPresent
 
@@ -432,9 +432,9 @@ worker:
       # worker.runnerInstallerContainer.image.pullPolicy -- image pull policy
       pullPolicy: IfNotPresent
       # worker.runnerInstallerContainer.image.repository -- image repository
-      repository: buildbarn/bb-runner-installer
+      repository: ghcr.io/buildbarn/bb-runner-installer
       # worker.runnerInstallerContainer.image.tag -- image tag
-      tag: 20230213T172655Z-e0ae60c
+      tag: 20250411T124310Z-1c726bd
 
   volumeInitContainer:
     image:
@@ -450,9 +450,9 @@ worker:
       # worker.workerContainer.image.pullPolicy -- image pull policy
       pullPolicy: IfNotPresent
       # worker.workerContainer.image.repository -- image repository
-      repository: buildbarn/bb-worker
+      repository: ghcr.io/buildbarn/bb-worker
       # worker.workerContainer.image.tag -- image tag
-      tag: 20230213T172655Z-e0ae60c
+      tag: 20250411T124310Z-1c726bd
     # worker.workerContainer.securityContext -- specifies security settings for a container
     securityContext: {}
       # capabilities:
@@ -598,9 +598,9 @@ storage:
   replicaCount: 2
   image:
     # storage.image.repository -- image repository
-    repository: buildbarn/bb-storage
+    repository: ghcr.io/buildbarn/bb-browser
     # storage.image.tag -- image tag
-    tag: 20230208T220714Z-fd356c8
+    tag: 20250414T180739Z-9b44996
     # storage.image.pullPolicy -- image pull policy
     pullPolicy: IfNotPresent
 
