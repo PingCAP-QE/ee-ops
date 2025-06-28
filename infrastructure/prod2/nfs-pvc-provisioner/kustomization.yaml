@@ -3,5 +3,8 @@ kind: Kustomization
 namespace: nfs
 resources:
   - namespace.yaml
+  - source-csi-nfs.yaml
   - pvc.yaml
-  - release.yaml
+  - deployment.yaml
+  - svc.yaml
+  - release-csi-nfs.yaml

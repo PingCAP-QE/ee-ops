@@ -2,34 +2,29 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: nfs-server-provisioner
+  name: csi-driver-nfs
 spec:
   dependsOn: [{ name: openebs, namespace: openebs }]
   chart:
     spec:
-      chart: nfs-server-provisioner
+      chart: csi-driver-nfs
       sourceRef:
         kind: HelmRepository
-        name: nfs-server-provisioner
-        namespace: flux-system
-      version: "1.8.0"
+        name: csi-driver-nfs
+      version: "4.11.0"
   interval: 5m0s
   install:
     remediation:
       retries: 3
   values:
     # Ref: https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner/tree/master/charts/nfs-server-provisioner
-    replicaCount: 2
-    image:
-      repository: registry.k8s.io/sig-storage/nfs-provisioner
-      tag: v4.0.8
-    persistence:
-      existingClaim: nfs-server-provisioner-claim
     storageClass:
-      name: nfs
-      defaultClass: true
-      mountOptions: []
-    resources:
-      limits:
-        cpu: "1"
-        memory: 4Gi
+      create: true
+      name: nfs-csi
+      parameters:
+        server: nfs-server.nfs.svc
+        share: /
+      reclaimPolicy: Delete
+      volumeBindingMode: Immediate
+      mountOptions:
+        - nfsvers=4.1
