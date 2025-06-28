@@ -4,7 +4,7 @@ kind: HelmRelease
 metadata:
   name: nfs-server-provisioner
 spec:
-  dependsOn: [{ name: openobs, namespace: openobs }]
+  dependsOn: [{ name: openebs, namespace: openebs }]
   chart:
     spec:
       chart: nfs-server-provisioner
