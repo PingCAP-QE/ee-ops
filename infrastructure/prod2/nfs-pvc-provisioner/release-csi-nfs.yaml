@@ -17,7 +17,7 @@ spec:
     remediation:
       retries: 3
   values:
-    # Ref: https://github.com/kubernetes-sigs/nfs-ganesha-server-and-external-provisioner/tree/master/charts/nfs-server-provisioner
+    # Ref: # Ref: https://github.com/kubernetes-csi/csi-driver-nfs/tree/master/charts/csi-driver-nfs
     storageClass:
       create: true
       name: nfs-csi
