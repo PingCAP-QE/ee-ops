@@ -1,7 +1,4 @@
-reviewers:
-  - purelind
 approvers:
-  - wuhuizuo
-
-emeritus_reviewers:
-  - lijie0123
+  - sig-root-approvers
+reviewers:
+  - sig-root-reviewers

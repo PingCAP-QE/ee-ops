@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - ../_base
   - openebs
+  - nfs-pvc-provisioner
   - nginx
   - secret-generator
