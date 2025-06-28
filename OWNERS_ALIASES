@@ -1,0 +1,13 @@
+aliases:
+  # for whole repo.
+  sig-root-approvers:
+    - wuhuizuo
+  sig-root-reviewers:
+    - purelind
+
+  sig-apps-prod-approvers:
+    - purelind
+    - wuhuizuo
+
+  emeritus_reviewers:
+    - lijie0123
