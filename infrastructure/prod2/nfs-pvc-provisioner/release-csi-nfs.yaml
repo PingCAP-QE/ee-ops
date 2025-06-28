@@ -18,8 +18,11 @@ spec:
       retries: 3
   values:
     # Ref: # Ref: https://github.com/kubernetes-csi/csi-driver-nfs/tree/master/charts/csi-driver-nfs
+    kubeletDir: /data/kubelet
     storageClass:
       create: true
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
       name: nfs-csi
       parameters:
         server: nfs-server.nfs.svc
