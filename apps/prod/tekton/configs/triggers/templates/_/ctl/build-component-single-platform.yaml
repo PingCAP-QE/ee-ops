@@ -75,8 +75,6 @@ spec:
             value: $(tt.params.registry)
           - name: force-builder-image
             value: $(tt.params.force-builder-image)
-          - name: boskos-server-url # for darwin platforms
-            value: http://boskos.apps.svc
         taskRunSpecs:
           - pipelineTaskName: build-binaries
             taskPodTemplate:
