@@ -17,7 +17,7 @@ spec:
         spec:
           containers:
             - image: gcr.io/tekton-releases/dogfooding/tkn:v20221201-ed0196540a
-              name: pruner          
+              name: pruner
               command:
                 - /bin/sh
                 - -c
@@ -28,8 +28,8 @@ spec:
                     resources=$3;
                     old_ifs=" ";
                     IFS=",";
-                    for r in $resources; do 
-                      tkn $r delete -n=$n $a -f; 
+                    for r in $resources; do
+                      tkn $r delete -n=$n $a -f;
                     done;
                     IFS=$old_ifs;
                   };

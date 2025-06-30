@@ -10,7 +10,7 @@ spec:
       description: The git revision
       default: main
     - name: pr-number
-      description: Pull request number      
+      description: Pull request number
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -33,7 +33,7 @@ spec:
           - name: git-revision
             value: $(tt.params.git-revision)
           - name: pr-number
-            value: $(tt.params.pr-number)            
+            value: $(tt.params.pr-number)
         workspaces:
           - name: output
             volumeClaimTemplate:

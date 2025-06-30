@@ -49,4 +49,4 @@ helm install my-mcp-tool ./charts/mcp-tool \
 ```
 
 ## SSE Protocol
-Ensure your application serves HTTP responses with the `Content-Type: text/event-stream` header for SSE. 
+Ensure your application serves HTTP responses with the `Content-Type: text/event-stream` header for SSE.

@@ -27,7 +27,7 @@ deck:
       required_files:
       - podinfo.json
   external_agent_logs:
-  - agent: jenkins    
+  - agent: jenkins
     url_template: 'http://prow-jenkins-operator/job/{{`{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/consoleText`}}'
 plank:
   job_url_prefix_config:

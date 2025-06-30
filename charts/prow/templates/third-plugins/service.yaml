@@ -16,7 +16,7 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-  selector: 
+  selector:
     {{- include "prow.selectorLabels" $root | nindent 4 }}
     app.kubernetes.io/app: {{ $name }}
 {{- end }}

@@ -28,7 +28,7 @@ deck:
       - podinfo.json
   {{- if .Values.jenkinsOperator.enabled }}
   external_agent_logs:
-  - agent: jenkins    
+  - agent: jenkins
     url_template: 'http://{{ include "prow.fullname.jenkinsoperator" . }}/job/{{`{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/consoleText`}}'
   {{- end }}
 plank:

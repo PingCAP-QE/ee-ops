@@ -35,10 +35,10 @@ spec:
         git config --global --add safe.directory `pwd`
         git config --global user.email "ti-community-prow-bot@tidb.io"
         git config --global user.name  "ti-chi-bot"
-        
+
         # Update ladp crt/key by cherry-pick specific commit from base release branch
         # Check if the branch is a hotfix branch for specific hotfix release branch
-        
+
         base_release_branch=""
         is_ldap_hotfix_candidate_branch=false
 
@@ -64,25 +64,25 @@ spec:
           echo "Branch $(params.branch) is a hotfix branch for $base_release_branch which may need to update the ldap crt/key."
           echo "Fetching base release branch: $base_release_branch..."
           git fetch origin $base_release_branch
-          git remote -v 
+          git remote -v
           git branch
           echo "Successfully fetched $base_release_branch."
-          
+
           echo "Performing git cherry-pick if needed..."
           commit_to_cherry_pick=$(git log FETCH_HEAD --grep="re-generate crt/key for ldap test" --format=%H -n 1)
           echo "commit_to_cherry_pick: $commit_to_cherry_pick"
-          
+
           # Debug: Show current branch's ldap related commits
           echo "=== Debug: Current branch ldap commits ==="
           git log HEAD --grep="re-generate crt/key for ldap test" --oneline -n 5 || echo "No ldap commits found in current branch"
-          
-          # Debug: Show base branch's ldap related commits  
+
+          # Debug: Show base branch's ldap related commits
           echo "=== Debug: Base branch ldap commits ==="
           git log FETCH_HEAD --grep="re-generate crt/key for ldap test" --oneline -n 5 || echo "No ldap commits found in base releasebranch"
-          
+
           should_cherry_pick=false
           skip_reason=""
-          
+
           # Check 1: Is there a commit to cherry-pick?
           if [ -z "$commit_to_cherry_pick" ]; then
             skip_reason="No relevant commit found in $base_release_branch to cherry-pick for ldap update."
@@ -102,7 +102,7 @@ spec:
 
           echo "should_cherry_pick: $should_cherry_pick"
           echo "skip_reason: $skip_reason"
-          
+
           # Execute based on decision
           if [ "$should_cherry_pick" = true ]; then
             echo "Cherry-picking commit $commit_to_cherry_pick from $base_release_branch"
@@ -142,7 +142,7 @@ spec:
           echo 'build --remote_cache=http://ats.apps.svc/brc/tidb --remote_timeout="30s"' > ~/.bazelrc
           make bazel_prepare || true
         fi
-        
+
     - name: create-pr
       image: bitnami/git:2.43.0
       workingDir: /workspace/src
@@ -229,7 +229,7 @@ spec:
         None
         \`\`\`
         EOF
-        
+
         echo "Creating PR with title: '$pr_title' for head branch '$head_branch' into base '$(params.branch)'"
         gh pr create \
           --base $(params.branch) \

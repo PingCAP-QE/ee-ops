@@ -16,7 +16,7 @@
 | apps        | prow-jenkins-operator-auth | `kubectl -n apps create secret generic prow-jenkins-operator-auth ...` | auth to external jenkins controller, keys: `user`, `token`                                                                                                                                      |
 
 - How to create jenkins api token?
-   > 
+   >
     ```bash
     #!/usr/bin/env bash
 
@@ -37,4 +37,4 @@
 
 ## TODO
 
-- [ ] make the jenkins api token generating automatic in GitOps. 
+- [ ] make the jenkins api token generating automatic in GitOps.

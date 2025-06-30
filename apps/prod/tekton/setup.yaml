@@ -23,7 +23,7 @@ spec:
     - target:
         kind: Deployment
         namespace: tekton-pipelines
-        name: tekton-triggers-core-interceptors        
+        name: tekton-triggers-core-interceptors
       patch: &patch_with_min_k8s_ver_env_var |-
         - op: add
           path: /spec/template/spec/containers/0/env/-

@@ -79,4 +79,3 @@ controller:
     enabled: true
     # Additional labels to add to the ServiceMonitor object
     serviceMonitorAdditionalLabels: { release: kps }
- 

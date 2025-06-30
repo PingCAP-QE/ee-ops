@@ -1,7 +1,7 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: build-component-single-platform-darwin
+  name: build-ctl-single-platform
 spec:
   params:
     - name: git-url
@@ -15,7 +15,7 @@ spec:
     - name: component
       description: component name, tidb|tikv|pd|tiflow|tiflash, etc...
     - name: os
-      default: darwin
+      default: linux
     - name: arch
       default: amd64
     - name: profile
@@ -25,14 +25,14 @@ spec:
       default: hub.pingcap.net
     - name: timeout
       description: pipeline run timeout
-      default: 2h
+      default: 30m
     - name: source-ws-size
       description: workspace size for source.
       default: 10Gi
     - name: builder-resources-memory
-      default: 16Gi
+      default: 4Gi
     - name: builder-resources-cpu
-      default: "4"
+      default: "1"
     - name: ce-context
       description: cloud event context.
       default: "{}"
@@ -53,7 +53,7 @@ spec:
           "tibuild.pingcap.net/platform": $(tt.params.os)/$(tt.params.arch)
       spec:
         pipelineRef:
-          name: pingcap-build-package-$(tt.params.os)
+          name: pingcap-build-package-linux
         params:
           - name: git-url
             value: $(tt.params.git-url)
@@ -75,8 +75,21 @@ spec:
             value: $(tt.params.registry)
           - name: force-builder-image
             value: $(tt.params.force-builder-image)
-          - name: boskos-server-url
-            value: http://boskos.apps.svc
+        taskRunSpecs:
+          - pipelineTaskName: build-binaries
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: $(tt.params.arch)
+            stepOverrides:
+              - name: build
+                resources:
+                  requests:
+                    memory: $(tt.params.builder-resources-memory)
+                    cpu: $(tt.params.builder-resources-cpu)
+          - pipelineTaskName: build-images
+            taskPodTemplate:
+              nodeSelector:
+                kubernetes.io/arch: $(tt.params.arch)
         timeouts:
           pipeline: $(tt.params.timeout)
         workspaces:
@@ -95,6 +108,3 @@ spec:
           - name: git-basic-auth # fetch with git-cdn.
             secret:
               secretName: git-credentials-basic
-          - name: mac-ssh-credentials
-            secret:
-              secretName: mac-ssh-credentials

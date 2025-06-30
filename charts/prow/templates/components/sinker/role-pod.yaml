@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.prow.podsNamespace }}
   name: {{ include "prow.roleName.sinker" . }}
   labels:
-    {{- include "prow.labels.sinker" . | nindent 4 }}  
+    {{- include "prow.labels.sinker" . | nindent 4 }}
 rules:
   - apiGroups:
       - ""
@@ -25,7 +25,7 @@ metadata:
   namespace: {{ .Values.prow.podsNamespace }}
   name: {{ include "prow.roleBindingName.sinker" . }}
   labels:
-    {{- include "prow.labels.sinker" . | nindent 4 }} 
+    {{- include "prow.labels.sinker" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

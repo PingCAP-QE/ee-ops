@@ -34,7 +34,7 @@ spec:
       description: Include file globs, default is all, "*" covers `/` chars.
       default: ""
   steps:
-    - name: restore    
+    - name: restore
       image: ghcr.io/pingcap-qe/cd/utils/ks3util:v20231216-31-g613ba06
       workingDir: $(workspaces.source.path)/$(params.path)
       args: [$(params.key), "$(params.restore-keys[*])"] # retore keys.
@@ -51,7 +51,7 @@ spec:
           done
         fi
 
-        if [ ! -f $local_file ]; then 
+        if [ ! -f $local_file ]; then
           echo "🤷 None cached objects found"
           exit 0
         fi

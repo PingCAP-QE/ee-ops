@@ -51,7 +51,7 @@ spec:
       script: |
         #!/usr/bin/env bash
 
-        if [ "$(params.push)" = "true" ]; then                
+        if [ "$(params.push)" = "true" ]; then
           if [ "$(params.PROW_IMAGE)" = "" ]; then
             make -C prow push-images REGISTRY=$(params.REGISTRY)
           else

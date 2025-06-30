@@ -34,7 +34,7 @@ else
     exit 0
 fi
 
-mkdir /bazel-out-overlay/upper /bazel-out-overlay/work; 
+mkdir /bazel-out-overlay/upper /bazel-out-overlay/work;
 sudo mount -t overlay overlay /home/jenkins/.tidb/tmp -o lowerdir=/bazel-out-lower,upperdir=/bazel-out-overlay/upper,workdir=/bazel-out-overlay/work;
 
 # generate file $HOME/.bazelrc

@@ -11,7 +11,7 @@ spec:
         name: cel
       params:
         - name: filter
-          value: >-            
+          value: >-
             body.repository.full_name in ['tikv/tikv', 'tikv/pd', 'pingcap/tidb', 'pingcap/tiflow', 'pingcap/tidb-dashboard', 'pingcap/ng-monitoring']
             &&
             body.ref.matches('^refs/heads/(feature/release-6.5-fips)$')

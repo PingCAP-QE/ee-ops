@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.prow.podsNamespace }}
   name: {{ include "prow.roleName.pipeline" . }}
   labels:
-    {{- include "prow.labels.pipeline" . | nindent 4 }}  
+    {{- include "prow.labels.pipeline" . | nindent 4 }}
 rules:
 - apiGroups:
   - tekton.dev
@@ -35,7 +35,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: {{ include "prow.roleBindingName.pipeline" . }}
   labels:
-    {{- include "prow.labels.pipeline" . | nindent 4 }} 
+    {{- include "prow.labels.pipeline" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
