@@ -74,6 +74,7 @@ function generateCreatePayload(
     ref_type,
     repository: {
       name: repoName!,
+      full_name: `${owner}/${repoName}`,
       owner: {
         login: owner,
       },
