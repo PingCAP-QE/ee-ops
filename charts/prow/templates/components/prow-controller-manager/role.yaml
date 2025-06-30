@@ -5,7 +5,7 @@ metadata:
   name: {{ include "prow.roleName.pcm" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "prow.labels.pcm" . | nindent 4 }}  
+    {{- include "prow.labels.pcm" . | nindent 4 }}
 rules:
   - apiGroups:
       - prow.k8s.io
@@ -56,7 +56,7 @@ metadata:
   name: {{ include "prow.roleBindingName.pcm" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "prow.labels.pcm" . | nindent 4 }}  
+    {{- include "prow.labels.pcm" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

@@ -24,7 +24,7 @@ metadata:
   name: {{ include "prow.roleBindingName.tide" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "prow.labels.tide" . | nindent 4 }}  
+    {{- include "prow.labels.tide" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

@@ -35,7 +35,7 @@ spec:
       name: '*'
     - kind: HelmRelease
       name: '*'
----      
+---
 apiVersion: notification.toolkit.fluxcd.io/v1beta1
 kind: Alert
 metadata:

@@ -27,7 +27,7 @@ spec:
       params:
         - name: filter
           value: >-
-            body.ref.matches('^release-[0-9]+[.][0-9]+-[0-9]+-v[0-9]+[.][0-9]+[.][0-9]+(-.+)?$') && 
+            body.ref.matches('^release-[0-9]+[.][0-9]+-[0-9]+-v[0-9]+[.][0-9]+[.][0-9]+(-.+)?$') &&
             body.ref < 'release-7.0'
 
   bindings:
@@ -65,9 +65,9 @@ spec:
       params:
         - name: filter
           value: >-
-            body.ref.matches('^release-[0-9]+[.][0-9]+-[0-9]+-v[0-9]+[.][0-9]+[.][0-9]+(-.+)?$') && 
+            body.ref.matches('^release-[0-9]+[.][0-9]+-[0-9]+-v[0-9]+[.][0-9]+[.][0-9]+(-.+)?$') &&
             body.ref >= 'release-7.0' &&
-            body.ref < 'release-7.4' 
+            body.ref < 'release-7.4'
 
   bindings:
     - ref: github-branch-create
