@@ -15,7 +15,7 @@ Helm Chart for Prow
       # you can change it with existed namespace.
       podsNamespace: default
 
-      # you can fill it with dumy domain, such as: `test.io`  
+      # you can fill it with dumy domain, such as: `test.io`
       domainName: <<prow app backend domain with prefix `prow.`>>
       githubAppId: <<prow github app id>
       githubAppCert: |
@@ -26,7 +26,7 @@ Helm Chart for Prow
       # Generate via `openssl rand -hex 20`. This is the secret used in the GitHub webhook configuration
       githubHmacToken: <<prow gitub app hmac token>>
 
-      # github org (optional): your first org to take effects, the repo that have prow github app installed must belonged this org. 
+      # github org (optional): your first org to take effects, the repo that have prow github app installed must belonged this org.
       githubOrg: <<your git org>>
     ```
 2. install the chart

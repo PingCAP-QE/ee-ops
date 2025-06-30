@@ -18,8 +18,8 @@ spec:
       KS3_REGION: BEIJING
       KS3_REGION_ENDPOINT: ks3-cn-beijing-internal.ksyuncs.com
     substituteFrom:
-      # Need keys: 
-      # - ADMIN_PASSWORD, 
+      # Need keys:
+      # - ADMIN_PASSWORD,
       # - PG_HOST, PG_PORT, PG_DB, PG_USER, PG_PASSWORD
       # - KS3_ACCESS_KEY, KS3_SECRET_KEY, KS3_BUCKET
       - kind: Secret

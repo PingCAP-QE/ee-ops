@@ -44,7 +44,7 @@ spec:
         # for tags
         for tag in $(params.tags); do
           yq -i ".tags += [\"${tag}\"]" manifest.yaml
-        done        
+        done
 
         cat manifest.yaml
       volumeMounts:
@@ -57,7 +57,7 @@ spec:
       volumeMounts:
         - mountPath: /workspace
           name: manifest
-      workingDir: /workspace      
+      workingDir: /workspace
   workspaces:
     - description: Includes a docker `config.json`
       mountPath: /root/.docker

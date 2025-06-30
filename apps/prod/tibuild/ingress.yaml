@@ -5,10 +5,10 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: tibuild.pingcap.net 
-      http: 
+    - host: tibuild.pingcap.net
+      http:
         paths:
-          - path: / 
+          - path: /
             pathType: Prefix
             backend:
               service:
