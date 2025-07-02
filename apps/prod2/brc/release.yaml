@@ -2,10 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: brc
-  namespace: flux-system
 spec:
-  releaseName: brc
-  targetNamespace: apps
   chart:
     spec:
       chart: bazel-remote
@@ -25,23 +22,29 @@ spec:
     ignoreFailures: false
   values:
     image:
-      repository: buchgr/bazel-remote-cache
-      tag: v2.4.1
+      repository: quay.io/bazel-remote/bazel-remote
+      tag: v2.5.1
     podSecurityContext:
       fsGroup: 1000
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /data
-      max_size: 1000
+      max_size: 1000 # The maximum size of bazel-remote's disk cache in GiB.
       experimental_remote_asset_api: true
       access_log_level: all
-      port: 8080
-      grpc_port: 9092
+      http_address: ":8080"
+      grpc_address: ":9092"
+      #s3_proxy:
+      #  endpoint: ks3-endpoint:9000
+      #  bucket: test-bucket
+      #  prefix: test-prefix
+      #  disable_ssl: true
+      #  bucket_lookup_type: auto
     replicaCount: 1
     volumeMounts:
-    - mountPath: /data
-      name: brc-cache
+      - mountPath: /data
+        name: brc-cache
     volumes:
       - name: brc-cache
         persistentVolumeClaim:
-          claimName: brc
+          claimName: brc-cache
