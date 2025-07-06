@@ -4,4 +4,4 @@ metadata:
   name: project-zot
 spec:
   interval: 24h0m0s
-  url: http://zotregistry.dev/helm-charts
+  url: https://zotregistry.dev/helm-charts
