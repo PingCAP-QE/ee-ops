@@ -16,9 +16,9 @@ spec:
   interval: 1h
   values:
     mountSecrets: true
-    secretFiles: {} # We are in charge of managing it.
+    secretFiles: false # We are in charge of managing it.
     mountConfig: true
-    configFiles: {} # We are in charge of managing it.
+    configFiles: false # We are in charge of managing it.
     ingress:
       annotations:
         kubernetes.io/tls-acme: "true"
@@ -38,6 +38,6 @@ spec:
       create: true
       storage: 8Gi
       storageClassName: openebs-3-replicas
-    replicaCount: 1
+    replicaCount: 2
     service:
       type: ClusterIP
