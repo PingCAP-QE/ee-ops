@@ -4,3 +4,4 @@ resources:
   - ../_base
   - buildbarn # experiment
   - brc
+  - zot # experiment
