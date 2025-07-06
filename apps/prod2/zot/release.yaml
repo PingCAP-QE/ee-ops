@@ -15,7 +15,7 @@ spec:
     - name: redis
   interval: 1h
   values:
-    mountSecrets: true
+    mountSecret: true
     secretFiles: false # We are in charge of managing it.
     mountConfig: true
     configFiles: false # We are in charge of managing it.
