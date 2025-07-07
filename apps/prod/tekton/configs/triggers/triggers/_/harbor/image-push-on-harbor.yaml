@@ -54,7 +54,7 @@ spec:
             (
             body.event_data.repository.repo_full_name.matches('^pingcap/tidb-operator/')
             &&
-            body.event_data.resources[0].tag.matches('^v2[.][0-9]+[.][0-9]+')
+            body.event_data.resources[0].tag.matches('^v2[.][0-9]+[.][0-9]+(-(alpha|beta)[.][0-9]+)?$')
             )
             ||
             (
