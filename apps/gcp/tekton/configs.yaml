@@ -12,5 +12,4 @@ spec:
   path: ./apps/gcp/tekton/configs
   dependsOn:
     - name: tekton-setup
-      namespace: apps-dev
   prune: true
