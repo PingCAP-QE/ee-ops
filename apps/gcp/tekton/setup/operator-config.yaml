@@ -27,7 +27,8 @@ spec:
     max-result-size: 4096 # should <= 1572863
     enable-step-actions: false
     enable-cel-in-whenexpression: false
-
+  result:
+    disabled: true
   trigger:
     default-service-account: "default"
     enable-api-fields: stable
