@@ -7,20 +7,15 @@ spec:
   profile: all
   pipeline:
     disable-affinity-assistant: true
-    disable-creds-init: false
     # disable-home-env-overwrite: true
     # disable-working-directory-overwrite: true
-    enable-api-fields: alpha # stable | alpha
+    enable-api-fields: stable # stable | alpha
     enable-custom-tasks: true
     enable-tekton-oci-bundles: true
     require-git-ssh-secret-known-hosts: false
     running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
-
     ###### metrics items ########
-    metrics.pipelinerun.duration-type: histogram
-    metrics.pipelinerun.level: pipelinerun
-    metrics.taskrun.duration-type: histogram
-    metrics.taskrun.level: taskrun
+    metrics.count.enable-reason: true
 
     ###### optional items #######
     default-timeout-minutes: 60 # unit is minutes, default timeout for TaskRun and PipelineRun.
@@ -28,6 +23,11 @@ spec:
     # default empty dir, can not be shared between tasks.
     default-task-run-workspace-binding: >
       emptyDir: {}
+
+    max-result-size: 4096 # should <= 1572863
+    enable-step-actions: false
+    enable-cel-in-whenexpression: false
+
   trigger:
     default-service-account: "default"
     enable-api-fields: stable
@@ -35,7 +35,7 @@ spec:
     resources:
       - taskrun
       - pipelinerun
-    keep: 100
+    keep-since: 30 # unit: minute
     schedule: "0 * * * *" # hourly
   hub:
     params:
@@ -43,3 +43,7 @@ spec:
         value: "true"
   dashboard:
     readonly: true
+  config:
+    nodeSelector:
+      kubernetes.io/os: linux
+      kubernetes.io/arch: amd64

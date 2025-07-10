@@ -46,14 +46,6 @@ spec:
       kind: Deployment
       name: tekton-dashboard
       namespace: tekton-pipelines
-  postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: tekton-ingress # should manual created in namespace `apps-dev`
-        optional: true
-  images:
-    - name: gcr.io/tekton-nightly/github.com/tektoncd/experimental/pipelines-in-pipelines/cmd/controller
-      newTag: v20230909-ee13de632e
   patches:
     # replace namespace
     - target:
