@@ -31,6 +31,8 @@ spec:
   trigger:
     default-service-account: "default"
     enable-api-fields: stable
+  tektonpruner:
+    disabled: true
   pruner:
     resources:
       - taskrun
