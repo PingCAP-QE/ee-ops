@@ -7,5 +7,5 @@ resources:
   - cla-assistant
   - prow-crd.yaml
   - prow
+  - tekton
   # - prow-dev
-  # - tekton-dev
