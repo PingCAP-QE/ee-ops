@@ -14,7 +14,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: "/tekton/hooks/github(/|$)(.*)"
+            value: "/tekton/hooks/github"
       backendRefs:
         - name: el-public
           # namespace: ee-cd
@@ -24,11 +24,11 @@ spec:
           urlRewrite:
             path:
               type: ReplacePrefixMatch
-              replacePrefixMatch: /$2
+              replacePrefixMatch: /
     - matches:
         - path:
             type: PathPrefix
-            value: "/tekton/dashboard(/|$)(.*)"
+            value: "/tekton/dashboard"
       backendRefs:
         - name: tekton-dashboard
           namespace: tekton-pipelines
@@ -38,4 +38,4 @@ spec:
           urlRewrite:
             path:
               type: ReplacePrefixMatch
-              replacePrefixMatch: /$2
+              replacePrefixMatch: /
