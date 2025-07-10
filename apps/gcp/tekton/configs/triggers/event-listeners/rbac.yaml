@@ -22,7 +22,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: tekton-trigger-eventlistener
-    namespace: ee-cd
+    # namespace: ee-cd
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

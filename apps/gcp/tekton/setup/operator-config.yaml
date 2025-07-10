@@ -42,4 +42,4 @@ spec:
       - name: enable-devconsole-integration
         value: "true"
   dashboard:
-    readonly: false
+    readonly: true
