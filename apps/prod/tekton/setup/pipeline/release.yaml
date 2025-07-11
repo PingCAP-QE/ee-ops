@@ -43,38 +43,38 @@ metadata:
     app.kubernetes.io/instance: default
     app.kubernetes.io/part-of: tekton-pipelines
   annotations:
-    seccomp.security.alpha.kubernetes.io/allowedProfileNames: 'docker/default,runtime/default'
-    seccomp.security.alpha.kubernetes.io/defaultProfileName: 'runtime/default'
-    apparmor.security.beta.kubernetes.io/allowedProfileNames: 'runtime/default'
-    apparmor.security.beta.kubernetes.io/defaultProfileName: 'runtime/default'
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: "docker/default,runtime/default"
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: "runtime/default"
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: "runtime/default"
+    apparmor.security.beta.kubernetes.io/defaultProfileName: "runtime/default"
 spec:
   privileged: false
   allowPrivilegeEscalation: false
   requiredDropCapabilities:
     - ALL
   volumes:
-    - 'emptyDir'
-    - 'configMap'
-    - 'secret'
+    - "emptyDir"
+    - "configMap"
+    - "secret"
   hostNetwork: false
   hostIPC: false
   hostPID: false
   runAsUser:
-    rule: 'MustRunAsNonRoot'
+    rule: "MustRunAsNonRoot"
   runAsGroup:
-    rule: 'MustRunAs'
+    rule: "MustRunAs"
     ranges:
       - min: 1
         max: 65535
   seLinux:
-    rule: 'RunAsAny'
+    rule: "RunAsAny"
   supplementalGroups:
-    rule: 'MustRunAs'
+    rule: "MustRunAs"
     ranges:
       - min: 1
         max: 65535
   fsGroup:
-    rule: 'MustRunAs'
+    rule: "MustRunAs"
     ranges:
       - min: 1
         max: 65535
@@ -110,13 +110,33 @@ rules:
     # Controller needs cluster access to all of the CRDs that it is responsible for
     # managing.
   - apiGroups: ["tekton.dev"]
-    resources: ["tasks", "clustertasks", "taskruns", "pipelines", "pipelineruns", "pipelineresources", "conditions", "runs"]
+    resources:
+      [
+        "tasks",
+        "clustertasks",
+        "taskruns",
+        "pipelines",
+        "pipelineruns",
+        "pipelineresources",
+        "conditions",
+        "runs",
+      ]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["tekton.dev"]
-    resources: ["taskruns/finalizers", "pipelineruns/finalizers", "runs/finalizers"]
+    resources:
+      ["taskruns/finalizers", "pipelineruns/finalizers", "runs/finalizers"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["tekton.dev"]
-    resources: ["tasks/status", "clustertasks/status", "taskruns/status", "pipelines/status", "pipelineruns/status", "pipelineresources/status", "runs/status"]
+    resources:
+      [
+        "tasks/status",
+        "clustertasks/status",
+        "taskruns/status",
+        "pipelines/status",
+        "pipelineruns/status",
+        "pipelineresources/status",
+        "runs/status",
+      ]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
 ---
 kind: ClusterRole
@@ -180,7 +200,8 @@ rules:
   - apiGroups: ["admissionregistration.k8s.io"]
     # The webhook performs a reconciliation on these two resources and continuously
     # updates configuration.
-    resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
+    resources:
+      ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
     # knative starts informers on these things, which is why we need get, list and watch.
     verbs: ["list", "watch"]
   - apiGroups: ["admissionregistration.k8s.io"]
@@ -195,7 +216,11 @@ rules:
     resources: ["validatingwebhookconfigurations"]
     # validation.webhook.pipeline.tekton.dev performs schema validation when you, for example, create TaskRuns.
     # config.webhook.pipeline.tekton.dev validates the logging configuration against knative's logging structure
-    resourceNames: ["validation.webhook.pipeline.tekton.dev", "config.webhook.pipeline.tekton.dev"]
+    resourceNames:
+      [
+        "validation.webhook.pipeline.tekton.dev",
+        "config.webhook.pipeline.tekton.dev",
+      ]
     # When there are changes to the configs or secrets, knative updates the validatingwebhook config
     # with the updated certificates or the refreshed set of rules.
     verbs: ["get", "update", "delete"]
@@ -248,7 +273,16 @@ rules:
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get"]
-    resourceNames: ["config-logging", "config-observability", "config-artifact-bucket", "config-artifact-pvc", "feature-flags", "config-leader-election", "config-registry-cert"]
+    resourceNames:
+      [
+        "config-logging",
+        "config-observability",
+        "config-artifact-bucket",
+        "config-artifact-pvc",
+        "feature-flags",
+        "config-leader-election",
+        "config-registry-cert",
+      ]
   - apiGroups: ["policy"]
     resources: ["podsecuritypolicies"]
     resourceNames: ["tekton-pipelines"]
@@ -271,7 +305,13 @@ rules:
   - apiGroups: [""]
     resources: ["configmaps"]
     verbs: ["get"]
-    resourceNames: ["config-logging", "config-observability", "config-leader-election", "feature-flags"]
+    resourceNames:
+      [
+        "config-logging",
+        "config-observability",
+        "config-leader-election",
+        "feature-flags",
+      ]
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["list", "watch"]
@@ -700,10 +740,10 @@ spec:
       additionalPrinterColumns:
         - name: Succeeded
           type: string
-          jsonPath: ".status.conditions[?(@.type==\"Succeeded\")].status"
+          jsonPath: '.status.conditions[?(@.type=="Succeeded")].status'
         - name: Reason
           type: string
-          jsonPath: ".status.conditions[?(@.type==\"Succeeded\")].reason"
+          jsonPath: '.status.conditions[?(@.type=="Succeeded")].reason'
         - name: StartTime
           type: date
           jsonPath: .status.startTime
@@ -933,10 +973,10 @@ spec:
       additionalPrinterColumns:
         - name: Succeeded
           type: string
-          jsonPath: ".status.conditions[?(@.type==\"Succeeded\")].status"
+          jsonPath: '.status.conditions[?(@.type=="Succeeded")].status'
         - name: Reason
           type: string
-          jsonPath: ".status.conditions[?(@.type==\"Succeeded\")].reason"
+          jsonPath: '.status.conditions[?(@.type=="Succeeded")].reason'
         - name: StartTime
           type: date
           jsonPath: .status.startTime
@@ -1083,10 +1123,10 @@ spec:
       additionalPrinterColumns:
         - name: Succeeded
           type: string
-          jsonPath: ".status.conditions[?(@.type==\"Succeeded\")].status"
+          jsonPath: '.status.conditions[?(@.type=="Succeeded")].status'
         - name: Reason
           type: string
-          jsonPath: ".status.conditions[?(@.type==\"Succeeded\")].reason"
+          jsonPath: '.status.conditions[?(@.type=="Succeeded")].reason'
         - name: StartTime
           type: date
           jsonPath: .status.startTime
@@ -1823,20 +1863,37 @@ spec:
       serviceAccountName: tekton-pipelines-controller
       containers:
         - name: tekton-pipelines-controller
-          image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller:v0.39.0@sha256:c8ef49937b7f0d9c0f4753c6c5e809711490225c4dc00115981d0a484b248350
+          image: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/controller:v0.39.0@sha256:c8ef49937b7f0d9c0f4753c6c5e809711490225c4dc00115981d0a484b248350
           args: [
-            # These images are built on-demand by `ko resolve` and are replaced
-            # by image references by digest.
-            "-kubeconfig-writer-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/kubeconfigwriter:v0.39.0@sha256:712f7be864852519e4091b40de10721ce9f0d48218398820bee3069fee5ee1a7", "-git-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.39.0@sha256:3a1d3e57692e96663c76e4909ef5ef555a936eb599bc46175221ab4c94e4ec52", "-entrypoint-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/entrypoint:v0.39.0@sha256:e0afeceb58d73b7c162a8f2aac5b2addf8527d11750e4e885cc4178b65627afb", "-nop-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/nop:v0.39.0@sha256:267dcd865a41dab421a934341ff19fe681c006a922fb84d3eb17033eab4d4374", "-imagedigest-exporter-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/imagedigestexporter:v0.39.0@sha256:65c708b411c0849b9d009dc2b342f14aff2d4f5977d223acdbbcced77de15845", "-pr-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/pullrequest-init:v0.39.0@sha256:d9c523f32562d0af4dcf9fbf4a883dfbe2cabf2207934564487d6f6b46cfd90f", "-workingdirinit-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/workingdirinit:v0.39.0@sha256:01c8e99b7dcf842c64dde2ca4c3c9dc557a5c7ab28040f132c9ea003ab89e6c7",
-            # This is gcr.io/google.com/cloudsdktool/cloud-sdk:302.0.0-slim
-            "-gsutil-image", "gcr.io/google.com/cloudsdktool/cloud-sdk@sha256:27b2c22bf259d9bc1a291e99c63791ba0c27a04d2db0a43241ba0f1f20f4067f",
-            # The shell image must allow root in order to create directories and copy files to PVCs.
-            # ghcr.io/distroless/busybox as of April 14 2022
-            # image shall not contains tag, so it will be supported on a runtime like cri-o
-            "-shell-image", "ghcr.io/distroless/busybox@sha256:19f02276bf8dbdd62f069b922f10c65262cc34b710eea26ff928129a736be791",
-            # for script mode to work with windows we need a powershell image
-            # pinning to nanoserver tag as of July 15 2021
-            "-shell-image-win", "mcr.microsoft.com/powershell:nanoserver@sha256:b6d5ff841b78bdf2dfed7550000fd4f3437385b8fa686ec0f010be24777654d6"]
+              # These images are built on-demand by `ko resolve` and are replaced
+              # by image references by digest.
+              "-kubeconfig-writer-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/kubeconfigwriter:v0.39.0@sha256:712f7be864852519e4091b40de10721ce9f0d48218398820bee3069fee5ee1a7",
+              "-git-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/git-init:v0.39.0@sha256:3a1d3e57692e96663c76e4909ef5ef555a936eb599bc46175221ab4c94e4ec52",
+              "-entrypoint-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/entrypoint:v0.39.0@sha256:e0afeceb58d73b7c162a8f2aac5b2addf8527d11750e4e885cc4178b65627afb",
+              "-nop-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/nop:v0.39.0@sha256:267dcd865a41dab421a934341ff19fe681c006a922fb84d3eb17033eab4d4374",
+              "-imagedigest-exporter-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/imagedigestexporter:v0.39.0@sha256:65c708b411c0849b9d009dc2b342f14aff2d4f5977d223acdbbcced77de15845",
+              "-pr-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/pullrequest-init:v0.39.0@sha256:d9c523f32562d0af4dcf9fbf4a883dfbe2cabf2207934564487d6f6b46cfd90f",
+              "-workingdirinit-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/workingdirinit:v0.39.0@sha256:01c8e99b7dcf842c64dde2ca4c3c9dc557a5c7ab28040f132c9ea003ab89e6c7",
+              # This is gcr.io/google.com/cloudsdktool/cloud-sdk:302.0.0-slim
+              "-gsutil-image",
+              "gcr.io/google.com/cloudsdktool/cloud-sdk@sha256:27b2c22bf259d9bc1a291e99c63791ba0c27a04d2db0a43241ba0f1f20f4067f",
+              # The shell image must allow root in order to create directories and copy files to PVCs.
+              # ghcr.io/distroless/busybox as of April 14 2022
+              # image shall not contains tag, so it will be supported on a runtime like cri-o
+              "-shell-image",
+              "ghcr.io/distroless/busybox@sha256:19f02276bf8dbdd62f069b922f10c65262cc34b710eea26ff928129a736be791",
+              # for script mode to work with windows we need a powershell image
+              # pinning to nanoserver tag as of July 15 2021
+              "-shell-image-win",
+              "mcr.microsoft.com/powershell:nanoserver@sha256:b6d5ff841b78bdf2dfed7550000fd4f3437385b8fa686ec0f010be24777654d6",
+            ]
           volumeMounts:
             - name: config-logging
               mountPath: /etc/config-logging
@@ -2064,7 +2121,7 @@ spec:
         - name: webhook
           # This is the Go import path for the binary that is containerized
           # and substituted here.
-          image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.39.0@sha256:932a1536223ea48d3bb36d4934830b767d46d44479e9fd4d95dc751e4bf0e365
+          image: ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/webhook:v0.39.0@sha256:932a1536223ea48d3bb36d4934830b767d46d44479e9fd4d95dc751e4bf0e365
           # Resource request required for autoscaler to take any action for a metric
           resources:
             requests:
