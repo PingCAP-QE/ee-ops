@@ -77,7 +77,7 @@ spec:
       serviceAccountName: tekton-triggers-core-interceptors
       containers:
         - name: tekton-triggers-core-interceptors
-          image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/interceptors:v0.24.1@sha256:162607d0901cd65e525b3563bc19aa55802f0635ca425df05ccc3eb7f420c2e4"
+          image: "ghcr.io/tektoncd/github.com/tektoncd/triggers/cmd/interceptors:v0.24.1@sha256:162607d0901cd65e525b3563bc19aa55802f0635ca425df05ccc3eb7f420c2e4"
           ports:
             - containerPort: 8443
           args: ["-logtostderr", "-stderrthreshold", "INFO"]
@@ -227,3 +227,4 @@ spec:
       port: 8443
 
 ---
+

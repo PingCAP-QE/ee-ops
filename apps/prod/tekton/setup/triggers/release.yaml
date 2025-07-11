@@ -27,13 +27,33 @@ rules:
     resources: ["deployments", "deployments/finalizers"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["admissionregistration.k8s.io"]
-    resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
+    resources:
+      ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["triggers.tekton.dev"]
-    resources: ["clustertriggerbindings", "clusterinterceptors", "interceptors", "eventlisteners", "triggerbindings", "triggertemplates", "triggers", "eventlisteners/finalizers"]
+    resources:
+      [
+        "clustertriggerbindings",
+        "clusterinterceptors",
+        "interceptors",
+        "eventlisteners",
+        "triggerbindings",
+        "triggertemplates",
+        "triggers",
+        "eventlisteners/finalizers",
+      ]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["triggers.tekton.dev"]
-    resources: ["clustertriggerbindings/status", "clusterinterceptors/status", "interceptors/status", "eventlisteners/status", "triggerbindings/status", "triggertemplates/status", "triggers/status"]
+    resources:
+      [
+        "clustertriggerbindings/status",
+        "clusterinterceptors/status",
+        "interceptors/status",
+        "eventlisteners/status",
+        "triggerbindings/status",
+        "triggertemplates/status",
+        "triggers/status",
+      ]
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   # We uses leases for leaderelection
   - apiGroups: ["coordination.k8s.io"]
@@ -41,7 +61,17 @@ rules:
     verbs: ["get", "list", "create", "update", "delete", "patch", "watch"]
   - apiGroups: ["serving.knative.dev"]
     resources: ["*", "*/status", "*/finalizers"]
-    verbs: ["get", "list", "create", "update", "delete", "deletecollection", "patch", "watch"]
+    verbs:
+      [
+        "get",
+        "list",
+        "create",
+        "update",
+        "delete",
+        "deletecollection",
+        "patch",
+        "watch",
+      ]
   - apiGroups: [""]
     resources: ["namespaces"]
     verbs: ["get"]
@@ -92,7 +122,14 @@ metadata:
     app.kubernetes.io/part-of: tekton-triggers
 rules:
   - apiGroups: ["triggers.tekton.dev"]
-    resources: ["eventlisteners", "triggerbindings", "interceptors", "triggertemplates", "triggers"]
+    resources:
+      [
+        "eventlisteners",
+        "triggerbindings",
+        "interceptors",
+        "triggertemplates",
+        "triggers",
+      ]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["configmaps"]
@@ -1371,8 +1408,42 @@ spec:
       serviceAccountName: tekton-triggers-controller
       containers:
         - name: tekton-triggers-controller
-          image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/controller:v0.24.1@sha256:d928774533783ce98fdc95f1fa2b7ac3b2c519e8366512a2e65ed9f540e3c0bb"
-          args: ["-logtostderr", "-stderrthreshold", "INFO", "-el-image", "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/eventlistenersink:v0.24.1@sha256:37d41d06d0c306e7b875baa594b9e1ff51ad56d2828703144680b547d56ec2ef", "-el-port", "8080", "-el-security-context=true", "-el-events", "disable", "-el-readtimeout", "5", "-el-writetimeout", "40", "-el-idletimeout", "120", "-el-timeouthandler", "30", "-el-httpclient-readtimeout", "30", "-el-httpclient-keep-alive", "30", "-el-httpclient-tlshandshaketimeout", "10", "-el-httpclient-responseheadertimeout", "10", "-el-httpclient-expectcontinuetimeout", "1", "-period-seconds", "10", "-failure-threshold", "1"]
+          image: "ghcr.io/tektoncd/github.com/tektoncd/triggers/cmd/controller:v0.24.1@sha256:d928774533783ce98fdc95f1fa2b7ac3b2c519e8366512a2e65ed9f540e3c0bb"
+          args:
+            [
+              "-logtostderr",
+              "-stderrthreshold",
+              "INFO",
+              "-el-image",
+              "ghcr.io/tektoncd/github.com/tektoncd/triggers/cmd/eventlistenersink:v0.24.1@sha256:37d41d06d0c306e7b875baa594b9e1ff51ad56d2828703144680b547d56ec2ef",
+              "-el-port",
+              "8080",
+              "-el-security-context=true",
+              "-el-events",
+              "disable",
+              "-el-readtimeout",
+              "5",
+              "-el-writetimeout",
+              "40",
+              "-el-idletimeout",
+              "120",
+              "-el-timeouthandler",
+              "30",
+              "-el-httpclient-readtimeout",
+              "30",
+              "-el-httpclient-keep-alive",
+              "30",
+              "-el-httpclient-tlshandshaketimeout",
+              "10",
+              "-el-httpclient-responseheadertimeout",
+              "10",
+              "-el-httpclient-expectcontinuetimeout",
+              "1",
+              "-period-seconds",
+              "10",
+              "-failure-threshold",
+              "1",
+            ]
           env:
             - name: SYSTEM_NAMESPACE
               valueFrom:
@@ -1494,7 +1565,7 @@ spec:
         - name: webhook
           # This is the Go import path for the binary that is containerized
           # and substituted here.
-          image: "gcr.io/tekton-releases/github.com/tektoncd/triggers/cmd/webhook:v0.24.1@sha256:314d28791b9adeee9e38c6fb0b1ed40deeee097f495f73a82e5831ff6393dfcc"
+          image: "ghcr.io/tektoncd/github.com/tektoncd/triggers/cmd/webhook:v0.24.1@sha256:314d28791b9adeee9e38c6fb0b1ed40deeee097f495f73a82e5831ff6393dfcc"
           env:
             - name: SYSTEM_NAMESPACE
               valueFrom:
@@ -1528,3 +1599,4 @@ spec:
               type: RuntimeDefault
 
 ---
+

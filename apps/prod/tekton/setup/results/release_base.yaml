@@ -483,7 +483,7 @@ spec:
                 secretKeyRef:
                   key: POSTGRES_PASSWORD
                   name: tekton-results-postgres
-          image: gcr.io/tekton-releases/github.com/tektoncd/results/cmd/api:v0.9.2@sha256:3651a8bd6e113b16a8a58308472e4612cc7affab1645b6e7982ee4577bc6a769
+          image: ghcr.io/tektoncd/github.com/tektoncd/results/cmd/api:v0.9.2@sha256:3651a8bd6e113b16a8a58308472e4612cc7affab1645b6e7982ee4577bc6a769
           livenessProbe:
             httpGet:
               path: /healthz
@@ -577,7 +577,7 @@ spec:
               value: tekton-results-api-service.tekton-pipelines.svc.cluster.local:8080
             - name: AUTH_MODE
               value: token
-          image: gcr.io/tekton-releases/github.com/tektoncd/results/cmd/watcher:v0.9.2@sha256:e9b8b4eeeb275b5e2c4d3272c64961b95477090bee8cbc0445f2e047eb974b67
+          image: ghcr.io/tektoncd/github.com/tektoncd/results/cmd/watcher:v0.9.2@sha256:e9b8b4eeeb275b5e2c4d3272c64961b95477090bee8cbc0445f2e047eb974b67
           name: watcher
           ports:
             - containerPort: 9090
@@ -603,3 +603,4 @@ spec:
             secretName: tekton-results-tls
 
 ---
+

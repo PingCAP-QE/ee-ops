@@ -90,7 +90,7 @@ spec:
     - name: gitInitImage
       description: The image providing the git-init binary that this Task runs.
       type: string
-      default: "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.29.0"
+      default: "ghcr.io/tektoncd/github.com/tektoncd/pipeline/cmd/git-init:v0.29.0"
     - name: userHome
       description: |
         Absolute path to the user's home directory. Set this explicitly if you are running the image as a non-root user or have overridden
@@ -103,8 +103,7 @@ spec:
     - name: url
       description: The precise URL that was fetched by this Task.
     - name: committer-date
-      description:
-        The epoch timestamp of the commit that was fetched by this Task.
+      description: The epoch timestamp of the commit that was fetched by this Task.
   steps:
     - name: get
       image: alpine/git:v2.49.0
@@ -112,7 +111,7 @@ spec:
       resources:
         requests:
           memory: 512Mi
-          cpu: '100m'
+          cpu: "100m"
       script: |
         # Get the URL of the origin remote of current workspace.
         origin_url=$(git remote get-url origin)
