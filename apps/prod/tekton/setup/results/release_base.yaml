@@ -603,4 +603,3 @@ spec:
             secretName: tekton-results-tls
 
 ---
-

@@ -2223,4 +2223,3 @@ spec:
     app.kubernetes.io/part-of: tekton-pipelines
 
 ---
-
