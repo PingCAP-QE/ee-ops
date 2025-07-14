@@ -16,7 +16,7 @@ spec:
       template:
         spec:
           containers:
-            - image: gcr.io/tekton-releases/dogfooding/tkn:v20221201-ed0196540a
+            - image: ghcr.io/tektoncd/plumbing/tkn:v20221201-ed0196540a
               name: pruner
               command:
                 - /bin/sh
