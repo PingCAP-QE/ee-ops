@@ -5,4 +5,5 @@ resources:
   # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
   - https://storage.googleapis.com/tekton-releases/operator/previous/v0.76.0/release.yaml
   - operator-config.yaml
+  - http-route.yaml
   # - https://storage.googleapis.com/tekton-releases-nightly/pipelines-in-pipelines/latest/release.yaml
