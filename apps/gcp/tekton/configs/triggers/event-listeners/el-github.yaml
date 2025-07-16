@@ -2,84 +2,24 @@
 apiVersion: triggers.tekton.dev/v1beta1
 kind: EventListener
 metadata:
-  name: public
+  name: github
 spec:
   serviceAccountName: tekton-trigger-eventlistener
   triggerGroups:
-    # prepare for self pipeline proposal.
-    #  - before run setup tasks,pipelines,trigger templates, triggers.
-    #  - then delivered to trigger group: `githug-pr`
-    - name: github-pr-setup-for-self-pipelines
-      interceptors:
-        - name: "filter on eventType"
-          ref:
-            name: github
-          params:
-            - name: eventTypes
-              value: ["pull_request"]
-        - name: "validate PR state and add field"
-          ref:
-            name: "cel"
-          params:
-            - name: "filter"
-              value: "body.action in ['opened', 'synchronize', 'reopened']"
-            - name: "overlays"
-              value:
-                - key: truncated_sha
-                  expression: body.pull_request.head.sha.truncate(7)
-      triggerSelector:
-        namespaceSelector:
-          matchNames:
-            - ee-cd
-        labelSelector:
-          matchLabels:
-            type: github-pr-setup
-    # teardown for self pipeline proposal.
-    #  - clean triggers, trigger templates, pipelines, tasks when github PR fininshed(closed or merged)
-    #  - then delivered to trigger group: `githug-pr`
-    - name: github-pr-teardown-for-self-pipelines
-      interceptors:
-        - name: "filter on eventType"
-          ref:
-            name: github
-          params:
-            - name: eventTypes
-              value: ["pull_request"]
-        - name: "validate PR state is closed"
-          ref:
-            name: "cel"
-          params:
-            - name: "filter"
-              value: "body.action in ['merged', 'closed']"
-      triggerSelector:
-        namespaceSelector:
-          matchNames:
-            - ee-cd
-        labelSelector:
-          matchLabels:
-            type: github-pr-teardown
     - name: github-pr
       interceptors:
         - name: "filter on eventType"
           ref:
             name: github
           params:
-            # - name: secretRef
-            #   value:
-            #     secretName: github-secret
-            #     secretKey: secretToken
             - name: eventTypes
               value: ["pull_request"]
         - name: "validate PR state and add field"
           ref:
-            name: "cel"
+            name: cel
           params:
-            - name: "filter"
-              value: "body.action in ['opened', 'synchronize', 'reopened']"
-            - name: "overlays"
-              value:
-                - key: truncated_sha
-                  expression: body.pull_request.head.sha.truncate(7)
+            - name: filter
+              value: body.action in ['opened', 'synchronize', 'reopened', 'labeled']
       triggerSelector:
         namespaceSelector:
           matchNames:
@@ -87,3 +27,76 @@ spec:
         labelSelector:
           matchLabels:
             type: github-pr
+    - name: github-branch-push
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["push"]
+        - name: exclude the old branch when renaming
+          # Filter out the old branch when renaming to prevent unnecessary processing
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.after != '0000000000000000000000000000000000000000'
+        # "refs/heads/main" => "main"
+        - name: shortten the git REF
+          ref:
+            name: cel
+          params:
+            - name: overlays
+              value:
+                - key: short-ref
+                  expression: body.ref.replace('refs/heads/', '')
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-branch-push
+    - name: github-branch-create
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["create"]
+        - name: "validate branch create"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.ref_type == 'branch'
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-branch-create
+    - name: github-tag-create
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["create"]
+        - name: "validate tag create"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.ref_type == 'tag'
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-tag-create

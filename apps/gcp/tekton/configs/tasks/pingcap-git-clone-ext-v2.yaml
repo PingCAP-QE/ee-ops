@@ -1,26 +1,21 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: git-clone
+  name: pingcap-git-clone-ext-v2
   labels:
-    app.kubernetes.io/version: "0.9"
+    app.kubernetes.io/version: "0.1"
   annotations:
     tekton.dev/pipelines.minVersion: "0.38.0"
     tekton.dev/categories: Git
     tekton.dev/tags: git
     tekton.dev/displayName: "git clone"
-    tekton.dev/platforms: "linux/amd64,linux/s390x,linux/ppc64le,linux/arm64"
+    tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
   description: >-
-    These Tasks are Git tasks to work with repositories used by other tasks
-    in your Pipeline.
+    These Tasks are Git tasks to clone external git repositories that the main repository needs.
 
-    The git-clone Task will clone a repo from the provided url into the
-    output Workspace. By default the repo will be cloned into the root of
-    your Workspace. You can clone into a subdirectory by setting this Task's
-    subdirectory param. This Task also supports sparse checkouts. To perform
-    a sparse checkout, pass a list of comma separated directory patterns to
-    this Task's sparseCheckoutDirectories param.
+    This task will compute the external git refs from the master repo directory, then clone it into a subdirectory of the
+    output Workspace.
   workspaces:
     - name: output
       description: The git repo will be cloned onto the volume backing this Workspace.
@@ -45,13 +40,6 @@ spec:
         A workspace containing CA certificates, this will be used by Git to
         verify the peer with when fetching or pushing over HTTPS.
   params:
-    - name: url
-      description: Repository URL to clone from.
-      type: string
-    - name: revision
-      description: Revision to checkout. (branch, tag, sha, ref, etc...)
-      type: string
-      default: ""
     - name: refspec
       description: Refspec to fetch before checking out revision.
       default: ""
@@ -71,8 +59,8 @@ spec:
       description: file name of mounted crt using ssl-ca-directory workspace. default value is ca-bundle.crt.
       type: string
       default: "ca-bundle.crt"
-    - name: subdirectory
-      description: Subdirectory inside the `output` Workspace to clone the repo into.
+    - name: master-directory
+      description: Subdirectory inside the `output` Workspace to compute the external repository.
       type: string
       default: ""
     - name: sparseCheckoutDirectories
@@ -117,15 +105,72 @@ spec:
     - name: committer-date
       description: The epoch timestamp of the commit that was fetched by this Task.
   steps:
+    - name: get
+      image: alpine/git:v2.49.0
+      workingDir: $(workspaces.output.path)/$(params.master-directory)
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: "100m"
+      script: |
+
+        # Get the URL of the origin remote of current workspace.
+        origin_url=$(git remote get-url origin)
+        # Check if the URL contains "pingcap/tidb"
+        if [[ $origin_url != *"pingcap/tidb.git" && $origin_url != *"pingcap/tidb" ]]; then
+            echo "🏃 The repo is not 'pingcap/tidb', exit now."
+            exit 0
+        fi
+
+        echo -n "https://github.com/pingcap-inc/enterprise-plugin.git" > /workspace/inner-results-url
+
+        # Get the external git revision.
+        RELEASE_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
+        origin_ref="$(git branch --contains | grep -v 'HEAD detached' | sed 's/^ *//'| sed 's/^* //' | grep -E '^(master|main|release-.*|feature/.*)$' | head -1)"
+
+        if [[ $origin_ref =~ "^feature/release-[0-9]+\.[0-9]+" ]]; then
+          # feature branches based on released version.
+          MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+          EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
+        elif [[ $origin_ref =~ "^release-[0-9]+\.[0-9]+-.*-v[0-9]+\.[0-9]+\.[0-9]+" ]]; then
+          # hotfix branches
+          MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")
+          EXT_REVERSION=$(echo "$MAJOR_MINOR_PATCH" | sed -E 's/^v/release-/')
+        elif [[ $origin_ref =~ "^(master|main|feature/.*)$" ]]; then
+          # trunk and common feature branches.
+          EXT_REVERSION="master"
+        elif [[ "$origin_ref" == "" ]]; then
+          echo "$RELEASE_VERSION"
+          # empty branch, may be pull request cases, judge it from $RELEASE_VERSION
+          if [[ $RELEASE_VERSION =~ "^v[0-9]+\.[0-9]+\.[0-9]+-alpha-[0-9]+-" ]]; then
+            EXT_REVERSION="master"
+          else
+            # if it seems like 'vX.Y.0-beta.M*', then set the EXT_REVERSION as 'release-X.Y-beta.M'.
+            if [[ "$RELEASE_VERSION" =~ "^v[0-9]+[.][0-9]+[.]0-beta[.][0-9]+" ]]; then
+              MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+              BETA_VERSION=$(echo "$RELEASE_VERSION" | sed -E 's/.*-beta\.//' | sed -E 's/[.-].*$//')
+              EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')-beta.$BETA_VERSION
+            else
+              MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+              EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
+            fi
+          fi
+        else
+          # GA version tags and RC release branches
+          EXT_REVERSION="$origin_ref"
+        fi
+        # Set the external git revision.
+        printf "%s" "${EXT_REVERSION}" > /workspace/inner-results-revision
+
+        echo "🔗 git url: $(cat /workspace/inner-results-url)"
+        echo "📝 git reversion: $(cat /workspace/inner-results-revision)"
+
+        # TODO(wuhuizuo): support tag checkout cases.
     - name: clone
       image: "$(params.gitInitImage)"
       env:
         - name: HOME
           value: "$(params.userHome)"
-        - name: PARAM_URL
-          value: $(params.url)
-        - name: PARAM_REVISION
-          value: $(params.revision)
         - name: PARAM_REFSPEC
           value: $(params.refspec)
         - name: PARAM_SUBMODULES
@@ -136,8 +181,6 @@ spec:
           value: $(params.sslVerify)
         - name: PARAM_CRT_FILENAME
           value: $(params.crtFileName)
-        - name: PARAM_SUBDIRECTORY
-          value: $(params.subdirectory)
         - name: PARAM_DELETE_EXISTING
           value: $(params.deleteExisting)
         - name: PARAM_HTTP_PROXY
@@ -171,6 +214,19 @@ spec:
       script: |
         #!/usr/bin/env sh
         set -eu
+
+        if [ ! -e /workspace/inner-results-url ]; then
+          echo "🏃 None external repositories need to be cloned, exit now."
+          printf "" > "$(results.committer-date.path)"
+          printf "" > "$(results.commit.path)"
+          printf "" > "$(results.url.path)"
+
+          exit 0
+        fi
+
+        PARAM_URL="$(cat /workspace/inner-results-url)"
+        PARAM_REVISION="$(cat /workspace/inner-results-revision)"
+        PARAM_SUBDIRECTORY=$(echo "$PARAM_URL" | sed 's#.*/\([^/]*\)\.git#\1#')
 
         if [ "${PARAM_VERBOSE}" = "true" ] ; then
           set -x
