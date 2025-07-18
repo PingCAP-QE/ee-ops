@@ -33,7 +33,7 @@ spec:
       default: "4"
     - name: ce-context
       description: cloud event context.
-      default: '{}'
+      default: "{}"
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -85,7 +85,7 @@ spec:
               nodeSelector:
                 kubernetes.io/arch: amd64
         timeouts:
-          pipeline: $(tt.params.timeout)
+          tasks: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
@@ -158,7 +158,7 @@ spec:
               nodeSelector:
                 kubernetes.io/arch: arm64
         timeouts:
-          pipeline: $(tt.params.timeout)
+          tasks: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
