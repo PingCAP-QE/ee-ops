@@ -21,6 +21,7 @@ spec:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: next-gen }
+    - { name: registry, value: us-docker.pkg.dev/pingcap-testing-account/hub }
     - { name: timeout, value: 40m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-cpu, value: "8" }

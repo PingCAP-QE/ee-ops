@@ -21,6 +21,7 @@ spec:
     - ref: github-branch-push
     - { name: component, value: tikv }
     - { name: profile, value: next-gen }
+    - { name: registry, value: us-docker.pkg.dev/pingcap-testing-account/hub }
     - { name: timeout, value: 2h }
     - { name: source-ws-size, value: 100Gi }
     - { name: builder-resources-cpu, value: "16" }
