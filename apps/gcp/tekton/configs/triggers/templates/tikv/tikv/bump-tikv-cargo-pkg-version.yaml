@@ -29,6 +29,6 @@ spec:
           - name: github
             secret:
               secretName: github
-          - name: cargo-home
-            persistentVolumeClaim:
-              claimName: cargo-home
+          # - name: cargo-home
+          #   persistentVolumeClaim:
+          #     claimName: cargo-home
