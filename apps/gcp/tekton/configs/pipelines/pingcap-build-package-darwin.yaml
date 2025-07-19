@@ -60,9 +60,6 @@ spec:
       description: The workspace where the git repo will be cloned.
     - name: dockerconfig
       description: Includes a docker `config.json`
-    - name: git-basic-auth
-      description: secret containing a .gitconfig and .git-credentials file.
-      optional: true
     - name: mac-ssh-credentials
       description: secret contains ssh private key in `id_rsa` key for login mac
   tasks:
@@ -84,8 +81,6 @@ spec:
       workspaces:
         - name: output
           workspace: source
-        - name: basic-auth
-          workspace: git-basic-auth
     - name: checkout-ext
       runAfter:
         - checkout
@@ -101,8 +96,6 @@ spec:
       workspaces:
         - name: output
           workspace: source
-        - name: basic-auth
-          workspace: git-basic-auth
     - name: get-release-ver
       runAfter:
         - checkout

@@ -57,9 +57,6 @@ spec:
       description: The workspace where the git repo will be cloned.
     - name: dockerconfig
       description: Includes a docker `config.json`
-    - name: git-basic-auth
-      description: secret containing a .gitconfig and .git-credentials file.
-      optional: true
     - name: cargo-home
       description: cache for cargo packages when build binaries
       optional: true
@@ -85,8 +82,6 @@ spec:
       workspaces:
         - name: output
           workspace: source
-        - name: basic-auth
-          workspace: git-basic-auth
     - name: checkout-ext
       runAfter:
         - checkout
@@ -102,8 +97,6 @@ spec:
       workspaces:
         - name: output
           workspace: source
-        - name: basic-auth
-          workspace: git-basic-auth
     - name: get-release-ver
       runAfter:
         - checkout

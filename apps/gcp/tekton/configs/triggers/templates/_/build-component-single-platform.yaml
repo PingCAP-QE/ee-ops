@@ -78,6 +78,10 @@ spec:
           - name: boskos-server-url # for darwin platforms
             value: http://boskos.apps.svc
         taskRunSpecs:
+          - pipelineTaskName: checkout
+            taskServiceAccountName: github-bot
+          - pipelineTaskName: checkout-ext
+            taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskPodTemplate:
               nodeSelector:

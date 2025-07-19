@@ -70,6 +70,10 @@ spec:
           - name: registry
             value: $(tt.params.registry)
         taskRunSpecs:
+          - pipelineTaskName: checkout
+            taskServiceAccountName: github-bot
+          - pipelineTaskName: checkout-ext
+            taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskPodTemplate:
               nodeSelector:
@@ -143,6 +147,10 @@ spec:
           - name: registry
             value: $(tt.params.registry)
         taskRunSpecs:
+          - pipelineTaskName: checkout
+            taskServiceAccountName: github-bot
+          - pipelineTaskName: checkout-ext
+            taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskPodTemplate:
               nodeSelector:

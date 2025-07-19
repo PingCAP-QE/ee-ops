@@ -72,6 +72,10 @@ spec:
           - name: force-builder-image
             value: $(tt.params.force-builder-image)
         taskRunSpecs:
+          - pipelineTaskName: checkout
+            taskServiceAccountName: github-bot
+          - pipelineTaskName: checkout-ext
+            taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskPodTemplate:
               nodeSelector:
@@ -147,6 +151,10 @@ spec:
           - name: force-builder-image
             value: $(tt.params.force-builder-image)
         taskRunSpecs:
+          - pipelineTaskName: checkout
+            taskServiceAccountName: github-bot
+          - pipelineTaskName: checkout-ext
+            taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskPodTemplate:
               nodeSelector:
