@@ -102,15 +102,15 @@ spec:
                 resources:
                   requests:
                     storage: $(tt.params.source-ws-size)
-          - name: git-basic-auth # fetch with git-cdn.
-            secret:
-              secretName: git-credentials-basic
-          - name: cargo-home
-            persistentVolumeClaim:
-              claimName: cargo-home
-          - name: cypress-cache
-            persistentVolumeClaim:
-              claimName: cypress-cache
+          # - name: git-basic-auth # fetch with git-cdn.
+          #   secret:
+          #     secretName: git-credentials-basic
+          # - name: cargo-home
+          #   persistentVolumeClaim:
+          #     claimName: cargo-home
+          # - name: cypress-cache
+          #   persistentVolumeClaim:
+          #     claimName: cypress-cache
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
       metadata:
@@ -178,12 +178,12 @@ spec:
                 resources:
                   requests:
                     storage: $(tt.params.source-ws-size)
-          - name: git-basic-auth # fetch with git-cdn.
-            secret:
-              secretName: git-credentials-basic
-          - name: cargo-home
-            persistentVolumeClaim:
-              claimName: cargo-home
-          - name: cypress-cache
-            persistentVolumeClaim:
-              claimName: cypress-cache
+          # - name: git-basic-auth # fetch with git-cdn.
+          #   secret:
+          #     secretName: git-credentials-basic
+          # - name: cargo-home
+          #   persistentVolumeClaim:
+          #     claimName: cargo-home
+          # - name: cypress-cache
+          #   persistentVolumeClaim:
+          #     claimName: cypress-cache

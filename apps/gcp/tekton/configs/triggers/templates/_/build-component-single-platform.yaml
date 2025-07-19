@@ -110,15 +110,15 @@ spec:
                 resources:
                   requests:
                     storage: $(tt.params.source-ws-size)
-          - name: git-basic-auth # fetch with git-cdn.
-            secret:
-              secretName: git-credentials-basic
-          - name: cargo-home # for linux platforms
-            persistentVolumeClaim:
-              claimName: cargo-home
-          - name: cypress-cache # for linux platforms
-            persistentVolumeClaim:
-              claimName: cypress-cache
+          # - name: git-basic-auth # fetch with git-cdn.
+          #   secret:
+          #     secretName: git-credentials-basic
+          # - name: cargo-home # for linux platforms
+          #   persistentVolumeClaim:
+          #     claimName: cargo-home
+          # - name: cypress-cache # for linux platforms
+          #   persistentVolumeClaim:
+          #     claimName: cypress-cache
           - name: mac-ssh-credentials # for darwin platforms
             secret:
               secretName: mac-ssh-credentials
