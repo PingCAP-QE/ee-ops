@@ -22,6 +22,7 @@ spec:
     - { name: component, value: $(body.repository.name) }
     - { name: os, value: linux }
     - { name: profile, value: next-gen }
+    - { name: registry, value: us-docker.pkg.dev/pingcap-testing-account/hub }
     - { name: timeout, value: 45m }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 32Gi }
