@@ -58,8 +58,6 @@ spec:
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
-    - name: dockerconfig
-      description: Includes a docker `config.json`
     - name: mac-ssh-credentials
       description: secret contains ssh private key in `id_rsa` key for login mac
   tasks:
@@ -154,8 +152,6 @@ spec:
       workspaces:
         - name: source
           workspace: source
-        - name: dockerconfig
-          workspace: dockerconfig
         - name: ssh-directory
           workspace: mac-ssh-credentials
     - name: build-images

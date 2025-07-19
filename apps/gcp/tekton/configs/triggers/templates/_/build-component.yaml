@@ -75,6 +75,7 @@ spec:
           - pipelineTaskName: checkout-ext
             taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
+            taskServiceAccountName: image-releaser
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: amd64
@@ -85,15 +86,13 @@ spec:
                     memory: $(tt.params.builder-resources-memory)
                     cpu: $(tt.params.builder-resources-cpu)
           - pipelineTaskName: build-images
+            taskServiceAccountName: image-releaser
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: amd64
         timeouts:
           tasks: $(tt.params.timeout)
         workspaces:
-          - name: dockerconfig
-            secret:
-              secretName: hub-pingcap-net-ee
           - name: source
             volumeClaimTemplate:
               spec:
@@ -152,6 +151,7 @@ spec:
           - pipelineTaskName: checkout-ext
             taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
+            taskServiceAccountName: image-releaser
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: arm64
@@ -162,15 +162,13 @@ spec:
                     memory: $(tt.params.builder-resources-memory)
                     cpu: $(tt.params.builder-resources-cpu)
           - pipelineTaskName: build-images
+            taskServiceAccountName: image-releaser
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: arm64
         timeouts:
           tasks: $(tt.params.timeout)
         workspaces:
-          - name: dockerconfig
-            secret:
-              secretName: hub-pingcap-net-ee
           - name: source
             volumeClaimTemplate:
               spec:

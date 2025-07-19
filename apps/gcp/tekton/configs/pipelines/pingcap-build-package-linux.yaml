@@ -55,8 +55,6 @@ spec:
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
-    - name: dockerconfig
-      description: Includes a docker `config.json`
     - name: cargo-home
       description: cache for cargo packages when build binaries
       optional: true
@@ -153,8 +151,6 @@ spec:
       workspaces:
         - name: source
           workspace: source
-        - name: dockerconfig
-          workspace: dockerconfig
         - name: cargo-home
           workspace: cargo-home
         - name: cypress-cache
@@ -193,5 +189,3 @@ spec:
       workspaces:
         - name: source
           workspace: source
-        - name: dockerconfig
-          workspace: dockerconfig
