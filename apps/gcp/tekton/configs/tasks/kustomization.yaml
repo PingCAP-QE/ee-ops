@@ -9,8 +9,8 @@ resources:
   - pingcap-build-binaries-darwin.yaml
   - pingcap-build-binaries-linux.yaml
   - pingcap-build-images.yaml
+  - pingcap-git-clone-ext.yaml
   - pingcap-get-builder-image.yaml
-  - pingcap-git-clone-ext-v2.yaml
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/kaniko/0.6/kaniko.yaml # kaniko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/ko/0.1/ko.yaml # ko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml # tkn task
