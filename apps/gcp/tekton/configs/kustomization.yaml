@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: ee-cd
 resources:
   - namespace.yaml
+  - rbac
   - tasks
-  - pipelines
   - triggers
+  - pipelines

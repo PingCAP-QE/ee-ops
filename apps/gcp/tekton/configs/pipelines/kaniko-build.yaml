@@ -56,8 +56,6 @@ spec:
       workspaces:
         - name: source
           workspace: git-source
-        - name: dockerconfig
-          workspace: dockerconfig
     - name: build-arm64
       runAfter:
         - fetch-from-git
@@ -77,8 +75,6 @@ spec:
       workspaces:
         - name: source
           workspace: git-source
-        - name: dockerconfig
-          workspace: dockerconfig
     - name: mult-arch-push
       runAfter:
         - "build-amd64"
@@ -94,10 +90,5 @@ spec:
           value:
             - linux/amd64 => $(tasks.build-amd64.results.IMAGE_DIGEST)
             - linux/arm64 => $(tasks.build-arm64.results.IMAGE_DIGEST)
-      workspaces:
-        - name: dockerconfig
-          workspace: dockerconfig
   workspaces:
     - name: git-source
-    - name: dockerconfig # contains file: config.json
-      optional: true

@@ -12,10 +12,6 @@ spec:
   workspaces:
     - name: source
       description: source code.
-    - name: dockerconfig
-      description: Includes a docker `config.json`
-      mountPath: /root/.docker
-      optional: true
     - name: cargo-home
       description: Cache for cargo packages.
       mountPath: /workspace/.cargo

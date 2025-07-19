@@ -12,10 +12,6 @@ spec:
   workspaces:
     - name: source
       description: source code.
-    - name: dockerconfig
-      description: Includes a docker `config.json`
-      mountPath: /root/.docker
-      optional: true
     - name: ssh-directory
       description: ssh credential for remote building on mac.
   results:
