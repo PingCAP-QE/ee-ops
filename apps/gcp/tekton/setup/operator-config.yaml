@@ -9,7 +9,7 @@ spec:
     disable-affinity-assistant: true
     # disable-home-env-overwrite: true
     # disable-working-directory-overwrite: true
-    enable-api-fields: stable # stable | alpha
+    enable-api-fields: alpha # stable | alpha | beta
     enable-custom-tasks: true
     enable-tekton-oci-bundles: true
     require-git-ssh-secret-known-hosts: false
@@ -31,7 +31,7 @@ spec:
     disabled: true
   trigger:
     default-service-account: "default"
-    enable-api-fields: stable
+    enable-api-fields: alpha
   tektonpruner:
     disabled: true
   pruner:
