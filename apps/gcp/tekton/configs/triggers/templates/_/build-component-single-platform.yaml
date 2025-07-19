@@ -78,7 +78,12 @@ spec:
           - name: boskos-server-url # for darwin platforms
             value: http://boskos.apps.svc
         taskRunSpecs:
+          - pipelineTaskName: checkout
+            taskServiceAccountName: github-bot
+          - pipelineTaskName: checkout-ext
+            taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
+            taskServiceAccountName: image-releaser
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: $(tt.params.arch)
@@ -89,15 +94,13 @@ spec:
                     memory: $(tt.params.builder-resources-memory)
                     cpu: $(tt.params.builder-resources-cpu)
           - pipelineTaskName: build-images
+            taskServiceAccountName: image-releaser
             taskPodTemplate:
               nodeSelector:
                 kubernetes.io/arch: $(tt.params.arch)
         timeouts:
           tasks: $(tt.params.timeout)
         workspaces:
-          - name: dockerconfig
-            secret:
-              secretName: hub-pingcap-net-ee
           - name: source
             volumeClaimTemplate:
               spec:

@@ -58,8 +58,3 @@ spec:
         - mountPath: /workspace
           name: manifest
       workingDir: /workspace
-  workspaces:
-    - description: Includes a docker `config.json`
-      mountPath: /root/.docker
-      name: dockerconfig
-      optional: true
