@@ -93,7 +93,7 @@ spec:
           - name: source
             volumeClaimTemplate:
               spec:
-                storageClassName: ceph-block
+                storageClassName: standard-rwo
                 accessModes:
                   - ReadWriteOnce
                 resources:
@@ -166,7 +166,7 @@ spec:
           - name: source
             volumeClaimTemplate:
               spec:
-                storageClassName: ceph-block
+                storageClassName: standard-rwo
                 accessModes:
                   - ReadWriteOnce
                 resources:
