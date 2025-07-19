@@ -6,7 +6,7 @@ spec:
   targetNamespace: tekton-pipelines
   profile: all
   pipeline:
-    disable-affinity-assistant: true
+    coschedule: disabled
     # disable-home-env-overwrite: true
     # disable-working-directory-overwrite: true
     enable-api-fields: alpha # stable | alpha | beta
