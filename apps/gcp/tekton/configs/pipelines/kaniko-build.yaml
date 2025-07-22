@@ -21,7 +21,7 @@ spec:
       default: ./
     - name: BUILDER_IMAGE
       description: The image on which builds will run.
-      default: gcr.io/kaniko-project/executor:v1.9.1
+      default: gcr.io/kaniko-project/executor:v1.24.0
     - name: EXTRA_ARGS
       type: array
       default: []
