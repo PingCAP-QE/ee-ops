@@ -9,6 +9,13 @@ metadata:
 spec:
   description: >-
     This task builds images for pingcap components.
+
+    ## How to run to push to google artifact registries.
+
+    1. prepare `docker-registry` secret.
+    2. append the google service account key json the to the secret.
+    3. add the secret to the Kubernetes service account
+    4. run the task with the service account, Tekton pipeline controller will auto inject the volume from the `docker-registry` type secret to `/tekton/creds-secrets/<secret-name>/` path.
   workspaces:
     - name: source
   results:
@@ -40,7 +47,7 @@ spec:
       default: hub.pingcap.net
   steps:
     - name: generate
-      image: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2025.5.11-2-gfd3e259
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -74,8 +81,9 @@ spec:
       env:
         - name: KANIKO_EXECUTOR
           value: /kaniko/executor
-        - name: KANIKO_REGISTRY_MIRROR
-          value: registry-mirror.pingcap.net
+        # To Support GAR for kaniko: the service account should add a secret named `image-release-cred` with key `gsa.json` included
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /tekton/creds-secrets/image-release-cred/gsa.json
       resources:
         requests:
           cpu: "4"
