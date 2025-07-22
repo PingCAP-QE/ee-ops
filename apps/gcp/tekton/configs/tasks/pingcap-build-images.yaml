@@ -9,6 +9,13 @@ metadata:
 spec:
   description: >-
     This task builds images for pingcap components.
+
+    ## How to run to push to google artifact registries.
+
+    1. prepare `docker-registry` secret.
+    2. append the google service account key json the to the secret.
+    3. add the secret to the Kubernetes service account
+    4. run the task with the service account, Tekton pipeline controller will auto inject the volume from the `docker-registry` type secret to `/tekton/creds-secrets/<secret-name>/` path.
   workspaces:
     - name: source
   results:
