@@ -1,0 +1,29 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: avoid-application-pods-run-on-spot-nodes
+spec:
+  rules:
+    - name: inject-node-affinity
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - apps
+            - cla
+            - arc-systems
+            - tekton-operator
+            - tekton-pipelines
+      mutate:
+        patchStrategicMerge:
+          spec:
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: cloud.google.com/gke-spot
+                          operator: NotIn
+                          values:
+                            - "true"
