@@ -69,6 +69,9 @@ spec:
             value: amd64
           - name: registry
             value: $(tt.params.registry)
+        podTemplate:
+          nodeSelector:
+            kubernetes.io/arch: amd64
         taskRunSpecs:
           - pipelineTaskName: checkout
             taskServiceAccountName: github-bot
@@ -76,9 +79,6 @@ spec:
             taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
             stepOverrides:
               - name: build
                 resources:
@@ -87,9 +87,6 @@ spec:
                     cpu: $(tt.params.builder-resources-cpu)
           - pipelineTaskName: build-images
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
         timeouts:
           tasks: $(tt.params.timeout)
         workspaces:
@@ -145,6 +142,9 @@ spec:
             value: arm64
           - name: registry
             value: $(tt.params.registry)
+        podTemplate:
+          nodeSelector:
+            kubernetes.io/arch: arm64
         taskRunSpecs:
           - pipelineTaskName: checkout
             taskServiceAccountName: github-bot
@@ -152,9 +152,6 @@ spec:
             taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
             stepOverrides:
               - name: build
                 resources:
@@ -163,9 +160,6 @@ spec:
                     cpu: $(tt.params.builder-resources-cpu)
           - pipelineTaskName: build-images
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
         timeouts:
           tasks: $(tt.params.timeout)
         workspaces:
@@ -178,9 +172,6 @@ spec:
                 resources:
                   requests:
                     storage: $(tt.params.source-ws-size)
-          # - name: git-basic-auth # fetch with git-cdn.
-          #   secret:
-          #     secretName: git-credentials-basic
           # - name: cargo-home
           #   persistentVolumeClaim:
           #     claimName: cargo-home
