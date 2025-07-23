@@ -5,4 +5,5 @@ resources:
   - namespace.yaml
   - secret-generator
   - gateways
+  - kyverno
   # TODO(wuhuizuo): move the gateway from `apps` folder to here.

@@ -7,6 +7,8 @@ spec:
   dependsOn:
     - name: prow-pre
       namespace: flux-system
+    - name: prow-crd
+      namespace: flux-system
   interval: 5m0s
   sourceRef:
     kind: GitRepository
