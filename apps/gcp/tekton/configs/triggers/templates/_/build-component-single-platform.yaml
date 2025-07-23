@@ -104,7 +104,7 @@ spec:
           - name: source
             volumeClaimTemplate:
               spec:
-                storageClassName: standard-rwo
+                storageClassName: hyperdisk-rwo
                 accessModes:
                   - ReadWriteOnce
                 resources:
