@@ -71,6 +71,9 @@ spec:
             value: $(tt.params.registry)
           - name: force-builder-image
             value: $(tt.params.force-builder-image)
+        podTemplate:
+          nodeSelector:
+            kubernetes.io/arch: amd64
         taskRunSpecs:
           - pipelineTaskName: checkout
             taskServiceAccountName: github-bot
@@ -78,9 +81,6 @@ spec:
             taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
             stepOverrides:
               - name: build
                 resources:
@@ -89,9 +89,6 @@ spec:
                     cpu: $(tt.params.builder-resources-cpu)
           - pipelineTaskName: build-images
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: amd64
         timeouts:
           tasks: $(tt.params.timeout)
         workspaces:
@@ -149,6 +146,9 @@ spec:
             value: $(tt.params.registry)
           - name: force-builder-image
             value: $(tt.params.force-builder-image)
+        podTemplate:
+          nodeSelector:
+            kubernetes.io/arch: arm64
         taskRunSpecs:
           - pipelineTaskName: checkout
             taskServiceAccountName: github-bot
@@ -156,9 +156,6 @@ spec:
             taskServiceAccountName: github-bot
           - pipelineTaskName: build-binaries
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
             stepOverrides:
               - name: build
                 resources:
@@ -167,9 +164,6 @@ spec:
                     cpu: $(tt.params.builder-resources-cpu)
           - pipelineTaskName: build-images
             taskServiceAccountName: image-releaser
-            taskPodTemplate:
-              nodeSelector:
-                kubernetes.io/arch: arm64
         timeouts:
           tasks: $(tt.params.timeout)
         workspaces:
