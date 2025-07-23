@@ -5,7 +5,6 @@ resources:
   - cluster-policies
   - acr-runners
   - cla-assistant
-  - prow-crd.yaml
   - prow
   - tekton
   # - prow-dev
