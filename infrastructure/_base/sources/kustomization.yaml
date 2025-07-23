@@ -7,3 +7,4 @@ resources:
   - helm-repo-nfs-server-provisioner.yaml
   - helm-repo-rook.yaml
   - helm-repo-others.yaml
+  - helm-repo-kyverno.yaml
