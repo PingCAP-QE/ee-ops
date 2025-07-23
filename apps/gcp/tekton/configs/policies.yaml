@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: restrict-to-node-instance-types
+spec:
+  rules:
+    - name: restrict-non-el-pods-to-c4-c4a
+      match:
+        resources:
+          kinds:
+            - Pod
+      exclude:
+        resources:
+          names:
+            - "el-*"
+      mutate:
+        patchStrategicMerge:
+          spec:
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: cloud.google.com/machine-family
+                          operator: In
+                          values: [c4, c4a]
+  validationFailureAction: Enforce
