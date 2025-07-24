@@ -87,7 +87,7 @@ spec:
               nodeSelector:
                 kubernetes.io/arch: amd64
         timeouts:
-          tasks: $(tt.params.timeout)
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
@@ -162,7 +162,7 @@ spec:
               nodeSelector:
                 kubernetes.io/arch: arm64
         timeouts:
-          tasks: $(tt.params.timeout)
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
@@ -224,7 +224,7 @@ spec:
           - name: boskos-server-url
             value: http://boskos.apps.svc
         timeouts:
-          tasks: $(tt.params.timeout)
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
@@ -283,7 +283,7 @@ spec:
           - name: boskos-server-url
             value: http://boskos.apps.svc
         timeouts:
-          tasks: $(tt.params.timeout)
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
