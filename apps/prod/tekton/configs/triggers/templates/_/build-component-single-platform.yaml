@@ -93,7 +93,7 @@ spec:
               nodeSelector:
                 kubernetes.io/arch: $(tt.params.arch)
         timeouts:
-          tasks: $(tt.params.timeout)
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: dockerconfig
             secret:
