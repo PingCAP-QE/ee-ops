@@ -96,7 +96,7 @@ spec:
           - pipelineTaskName: build-images
             taskServiceAccountName: image-releaser
         timeouts:
-          tasks: $(tt.params.timeout)
+          pipeline: $(tt.params.timeout)
         workspaces:
           - name: source
             volumeClaimTemplate:
