@@ -24,8 +24,8 @@ spec:
     - { name: registry, value: us-docker.pkg.dev/pingcap-testing-account/hub }
     - { name: timeout, value: 2h }
     - { name: source-ws-size, value: 100Gi }
-    - { name: builder-resources-cpu, value: "14" }
-    - { name: builder-resources-memory, value: "56Gi" }
+    - { name: builder-resources-cpu, value: "12" }
+    - { name: builder-resources-memory, value: "48Gi" }
 
   template:
     ref: build-component
