@@ -4,6 +4,7 @@ namespace: ee-cd
 resources:
   - namespace.yaml
   - policies.yaml
+  - secrets
   - rbac
   - tasks
   - triggers
