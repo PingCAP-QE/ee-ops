@@ -87,7 +87,7 @@ spec:
         enabled: false
       image:
         repository: ghcr.io/ti-community-infra/prow/hook
-        tag: v20250526-47c62ac71
+        tag: v20250728-3eb01d86a
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
@@ -142,8 +142,8 @@ spec:
           type: ClusterIP
         replicaCount: 1
         image:
-          repository: ticommunityinfra/chatgpt
-          tag: v20230621-df5abce
+          repository: ghcr.io/ti-community-infra/prow/chatgpt
+          tag: v20250728-3eb01d86a
         ports:
           http: 8888
         args:
