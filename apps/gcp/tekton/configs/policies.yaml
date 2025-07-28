@@ -24,4 +24,8 @@ spec:
                         - key: cloud.google.com/machine-family
                           operator: In
                           values: [c4, c4a]
+                        - key: cloud.google.com/gke-provisioning
+                          operator: In
+                          values: ["spot"]
+
   validationFailureAction: Enforce
