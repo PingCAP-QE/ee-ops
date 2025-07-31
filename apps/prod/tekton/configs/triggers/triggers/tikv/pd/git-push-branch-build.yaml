@@ -15,7 +15,7 @@ spec:
           value: >-
             body.repository.full_name == 'tikv/pd'
             &&
-            body.ref.matches('^refs/heads/(master)$')
+            body.ref.matches('^refs/heads/(master|release-nextgen-[0-9]+)$')
 
   bindings:
     - ref: github-branch-push
