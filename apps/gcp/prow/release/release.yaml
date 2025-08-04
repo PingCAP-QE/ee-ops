@@ -180,6 +180,25 @@ spec:
                     items:
                       - key: tasks.yaml
                         path: tasks.yaml
+      cherrypicker:
+        service:
+          type: ClusterIP
+        ports:
+          http: 8888
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ghcr.io/ti-community-infra/prow/cherrypicker
+          tag: v20250804-aee3e5aaf
+        args:
+          - --allow-all
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/app-private-key
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+          - --label-prefix=needs-cherry-pick-
+          - --skip-fork
       needs-rebase:
         replicaCount: 1
         image:
