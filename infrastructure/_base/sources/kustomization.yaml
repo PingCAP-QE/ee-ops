@@ -8,3 +8,4 @@ resources:
   - helm-repo-rook.yaml
   - helm-repo-others.yaml
   - helm-repo-kyverno.yaml
+  - helm-repo-external-secrets.yaml
