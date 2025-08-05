@@ -8,19 +8,36 @@ spec:
   chart:
     spec:
       chart: external-secrets
-      version: 0.19.0
+      version: 0.13.0 # it support K8S version: 1.19 ~ 1.31. It only support K8S 1.32+ since 0.14.0
       sourceRef:
         kind: HelmRepository
         name: external-secrets
         namespace: flux-system
   values:
     replicaCount: 2
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 200m
+        memory: 256Mi
     webhook:
       replicaCount: 2
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
     certController:
       replicaCount: 2
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
     serviceAccount:
       create: true
-    crds:
-      enabled: true
     installCRDs: true
