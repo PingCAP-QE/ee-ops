@@ -2,7 +2,6 @@ apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
   name: example-es
-  namespace: apps
 spec:
   refreshInterval: 1h
   secretStoreRef:
