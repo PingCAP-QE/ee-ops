@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: infra
 resources:
   - release.yaml
+  - cluster-secret-store-gcp.yaml
