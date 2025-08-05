@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: external-secrets
-      version: 0.13.0 # it support K8S version: 1.19 ~ 1.31. It only support K8S 1.32+ since 0.14.0
+      version: 0.19.0
       sourceRef:
         kind: HelmRepository
         name: external-secrets
@@ -40,4 +40,6 @@ spec:
         memory: 128Mi
     serviceAccount:
       create: true
+    crds:
+      enabled: true
     installCRDs: true
