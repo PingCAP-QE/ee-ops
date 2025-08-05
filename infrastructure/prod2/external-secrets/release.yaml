@@ -40,6 +40,4 @@ spec:
         memory: 128Mi
     serviceAccount:
       create: true
-    crds:
-      enabled: true
     installCRDs: true
