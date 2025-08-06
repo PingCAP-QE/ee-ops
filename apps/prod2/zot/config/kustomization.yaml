@@ -5,4 +5,4 @@ configMapGenerator:
     options:
       disableNameSuffixHash: true
     files:
-      - config/config.json
+      - config.json
