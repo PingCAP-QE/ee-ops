@@ -1,0 +1,124 @@
+{
+  "log": { "level": "debug" },
+  "storage": {
+    "rootDirectory": "/var/lib/registry",
+    "remoteCache": true,
+    "commit": true,
+    "dedupe": true,
+    "gc": true,
+    "gcDelay": "1h",
+    "gcInterval": "24h",
+    "storageDriver": {
+      "name": "s3",
+      "rootdirectory": "/zot",
+      "secure": true,
+      "skipverify": false,
+      "forcepathstyle": false,
+      "region": "${S3_REGION}",
+      "regionendpoint": "${S3_REGION_ENDPOINT}",
+      "bucket": "${S3_BUCKET}",
+      "accesskey": "${S3_ACCESS_KEY}",
+      "secretkey": "${S3_SECRET_KEY}"
+    },
+    "cacheDriver": {
+      "name": "redis",
+      "url": "redis://:${redis-password}@redis-master:6379/0?dial_timeout=3&read_timeout=6s",
+      "keyprefix": "zot"
+    }
+  },
+  "http": {
+    "address": "0.0.0.0",
+    "port": "5000",
+    "compat": ["docker2s2"],
+    "externalUrl": "${EXTERNAL_URL}",
+    "realm": "zot",
+    "auth": {
+      "failDelay": 5,
+      "htpasswd": {
+        "path": "/secret/htpasswd"
+      },
+      "sessionKeysFile": "/secret/sessionKeys.json",
+      "apikey": true,
+      "openid": {
+        "providers": {
+          "github": {
+            "clientid": "${GITHUB_CLIENT_ID}",
+            "clientsecret": "${GITHUB_CLIENT_SECRET}",
+            "scopes": ["read:org", "user", "repo"]
+          }
+        }
+      }
+    },
+    "accessControl": {
+      "repositories": {
+        "**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read"]
+        }
+      },
+      "adminPolicy": {
+        "users": ["admin"],
+        "actions": ["read", "create", "update", "delete"]
+      }
+    },
+    "ratelimit": {
+      "rate": 10,
+      "methods": [
+        {
+          "method": "GET",
+          "rate": 5
+        }
+      ]
+    }
+  },
+  "extensions": {
+    "ui": {
+      "enable": true
+    },
+    "search": {
+      "enable": true
+    },
+    "sync": {
+      "enable": true,
+      "downloadDir": "/tmp/zot",
+      "registries": [
+        {
+          "urls": ["https://hub.pingcap.net"],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "**",
+              "destination": "/hub"
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true
+        },
+        {
+          "urls": ["https://docker.io"],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "pingcap",
+              "destination": "/dockerhub",
+              "tags": {
+                "semver": true
+              }
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true,
+          "maxRetries": 3,
+          "retryDelay": "5m"
+        }
+      ]
+    },
+    "scrub": {
+      "enable": true,
+      "interval": "120h"
+    },
+    "mgmt": {
+      "enable": true
+    }
+  }
+}

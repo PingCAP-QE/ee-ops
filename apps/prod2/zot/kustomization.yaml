@@ -4,5 +4,6 @@ namespace: zot
 resources:
   - namespace.yaml
   - source.yaml
-  - redis-release.yaml
+  - pre.yaml
+  - config.yaml
   - release.yaml
