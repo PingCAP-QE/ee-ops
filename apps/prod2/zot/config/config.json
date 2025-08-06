@@ -14,7 +14,7 @@
       "secure": true,
       "skipverify": false,
       "forcepathstyle": false,
-      "region": "${S3_region}",
+      "region": "${S3_REGION}",
       "regionendpoint": "${S3_REGION_ENDPOINT}",
       "bucket": "${S3_BUCKET}",
       "accesskey": "${S3_ACCESS_KEY}",
