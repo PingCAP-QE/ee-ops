@@ -1,0 +1,28 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: zot-config
+spec:
+  dependsOn:
+    - name: zot-pre
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/prod2/zot/config
+  prune: true
+  postBuild:
+    substitute:
+      EXTERNAL_URL: https://hub-zot.pingcap.net
+    substituteFrom:
+      # from redis helm release, contains keys:
+      # - redis-password
+      - kind: Secret
+        name: redis
+      # from external-secret in zot-pre, contains keys:
+      # - GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
+      # - S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET, S3_REGION_ENDPOINT, S3_region
+      - kind: Secret
+        name: zot-config-secrets
