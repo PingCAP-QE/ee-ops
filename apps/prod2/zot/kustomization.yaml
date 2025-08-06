@@ -5,5 +5,5 @@ resources:
   - namespace.yaml
   - source.yaml
   - pre.yaml
-  - zot-config.yaml
-  - zot-release.yaml
+  - config.yaml
+  - release.yaml
