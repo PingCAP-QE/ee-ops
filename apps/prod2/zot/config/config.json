@@ -22,7 +22,7 @@
     },
     "cacheDriver": {
       "name": "redis",
-      "url": "redis://:${redis-password}@redis-master:6379/0?dial_timeout=3&read_timeout=6s",
+      "url": "redis://:${REDIS_PASSWORD}@redis-master:6379/0?dial_timeout=3&read_timeout=6s",
       "keyprefix": "zot"
     }
   },

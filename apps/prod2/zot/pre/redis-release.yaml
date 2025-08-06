@@ -20,3 +20,6 @@ spec:
       resourcesPreset: nano #  nano < micro < small < medium < large < xlarge < 2xlarge
     replica:
       resourcesPreset: nano
+    auth:
+      existingSecret: redis
+      existingSecretPasswordKey: REDIS_PASSWORD
