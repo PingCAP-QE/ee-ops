@@ -140,7 +140,7 @@ spec:
         name: builder-resources-memory,
         value: $(extensions.builder-resources-memory),
       }
-    - { name: registry, value: hub.pingcap.net/devbuild }
+    - { name: registry, value: us-docker.pkg.dev/pingcap-testing-account/dev }
     - {
         name: force-builder-image,
         value: $(extensions.custom-params.builder-image),
