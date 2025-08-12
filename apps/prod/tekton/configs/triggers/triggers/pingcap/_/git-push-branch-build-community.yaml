@@ -23,7 +23,7 @@ spec:
             'pingcap/tiflow',
             ]
             &&
-            body.ref.matches('^refs/heads/(main|master|release-[6-9][.][0-9]+(-beta[.][0-9]+)?|feature/(fts|ng.+))$')
+            body.ref.matches('^refs/heads/(main|master|release-[6-9][.][0-9]+(-beta[.][0-9]+)?|feature/fts)$')
         - name: overlays
           value:
             - key: timeout
