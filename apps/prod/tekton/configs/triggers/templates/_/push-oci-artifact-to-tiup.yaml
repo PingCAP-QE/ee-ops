@@ -42,7 +42,7 @@ spec:
 apiVersion: triggers.tekton.dev/v1beta1
 kind: TriggerTemplate
 metadata:
-  name: push-oci-artifact-to-tiup-for-release-branches
+  name: push-oci-artifact-to-tiup-staging
 spec:
   params:
     - name: image_url
