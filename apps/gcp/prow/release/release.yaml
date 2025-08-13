@@ -143,7 +143,7 @@ spec:
         replicaCount: 1
         image:
           repository: ghcr.io/ti-community-infra/prow/chatgpt
-          tag: v20250728-3eb01d86a
+          tag: v20250812-57374e9b9
         ports:
           http: 8888
         args:
