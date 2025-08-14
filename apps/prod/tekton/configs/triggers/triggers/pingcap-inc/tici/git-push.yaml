@@ -20,10 +20,9 @@ spec:
     - ref: github-branch-push
     - { name: component, value: $(body.repository.name) }
     - { name: profile, value: release }
-    - { name: os, value: linux }
     - { name: timeout, value: 1h }
     - { name: source-ws-size, value: 50Gi }
     - { name: builder-resources-memory, value: 16Gi }
     - { name: builder-resources-cpu, value: "4" }
   template:
-    ref: build-component
+    ref: build-component-all-platforms
