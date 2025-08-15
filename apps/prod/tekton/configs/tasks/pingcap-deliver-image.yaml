@@ -56,9 +56,9 @@ spec:
         until $script; do
           tries=$((tries + 1))
           if [ $tries -ge $max_retries ]; then
-            echo "Script failed after $max_retries attempts."
+            echo "Script '$script' failed after $max_retries attempts."
             exit 1
           fi
-          echo "Script failed. Retrying in 10 seconds... ($tries/$max_retries)"
+          echo "Script '$script' failed. Retrying in 10 seconds... ($tries/$max_retries)"
           sleep 10
         done
