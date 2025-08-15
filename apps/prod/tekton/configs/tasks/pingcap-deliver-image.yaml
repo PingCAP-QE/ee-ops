@@ -50,4 +50,15 @@ spec:
           exit 0
         fi
 
-        chmod +x $script && $script
+        chmod +x $script
+        tries=0
+        max_retries=3
+        until $script; do
+          tries=$((tries + 1))
+          if [ $tries -ge $max_retries ]; then
+            echo "Script failed after $max_retries attempts."
+            exit 1
+          fi
+          echo "Script failed. Retrying in 10 seconds... ($tries/$max_retries)"
+          sleep 10
+        done
