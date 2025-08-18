@@ -29,3 +29,30 @@ spec:
                           values: ["spot"]
 
   validationFailureAction: Enforce
+---
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: add-tolerations-for-arm64-pods
+spec:
+  rules:
+    - name: restrict-non-el-pods-to-c4-c4a
+      match:
+        resources:
+          kinds:
+            - Pod
+      preconditions:
+        all:
+          - key: '{{ request.object.spec.nodeSelector."kubernetes.io/arch" }}'
+            operator: Equals
+            value: "arm64"
+      mutate:
+        patchStrategicMerge:
+          spec:
+            tolerations:
+              - key: "kubernetes.io/arch"
+                operator: "Equal"
+                value: "arm64"
+                effect: "NoSchedule"
+
+  validationFailureAction: Enforce
