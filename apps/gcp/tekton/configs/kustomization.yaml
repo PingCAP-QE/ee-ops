@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - policies.yaml
   - rbac
+  - secrets
   - tasks
   - triggers
   - pipelines
