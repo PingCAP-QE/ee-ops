@@ -80,7 +80,7 @@ spec:
         else
           echo -n "false" > $(step.results.generated.path)
           echo "🤷 no output script generated!"
-          printf '"{}"' > $(results.pushed.path)
+          printf '"{}"' > $(task.results.pushed.path)
         fi
     - name: prepare-remote-env-file
       image: "$(params.builder-image)"
@@ -152,11 +152,6 @@ spec:
       workingDir: $(workspaces.source.path)/$(params.component)
       script: |
         script="/workspace/build-package-artifacts.sh"
-        if [ ! -f "$script" ]; then
-          echo "No build script, skip it."
-          printf '"{}"' > $(results.pushed.path)
-          exit 0
-        fi
 
         for f in $(find $(params.release-dir) -name "*.tar.gz"); do
           tar -tf $f

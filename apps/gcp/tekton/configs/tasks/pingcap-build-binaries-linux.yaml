@@ -1,4 +1,4 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.dev/v1
 kind: Task
 metadata:
   name: pingcap-build-binaries-linux
@@ -83,7 +83,7 @@ spec:
         else
           echo -n "false" > $(step.results.generated.path)
           echo "🤷 no output script generated!"
-          printf '"{}"' > $(results.pushed.path)
+          printf '"{}"' > $(task.results.pushed.path)
         fi
     - name: build
       image: "$(params.builder-image)"
@@ -109,11 +109,6 @@ spec:
         #   value: /workspace/.cache/Cypress
       script: |
         script="/workspace/build-package-artifacts.sh"
-        if [ ! -f "$script" ]; then
-          echo "No build script, skip it."
-          exit 0
-        fi
-
         "$script" -b -a -w "$(params.release-dir)"
     - name: publish
       image: ghcr.io/pingcap-qe/cd/utils/release:v2025.8.17-13-ga5750d9
@@ -124,11 +119,6 @@ spec:
       workingDir: $(workspaces.source.path)/$(params.component)
       script: |
         script="/workspace/build-package-artifacts.sh"
-        if [ ! -f "$script" ]; then
-          echo "No build script, skip it."
-          printf '"{}"' > $(results.pushed.path)
-          exit 0
-        fi
 
         for f in $(find $(params.release-dir) -name "*.tar.gz"); do
           tar -tf $f
