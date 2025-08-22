@@ -26,7 +26,7 @@ spec:
     - name: git-ref
     - name: git-sha
     - name: build-image
-      default: ghcr.io/pingcap-qe/cd/utils/release:v2024.10.8-71-gf13e219
+      default: ghcr.io/pingcap-qe/cd/utils/release:v2025.8.17-13-ga5750d9
     - name: save-file
       default: build-package-images.sh
   steps:
