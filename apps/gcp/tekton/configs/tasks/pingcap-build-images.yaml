@@ -48,6 +48,9 @@ spec:
   steps:
     - name: generate
       image: ghcr.io/pingcap-qe/cd/utils/release:v2025.8.17-13-ga5750d9
+      results:
+        - name: generated
+          type: string
       script: |
         git clone --depth=1 --branch=main https://github.com/PingCAP-QE/artifacts.git /workspace/artifacts
 
@@ -71,12 +74,19 @@ spec:
           $(params.registry) || true
 
         if [ -f "$out_script" ]; then
+          echo -n "true" > $(step.results.generated.path)
           cat "$out_script"
         else
+          echo -n "false" > $(step.results.generated.path)
           echo "🤷 no output script generated!"
+          printf '"{}"' > $(results.pushed.path)
         fi
     - name: build-and-publish
       image: gcr.io/kaniko-project/executor:v1.24.0-debug
+      when:
+        - input: "$(steps.generate.results.generated)"
+          operator: in
+          values: ["true"]
       workingDir: $(workspaces.source.path)/$(params.component)
       env:
         - name: KANIKO_EXECUTOR
@@ -107,6 +117,10 @@ spec:
         fi
     - name: add-more-tags
       image: ghcr.io/pingcap-qe/cd/utils/release:v2025.8.17-13-ga5750d9
+      when:
+        - input: "$(steps.generate.results.generated)"
+          operator: in
+          values: ["true"]
       script: |
         script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then
@@ -116,3 +130,18 @@ spec:
 
         oras version
         "$script" -P -t || true # -P means disable build and push the image.
+    - name: collect-multi-arch
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2025.8.17-13-ga5750d9
+      when:
+        - input: "$(steps.generate.results.generated)"
+          operator: in
+          values: ["true"]
+      script: |
+        script="/workspace/build-package-images.sh"
+        if [ ! -f "$script" ]; then
+          echo "No build script, skip it."
+          exit 0
+        fi
+
+        oras version
+        "$script" -P -m || true # -P means disable build and push the image.
