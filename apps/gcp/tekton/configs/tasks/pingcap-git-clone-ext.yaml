@@ -134,25 +134,21 @@ spec:
         origin_ref="$(params.master-git-ref)"
         echo "origin ref: '$origin_ref'"
 
-        case "$origin_ref" in
-            feature/release-[0-9]+.[0-9]+)
-                # feature branches based on released version.
-                EXT_REVERSION="release-$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')"
-                ;;
-            release-[0-9]+.[0-9]+-.*-v[0-9]+.[0-9]+.[0-9]+)
-                # hotfix branches
-                EXT_REVERSION="release-$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")"
-                ;;
-            master|main|feature/*)
-                # trunk and common feature branches.
-                EXT_REVERSION="master"
-                ;;
-            *)
-                # GA version tags and RC release branches
-                EXT_REVERSION="$origin_ref"
-                ;;
-        esac
-
+        if [[ $origin_ref =~ "^feature/release-[0-9]+\.[0-9]+" ]]; then
+          # feature branches based on released version.
+          MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+          EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
+        elif [[ $origin_ref =~ "^release-[0-9]+\.[0-9]+-.*-v[0-9]+\.[0-9]+\.[0-9]+" ]]; then
+          # hotfix branches
+          MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")
+          EXT_REVERSION=$(echo "$MAJOR_MINOR_PATCH" | sed -E 's/^v/release-/')
+        elif [[ $origin_ref =~ "^(master|main|feature/.*)$" ]]; then
+          # trunk and common feature branches.
+          EXT_REVERSION="master"
+        else
+          # GA version tags and RC release branches
+          EXT_REVERSION="$origin_ref"
+        fi
 
         # Set the external git revision.
         printf "%s" "${EXT_REVERSION}" > /workspace/inner-results-revision
