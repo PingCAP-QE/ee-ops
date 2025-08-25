@@ -40,6 +40,10 @@ spec:
         A workspace containing CA certificates, this will be used by Git to
         verify the peer with when fetching or pushing over HTTPS.
   params:
+    - name: master-git-url
+      description: git clone url of the master repo.
+    - name: master-git-ref
+      description: git ref of the master repo
     - name: refspec
       description: Refspec to fetch before checking out revision.
       default: ""
@@ -112,22 +116,27 @@ spec:
         requests:
           memory: 512Mi
           cpu: "100m"
+      env:
+        - name: PLUGIN_GIT_URL
+          value: "https://github.com/pingcap-inc/enterprise-plugin.git"
       script: |
+
         # Get the URL of the origin remote of current workspace.
-        origin_url=$(git remote get-url origin)
+        origin_url="$(params.master-git-url)"
         # Check if the URL contains "pingcap/tidb"
         if [[ $origin_url != *"pingcap/tidb.git" && $origin_url != *"pingcap/tidb" ]]; then
             echo "🏃 The repo is not 'pingcap/tidb', exit now."
             exit 0
         fi
 
-        echo -n "https://github.com/pingcap-inc/enterprise-plugin.git" > /workspace/inner-results-url
 
         # Get the external git revision.
         RELEASE_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
-        origin_ref="$(git branch --contains | grep -v 'HEAD detached' | sed 's/^ *//'| sed 's/^* //' | grep -E '^(master|main|release-.*|feature/.*)$' | head -1)"
+        origin_ref="$(params.master-git-ref)"
+        echo "origin ref: '$origin_ref'"
 
         if [[ $origin_ref =~ "^feature/release-[0-9]+\.[0-9]+" ]]; then
+          # feature branches based on released version.
           MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
           EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
         elif [[ $origin_ref =~ "^release-[0-9]+\.[0-9]+-.*-v[0-9]+\.[0-9]+\.[0-9]+" ]]; then
@@ -135,22 +144,15 @@ spec:
           MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")
           EXT_REVERSION=$(echo "$MAJOR_MINOR_PATCH" | sed -E 's/^v/release-/')
         elif [[ $origin_ref =~ "^(master|main|feature/.*)$" ]]; then
+          # trunk and common feature branches.
           EXT_REVERSION="master"
-        elif [[ "$origin_ref" == "" ]]; then
-          echo "$RELEASE_VERSION"
-          # empty branch, may be pull request cases, judge it from $RELEASE_VERSION
-          if [[ $RELEASE_VERSION =~ "^v[0-9]+\.[0-9]+\.[0-9]+-alpha-[0-9]+-" ]]; then
-            EXT_REVERSION="master"
-          else
-            MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
-            EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
-          fi
         else
           # GA version tags and RC release branches
           EXT_REVERSION="$origin_ref"
         fi
         # Set the external git revision.
         printf "%s" "${EXT_REVERSION}" > /workspace/inner-results-revision
+        echo -n "${PLUGIN_GIT_URL}" > /workspace/inner-results-url
 
         echo "🔗 git url: $(cat /workspace/inner-results-url)"
         echo "📝 git reversion: $(cat /workspace/inner-results-revision)"
