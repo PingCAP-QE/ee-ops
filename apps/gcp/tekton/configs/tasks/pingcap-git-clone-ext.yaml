@@ -44,9 +44,6 @@ spec:
       description: git clone url of the master repo.
     - name: master-git-ref
       description: git ref of the master repo
-    - name: plugin-git-url
-      description: URL of the plugin repository.
-      default: "https://github.com/pingcap-inc/enterprise-plugin.git"
     - name: refspec
       description: Refspec to fetch before checking out revision.
       default: ""
@@ -119,6 +116,9 @@ spec:
         requests:
           memory: 512Mi
           cpu: "100m"
+      env:
+        - name: PLUGIN_GIT_URL
+          value: "https://github.com/pingcap-inc/enterprise-plugin.git"
       script: |
 
         # Get the URL of the origin remote of current workspace.
@@ -129,34 +129,30 @@ spec:
             exit 0
         fi
 
+
         # Get the external git revision.
         RELEASE_VERSION="$(git describe --tags --always --dirty --exclude 'v20[0-9][0-9].[0-1][0-9].[0-3][0-9]*')"
         origin_ref="$(params.master-git-ref)"
         echo "origin ref: '$origin_ref'"
 
-        case "$origin_ref" in
-            feature/release-[0-9]+.[0-9]+)
-                # feature branches based on released version.
-                EXT_REVERSION="release-$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')"
-                ;;
-            release-[0-9]+.[0-9]+-.*-v[0-9]+.[0-9]+.[0-9]+)
-                # hotfix branches
-                EXT_REVERSION="release-$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")"
-                ;;
-            master|main|feature/*)
-                # trunk and common feature branches.
-                EXT_REVERSION="master"
-                ;;
-            *)
-                # GA version tags and RC release branches
-                EXT_REVERSION="$origin_ref"
-                ;;
-        esac
-
-
+        if [[ $origin_ref =~ "^feature/release-[0-9]+\.[0-9]+" ]]; then
+          # feature branches based on released version.
+          MAJOR_MINOR=$(echo "$RELEASE_VERSION" | awk -F. '{print $1 "." $2}')
+          EXT_REVERSION=$(echo "$MAJOR_MINOR" | sed -E 's/^v/release-/')
+        elif [[ $origin_ref =~ "^release-[0-9]+\.[0-9]+-.*-v[0-9]+\.[0-9]+\.[0-9]+" ]]; then
+          # hotfix branches
+          MAJOR_MINOR_PATCH=$(echo "$RELEASE_VERSION" | grep -oE "^v[0-9]+[.][0-9]+[.][0-9]+")
+          EXT_REVERSION=$(echo "$MAJOR_MINOR_PATCH" | sed -E 's/^v/release-/')
+        elif [[ $origin_ref =~ "^(master|main|feature/.*)$" ]]; then
+          # trunk and common feature branches.
+          EXT_REVERSION="master"
+        else
+          # GA version tags and RC release branches
+          EXT_REVERSION="$origin_ref"
+        fi
         # Set the external git revision.
         printf "%s" "${EXT_REVERSION}" > /workspace/inner-results-revision
-        echo -n "$(params.plugin-git-url)" > /workspace/inner-results-url
+        echo -n "${PLUGIN_GIT_URL}" > /workspace/inner-results-url
 
         echo "🔗 git url: $(cat /workspace/inner-results-url)"
         echo "📝 git reversion: $(cat /workspace/inner-results-revision)"
