@@ -138,4 +138,6 @@ spec:
       script: |
         script="/workspace/build-package-images.sh"
 
-        "$script" -P -m -M $(results.pushed-multi-arch.path) || true # -P means disable build and push the image.
+        "$script" -P -m -M $(results.pushed-multi-arch.path)
+        echo "📃results:"
+        cat $(results.pushed-multi-arch.path)

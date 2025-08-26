@@ -127,4 +127,6 @@ spec:
         fi
 
         cp -r $(workspaces.dockerconfig.path) ~/.docker # need the credentials.
-        "$script" -P -m -M $(results.pushed-multi-arch.path) || true # -P means disable build and push the image.
+        "$script" -P -m -M $(results.pushed-multi-arch.path)
+        echo "📃results:"
+        cat $(results.pushed-multi-arch.path)
