@@ -19,9 +19,9 @@ spec:
     - description: Just built and pushed single-arch images, it will be a yaml content.
       name: pushed
       type: string
-    - description: Just pushed multi-arch images, it will be a yaml content.
-      name: pushed-multi-arch
-      type: string
+    # - description: Just pushed multi-arch images, it will be a yaml content.
+    #   name: pushed-multi-arch
+    #   type: string
   params:
     - name: component
     - name: os
@@ -92,7 +92,6 @@ spec:
         if [ ! -f "$script" ]; then
           echo "No build script, skip it."
           printf '"{}"' > $(results.pushed.path)
-          printf '"{}"' > $(results.pushed-multi-arch.path)
           exit 0
         fi
 
@@ -127,6 +126,6 @@ spec:
         fi
 
         cp -r $(workspaces.dockerconfig.path) ~/.docker # need the credentials.
-        "$script" -P -m -M $(results.pushed-multi-arch.path)
+        "$script" -P -m -M multi-arch-images.yaml
         echo "📃results:"
-        cat $(results.pushed-multi-arch.path)
+        cat multi-arch-images.yaml

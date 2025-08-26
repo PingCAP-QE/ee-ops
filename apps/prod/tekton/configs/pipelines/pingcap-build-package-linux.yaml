@@ -52,9 +52,9 @@ spec:
     - name: pushed-images
       description: pushed images.
       value: "$(tasks.build-images.results.pushed)"
-    - name: pushed-multi-arch-images
-      description: pushed multi-arch images.
-      value: "$(tasks.build-images.results.pushed-multi-arch)"
+    # - name: pushed-multi-arch-images
+    #   description: pushed multi-arch images.
+    #   value: "$(tasks.build-images.results.pushed-multi-arch)"
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
