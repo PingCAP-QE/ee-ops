@@ -19,8 +19,11 @@ spec:
   workspaces:
     - name: source
   results:
-    - description: Just built and pushed images, it will be a yaml content.
+    - description: Just built and pushed single-arch images, it will be a yaml content.
       name: pushed
+      type: string
+    - description: Just built and pushed single-arch images, it will be a yaml content.
+      name: pushed-multi-arch
       type: string
   params:
     - name: component
@@ -80,6 +83,7 @@ spec:
           echo -n "false" > $(step.results.generated.path)
           echo "🤷 no output script generated!"
           printf '"{}"' > $(task.results.pushed.path)
+          printf '"{}"' > $(results.pushed-multi-arch.path)
         fi
     - name: build-and-publish
       image: gcr.io/kaniko-project/executor:v1.24.0-debug
@@ -133,10 +137,5 @@ spec:
           values: ["true"]
       script: |
         script="/workspace/build-package-images.sh"
-        if [ ! -f "$script" ]; then
-          echo "No build script, skip it."
-          exit 0
-        fi
 
-        oras version
-        "$script" -P -m || true # -P means disable build and push the image.
+        "$script" -P -m -M $(results.pushed-multi-arch.path) || true # -P means disable build and push the image.
