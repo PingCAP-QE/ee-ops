@@ -52,6 +52,9 @@ spec:
     - name: pushed-images
       description: pushed images.
       value: "$(tasks.build-images.results.pushed)"
+    - name: pushed-multi-arch-images
+      description: pushed multi-arch images.
+      value: "$(tasks.build-images.results.pushed-multi-arch)"
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
@@ -179,7 +182,6 @@ spec:
         name: pingcap-build-images
       runAfter:
         - build-binaries
-      # TODO: currently matrix feature is not support in v0.32.x, we need upgrade the K8S cluster and then upgrade Tekton.
       params:
         - name: os
           value: "$(params.os)"
