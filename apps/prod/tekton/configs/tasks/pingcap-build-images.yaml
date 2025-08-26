@@ -19,7 +19,7 @@ spec:
     - description: Just built and pushed single-arch images, it will be a yaml content.
       name: pushed
       type: string
-    - description: Just built and pushed single-arch images, it will be a yaml content.
+    - description: Just pushed multi-arch images, it will be a yaml content.
       name: pushed-multi-arch
       type: string
   params:
