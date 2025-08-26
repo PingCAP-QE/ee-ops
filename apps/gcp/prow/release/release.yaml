@@ -110,6 +110,9 @@ spec:
             tikv/pd
             tikv/tikv
     pcm:
+      image:
+        repository: gcr.io/k8s-prow/prow-controller-manager
+        tag: v20240805-37a08f946
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
