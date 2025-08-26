@@ -92,6 +92,10 @@ spec:
       taskRef:
         name: pingcap-git-clone-ext
       params:
+        - name: master-git-url
+          value: $(params.git-url)
+        - name: master-git-ref
+          value: $(params.git-ref)
         - name: depth
           value: "0"
         - name: refspec
