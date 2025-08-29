@@ -16,6 +16,7 @@ spec:
             'pingcap/ng-monitoring',
             'pingcap/tidb-binlog',
             'pingcap/tidb-dashboard',
+            'pingcap/tiflow',
             ]
             &&
             body.ref.matches('^v[0-9]+[.][0-9]+[.][0-9]+(-(alpha|beta)([.][0-9]+.*)?)?$')

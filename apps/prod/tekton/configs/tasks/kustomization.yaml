@@ -3,6 +3,9 @@ kind: Kustomization
 namespace: ee-cd
 resources:
   - aws-cli.yaml # from and hacked: https://hub.tekton.dev/tekton/task/aws-cli
+  - build/pingcap-build-binaries-darwin.yaml
+  - build/pingcap-build-binaries-linux.yaml
+  - build/pingcap-build-images.yaml
   - ci/ci-helper-for-pr.yaml
   - crane-copy.yaml # crane copy task
   - echo.yaml ##### an example task.
@@ -12,8 +15,8 @@ resources:
   - github-set-status.yaml
   - golang-build.yaml
   - golang-test.yaml
-  - hotfix/create-pr-to-update-gomod-fix-ladp.yaml
   - hotfix/create-pr-to-sync-owners.yaml
+  - hotfix/create-pr-to-update-gomod-fix-ladp.yaml
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/kaniko/0.6/kaniko.yaml # kaniko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/ko/0.1/ko.yaml # ko task
   - https://raw.githubusercontent.com/tektoncd/catalog/main/task/tkn/0.4/tkn.yaml # tkn task
@@ -23,15 +26,12 @@ resources:
   - multi-arch-image-collect.yaml
   - multi-arch-image-push.yaml
   - pingcap-auto-add-image-major-tag.yaml
-  - pingcap-build-binaries-darwin.yaml
-  - pingcap-build-binaries-linux.yaml
-  - pingcap-build-images.yaml
   - pingcap-compose-offline-pkgs.yaml
   - pingcap-deliver-image.yaml
   - pingcap-get-builder-image.yaml
   - pingcap-get-release-version.yaml
-  - pingcap-get-set-release-version.yaml
   - pingcap-get-set-release-version-v2.yaml
+  - pingcap-get-set-release-version.yaml
   - pingcap-git-clone-ext.yaml
   - pingcap-upload-enterprise-plugins.yaml
   - pingcap-upload-offline-package.yaml
