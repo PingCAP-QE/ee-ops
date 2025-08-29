@@ -16,12 +16,9 @@ spec:
       mountPath: /kaniko/.docker
       optional: true
   results:
-    - description: Just built and pushed single-arch images, it will be a yaml content.
+    - description: Built and pushed images, it will be a yaml content.
       name: pushed
       type: string
-    # - description: Just pushed multi-arch images, it will be a yaml content.
-    #   name: pushed-multi-arch
-    #   type: string
   params:
     - name: component
     - name: os
@@ -74,6 +71,7 @@ spec:
           cat "$out_script"
         else
           echo "🤷 no output script generated!"
+          printf '"{}"' > $(results.pushed.path)
         fi
     - name: build-and-publish
       image: gcr.io/kaniko-project/executor:v1.24.0-debug
@@ -91,7 +89,6 @@ spec:
         script="/workspace/build-package-images.sh"
         if [ ! -f "$script" ]; then
           echo "No build script, skip it."
-          printf '"{}"' > $(results.pushed.path)
           exit 0
         fi
 
@@ -115,7 +112,7 @@ spec:
 
         oras version
         cp -r $(workspaces.dockerconfig.path) ~/.docker # need the credentials.
-        "$script" -P -t || true # -P means disable build and push the image.
+        "$script" -P -t -o $(results.pushed.path) # -P means disable build and push the image.
     - name: collect-multi-arch
       image: ghcr.io/pingcap-qe/cd/utils/release:v2025.8.17-13-ga5750d9
       script: |
@@ -126,6 +123,4 @@ spec:
         fi
 
         cp -r $(workspaces.dockerconfig.path) ~/.docker # need the credentials.
-        "$script" -P -m -M multi-arch-images.yaml
-        echo "📃results:"
-        cat multi-arch-images.yaml
+        "$script" -P -m -o $(results.pushed.path) # -P means disable build and push the image.

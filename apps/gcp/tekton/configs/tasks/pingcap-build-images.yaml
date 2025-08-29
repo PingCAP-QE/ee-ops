@@ -19,12 +19,9 @@ spec:
   workspaces:
     - name: source
   results:
-    - description: Just built and pushed single-arch images, it will be a yaml content.
+    - description: Built and pushed images, it will be a yaml content.
       name: pushed
       type: string
-    # - description: Just pushed multi-arch images, it will be a yaml content.
-    #   name: pushed-multi-arch
-    #   type: string
   params:
     - name: component
     - name: os
@@ -121,13 +118,8 @@ spec:
           values: ["true"]
       script: |
         script="/workspace/build-package-images.sh"
-        if [ ! -f "$script" ]; then
-          echo "No build script, skip it."
-          exit 0
-        fi
-
         oras version
-        "$script" -P -t || true # -P means disable build and push the image.
+        "$script" -P -t -o $(results.pushed.path) # -P means disable build and push the image.
     - name: collect-multi-arch
       image: ghcr.io/pingcap-qe/cd/utils/release:v2025.8.17-13-ga5750d9
       when:
@@ -136,7 +128,4 @@ spec:
           values: ["true"]
       script: |
         script="/workspace/build-package-images.sh"
-
-        "$script" -P -m -M multi-arch-images.yaml
-        echo "📃results:"
-        cat multi-arch-images.yaml
+        "$script" -P -m -o $(results.pushed.path) # -P means disable build and push the image.
