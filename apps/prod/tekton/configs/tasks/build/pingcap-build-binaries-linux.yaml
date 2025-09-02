@@ -82,6 +82,7 @@ spec:
           cat "$out_script"
         else
           echo "🤷 no output script generated!"
+          printf '"{}"' > $(results.pushed.path)
         fi
     - name: build
       image: "$(params.builder-image)"
@@ -116,7 +117,6 @@ spec:
         script="/workspace/build-package-artifacts.sh"
         if [ ! -f "$script" ]; then
           echo "No build script, skip it."
-          printf '"{}"' > $(results.pushed.path)
           exit 0
         fi
 
