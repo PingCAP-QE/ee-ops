@@ -71,7 +71,7 @@ spec:
     tide:
       image:
         repository: ghcr.io/ti-community-infra/prow/tide
-        tag: v20250516-ceae038a4
+        tag: v20250903-f07f5145d
       additionalArgs:
         - --sync-hourly-tokens=1200 # default is 800
         - --status-hourly-tokens=600 # default is 400
@@ -87,7 +87,7 @@ spec:
         enabled: false
       image:
         repository: ghcr.io/ti-community-infra/prow/hook
-        tag: v20250728-3eb01d86a
+        tag: v20250903-f07f5145d
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
