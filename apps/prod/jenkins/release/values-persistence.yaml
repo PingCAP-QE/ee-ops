@@ -14,4 +14,4 @@ persistence:
   #   GKE, AWS & OpenStack)
   #
   storageClass: ceph-block
-  size: "600Gi"
+  size: "1000Gi"
