@@ -103,6 +103,11 @@ spec:
         - checkout
       taskRef:
         name: pingcap-get-set-release-version-v2
+      params:
+        - name: git-ref
+          value: $(params.git-ref)
+        - name: git-refspec
+          value: $(params.git-refspec)
       workspaces:
         - name: source
           workspace: source
@@ -140,7 +145,7 @@ spec:
         - name: version
           value: "$(tasks.get-release-ver.results.version)"
         - name: git-ref
-          value: $(params.git-ref)
+          value: "$(tasks.get-release-ver.results.build-ref)"
         - name: git-sha
           value: $(tasks.checkout.results.commit)
         - name: builder-image

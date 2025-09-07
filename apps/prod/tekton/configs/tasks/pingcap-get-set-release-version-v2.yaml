@@ -3,10 +3,18 @@ kind: Task
 metadata:
   name: pingcap-get-set-release-version-v2
 spec:
-  results:
-    - description: The release version of the git repo
-      name: version
+  params:
+    - name: git-ref
       type: string
+      default: ""
+    - name: git-refspec
+      type: string
+      default: ""
+  results:
+    - name: version
+      description: The release version of the git repo
+    - name: build-ref
+      description: The git-ref to use for build-bin, used to set the artifact tags.
   workspaces:
     - name: source
   steps:
@@ -71,4 +79,17 @@ spec:
           git tag -f "${NEW_TAG}"
         else
           echo "No new tag needs to be applied."
+        fi
+    - name: set-ref
+      image: alpine/git:v2.49.1
+      script: |
+        #!/bin/sh
+        set -e
+
+        if echo "$(params.git-refspec)" | grep -E '^refs/pull/[0-9]+/head:pull/[0-9]+$'; then
+          # Extract the part after the colon
+          ref=$(echo "$(params.git-refspec)" | awk -F: '{print $2}')
+          echo -n "$ref" > $(results.build-ref.path)
+        else
+          echo -n "$(params.git-ref)" > $(results.build-ref.path)
         fi

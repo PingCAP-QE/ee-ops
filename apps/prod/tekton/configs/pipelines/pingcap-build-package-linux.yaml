@@ -52,9 +52,6 @@ spec:
     - name: pushed-images
       description: pushed images.
       value: "$(tasks.build-images.results.pushed)"
-    # - name: pushed-multi-arch-images
-    #   description: pushed multi-arch images.
-    #   value: "$(tasks.build-images.results.pushed-multi-arch)"
   workspaces:
     - name: source
       description: The workspace where the git repo will be cloned.
@@ -116,6 +113,11 @@ spec:
         - checkout
       taskRef:
         name: pingcap-get-set-release-version-v2
+      params:
+        - name: git-ref
+          value: $(params.git-ref)
+        - name: git-refspec
+          value: $(params.git-refspec)
       workspaces:
         - name: source
           workspace: source
@@ -153,7 +155,7 @@ spec:
         - name: version
           value: "$(tasks.get-release-ver.results.version)"
         - name: git-ref
-          value: $(params.git-ref)
+          value: "$(tasks.get-release-ver.results.build-ref)"
         - name: git-sha
           value: $(tasks.checkout.results.commit)
         - name: builder-image
@@ -194,7 +196,7 @@ spec:
         - name: version
           value: "$(tasks.get-release-ver.results.version)"
         - name: git-ref
-          value: $(params.git-ref)
+          value: "$(tasks.get-release-ver.results.build-ref)"
         - name: git-sha
           value: $(tasks.checkout.results.commit)
         - name: release-dir
