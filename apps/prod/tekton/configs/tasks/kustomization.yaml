@@ -25,6 +25,7 @@ resources:
   - kubernetes-actions.yaml
   - multi-arch-image-collect.yaml
   - multi-arch-image-push.yaml
+  - ops/scan-go-modules-in-binaries.yaml
   - pingcap-auto-add-image-major-tag.yaml
   - pingcap-compose-offline-pkgs.yaml
   - pingcap-deliver-image.yaml
