@@ -53,6 +53,10 @@ spec:
       image:
         repository: ghcr.io/ti-community-infra/prow/crier
         tag: v20241220-cc8d4cf29
+    sinker:
+      image:
+        repository: ghcr.io/ti-community-infra/prow/sinker
+        tag: v20250905-a0cfed255
     deck:
       ingress:
         enabled: false
@@ -71,7 +75,7 @@ spec:
     tide:
       image:
         repository: ghcr.io/ti-community-infra/prow/tide
-        tag: v20250903-f07f5145d
+        tag: v20250905-a0cfed255
       additionalArgs:
         - --sync-hourly-tokens=1200 # default is 800
         - --status-hourly-tokens=600 # default is 400
