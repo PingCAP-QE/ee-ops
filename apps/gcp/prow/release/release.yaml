@@ -103,13 +103,14 @@ spec:
             pingcap/docs
             pingcap/docs-cn
             pingcap/docs-tidb-operator
+            pingcap/ticdc
             pingcap/tidb
             pingcap/tidb-binlog
             pingcap/tidb-engine-ext
+            pingcap/tidb-operator
             pingcap/tidb-tools
             pingcap/tiflash
             pingcap/tiflow
-            pingcap/ticdc
             tikv/client-c
             tikv/pd
             tikv/tikv
