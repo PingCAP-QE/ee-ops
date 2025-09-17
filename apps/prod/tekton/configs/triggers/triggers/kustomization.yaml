@@ -24,6 +24,7 @@ resources:
   - pingcap/_/git-push-branch-build-failpoint.yaml
   - pingcap/advanced-statefulset/git-create-tag.yaml
   - pingcap/advanced-statefulset/git-push.yaml
+  - pingcap/ticdc/git-push-branch-build.yaml
   - pingcap/tidb-binlog/git-push.yaml
   - pingcap/tidb-ctl/git-create-tag.yaml
   - pingcap/tidb-ctl/git-push.yaml
