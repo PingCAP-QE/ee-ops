@@ -12,7 +12,7 @@ metadata:
     tekton.dev/platforms: "linux/amd64,linux/arm64"
 spec:
   description: >-
-    This task performs upload for pingcap's offline packages.
+    This task performs upload for PingCAP's hot-fix packages .
   params:
     - name: src-url
       type: string
