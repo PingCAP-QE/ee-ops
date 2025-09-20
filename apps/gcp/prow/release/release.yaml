@@ -52,17 +52,21 @@ spec:
     crier:
       image:
         repository: ghcr.io/ti-community-infra/prow/crier
-        tag: v20241220-cc8d4cf29
+        tag: v20250905-a0cfed255
     sinker:
       image:
         repository: ghcr.io/ti-community-infra/prow/sinker
+        tag: v20250905-a0cfed255
+    horologium:
+      image:
+        repository: ghcr.io/ti-community-infra/prow/horologium
         tag: v20250905-a0cfed255
     deck:
       ingress:
         enabled: false
       image:
-        repository: ticommunityinfra/deck
-        tag: v20230323-3ade632
+        repository: ghcr.io/ti-community-infra/prow/deck
+        tag: v20250905-a0cfed255
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
@@ -130,8 +134,8 @@ spec:
         - --kubeconfig=/etc/kubeconfig/config
     statusReconciler:
       image:
-        repository: ticommunityinfra/status-reconciler
-        tag: v20240412-ac4df4b
+        repository: ghcr.io/ti-community-infra/prow/status-reconciler
+        tag: v20250905-a0cfed255
     jenkinsOperator:
       enabled: true
       image:
