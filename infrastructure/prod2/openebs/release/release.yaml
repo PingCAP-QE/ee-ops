@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/refs/heads/main/helmrelease-helm-v2beta1.json
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: openebs
+spec:
+  releaseName: openebs
+  chart:
+    spec:
+      chart: openebs
+      sourceRef:
+        kind: HelmRepository
+        name: openebs
+      version: "4.2.0"
+  interval: 10m0s
+  install:
+    remediation:
+      retries: 3
+  values:
+    engines:
+      local:
+        lvm:
+          enabled: false
+        zfs:
+          enabled: false
+      replicated:
+        mayastor:
+          enabled: true
+    localpv-provisioner:
+      localpv:
+        basePath: ${OPENEBS_LOCAL_DIR}
+    lvm-localpv:
+      lvmNode:
+        kubeletDir: ${KUBELET_DIR}
+    zfs-localpv:
+      zfsNode:
+        kubeletDir: ${KUBELET_DIR}
+    mayastor:
+      csi:
+        node:
+          kubeletDir: ${KUBELET_DIR}
+      storageClass:
+        default: true

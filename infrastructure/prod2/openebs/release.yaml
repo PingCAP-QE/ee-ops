@@ -1,43 +1,18 @@
-# yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/refs/heads/main/helmrelease-helm-v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
 metadata:
-  name: openebs
+  name: openebs-release # setup openebs components
+  namespace: openebs
 spec:
-  releaseName: openebs
-  chart:
-    spec:
-      chart: openebs
-      sourceRef:
-        kind: HelmRepository
-        name: openebs
-      version: "4.2.0"
   interval: 10m0s
-  install:
-    remediation:
-      retries: 3
-  values:
-    engines:
-      local:
-        lvm:
-          enabled: false
-        zfs:
-          enabled: false
-      replicated:
-        mayastor:
-          enabled: true
-    localpv-provisioner:
-      localpv:
-        basePath: /data/openebs/local
-    lvm-localpv:
-      lvmNode:
-        kubeletDir: /data/kubelet
-    zfs-localpv:
-      zfsNode:
-        kubeletDir: /data/kubelet
-    mayastor:
-      csi:
-        node:
-          kubeletDir: /data/kubelet
-      storageClass:
-        default: true
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./infrastructure/prod2/openebs/release
+  prune: true
+  postBuild:
+    substitute:
+      KUBELET_DIR: /data/kubelet
+      OPENEBS_LOCAL_DIR: /data/openebs/local
