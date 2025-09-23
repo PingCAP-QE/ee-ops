@@ -9,7 +9,7 @@ spec:
         secretRef:
           # you should prepare the secret manually.
           secretAccessKeySecretRef:
-            namespace: infra
+            namespace: flux-system
             name: gcp-sm-sa-secret
             key: secret-access-credentials
       projectID: pingcap-testing-account
