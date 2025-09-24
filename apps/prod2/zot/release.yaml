@@ -16,9 +16,9 @@ spec:
   interval: 1h
   values:
     mountSecret: true
-    secretFiles: false # We are in charge of managing it.
+    secretFiles: false # We are in charge of managing it(the secret `zot-secret`)
     mountConfig: true
-    configFiles: false # We are in charge of managing it.
+    configFiles: false # We are in charge of managing it(the config map `zot-config`)
     ingress:
       annotations:
         kubernetes.io/tls-acme: "true"
