@@ -7,4 +7,4 @@ spec:
   additionalConfig:
     maxSize: 50G
   bucketName: beta-ci-pipeline-cache
-  storageClassName: ceph-bucket
+  storageClassName: ceph-bucket # FIXME
