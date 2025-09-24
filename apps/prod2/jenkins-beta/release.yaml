@@ -4,8 +4,8 @@ kind: Kustomization
 metadata:
   name: jenkins-beta-release
 spec:
-  dependOn:
-    - jenkins-beta-pre
+  dependsOn:
+    - name: jenkins-beta-pre
   interval: 5m0s
   sourceRef:
     kind: GitRepository
