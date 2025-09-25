@@ -3,8 +3,9 @@ kind: Kustomization
 namespace: ee-cd
 resources:
   - 0-namespace.yaml
-  - pipelines
-  - pvcs
   - rbac
-  - tasks
+  - pvcs
+  - source.yaml
+  - tasks.yaml
+  - pipelines.yaml
   - triggers
