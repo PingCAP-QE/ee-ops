@@ -5,6 +5,6 @@ resources:
   - policies.yaml
   - rbac
   - secrets
-  - tasks.yaml
-  - pipelines.yaml
+  - tasks/config.yaml
+  - pipelines/config.yaml
   - triggers
