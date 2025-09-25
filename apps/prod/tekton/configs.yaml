@@ -6,6 +6,7 @@ metadata:
   namespace: apps
 spec:
   interval: 1m0s
+  targetNamespace: ee-cd
   sourceRef:
     kind: GitRepository
     name: flux-system
@@ -24,3 +25,10 @@ spec:
           value:
             scheduler.alpha.kubernetes.io/defaultTolerations: '[{"operator": "Equal", "effect": "NoSchedule", "key": "dedicated", "value": "test-infra"}]'
             scheduler.alpha.kubernetes.io/node-selector: enable-ci=true
+    - target:
+        kind: Kustomization
+        group: kustomize.toolkit.fluxcd.io
+        name: tekton-config-.+
+      patch: |-
+        spec:
+          targetNamespace: ee-cd
