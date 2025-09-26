@@ -13,3 +13,12 @@ spec:
   dependsOn:
     - name: tekton-setup
   prune: true
+  patches:
+    - target:
+        kind: Kustomization
+        group: kustomize.toolkit.fluxcd.io
+        name: tekton-config-.+
+      patch: |-
+        - op: add
+          path: /spec/targetNamespace
+          value: ee-cd
