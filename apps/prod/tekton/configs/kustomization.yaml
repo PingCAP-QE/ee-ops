@@ -5,6 +5,6 @@ resources:
   - rbac
   - pvcs
   - source.yaml
-  - tasks.yaml
-  - pipelines.yaml
+  - tasks/config.yaml
+  - pipelines/config.yaml
   - triggers
