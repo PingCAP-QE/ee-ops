@@ -7,6 +7,5 @@ spec:
   sourceRef:
     kind: GitRepository
     name: ci
-    namespace: flux-system
-  path: ./tekton/v1/triggers/triggers
+  path: ./tekton/v0/triggers/triggers
   prune: true
