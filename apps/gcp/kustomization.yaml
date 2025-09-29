@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - ../_base
   - cluster-policies
-  - secret-store
   - acr-runners
   - cla-assistant
   - prow
