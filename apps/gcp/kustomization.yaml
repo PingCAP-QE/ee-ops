@@ -8,4 +8,3 @@ resources:
   - cla-assistant
   - prow
   - tekton
-  # - prow-dev
