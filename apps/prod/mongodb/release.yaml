@@ -29,6 +29,10 @@ spec:
       storageClass: ceph-block
     persistence:
       size: 16Gi
+    image:
+      registry: docker.io
+      repository: bitnamilegacy/mongodb
+      tag: 4.4.15
     resources:
       requests:
         cpu: 100m
