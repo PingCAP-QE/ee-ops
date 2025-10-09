@@ -3,6 +3,4 @@ kind: Kustomization
 namespace: ${TEST_PODS_NAMESPACE}
 resources:
   - rbac.yaml
-  - secrets/ci-job-params-mono.yaml
-  - secrets/ci-smtp.yaml
-  - secrets/gcs-credentials.yaml
+  - secrets
