@@ -8,7 +8,6 @@ spec:
   dependsOn:
     - name: prow-release
       namespace: flux-system
-  targetNamespace: apps
   interval: 5m0s
   sourceRef:
     kind: GitRepository
