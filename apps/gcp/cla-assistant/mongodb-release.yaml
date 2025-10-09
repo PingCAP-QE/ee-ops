@@ -24,6 +24,8 @@ spec:
     ignoreFailures: false
   values:
     image:
+      registry: docker.io
+      repository: bitnamilegacy/mongodb
       tag: 4.4.15
     persistence:
       storageClass: premium-rwo # SSD backend.

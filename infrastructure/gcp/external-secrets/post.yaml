@@ -2,13 +2,15 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
-  name: external-secrets-release # setup components
+  name: external-secrets-post # setup after deployment
 spec:
   targetNamespace: infra
-  interval: 10m0s
+  dependsOn:
+    - name: external-secrets-release
+  interval: 5m0s
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./infrastructure/gcp/external-secrets/release
+  path: ./infrastructure/gcp/external-secrets/post
   prune: true
