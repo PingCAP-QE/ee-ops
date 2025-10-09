@@ -5,6 +5,9 @@ metadata:
   name: prow-post
   namespace: flux-system
 spec:
+  dependsOn:
+    - name: prow-release
+      namespace: flux-system
   targetNamespace: apps
   interval: 5m0s
   sourceRef:
