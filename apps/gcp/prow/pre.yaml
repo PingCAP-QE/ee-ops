@@ -5,6 +5,7 @@ metadata:
   name: prow-pre
   namespace: flux-system
 spec:
+  targetNamespace: apps
   interval: 5m0s
   sourceRef:
     kind: GitRepository
@@ -17,6 +18,3 @@ spec:
       TEST_PODS_NAMESPACE: prow-test-pods
       BUCKET_NAME: prow-tidb-logs
       DOMAIN_NAME: prow.tidb.net
-    substituteFrom:
-      - kind: Secret
-        name: prow
