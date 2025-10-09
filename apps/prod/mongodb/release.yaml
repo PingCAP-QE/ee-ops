@@ -31,8 +31,8 @@ spec:
       size: 16Gi
     image:
       registry: docker.io
-      repository: bitnamilegacy/mongodb
-      tag: 4.4.15
+      repository: bitnami/mongodb
+      tag: 6.0.0-debian-11-r0
     resources:
       requests:
         cpu: 100m
