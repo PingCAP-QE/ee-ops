@@ -18,10 +18,10 @@
       "customType": "regex",
       "fileMatch": ["apps/.*\\.yaml$$"],
       "matchStrings": [
-        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?[\\s\\S]*?(?:tag|version|appVersion): (?<currentValue>\\S+)(?:\\s|$)",
-        "(?:tag|version|appVersion): (?<currentValue>\\S+)[\\s\\S]*?datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?"
+        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))?[\\s\\S]*?(?:tag|version|appVersion): (?<currentValue>\\S+)(?:\\s|$)",
+        "(?:tag|version|appVersion): (?<currentValue>\\S+)[\\s\\S]*?datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))?"
       ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}"
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{/if}}"
     }
   ]
 }
