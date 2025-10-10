@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: publisher
-      version: 0.1.0
+      version: v2024.10.14
       sourceRef:
         kind: HelmRepository
         name: ee-apps
