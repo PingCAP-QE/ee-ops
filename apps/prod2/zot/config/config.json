@@ -87,29 +87,31 @@
           "preserveDigest": true,
           "content": [
             {
-              "prefix": "**",
-              "destination": "/hub"
+              "prefix": "/pingcap/**",
+              "destination": "/pingcap",
+              "stripPrefix": true
+            },
+            {
+              "prefix": "/tikv/**",
+              "destination": "/tikv",
+              "stripPrefix": true
             }
           ],
           "onDemand": true,
           "tlsVerify": true
         },
         {
-          "urls": ["https://docker.io"],
+          "urls": ["https://us-docker.pkg.dev"],
           "preserveDigest": true,
           "content": [
             {
-              "prefix": "pingcap",
-              "destination": "/dockerhub",
-              "tags": {
-                "semver": true
-              }
+              "prefix": "/pingcap-testing-account/dev/**",
+              "destination": "/dev",
+              "stripPrefix": true
             }
           ],
           "onDemand": true,
-          "tlsVerify": true,
-          "maxRetries": 3,
-          "retryDelay": "5m"
+          "tlsVerify": true
         }
       ]
     },
