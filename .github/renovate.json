@@ -1,17 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
-  ],
+  "extends": ["config:recommended"],
   "jenkins": {
     "enabled": true
   },
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "apps/.*/jenkins.*/release/.*-plugins\\.yaml$$"
-      ],
+      "fileMatch": ["apps/.*/jenkins.*/release/.*-plugins\\.yaml$$"],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*: (?<currentValue>.*)\\s",
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*: .*/download/(?<currentValue>[^/]+)/[^/]+\\.\\w+\\s"
@@ -20,13 +16,12 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "apps/.*\\.yaml$$"
-      ],
+      "fileMatch": ["apps/.*\\.yaml$$"],
       "matchStrings": [
-        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*(tag|version|appVersion): (?<currentValue>.*)\\s"
+        "datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))?[\\s\\S]*?(?:tag|version|appVersion): (?<currentValue>\\S+)(?:\\s|$)",
+        "(?:tag|version|appVersion): (?<currentValue>\\S+)[\\s\\S]*?datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))?"
       ],
-      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}docker{{/if}}"
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{/if}}"
     }
   ]
 }
