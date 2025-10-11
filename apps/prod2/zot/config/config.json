@@ -121,6 +121,18 @@
     },
     "mgmt": {
       "enable": true
+    },
+    "events": {
+      "enable": true,
+      "sinks": [
+        {
+          "type": "http",
+          "address": "${ZOT_EVENT_SINKER_URL}",
+          "timeout": "1s",
+          "credentials": {},
+          "headers": {}
+        }
+      ]
     }
   }
 }
