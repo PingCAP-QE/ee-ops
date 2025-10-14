@@ -12,6 +12,7 @@ spec:
     enable-api-fields: alpha # stable | alpha | beta
     enable-custom-tasks: true
     enable-tekton-oci-bundles: true
+    enable-param-enum: true
     require-git-ssh-secret-known-hosts: false
     running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
     ###### metrics items ########
