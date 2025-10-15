@@ -6,4 +6,7 @@ resources:
   - https://storage.googleapis.com/tekton-releases/operator/previous/v0.77.0/release.yaml
   - operator-config.yaml
   - http-route.yaml
+  # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
+  - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrole.yaml
+  - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrolebinding.yaml
   # - https://storage.googleapis.com/tekton-releases-nightly/pipelines-in-pipelines/latest/release.yaml
