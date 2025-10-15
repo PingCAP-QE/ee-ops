@@ -7,7 +7,7 @@ spec:
     spec:
       chart: zot
       # renovate: datasource=helm depName=zot registryUrl=https://zotregistry.dev/helm-charts
-      version: 0.1.83
+      version: 0.1.85
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
