@@ -10,9 +10,11 @@ spec:
     # disable-home-env-overwrite: true
     # disable-working-directory-overwrite: true
     enable-api-fields: alpha # stable | alpha | beta
+    enable-cel-in-whenexpression: true
     enable-custom-tasks: true
-    enable-tekton-oci-bundles: true
     enable-param-enum: true
+    enable-step-actions: true
+    enable-tekton-oci-bundles: true
     require-git-ssh-secret-known-hosts: false
     running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
     ###### metrics items ########
@@ -24,10 +26,8 @@ spec:
     # default empty dir, can not be shared between tasks.
     default-task-run-workspace-binding: >
       emptyDir: {}
-
-    max-result-size: 4096 # should <= 1572863
-    enable-step-actions: false
-    enable-cel-in-whenexpression: false
+    results-from: sidecar-logs
+    max-result-size: 10240 # should <= 1572863
   result:
     disabled: true
   trigger:
