@@ -412,6 +412,13 @@ spec:
           - --github-app-private-key-path=/etc/github/app-private-key
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
+        resources:
+          requests:
+            cpu: 25m
+            memory: 100Mi
+          limits:
+            cpu: 50m
+            memory: 200Mi
         volumes:
           - name: external-plugins-config
             configMap:
