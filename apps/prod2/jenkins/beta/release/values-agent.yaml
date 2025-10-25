@@ -1,4 +1,4 @@
 agent:
+  namespace: "${AGENT_NAMESPACE}" # DO NOT MODIFY IT!
   maxRequestsPerHostStr: "200" # need to restart controller after updated it.
-  namespace: jenkins-beta
   containerCap: 200

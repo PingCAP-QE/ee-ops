@@ -5,4 +5,4 @@ resources:
   - buildbarn # experiment
   - brc
   - zot # experiment
-  - jenkins-beta # experiment
+  - jenkins/beta # experiment

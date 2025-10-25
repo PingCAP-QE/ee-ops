@@ -15,18 +15,18 @@ controller:
     - { name: codecov-token, keyName: tidb }
     - { name: codecov-token, keyName: tikv-migration }
     - { name: codecov-token, keyName: tiflow }
-    - { name: codecov-token, keyName: tiproxy}
+    - { name: codecov-token, keyName: tiproxy }
 
     # for harbor
     - { name: harbor, keyName: tiflow-engine-username }
     - { name: harbor, keyName: tiflow-engine-password }
 
     # for ci cache, no need create manually.
-    - { name: jenkins-beta-cache, keyName: region }
-    - { name: jenkins-beta-cache, keyName: bucket }
-    - { name: jenkins-beta-cache, keyName: endpoint }
-    - { name: jenkins-beta-cache, keyName: access-key }
-    - { name: jenkins-beta-cache, keyName: access-secret }
+    - { name: jenkins-cache, keyName: region }
+    - { name: jenkins-cache, keyName: bucket }
+    - { name: jenkins-cache, keyName: endpoint }
+    - { name: jenkins-cache, keyName: access-key }
+    - { name: jenkins-cache, keyName: access-secret }
     # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
     - { name: mongodb, keyName: mongodb-root-password }
 
@@ -231,15 +231,15 @@ controller:
           gitHubConfiguration:
             apiRateLimitChecker: ThrottleOnOver
           gitHubPluginConfig:
-            hookUrl: "https://internal-do.pingcap.net/jenkins-beta/github-webhook/"
+            hookUrl: "https://${INGRESS_HOST}${INGRESS_PATH}/github-webhook/"
       pipeline-cache: |
         unclassified:
           pipeline-cache:
-            region: ${jenkins-beta-cache-region}
-            bucket: ${jenkins-beta-cache-bucket}
-            endpoint: ${jenkins-beta-cache-endpoint}
-            username: ${jenkins-beta-cache-access-key}
-            password: ${jenkins-beta-cache-access-secret}
+            region: ${jenkins-cache-region}
+            bucket: ${jenkins-cache-bucket}
+            endpoint: ${jenkins-cache-endpoint}
+            username: ${jenkins-cache-access-key}
+            password: ${jenkins-cache-access-secret}
             threshold: 400000 # limit to 400GiB
       # for global env variables
       env-vars: |
