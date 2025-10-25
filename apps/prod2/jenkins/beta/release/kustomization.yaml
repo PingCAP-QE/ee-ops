@@ -1,11 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespace-agent.yaml
   - release.yaml
-configMapGenerator:
-  - name: jenkins-beta-values
-    namespace: flux-system
+secretGenerator:
+  - name: jenkins-release-values
     files:
       - values1.yaml=values-controller.yaml
       - values2.yaml=values-persistence.yaml

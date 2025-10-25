@@ -3,7 +3,7 @@ Guide for jenkins helm chart value configuration
 
 ## Pre requests
 
-- Setup PVC `jenkins-beta` in namespace `apps`
+- Setup PVC `jenkins` in namespace `jenkins-<stage>`
   - size should bigger than 8Gi.
   - if replicas > 1, the PVC access mode should be `ReadWriteMany` to support jenkins server HA mode.
 
