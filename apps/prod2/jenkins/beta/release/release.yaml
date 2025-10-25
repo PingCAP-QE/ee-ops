@@ -26,6 +26,39 @@ spec:
     - { kind: Secret, name: jenkins-release-values, valuesKey: values1.yaml }
     - { kind: Secret, name: jenkins-release-values, valuesKey: values2.yaml }
     - { kind: Secret, name: jenkins-release-values, valuesKey: values3.yaml }
-    - { kind: Secret, name: jenkins-release-values, valuesKey: values4.yaml }
-    - { kind: Secret, name: jenkins-release-values, valuesKey: values5.yaml }
-    - { kind: Secret, name: jenkins-release-values, valuesKey: values6.yaml }
+  values:
+    agent:
+      namespace: "${AGENT_NAMESPACE}"
+      maxRequestsPerHostStr: "200" # need to restart controller after updated it.
+      containerCap: 200
+
+    controller:
+      jenkinsUriPrefix: "${INGRESS_PATH}"
+      jenkinsUrl: "https://${INGRESS_HOST}${INGRESS_PATH}"
+      jenkinsAdminEmail: "${ADMIN_EMAIL}"
+      ingress:
+        path: "${INGRESS_PATH}"
+        hostName: "${INGRESS_HOST}"
+
+    persistence:
+      enabled: true
+
+      # A manually managed Persistent Volume and Claim
+      # Requires persistence.enabled: true
+      # If defined, PVC must be created manually before volume will be bound
+      # existingClaim: jenkins
+
+      # jenkins data Persistent Volume Storage Class
+      # If defined, storageClassName: <storageClass>
+      # If set to "-", storageClassName: "", which disables dynamic provisioning
+      # If undefined (the default) or set to null, no storageClassName spec is
+      #   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      #   GKE, AWS & OpenStack)
+      #
+      storageClass: openebs-3-replicas
+      size: "100Gi"
+
+    serviceAccount:
+      create: true
+      # TODO: setup credentials to pull images from dockerhub to avoid rate limits
+      # imagePullSecretName: jenkins-registry-cred

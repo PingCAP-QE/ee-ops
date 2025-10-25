@@ -1,4 +1,0 @@
-agent:
-  namespace: "${AGENT_NAMESPACE}" # DO NOT MODIFY IT!
-  maxRequestsPerHostStr: "200" # need to restart controller after updated it.
-  containerCap: 200
