@@ -45,6 +45,12 @@
             "clientid": "${GITHUB_CLIENT_ID}",
             "clientsecret": "${GITHUB_CLIENT_SECRET}",
             "scopes": ["read:org", "user", "repo"]
+          },
+          "google": {
+            "issuer": "https://accounts.google.com",
+            "clientid": "${GOOGLE_CLIENT_ID}",
+            "clientsecret": "${GOOGLE_CLIENT_SECRET}",
+            "scopes": ["openid", "email"]
           }
         }
       }
