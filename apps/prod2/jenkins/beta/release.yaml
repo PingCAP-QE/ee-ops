@@ -4,6 +4,7 @@ kind: Kustomization
 metadata:
   name: jenkins-release
 spec:
+  targetNamespace: jenkins-beta
   dependsOn:
     - name: jenkins-pre
   interval: 5m0s
