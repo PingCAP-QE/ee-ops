@@ -9,5 +9,8 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./apps/prod2/jenkins-beta/pre
+  path: ./apps/prod2/jenkins/beta/pre
   prune: true
+  postBuild:
+    substitute:
+      JENKINS_CACHE_S3_JSON: prod2_jenkins_beta_ks3_json

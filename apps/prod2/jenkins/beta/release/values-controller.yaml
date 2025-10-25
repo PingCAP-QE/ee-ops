@@ -12,20 +12,6 @@ controller:
       cpu: "8"
       memory: 32Gi
 
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                  - amd64
-              - key: ee-infra-service
-                operator: In
-                values:
-                  - "true"
-
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # current jenkins using java-11.
   # Set min/max heap here if needed with:
@@ -58,9 +44,9 @@ controller:
   # If you are not using the provided ingress you can specify `controller.jenkinsUrl` to change the url definition.
   # jenkinsUrl: ""
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
-  jenkinsUriPrefix: /jenkins-beta
-  jenkinsUrl: https://internal-do.pingcap.net/jenkins-beta
-  jenkinsAdminEmail: lifu.wu@pingcap.net
+  jenkinsUriPrefix: "${INGRESS_PATH}"
+  jenkinsUrl: "https://${INGRESS_HOST}${INGRESS_PATH}"
+  jenkinsAdminEmail: "${ADMIN_EMAIL}"
 
   ingress:
     enabled: true
@@ -68,9 +54,9 @@ controller:
     kubernetes.io/tls-acme: "true"
     ingressClassName: nginx
     # Set this path to jenkinsUriPrefix above or use annotations to rewrite path
-    path: "/jenkins-beta"
+    path: "${INGRESS_PATH}"
     # configures the hostname e.g. jenkins.example.com
-    hostName: internal-do.pingcap.net
+    hostName: "${INGRESS_HOST}"
 
   # Expose Prometheus metrics
   prometheus:

@@ -1,0 +1,21 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: jenkins-release
+spec:
+  dependsOn:
+    - name: jenkins-pre
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/prod2/jenkins/beta/release
+  prune: true
+  postBuild:
+    substitute:
+      AGENT_NAMESPACE: jenkins-beta-agents
+      INGRESS_HOST: internal-do.pingcap.net
+      INGRESS_PATH: /jenkins-beta
+      ADMIN_EMAIL: lifu.wu@pingcap.net
