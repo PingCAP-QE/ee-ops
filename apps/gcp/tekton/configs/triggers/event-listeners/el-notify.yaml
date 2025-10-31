@@ -14,7 +14,7 @@ spec:
           params:
             - name: filter
               value: >-
-                header.canonical('ce-type') in ['et.pingcap.tibuild.notify.delivery.images.success']
+                header.canonical('ce-type') in ['net.pingcap.tibuild.notify.delivery.images.success']
             - name: overlays
               value:
                 - key: ce-context
@@ -24,6 +24,8 @@ spec:
                       "source": header.canonical('ce-source'),
                       "subject": header.canonical('ce-subject'),
                     }.marshalJSON()
+                - key: ce-data
+                  expression: body.marshalJSON()
       triggerSelector:
         namespaceSelector:
           matchNames:
