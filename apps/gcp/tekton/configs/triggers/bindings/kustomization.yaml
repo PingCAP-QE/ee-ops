@@ -5,3 +5,4 @@ resources:
   - github-branch-push.yaml
   - github-pr.yaml
   - github-tag-create.yaml
+  - github-issue-comment.yaml

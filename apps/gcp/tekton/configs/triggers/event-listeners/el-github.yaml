@@ -100,3 +100,24 @@ spec:
         labelSelector:
           matchLabels:
             type: github-tag-create
+    - name: github-issue-comment
+      interceptors:
+        - name: filter on eventType
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["issue_comment"]
+        - name: validate issue comment
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.action in ['created'] && body.comment.body.matches('[\s\S]*<!--\s*META=.+?-->[\s\S]*')
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-issue-comment
