@@ -113,7 +113,7 @@ spec:
             name: cel
           params:
             - name: filter
-              value: body.action in ['created'] && body.comment.body.matches('[\s\S]*<!--\s*META=.+?-->[\s\S]*')
+              value: body.action in ['created'] && body.comment.body.matches('[\\s\\S]*?<!--\\s*META=.+\\s*-->')
       triggerSelector:
         namespaceSelector:
           matchNames:
