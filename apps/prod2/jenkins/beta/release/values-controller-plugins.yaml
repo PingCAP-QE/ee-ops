@@ -27,7 +27,7 @@ controller:
     - generic-webhook-trigger:2.4.1
     - ssh-agent:386.v36cc0c7582f0
     - cdevents:1-40.vb_3d2c94f2379
-  initializeOnce: true
+  initializeOnce: false
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
