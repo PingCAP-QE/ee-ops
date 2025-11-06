@@ -19,13 +19,13 @@ controller:
     # but without outer `plugin` key.
     - prometheus:795.v995762102f28
     - blueocean:1.27.16
-    - job-dsl:1.89
+    - job-dsl:1.93
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - pipeline-utility-steps:2.18.0
-    - http_request:1.18
+    - pipeline-utility-steps:2.20.0
+    - http_request:1.22
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
-    - generic-webhook-trigger:2.2.5
-    - ssh-agent:376.v8933585c69d3
+    - generic-webhook-trigger:2.4.1
+    - ssh-agent:386.v36cc0c7582f0
     - cdevents:1-40.vb_3d2c94f2379
   initializeOnce: true
 
