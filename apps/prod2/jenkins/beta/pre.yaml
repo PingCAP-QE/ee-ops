@@ -15,3 +15,8 @@ spec:
   postBuild:
     substitute:
       JENKINS_CACHE_S3_JSON: prod2_jenkins_beta_ks3_json
+      GITHUB_SECRET_JSON: prod2_jenkins_beta_github_json
+      CODECOV_TOKENS_JSON: prod2_jenkins_beta_codecov_tokens_json
+      HARBOR_CREDENTIALS_JSON: prod2_jenkins_beta_harbor_credentials_json
+      DOCS_CN_S3_JSON: prod2_jenkins_beta_docs_cn_s3_json
+      KS3UTIL_CONFIG: prod2_jenkins_beta_ks3util_config
