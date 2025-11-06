@@ -79,6 +79,8 @@ controller:
 
           - group:
               name: administrators
+              sids:
+                - "wuhui.zuo@pingcap.com"
               permissions:
                 - Agent/Build
                 - Agent/Configure
