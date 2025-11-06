@@ -62,8 +62,11 @@ controller:
               name: anonymous
               permissions:
                 - Overall/Read
+                - Job/Discover
+                - Job/Read
+                - View/Read
           - group:
-              name: developer
+              name: authenticated
               permissions:
                 - Agent/Build
                 - Job/Build
