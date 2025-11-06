@@ -15,3 +15,4 @@ spec:
   postBuild:
     substitute:
       JENKINS_CACHE_S3_JSON: prod2_jenkins_beta_ks3_json
+      GITHUB_SECRET_JSON: prod2_jenkins_beta_github_json
