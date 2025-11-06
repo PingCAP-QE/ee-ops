@@ -12,13 +12,13 @@ controller:
   #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
   overwritePlugins: true
-  installLatestPlugins: false
+  installLatestPlugins: true
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
     - prometheus:795.v995762102f28
-    - blueocean:1.27.16
+    - blueocean:1.27.23
     - job-dsl:1.93
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - pipeline-utility-steps:2.20.0
