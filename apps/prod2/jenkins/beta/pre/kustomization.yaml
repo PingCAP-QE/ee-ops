@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - secret-jenkins-cache.yaml
   - secret-github.yaml
+  - secret-codecov.yaml
