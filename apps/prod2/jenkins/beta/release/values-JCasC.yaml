@@ -62,13 +62,13 @@ controller:
         useScriptSecurity: false
 
     securityRealm: |-
-      local:
-        allowsSignup: false
-        enableCaptcha: false
-        users:
-        - id: "${chart-admin-username}"
-          name: "Jenkins Admin"
-          password: "${chart-admin-password}"
+      # local:
+      #   allowsSignup: false
+      #   enableCaptcha: false
+      #   users:
+      #   - id: "${chart-admin-username}"
+      #     name: "Jenkins Admin"
+      #     password: "${chart-admin-password}"
       googleOAuth2:
         clientId: "${google-oauth-client-id}"
         clientSecret: "${google-oauth-client-secret}"
