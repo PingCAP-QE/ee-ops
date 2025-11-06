@@ -5,3 +5,4 @@ resources:
   - secret-github.yaml
   - secret-codecov.yaml
   - secret-harbor.yaml
+  - secret-docs-cn.yaml
