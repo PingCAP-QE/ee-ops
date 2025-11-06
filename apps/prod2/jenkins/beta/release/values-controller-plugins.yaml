@@ -17,16 +17,17 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - prometheus:795.v995762102f28
     - blueocean:1.27.23
-    - job-dsl:1.93
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - pipeline-utility-steps:2.20.0
+    - cdevents:1-40.vb_3d2c94f2379
+    - generic-webhook-trigger:2.4.1
+    - google-login:109.v022b_cf87b_e5b_
     - http_request:1.22
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
-    - generic-webhook-trigger:2.4.1
+    - job-dsl:1.93
+    - pipeline-utility-steps:2.20.0
+    - prometheus:795.v995762102f28
     - ssh-agent:386.v36cc0c7582f0
-    - cdevents:1-40.vb_3d2c94f2379
   initializeOnce: false
 
   # for plugin build-failure-analyzer
