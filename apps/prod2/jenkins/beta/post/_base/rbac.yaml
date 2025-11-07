@@ -39,4 +39,4 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: jenkins
-    namespace: apps
+    namespace: ${CONTROLLER_NAMESPACE}

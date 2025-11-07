@@ -14,3 +14,6 @@ spec:
   path: ./apps/prod2/jenkins/beta/post
   prune: true
   force: true
+  postBuild:
+    substitute:
+      CONTROLLER_NAMESPACE: jenkins-beta
