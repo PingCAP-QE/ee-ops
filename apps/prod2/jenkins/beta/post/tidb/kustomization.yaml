@@ -5,6 +5,13 @@ resources:
   - namespace.yaml
   - ../_base
   - pvc.yaml
+secretGenerator:
+  - name: bazel
+    options:
+      disableNameSuffixHash: true
+    files:
+      - files/bazel
+      - files/bazel-prepare-in-container.sh
 configMapGenerator:
   - name: bazel
     options:
