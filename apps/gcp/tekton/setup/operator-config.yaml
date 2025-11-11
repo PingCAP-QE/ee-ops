@@ -51,10 +51,3 @@ spec:
     nodeSelector:
       kubernetes.io/os: linux
       kubernetes.io/arch: amd64
----
-apiVersion: operator.tekton.dev/v1alpha1
-kind: ManualApprovalGate
-metadata:
-  name: manual-approval-gate
-spec:
-  targetNamespace: tekton-pipelines
