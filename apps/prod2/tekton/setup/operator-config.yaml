@@ -1,0 +1,53 @@
+apiVersion: operator.tekton.dev/v1alpha1
+kind: TektonConfig
+metadata:
+  name: config
+spec:
+  targetNamespace: tekton-pipelines
+  profile: all
+  pipeline:
+    coschedule: disabled
+    # disable-home-env-overwrite: true
+    # disable-working-directory-overwrite: true
+    enable-api-fields: alpha # stable | alpha | beta
+    enable-cel-in-whenexpression: true
+    enable-custom-tasks: true
+    enable-param-enum: true
+    enable-step-actions: true
+    enable-tekton-oci-bundles: true
+    require-git-ssh-secret-known-hosts: false
+    running-in-environment-with-injected-sidecars: false # set it to `true` when Istio installed and enabled auto sidecar injecting.
+    ###### metrics items ########
+    metrics.count.enable-reason: true
+
+    ###### optional items #######
+    default-timeout-minutes: 60 # unit is minutes, default timeout for TaskRun and PipelineRun.
+    default-service-account: "default"
+    # default empty dir, can not be shared between tasks.
+    default-task-run-workspace-binding: >
+      emptyDir: {}
+    results-from: sidecar-logs
+    max-result-size: 10240 # should <= 1572863
+  result:
+    disabled: true
+  trigger:
+    default-service-account: "default"
+    enable-api-fields: alpha
+  tektonpruner:
+    disabled: true
+  pruner:
+    resources:
+      - taskrun
+      - pipelinerun
+    keep-since: 30 # unit: minute
+    schedule: "0 * * * *" # hourly
+  hub:
+    params:
+      - name: enable-devconsole-integration
+        value: "true"
+  dashboard:
+    readonly: true
+  config:
+    nodeSelector:
+      kubernetes.io/os: linux
+      kubernetes.io/arch: amd64
