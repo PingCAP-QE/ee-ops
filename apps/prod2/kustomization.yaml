@@ -6,3 +6,4 @@ resources:
   - brc
   - zot # experiment
   - jenkins/beta # experiment
+  - tekton
