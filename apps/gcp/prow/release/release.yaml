@@ -140,7 +140,7 @@ spec:
       enabled: true
       image:
         repository: ghcr.io/ti-community-infra/prow/jenkins-operator
-        tag: v20251023-c4199afa4
+        tag: v20250105-d73428bb3
       skipReport: true
       dryRun: false
       jenkinsUrl: ${JENKINS_BASE_URL}
