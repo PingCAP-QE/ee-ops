@@ -118,6 +118,7 @@ spec:
             tikv/client-c
             tikv/pd
             tikv/rocksdb
+            tikv/rust-rocksdb
             tikv/tikv
     pcm:
       image:
