@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: github-bot
+secrets:
+  - name: github-pat-secret
+  # The public key for this SSH secret must be added to the bot's GitHub account.
+  - name: github-ssh-secret
