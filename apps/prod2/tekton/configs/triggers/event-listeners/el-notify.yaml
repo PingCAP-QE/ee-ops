@@ -1,0 +1,35 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: notify
+spec:
+  serviceAccountName: tekton-trigger-eventlistener
+  triggerGroups:
+    - name: notify
+      interceptors:
+        - name: filter on eventType and event source and extract cloud event context
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: >-
+                header.canonical('ce-type') in ['net.pingcap.tibuild.notify.delivery.images.success']
+            - name: overlays
+              value:
+                - key: ce-context
+                  expression: |
+                    {
+                      "type": header.canonical('ce-type'),
+                      "source": header.canonical('ce-source'),
+                      "subject": header.canonical('ce-subject'),
+                    }.marshalJSON()
+                - key: ce-data
+                  expression: body.marshalJSON()
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: ce-notify

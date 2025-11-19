@@ -8,3 +8,4 @@ resources:
   - nginx
   - secret-generator
   - external-secrets
+  - kyverno
