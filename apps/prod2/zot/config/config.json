@@ -87,19 +87,15 @@
     "sync": {
       "enable": true,
       "downloadDir": "/tmp/zot",
+      "credentialsFile": "${ZOT_SYNC_AUTH_JSON_FILEPATH}",
       "registries": [
         {
-          "urls": ["https://hub.pingcap.net"],
+          "urls": ["https://us-docker.pkg.dev"],
           "preserveDigest": true,
           "content": [
             {
-              "prefix": "/pingcap/**",
-              "destination": "/pingcap",
-              "stripPrefix": true
-            },
-            {
-              "prefix": "/tikv/**",
-              "destination": "/tikv",
+              "prefix": "/pingcap-testing-account/dev/**",
+              "destination": "/mirrors/dev",
               "stripPrefix": true
             }
           ],
@@ -111,8 +107,95 @@
           "preserveDigest": true,
           "content": [
             {
-              "prefix": "/pingcap-testing-account/dev/**",
-              "destination": "/dev",
+              "prefix": "/pingcap-testing-account/tidbx/**",
+              "destination": "/mirrors/tidbx",
+              "stripPrefix": true
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true
+        },
+        {
+          "urls": ["https://us-docker.pkg.dev"],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "/pingcap-testing-account/tidbx/**",
+              "tags": {
+                "regex": "^(dedicated|master|main|release-[0-9]+[.][0-9]+|release-nextgen-[0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(enterprise|failpoint|next-gen)?$"
+              },
+              "destination": "/mirrors/tidbx",
+              "stripPrefix": true
+            }
+          ],
+          "onDemand": true,
+          "pollInterval": "3600",
+          "tlsVerify": true
+        },
+        {
+          "urls": [
+            "https://hub.pingcap.net",
+            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
+          ],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "/pingcap/**",
+              "destination": "/mirrors/hub/pingcap",
+              "stripPrefix": true
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true
+        },
+        {
+          "urls": [
+            "https://hub.pingcap.net",
+            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
+          ],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "/pingcap/**",
+              "tags": {
+                "regex": "^(master|main|release-[0-9]+[.][0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(enterprise|failpoint)?$"
+              },
+              "destination": "/mirrors/hub/pingcap",
+              "stripPrefix": true
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true
+        },
+        {
+          "urls": [
+            "https://hub.pingcap.net",
+            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
+          ],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "/tikv/**",
+              "destination": "/mirrors/hub/tikv",
+              "stripPrefix": true
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true
+        },
+        {
+          "urls": [
+            "https://hub.pingcap.net",
+            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
+          ],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "/tikv/**",
+              "tags": {
+                "regex": "^(master|main|release-[0-9]+[.][0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(enterprise|failpoint)?$"
+              },
+              "destination": "/mirrors/hub/tikv",
               "stripPrefix": true
             }
           ],
