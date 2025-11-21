@@ -18,6 +18,18 @@ spec:
       EXTERNAL_URL: https://hub-zot.pingcap.net
       # TODO: we should put it in secret that managed by external-secret
       ZOT_EVENT_SINKER_URL: https://zot-sinker.free.beeceptor.com # free public mock test endpoint
+      # the json file should have content with this format:
+      #   {
+      #     "127.0.0.1:8080": {
+      #       "username": "user",
+      #       "password": "pass"
+      #     },
+      #     "registry2:5000": {
+      #       "username": "user2",
+      #       "password": "pass2"
+      #     }
+      #   }
+      ZOT_SYNC_AUTH_JSON_FILEPATH: /secret/sync_auth.json
     substituteFrom:
       # from redis helm release, contains keys:
       # - redis-password
