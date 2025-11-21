@@ -128,7 +128,7 @@
               "stripPrefix": true
             }
           ],
-          "onDemand": true,
+          "onDemand": false,
           "pollInterval": "3600",
           "tlsVerify": true
         },
