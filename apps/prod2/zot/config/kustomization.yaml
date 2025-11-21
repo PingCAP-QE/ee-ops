@@ -6,4 +6,4 @@ configMapGenerator:
     options:
       disableNameSuffixHash: true
     files:
-      - config.json
+      - config.json # Ref: https://zotregistry.dev/v2.1.11/admin-guide/admin-configuration/
