@@ -25,3 +25,4 @@ spec:
       path_for_hook: /tekton/hook
       domain_internal2: internal2-do.pingcap.net
       path_for_dashboard_prod2: /tekton2
+      path_for_hook_prod2: /tekton2/hook

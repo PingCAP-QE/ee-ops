@@ -23,3 +23,8 @@ spec:
         - op: add
           path: /spec/targetNamespace
           value: ee-cd
+  postBuild:
+    substitute:
+      domain: do.pingcap.net # not available yet.
+      domain_internal: internal2-do.pingcap.net
+      path_for_hook: /tekton

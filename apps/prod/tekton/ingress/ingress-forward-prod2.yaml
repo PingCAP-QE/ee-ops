@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fwd-tekton-dashboard-prod2
+  name: fwd-prod2-tekton
   namespace: tekton-pipelines
 spec:
   type: ExternalName
@@ -15,7 +15,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: fwd-tekton-dashboard-internal2
+  name: fwd-prod2-tekton-internal
   namespace: tekton-pipelines
   labels:
     app: tekton-dashboard
@@ -43,9 +43,41 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "${path_for_dashboard_prod2}(/|$)(.*)"
+            path: "${path_for_dashboard_prod2}(/|$)(.*)" # the path is top level, it will cover event-listeners service paths.
             backend:
               service:
-                name: fwd-tekton-dashboard-prod2
+                name: fwd-prod2-tekton
+                port:
+                  name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fwd-prod2-tekton-el-public
+  namespace: tekton-pipelines
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: "${path_for_hook}/$2"
+
+    # Tell ingress-nginx to talk to the service's DNS name (works with ExternalName)
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+
+    # Ensure the upstream sees the correct Host header
+    nginx.ingress.kubernetes.io/upstream-vhost: "${domain_internal2}"
+
+    # Upstream is HTTP
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "${domain}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "${path_for_hook_prod2}(/|$)(.*)"
+            backend:
+              service:
+                name: fwd-prod2-tekton
                 port:
                   name: http
