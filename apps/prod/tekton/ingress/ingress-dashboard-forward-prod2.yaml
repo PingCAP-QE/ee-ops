@@ -33,7 +33,7 @@ metadata:
     # Ensure the upstream sees the correct Host header
     nginx.ingress.kubernetes.io/upstream-vhost: "internal2-do.pingcap.net"
 
-    # Upstream is HTTPS
+    # Upstream is HTTP
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 
 spec:
