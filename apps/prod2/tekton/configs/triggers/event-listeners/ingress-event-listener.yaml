@@ -13,7 +13,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "${path_for_hook}(/|$)(.*)"
+            path: "${path_for_el_public}(/|$)(.*)"
             backend:
               service:
                 name: el-public
@@ -34,7 +34,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "${path_for_hook}(/|$)(.*)"
+            path: "${path_for_el_internal}(/|$)(.*)"
             backend:
               service:
                 name: el-internal
