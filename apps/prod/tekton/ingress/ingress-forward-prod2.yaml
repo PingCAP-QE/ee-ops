@@ -54,7 +54,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: fwd-prod2-tekton-el-public
-  namespace: ee-cd
+  namespace: tekton-pipelines
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: "${path_for_hook}/$2"
@@ -79,6 +79,5 @@ spec:
             backend:
               service:
                 name: fwd-prod2-tekton
-                namespace: tekton-pipelines
                 port:
                   name: http
