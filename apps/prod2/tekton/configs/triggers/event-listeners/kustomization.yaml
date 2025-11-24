@@ -4,3 +4,4 @@ resources:
   - rbac.yaml
   - el-github.yaml
   - el-notify.yaml
+  - ingress-event-listener.yaml
