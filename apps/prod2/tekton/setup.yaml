@@ -102,3 +102,7 @@ spec:
               requests:
                 cpu: "100m"
                 memory: 200Mi
+  postBuild:
+    substitute:
+      domain_internal: internal2-do.pingcap.net
+      path_for_dashboard: /tekton

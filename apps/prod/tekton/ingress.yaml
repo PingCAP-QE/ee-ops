@@ -18,7 +18,9 @@ spec:
       namespace: apps
   prune: true
   postBuild:
-    substituteFrom:
-      - kind: Secret
-        name: tekton-ingress # should manual created in namespace `apps`
-        optional: true
+    substitute:
+      domain: do.pingcap.net
+      domain_internal: internal-do.pingcap.net
+      domain_internal2: internal2-do.pingcap.net
+      path_for_dashboard: /tekton
+      path_for_dashboard_prod2: /tekton2
