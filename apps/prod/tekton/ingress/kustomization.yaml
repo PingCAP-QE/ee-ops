@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
   - ingress-dashboard.yaml
   - ingress-event-listener.yaml
-  - ingress-dashboard-forward-prod2.yaml
+  - ingress-forward-prod2.yaml
