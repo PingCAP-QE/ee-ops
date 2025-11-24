@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fwd-tekton-dashboard-prod2
+  namespace: tekton-pipelines
+spec:
+  type: ExternalName
+  externalName: ${domain_internal2}
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fwd-tekton-dashboard-internal2
+  namespace: tekton-pipelines
+  labels:
+    app: tekton-dashboard
+    app.kubernetes.io/component: dashboard
+    app.kubernetes.io/instance: default
+    app.kubernetes.io/name: dashboard
+    app.kubernetes.io/part-of: tekton-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+
+    # Tell ingress-nginx to talk to the service's DNS name (works with ExternalName)
+    nginx.ingress.kubernetes.io/service-upstream: "true"
+
+    # Ensure the upstream sees the correct Host header
+    nginx.ingress.kubernetes.io/upstream-vhost: "${domain_internal2}"
+
+    # Upstream is HTTP
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "${domain_internal}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "${path_for_dashboard_prod2}(/|$)(.*)"
+            backend:
+              service:
+                name: fwd-tekton-dashboard-prod2
+                port:
+                  name: http
