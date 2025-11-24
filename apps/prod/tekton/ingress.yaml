@@ -21,5 +21,6 @@ spec:
     substitute:
       domain: do.pingcap.net
       domain_internal: internal-do.pingcap.net
+      domain_internal2: internal2-do.pingcap.net
       path_for_dashboard: /tekton
       path_for_dashboard_prod2: /tekton2

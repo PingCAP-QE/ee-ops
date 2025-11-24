@@ -6,7 +6,7 @@ metadata:
   namespace: tekton-pipelines
 spec:
   type: ExternalName
-  externalName: internal2-do.pingcap.net
+  externalName: ${domain_internal2}
   ports:
     - name: http
       port: 80
@@ -31,7 +31,7 @@ metadata:
     nginx.ingress.kubernetes.io/service-upstream: "true"
 
     # Ensure the upstream sees the correct Host header
-    nginx.ingress.kubernetes.io/upstream-vhost: "internal2-do.pingcap.net"
+    nginx.ingress.kubernetes.io/upstream-vhost: "${domain_internal2}"
 
     # Upstream is HTTP
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
