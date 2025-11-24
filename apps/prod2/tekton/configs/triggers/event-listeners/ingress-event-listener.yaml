@@ -16,27 +16,6 @@ spec:
             path: "${path_for_el_public}(/|$)(.*)"
             backend:
               service:
-                name: el-public
-                port:
-                  name: http-listener
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: el-internal
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
-spec:
-  ingressClassName: nginx
-  rules:
-    - host: "${domain_internal}"
-      http:
-        paths:
-          - pathType: Prefix
-            path: "${path_for_el_internal}(/|$)(.*)"
-            backend:
-              service:
-                name: el-internal
+                name: el-github
                 port:
                   name: http-listener
