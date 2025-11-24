@@ -63,7 +63,7 @@ metadata:
     nginx.ingress.kubernetes.io/service-upstream: "true"
 
     # Ensure the upstream sees the correct Host header
-    nginx.ingress.kubernetes.io/upstream-vhost: "${domain_internal2}"
+    nginx.ingress.kubernetes.io/upstream-vhost: "${domain}"
 
     # Upstream is HTTP
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
