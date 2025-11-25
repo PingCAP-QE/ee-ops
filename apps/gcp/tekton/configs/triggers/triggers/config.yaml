@@ -8,5 +8,5 @@ spec:
     kind: GitRepository
     name: ci
     namespace: flux-system
-  path: ./tekton/v1/triggers/triggers
+  path: ./tekton/v1/triggers/triggers/env-gcp
   prune: true
