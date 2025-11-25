@@ -18,7 +18,9 @@ metadata:
 spec:
   interval: 1m0s
   ref:
-    branch: main
+    # branch: main
+    # Prepare to refactor the folder structure in the ci repository
+    commit: 647d383346eea0ab8fcc038ed8b887048b1c962c
   url: https://github.com/PingCAP-QE/ci.git
 ---
 apiVersion: source.toolkit.fluxcd.io/v1beta2
