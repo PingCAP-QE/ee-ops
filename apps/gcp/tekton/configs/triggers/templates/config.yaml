@@ -10,3 +10,7 @@ spec:
     namespace: flux-system
   path: ./tekton/v1/triggers/templates
   prune: true
+  postBuild:
+    substitute:
+      STORAGE_CLASSNAME_RWO: hyperdisk-rwo
+      STORAGE_CLASSNAME_RWM: not-used-yet
