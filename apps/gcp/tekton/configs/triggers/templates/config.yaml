@@ -13,4 +13,4 @@ spec:
   postBuild:
     substitute:
       STORAGE_CLASSNAME_RWO: hyperdisk-rwo
-      STORAGE_CLASSNAME_RWM: not-used-yet
+      # STORAGE_CLASSNAME_RWM: not-used-yet
