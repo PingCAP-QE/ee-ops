@@ -13,4 +13,6 @@ spec:
   postBuild:
     substitute:
       STORAGE_CLASSNAME_RWO: openebs-single-replica
+      STORAGE_CLASSNAME_RWO_AMD64: openebs-single-replica
+      STORAGE_CLASSNAME_RWO_ARM64: openebs-hostpath
       # STORAGE_CLASSNAME_RWM: not-used-yet
