@@ -122,26 +122,23 @@
             {
               "prefix": "/pingcap-testing-account/tidbx/**",
               "tags": {
-                "regex": "^(dedicated|master|main|release-[0-9]+[.][0-9]+|release-nextgen-[0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(enterprise|failpoint|next-gen)?$"
+                "regex": "^(dedicated|master|main|release-[0-9]+[.][0-9]+|release-nextgen-[0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(next-gen)?$"
               },
               "destination": "/mirrors/tidbx",
               "stripPrefix": true
             }
           ],
-          "onDemand": false,
+          "onDemand": true,
           "pollInterval": "1h",
           "tlsVerify": true
         },
         {
-          "urls": [
-            "https://hub.pingcap.net",
-            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
-          ],
+          "urls": ["https://us-docker.pkg.dev"],
           "preserveDigest": true,
           "content": [
             {
-              "prefix": "/pingcap/**",
-              "destination": "/mirrors/hub/pingcap",
+              "prefix": "/pingcap-testing-account/hub/**",
+              "destination": "/mirrors/hub",
               "stripPrefix": true
             }
           ],
@@ -149,58 +146,19 @@
           "tlsVerify": true
         },
         {
-          "urls": [
-            "https://hub.pingcap.net",
-            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
-          ],
+          "urls": ["https://us-docker.pkg.dev"],
           "preserveDigest": true,
           "content": [
             {
-              "prefix": "/pingcap/**",
+              "prefix": "/pingcap-testing-account/hub/**",
               "tags": {
                 "regex": "^(master|main|release-[0-9]+[.][0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(enterprise|failpoint)?$"
               },
-              "destination": "/mirrors/hub/pingcap",
-              "stripPrefix": true
-            }
-          ],
-          "onDemand": false,
-          "pollInterval": "1h",
-          "tlsVerify": true
-        },
-        {
-          "urls": [
-            "https://hub.pingcap.net",
-            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
-          ],
-          "preserveDigest": true,
-          "content": [
-            {
-              "prefix": "/tikv/**",
-              "destination": "/mirrors/hub/tikv",
+              "destination": "/mirrors/hub",
               "stripPrefix": true
             }
           ],
           "onDemand": true,
-          "tlsVerify": true
-        },
-        {
-          "urls": [
-            "https://hub.pingcap.net",
-            "https://us-docker.pkg.dev/pingcap-testing-account/hub"
-          ],
-          "preserveDigest": true,
-          "content": [
-            {
-              "prefix": "/tikv/**",
-              "tags": {
-                "regex": "^(master|main|release-[0-9]+[.][0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(enterprise|failpoint)?$"
-              },
-              "destination": "/mirrors/hub/tikv",
-              "stripPrefix": true
-            }
-          ],
-          "onDemand": false,
           "pollInterval": "1h",
           "tlsVerify": true
         }
