@@ -41,11 +41,6 @@
       "apikey": true,
       "openid": {
         "providers": {
-          "github": {
-            "clientid": "${GITHUB_CLIENT_ID}",
-            "clientsecret": "${GITHUB_CLIENT_SECRET}",
-            "scopes": ["read:org", "user", "repo"]
-          },
           "google": {
             "issuer": "https://accounts.google.com",
             "clientid": "${GOOGLE_CLIENT_ID}",
@@ -108,15 +103,11 @@
           "content": [
             {
               "prefix": "/pingcap-testing-account/tidbx/**",
-              "tags": {
-                "regex": "^(dedicated|master|main|release-[0-9]+[.][0-9]+|release-nextgen-[0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(next-gen)?$"
-              },
               "destination": "/mirrors/tidbx",
               "stripPrefix": true
             }
           ],
           "onDemand": true,
-          "pollInterval": "24h",
           "tlsVerify": true
         },
         {
@@ -125,15 +116,11 @@
           "content": [
             {
               "prefix": "/pingcap-testing-account/hub/**",
-              "tags": {
-                "regex": "^(master|main|release-[0-9]+[.][0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(enterprise|failpoint)?$"
-              },
               "destination": "/mirrors/hub",
               "stripPrefix": true
             }
           ],
           "onDemand": true,
-          "pollInterval": "24h",
           "tlsVerify": true
         }
       ]
