@@ -108,19 +108,6 @@
           "content": [
             {
               "prefix": "/pingcap-testing-account/tidbx/**",
-              "destination": "/mirrors/tidbx",
-              "stripPrefix": true
-            }
-          ],
-          "onDemand": true,
-          "tlsVerify": true
-        },
-        {
-          "urls": ["https://us-docker.pkg.dev"],
-          "preserveDigest": true,
-          "content": [
-            {
-              "prefix": "/pingcap-testing-account/tidbx/**",
               "tags": {
                 "regex": "^(dedicated|master|main|release-[0-9]+[.][0-9]+|release-nextgen-[0-9]+|v[0-9]+[.][0-9]+[.][0-9]+-pre)-(next-gen)?$"
               },
@@ -129,20 +116,7 @@
             }
           ],
           "onDemand": true,
-          "pollInterval": "1h",
-          "tlsVerify": true
-        },
-        {
-          "urls": ["https://us-docker.pkg.dev"],
-          "preserveDigest": true,
-          "content": [
-            {
-              "prefix": "/pingcap-testing-account/hub/**",
-              "destination": "/mirrors/hub",
-              "stripPrefix": true
-            }
-          ],
-          "onDemand": true,
+          "pollInterval": "1d",
           "tlsVerify": true
         },
         {
@@ -159,7 +133,7 @@
             }
           ],
           "onDemand": true,
-          "pollInterval": "1h",
+          "pollInterval": "1d",
           "tlsVerify": true
         }
       ]
