@@ -116,7 +116,7 @@
             }
           ],
           "onDemand": true,
-          "pollInterval": "1d",
+          "pollInterval": "24h",
           "tlsVerify": true
         },
         {
@@ -133,7 +133,7 @@
             }
           ],
           "onDemand": true,
-          "pollInterval": "1d",
+          "pollInterval": "24h",
           "tlsVerify": true
         }
       ]
