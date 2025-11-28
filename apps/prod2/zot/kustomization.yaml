@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: zot
 resources:
   - namespace.yaml
+  - policies.yaml
   - source.yaml
   - pre.yaml
   - config.yaml
