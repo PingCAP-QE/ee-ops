@@ -116,6 +116,7 @@ spec:
             pingcap/tiflash
             pingcap/tiflow
             tikv/client-c
+            tikv/client-go
             tikv/pd
             tikv/rocksdb
             tikv/rust-rocksdb
