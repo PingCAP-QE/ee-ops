@@ -36,7 +36,7 @@ spec:
       - kind: Secret
         name: redis
       # from external-secret in zot-pre, contains keys:
-      # - GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
+      # - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
       # - S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET, S3_REGION_ENDPOINT, S3_REGION
       - kind: Secret
         name: zot-config-secrets
