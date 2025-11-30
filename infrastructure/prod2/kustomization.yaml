@@ -9,3 +9,4 @@ resources:
   - secret-generator
   - external-secrets
   - kyverno
+  - operators
