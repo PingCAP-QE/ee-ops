@@ -16,4 +16,4 @@ spec:
   interval: 5m0s
   values:
     replicas: 2
-    watchNamespaces: [kafka]
+    watchAnyNamespace: true
