@@ -1,0 +1,25 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: redis
+spec:
+  chart:
+    spec:
+      chart: redis
+      version: 20.2.1
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  interval: 1h
+  values:
+    global:
+      storageClass: openebs-single-replica
+    master:
+      resourcesPreset: nano #  nano < micro < small < medium < large < xlarge < 2xlarge
+    replica:
+      resourcesPreset: nano
+    auth:
+      existingSecret: redis
+      existingSecretPasswordKey: REDIS_PASSWORD
