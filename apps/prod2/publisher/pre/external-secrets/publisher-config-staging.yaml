@@ -16,7 +16,7 @@ spec:
           event_source: "http://publisher-staging.apps.svc"
           kafka:
             brokers:
-              - cluster-cd-kafka-bootstrap.kafka.svc:9092
+              - cluster-cd-kafka-bootstrap:9092
             topic: cd-publishing-requests-staging
             client_id: publisher-staging
           redis:
@@ -27,7 +27,7 @@ spec:
           tiup:
             kafka:
               brokers:
-                - cluster-cd-kafka-bootstrap.kafka.svc:9092
+                - cluster-cd-kafka-bootstrap:9092
               topic: cd-publishing-requests-staging
               consumer_group: publisher-staging-tiup
 
@@ -43,7 +43,7 @@ spec:
           file_server:
             kafka:
               brokers:
-                - cluster-cd-kafka-bootstrap.kafka.svc:9092
+                - cluster-cd-kafka-bootstrap:9092
               topic: cd-publishing-requests-staging
               consumer_group: publisher-staging-fs
 

@@ -16,7 +16,7 @@ spec:
           event_source: "http://publisher-prod.apps.svc"
           kafka:
             brokers:
-              - cluster-cd-kafka-bootstrap.kafka.svc:9092
+              - cluster-cd-kafka-bootstrap:9092
             topic: cd-publishing-requests-prod
             client_id: publisher-prod
           redis:
@@ -27,7 +27,7 @@ spec:
           tiup:
             kafka:
               brokers:
-                - cluster-cd-kafka-bootstrap.kafka.svc:9092
+                - cluster-cd-kafka-bootstrap:9092
               topic: cd-publishing-requests-prod
               consumer_group: publisher-prod-tiup
 
