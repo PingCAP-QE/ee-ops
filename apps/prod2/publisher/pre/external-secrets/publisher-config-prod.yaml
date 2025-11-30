@@ -22,7 +22,7 @@ spec:
           redis:
             addr: "redis-master.redis:6379"
             db: 0
-            password: {{ .data.redis_password }}
+            password: {{ .redis_password }}
         worker.yaml: |
           tiup:
             kafka:
@@ -32,20 +32,20 @@ spec:
               consumer_group: publisher-prod-tiup
 
             options:
-              mirror_url: {{ .data.tiup_mirror_url}}
-              lark_webhook_url: {{ .data.lark_webhook_url }}
+              mirror_url: {{ .tiup_mirror_url}}
+              lark_webhook_url: {{ .lark_webhook_url }}
               nightly_interval: 12h
             redis:
               addr: "redis-master.redis:6379"
               db: 0
-              password: {{ .data.redis_password }}
+              password: {{ .redis_password }}
   data:
     - secretKey: redis_password
       remoteRef:
         key: prod2_publisher_redis_password
-    - secretKey: tiup-prod-mirror-url
+    - secretKey: tiup_mirror_url
       remoteRef:
-        key: prod2_publisher_redis_password
+        key: tiup-prod-mirror-url
     - secretKey: lark_webhook_url
       remoteRef:
         key: prod2_publisher_failure_lark_webhook_url

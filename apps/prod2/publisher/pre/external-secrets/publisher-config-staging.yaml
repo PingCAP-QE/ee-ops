@@ -22,7 +22,7 @@ spec:
           redis:
             addr: "redis-master.redis:6379"
             db: 0
-            password: {{ .data.redis_password }}
+            password: {{ .redis_password }}
         worker.yaml: |
           tiup:
             kafka:
@@ -32,13 +32,13 @@ spec:
               consumer_group: publisher-staging-tiup
 
             options:
-              mirror_url: {{ .data.tiup_mirror_url}}
-              lark_webhook_url: {{ .data.lark_webhook_url }}
+              mirror_url: {{ .tiup_mirror_url}}
+              lark_webhook_url: {{ .lark_webhook_url }}
               nightly_interval: 12h
             redis:
               addr: "redis-master.redis:6379"
               db: 0
-              password: {{ .data.redis_password }}
+              password: {{ .redis_password }}
 
           file_server:
             kafka:
@@ -50,23 +50,23 @@ spec:
             redis:
               addr: "redis-master.redis:6379"
               db: 0
-              password: {{ .data.redis_password }}
+              password: {{ .redis_password }}
 
             options:
-              lark_webhook_url: {{ .data.lark_webhook_url }}
-              s3.endpoint: {{ .data.S3_REGION_ENDPOINT }}
-              s3.region: {{ .data.S3_REGION }}
-              s3.bucket_name: {{ .data.S3_BUCKET }}
-              s3.access_key: {{ .data.S3_ACCESS_KEY }}
-              s3.secret_key: {{ .data.S3_SECRET_KEY }}
+              lark_webhook_url: {{ .lark_webhook_url }}
+              s3.endpoint: {{ .S3_REGION_ENDPOINT }}
+              s3.region: {{ .S3_REGION }}
+              s3.bucket_name: {{ .S3_BUCKET }}
+              s3.access_key: {{ .S3_ACCESS_KEY }}
+              s3.secret_key: {{ .S3_SECRET_KEY }}
 
   data:
     - secretKey: redis_password
       remoteRef:
         key: prod2_publisher_redis_password
-    - secretKey: tiup-prod-mirror-url
+    - secretKey: tiup_mirror_url
       remoteRef:
-        key: prod2_publisher_redis_password
+        key: tiup-staing-mirror-url
     - secretKey: lark_webhook_url
       remoteRef:
         key: prod2_publisher_failure_lark_webhook_url
