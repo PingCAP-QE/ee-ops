@@ -13,7 +13,7 @@ spec:
       type: Opaque
       data:
         service.yaml: |
-          event_source: "http://publisher-prod.apps.svc"
+          event_source: "http://publisher-prod.publisher.svc"
           kafka:
             brokers:
               - cluster-cd-kafka-bootstrap:9092
