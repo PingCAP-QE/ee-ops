@@ -12,6 +12,13 @@ spec:
           containers:
             - name: fetch-tags
               image: ghcr.io/pingcap-qe/cd/utils/release:v2025.10.26-7-geb77a69
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
               env:
                 - name: DST_REPO_PREFIX
                   value: "hub-zot.pingcap.net/mirrors/tidbx"
