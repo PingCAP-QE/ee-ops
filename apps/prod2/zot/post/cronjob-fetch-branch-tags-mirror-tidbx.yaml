@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-fetch-branch-tags-mirror-tidbx
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: fetch-tags
+              image: ghcr.io/pingcap-qe/cd/utils/release:v2025.10.26-7-geb77a69
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              env:
+                - name: DST_REPO_PREFIX
+                  value: "hub-zot.pingcap.net/mirrors/tidbx"
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+                  #!/usr/bin/env bash
+                  set -euo pipefail
+
+                  REPOS=(
+                    pingcap/ticdc/image
+                    pingcap/tidb/images/br
+                    pingcap/tidb/images/dumpling
+                    pingcap/tidb/images/tidb-lightning
+                    pingcap/tidb/images/tidb-server
+                    pingcap/tiflash/image
+                    tikv/pd/image
+                    tikv/tikv/image
+                  )
+                  TAGS=(
+                    "master-next-gen"
+                    "release-nextgen-20251011" # need to be updated for each next-gen sprint.
+                    "feature-fts-next-gen"     # for FTS project.
+                  )
+
+                  any_failed=false
+                  for repo in "${REPOS[@]}"; do
+                    DEST="$DST_REPO_PREFIX/$repo"
+                    for tag in "${TAGS[@]}"; do
+                      echo "Updating $DEST:$tag"
+                      # Try to get the digest. Redirect stdout to /dev/null as we only care about success/failure.
+                      if crane digest "$DEST:$tag" >/dev/null; then
+                        echo "Successfully processed $DEST:$tag"
+                      else
+                        # This will catch 'not found' as well as other errors.
+                        echo "Could not process $DEST:$tag"
+                        any_failed=true
+                      fi
+                    done
+                  done
+
+                  if [ "$any_failed" = "true" ]; then
+                    echo "Error: Failed to process some image tags. Please check logs for details." >&2
+                    exit 1
+                  fi

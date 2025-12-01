@@ -2,6 +2,7 @@ apiVersion: dashboard.tekton.dev/v1alpha1
 kind: Extension
 metadata:
   name: cronjobs
+  namespace: tekton-pipelines
 spec:
   apiVersion: batch/v1
   name: cronjobs
