@@ -20,7 +20,7 @@ spec:
             topic: cd-publishing-requests-prod
             client_id: publisher-prod
           redis:
-            addr: "redis-master.redis:6379"
+            addr: "redis-master:6379"
             db: 0
             password: {{ .redis_password }}
         worker.yaml: |
@@ -36,7 +36,7 @@ spec:
               lark_webhook_url: {{ .lark_webhook_url }}
               nightly_interval: 12h
             redis:
-              addr: "redis-master.redis:6379"
+              addr: "redis-master:6379"
               db: 0
               password: {{ .redis_password }}
   data:

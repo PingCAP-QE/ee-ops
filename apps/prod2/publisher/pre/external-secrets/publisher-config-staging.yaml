@@ -20,7 +20,7 @@ spec:
             topic: cd-publishing-requests-staging
             client_id: publisher-staging
           redis:
-            addr: "redis-master.redis:6379"
+            addr: "redis-master:6379"
             db: 0
             password: {{ .redis_password }}
         worker.yaml: |
@@ -36,7 +36,7 @@ spec:
               lark_webhook_url: {{ .lark_webhook_url }}
               nightly_interval: 12h
             redis:
-              addr: "redis-master.redis:6379"
+              addr: "redis-master:6379"
               db: 0
               password: {{ .redis_password }}
 
@@ -48,7 +48,7 @@ spec:
               consumer_group: publisher-staging-fs
 
             redis:
-              addr: "redis-master.redis:6379"
+              addr: "redis-master:6379"
               db: 0
               password: {{ .redis_password }}
 
