@@ -1,7 +1,7 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
-  name: cd-building-requests-darwin-amd64
+  name: cd-publishing-requests-staging
   labels:
     strimzi.io/cluster: cluster-cd
 spec: {}
@@ -9,23 +9,7 @@ spec: {}
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:
-  name: cd-building-requests-darwin-arm64
-  labels:
-    strimzi.io/cluster: cluster-cd
-spec: {}
----
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaTopic
-metadata:
-  name: cd-building-requests-linux-amd64
-  labels:
-    strimzi.io/cluster: cluster-cd
-spec: {}
----
-apiVersion: kafka.strimzi.io/v1beta2
-kind: KafkaTopic
-metadata:
-  name: cd-building-requests-linux-arm64
+  name: cd-publishing-requests-prod
   labels:
     strimzi.io/cluster: cluster-cd
 spec: {}
