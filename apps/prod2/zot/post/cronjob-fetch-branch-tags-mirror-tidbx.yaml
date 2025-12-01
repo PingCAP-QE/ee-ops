@@ -1,0 +1,48 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-fetch-branch-tags-mirror-tidbx
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: fetch-tags
+              image: ghcr.io/pingcap-qe/cd/utils/release:v2025.10.26-7-geb77a69
+              env:
+                - name: DST_REPO_PREFIX
+                  value: "hub-zot.pingcap.net/mirrors/tidbx"
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+                  #!/usr/bin/env bash
+                  set -euo pipefail
+
+                  REPOS=(
+                    pingcap/ticdc/image
+                    pingcap/tidb/images/br
+                    pingcap/tidb/images/dumpling
+                    pingcap/tidb/images/tidb-lightning
+                    pingcap/tidb/images/tidb-server
+                    pingcap/tiflash/image
+                    tikv/pd/image
+                    tikv/tikv/image
+                  )
+                  TAGS=(
+                    "master-next-gen"
+                    "release-nextgen-20251011" # need to be updated for each next-gen sprint.
+                    "feature-fts-next-gen"     # for FTS project.
+                  )
+
+                  for repo in "${REPOS[@]}"; do
+                    DEST="$DST_REPO_PREFIX/$repo"
+                    for tag in "${TAGS[@]}"; do
+                      echo "Updating $DEST:$tag"
+                      crane digest $DEST:$tag || echo "not found"
+                    done
+                  done
