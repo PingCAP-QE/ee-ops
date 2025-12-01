@@ -46,10 +46,23 @@ spec:
                     "feature-fts-next-gen"     # for FTS project.
                   )
 
+                  any_failed=false
                   for repo in "${REPOS[@]}"; do
                     DEST="$DST_REPO_PREFIX/$repo"
                     for tag in "${TAGS[@]}"; do
                       echo "Updating $DEST:$tag"
-                      crane digest $DEST:$tag || echo "not found"
+                      # Try to get the digest. Redirect stdout to /dev/null as we only care about success/failure.
+                      if crane digest "$DEST:$tag" >/dev/null; then
+                        echo "Successfully processed $DEST:$tag"
+                      else
+                        # This will catch 'not found' as well as other errors.
+                        echo "Could not process $DEST:$tag"
+                        any_failed=true
+                      fi
                     done
                   done
+
+                  if [ "$any_failed" = "true" ]; then
+                    echo "Error: Failed to process some image tags. Please check logs for details." >&2
+                    exit 1
+                  fi
