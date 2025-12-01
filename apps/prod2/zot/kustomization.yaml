@@ -7,3 +7,4 @@ resources:
   - pre.yaml
   - config.yaml
   - release.yaml
+  - post.yaml

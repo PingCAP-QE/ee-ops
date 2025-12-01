@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: zot-post
+spec:
+  dependsOn:
+    - name: zot-pre
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  targetNamespace: zot
+  path: ./apps/prod2/zot/post
+  prune: true
