@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cronjob-fetch-branch-tags-mirror-tidbx
+  name: cronjob-fetch-branch-tags-mirror-tidbx-binaries
 spec:
   schedule: "0 * * * *"
   jobTemplate:
@@ -31,29 +31,20 @@ spec:
                   set -euo pipefail
 
                   ocis=(
-                    pingcap/ticdc/image:master-next-gen
-                    pingcap/tidb/images/br:master-next-gen
-                    pingcap/tidb/images/dumpling:master-next-gen
-                    pingcap/tidb/images/tidb-lightning:master-next-gen
-                    pingcap/tidb/images/tidb-server:master-next-gen
-                    pingcap/tiflash/image:master-next-gen
-                    tikv/pd/image:master-next-gen
-                    tikv/tikv/image:dedicated-next-gen
+                    pingcap/ticdc/package:master-next-gen_linux_amd64
+                    pingcap/tidb/package:master-next-gen_linux_amd64
+                    pingcap/tiflash/package:master-next-gen_linux_amd64
+                    tikv/pd/package:master-next-gen_linux_amd64
+                    tikv/tikv/package:dedicated-next-gen_linux_amd64
 
-                    pingcap/ticdc/image:release-nextgen-20251011
-                    pingcap/tidb/images/br:release-nextgen-20251011
-                    pingcap/tidb/images/dumpling:release-nextgen-20251011
-                    pingcap/tidb/images/tidb-lightning:release-nextgen-20251011
-                    pingcap/tidb/images/tidb-server:release-nextgen-20251011
-                    pingcap/tiflash/image:release-nextgen-20251011
-                    tikv/pd/image:release-nextgen-20251011
-                    tikv/tikv/image:release-nextgen-20251011
+                    pingcap/ticdc/package:release-nextgen-20251011_linux_amd64
+                    pingcap/tidb/package:release-nextgen-20251011_linux_amd64
+                    pingcap/tiflash/package:release-nextgen-20251011_linux_amd64
+                    tikv/pd/package:release-nextgen-20251011_linux_amd64
+                    tikv/tikv/package:release-nextgen-20251011_linux_amd64
 
-                    pingcap/tidb/images/br:feature-fts-next-gen
-                    pingcap/tidb/images/dumpling:feature-fts-next-gen
-                    pingcap/tidb/images/tidb-lightning:feature-fts-next-gen
-                    pingcap/tidb/images/tidb-server:feature-fts-next-gen
-                    pingcap/tiflash/image:feature-fts-next-gen
+                    pingcap/tidb/package:feature-fts-next-gen_linux_amd64
+                    pingcap/tiflash/package:feature-fts-next-gen_linux_amd64
                   )
 
                   any_failed=false
