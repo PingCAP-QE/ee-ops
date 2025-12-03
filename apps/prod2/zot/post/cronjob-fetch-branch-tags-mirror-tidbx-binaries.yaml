@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-fetch-branch-tags-mirror-tidbx-binaries
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: fetch-tags
+              image: ghcr.io/pingcap-qe/cd/utils/release:v2025.10.26-7-geb77a69
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              env:
+                - name: DST_REPO_PREFIX
+                  value: "hub-zot.pingcap.net/mirrors/tidbx"
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+                  #!/usr/bin/env bash
+                  set -euo pipefail
+
+                  ocis=(
+                    pingcap/ticdc/package:master-next-gen_linux_amd64
+                    pingcap/tidb/package:master-next-gen_linux_amd64
+                    pingcap/tiflash/package:master-next-gen_linux_amd64
+                    tikv/pd/package:master-next-gen_linux_amd64
+                    tikv/tikv/package:dedicated-next-gen_linux_amd64
+
+                    pingcap/ticdc/package:release-nextgen-20251011_linux_amd64
+                    pingcap/tidb/package:release-nextgen-20251011_linux_amd64
+                    pingcap/tiflash/package:release-nextgen-20251011_linux_amd64
+                    tikv/pd/package:release-nextgen-20251011_linux_amd64
+                    tikv/tikv/package:release-nextgen-20251011_linux_amd64
+
+                    pingcap/tidb/package:feature-fts-next-gen_linux_amd64
+                    pingcap/tiflash/package:feature-fts-next-gen_linux_amd64
+                  )
+
+                  any_failed=false
+                  for oci in "${ocis[@]}"; do
+                    DEST="$DST_REPO_PREFIX/$oci"
+                    echo "Updating $DEST"
+                    # Try to get the digest. Redirect stdout to /dev/null as we only care about success/failure.
+                    if crane digest "$DEST" >/dev/null; then
+                      echo "Successfully processed $DEST"
+                    else
+                      # This will catch 'not found' as well as other errors.
+                      echo "Could not process $DEST"
+                      any_failed=true
+                    fi
+                  done
+
+                  if [ "$any_failed" = "true" ]; then
+                    echo "Error: Failed to process some image tags. Please check logs for details." >&2
+                    exit 1
+                  fi

@@ -30,36 +30,44 @@ spec:
                   #!/usr/bin/env bash
                   set -euo pipefail
 
-                  REPOS=(
-                    pingcap/ticdc/image
-                    pingcap/tidb/images/br
-                    pingcap/tidb/images/dumpling
-                    pingcap/tidb/images/tidb-lightning
-                    pingcap/tidb/images/tidb-server
-                    pingcap/tiflash/image
-                    tikv/pd/image
-                    tikv/tikv/image
-                  )
-                  TAGS=(
-                    "master-next-gen"
-                    "release-nextgen-20251011" # need to be updated for each next-gen sprint.
-                    "feature-fts-next-gen"     # for FTS project.
+                  ocis=(
+                    pingcap/ticdc/image:master-next-gen
+                    pingcap/tidb/images/br:master-next-gen
+                    pingcap/tidb/images/dumpling:master-next-gen
+                    pingcap/tidb/images/tidb-lightning:master-next-gen
+                    pingcap/tidb/images/tidb-server:master-next-gen
+                    pingcap/tiflash/image:master-next-gen
+                    tikv/pd/image:master-next-gen
+                    tikv/tikv/image:dedicated-next-gen
+
+                    pingcap/ticdc/image:release-nextgen-20251011
+                    pingcap/tidb/images/br:release-nextgen-20251011
+                    pingcap/tidb/images/dumpling:release-nextgen-20251011
+                    pingcap/tidb/images/tidb-lightning:release-nextgen-20251011
+                    pingcap/tidb/images/tidb-server:release-nextgen-20251011
+                    pingcap/tiflash/image:release-nextgen-20251011
+                    tikv/pd/image:release-nextgen-20251011
+                    tikv/tikv/image:release-nextgen-20251011
+
+                    pingcap/tidb/images/br:feature-fts-next-gen
+                    pingcap/tidb/images/dumpling:feature-fts-next-gen
+                    pingcap/tidb/images/tidb-lightning:feature-fts-next-gen
+                    pingcap/tidb/images/tidb-server:feature-fts-next-gen
+                    pingcap/tiflash/image:feature-fts-next-gen
                   )
 
                   any_failed=false
-                  for repo in "${REPOS[@]}"; do
-                    DEST="$DST_REPO_PREFIX/$repo"
-                    for tag in "${TAGS[@]}"; do
-                      echo "Updating $DEST:$tag"
-                      # Try to get the digest. Redirect stdout to /dev/null as we only care about success/failure.
-                      if crane digest "$DEST:$tag" >/dev/null; then
-                        echo "Successfully processed $DEST:$tag"
-                      else
-                        # This will catch 'not found' as well as other errors.
-                        echo "Could not process $DEST:$tag"
-                        any_failed=true
-                      fi
-                    done
+                  for oci in "${ocis[@]}"; do
+                    DEST="$DST_REPO_PREFIX/$oci"
+                    echo "Updating $DEST"
+                    # Try to get the digest. Redirect stdout to /dev/null as we only care about success/failure.
+                    if crane digest "$DEST" >/dev/null; then
+                      echo "Successfully processed $DEST"
+                    else
+                      # This will catch 'not found' as well as other errors.
+                      echo "Could not process $DEST"
+                      any_failed=true
+                    fi
                   done
 
                   if [ "$any_failed" = "true" ]; then
