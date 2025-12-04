@@ -18,6 +18,7 @@ spec:
             - tekton-operator
             - tekton-pipelines
             - zot
+            - tibuild
       mutate:
         patchStrategicMerge:
           spec:
