@@ -23,6 +23,9 @@ spec:
             addr: "redis-master:6379"
             db: 0
             password: {{ .redis_password }}
+          services:
+            tiup:
+              delivery_config_file: "/etc/config/delivery-config.yaml" # should load from config map
         worker.yaml: |
           tiup:
             kafka:
@@ -32,6 +35,7 @@ spec:
               consumer_group: publisher-staging-tiup
 
             options:
+              mirror_name: staging
               mirror_url: {{ .tiup_mirror_url}}
               lark_webhook_url: {{ .lark_webhook_url }}
               nightly_interval: 12h

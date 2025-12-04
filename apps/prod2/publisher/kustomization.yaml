@@ -6,3 +6,9 @@ resources:
   - pre.yaml
   - release-prod-mirror.yaml
   - release-staging-mirror.yaml
+configMapGenerator:
+  - name: delivery-config
+    options:
+      disableNameSuffixHash: true
+    files:
+      - config.json # Ref: https://zotregistry.dev/v2.1.11/admin-guide/admin-configuration/
