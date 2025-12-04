@@ -6,6 +6,7 @@ resources:
   - brc
   - tekton
   - publisher
-  - zot # experiment
+  - zot
+  - tibuild # experiment for v2
   - buildbarn # experiment
   - jenkins/beta # experiment
