@@ -41,15 +41,15 @@ spec:
       - name: tiup-credentials
         secret:
           secretName: tiup-credentials-staging
-      - name: package-config
+      - name: packages-config
         configMap:
-          configMapName: package-config
+          configMapName: packages-config
     volumeMounts:
       - name: tiup-credentials
         subPath: private.json
         mountPath: /root/.tiup/keys/private.json
         readOnly: true
-      - name: package-config
+      - name: packages-config
         mountPath: /etc/config
         readOnly: true
     ingress:
