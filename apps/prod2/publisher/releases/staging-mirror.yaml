@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: publisher-prod-mirror
+  name: publisher-staging-mirror
 spec:
   chart:
     spec:
@@ -25,30 +25,38 @@ spec:
     # Additional volumes on the output Deployment definition.
     image:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher versioning=semver
-      tag: v2025.11.2-1-g43046ac
+      tag: v2025.11.30-2-gde42167
     servers:
       publisher:
         config:
-          secretName: publisher-config-prod
+          secretName: publisher-config-staging
           secretKey: service.yaml
+          debug: true
       worker:
         config:
-          secretName: publisher-config-prod
+          secretName: publisher-config-staging
           secretKey: worker.yaml
+          debug: true
     volumes:
       - name: tiup-credentials
         secret:
-          secretName: tiup-credentials-prod
+          secretName: tiup-credentials-staging
+      - name: packages-config
+        configMap:
+          name: packages-config
     volumeMounts:
       - name: tiup-credentials
         subPath: private.json
         mountPath: /root/.tiup/keys/private.json
         readOnly: true
+      - name: packages-config
+        mountPath: /etc/config
+        readOnly: true
     ingress:
       enabled: true
       className: "nginx"
       hosts:
-        - host: publisher.pingcap.net
+        - host: publisher-staging.pingcap.net
           paths:
             - path: /
               pathType: ImplementationSpecific

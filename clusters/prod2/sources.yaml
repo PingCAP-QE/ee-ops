@@ -8,3 +8,14 @@ spec:
   ref:
     branch: main
   url: https://github.com/PingCAP-QE/ci.git
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: GitRepository
+metadata:
+  name: artifacts
+  namespace: flux-system
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: https://github.com/PingCAP-QE/artifacts.git
