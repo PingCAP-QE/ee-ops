@@ -13,4 +13,4 @@ spec:
   prune: true
   healthChecks:
     - name: packages-config
-      type: ConfigMap
+      kind: ConfigMap
