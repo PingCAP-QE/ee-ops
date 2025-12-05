@@ -4,5 +4,4 @@ namespace: publisher
 resources:
   - namespace.yaml
   - pre.yaml
-  - release-prod-mirror.yaml
-  - release-staging-mirror.yaml
+  - releases.yaml
