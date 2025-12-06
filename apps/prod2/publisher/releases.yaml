@@ -5,7 +5,7 @@ metadata:
   name: publisher-releases
 spec:
   dependsOn:
-    - name: publisher-pre
+    - name: publisher-packages-config
   targetNamespace: publisher
   interval: 5m0s
   sourceRef:

@@ -1,0 +1,32 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: publisher-server-config
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: publisher-server-config
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        config.yaml: |
+          event_source: "http://publisher-prod.publisher.svc"
+          kafka:
+            brokers:
+              - cluster-cd-kafka-bootstrap:9092
+            topic: cd-publishing-requests
+            client_id: publisher-server
+          redis:
+            addr: "redis-master:6379"
+            db: 0
+            password: {{ .redis_password }}
+          # services:
+          #   tiup:
+          #     delivery_config_file_path: /etc/config/delivery.yaml
+  data:
+    - secretKey: redis_password
+      remoteRef:
+        key: prod2_publisher_redis_password

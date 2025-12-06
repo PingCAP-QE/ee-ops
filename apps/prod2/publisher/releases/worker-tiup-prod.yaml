@@ -1,0 +1,50 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: publisher-worker-tiup-prod
+spec:
+  chart:
+    spec:
+      chart: publisher-worker
+      version: 0.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  dependsOn:
+    - name: redis
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+  test:
+    enable: false
+  values:
+    # Additional volumes on the output Deployment definition.
+    image:
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher-worker versioning=semver
+      tag: v2025.11.30-17-gbeadfd1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 200m
+        memory: 256Mi
+    worker:
+      config:
+        secretName: publisher-worker-config-tiup-prod
+        secretKey: config.yaml
+        debug: true
+
+    volumes:
+      - name: tiup-credentials
+        secret:
+          secretName: tiup-credentials-prod
+    volumeMounts:
+      - name: tiup-credentials
+        subPath: private.json
+        mountPath: /root/.tiup/keys/private.json
+        readOnly: true

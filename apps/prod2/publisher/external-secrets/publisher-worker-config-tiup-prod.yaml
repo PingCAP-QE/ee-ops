@@ -1,0 +1,41 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: publisher-worker-config-tiup-prod
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: publisher-worker-config-tiup-prod
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        config.yaml: |
+          tiup:
+            kafka:
+              brokers:
+                - cluster-cd-kafka-bootstrap:9092
+              topic: cd-publishing-requests
+              consumer_group: publisher-worker-tiup-prod
+
+            options:
+              mirror_name: prod # will match the subject of the cloud event.
+              mirror_url: {{ .tiup_mirror_url}}
+              lark_webhook_url: {{ .lark_webhook_url }}
+              nightly_interval: 12h
+            redis:
+              addr: "redis-master:6379"
+              db: 0
+              password: {{ .redis_password }}
+  data:
+    - secretKey: redis_password
+      remoteRef:
+        key: prod2_publisher_redis_password
+    - secretKey: tiup_mirror_url
+      remoteRef:
+        key: tiup-prod-mirror-url
+    - secretKey: lark_webhook_url
+      remoteRef:
+        key: prod2_publisher_failure_lark_webhook_url

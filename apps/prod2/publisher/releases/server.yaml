@@ -1,12 +1,12 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: publisher-prod-mirror
+  name: publisher
 spec:
   chart:
     spec:
       chart: publisher
-      version: 0.1.0
+      version: 0.3.0
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -25,31 +25,19 @@ spec:
     # Additional volumes on the output Deployment definition.
     image:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher versioning=semver
-      tag: v2025.11.30-2-gde42167
-    servers:
-      publisher:
-        config:
-          secretName: publisher-config-prod
-          secretKey: service.yaml
-      worker:
-        config:
-          secretName: publisher-config-prod
-          secretKey: worker.yaml
-    volumes:
-      - name: tiup-credentials
-        secret:
-          secretName: tiup-credentials-prod
-      - name: packages-config
-        configMap:
-          name: packages-config
-    volumeMounts:
-      - name: tiup-credentials
-        subPath: private.json
-        mountPath: /root/.tiup/keys/private.json
-        readOnly: true
-      - name: packages-config
-        mountPath: /etc/config
-        readOnly: true
+      tag: v2025.11.30-17-gbeadfd1
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 200m
+        memory: 256Mi
+    server:
+      config:
+        secretName: publisher-server-config
+        secretKey: config.yaml
+        debug: true
     ingress:
       enabled: true
       className: "nginx"
