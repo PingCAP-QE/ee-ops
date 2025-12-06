@@ -1,37 +1,27 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: publisher-config-prod
+  name: publisher-worker-config-tiup-staging
 spec:
   secretStoreRef:
     kind: ClusterSecretStore
     name: ee-gcp-sm
   target:
-    name: publisher-config-prod
+    name: publisher-worker-config-tiup-staging
     creationPolicy: Owner
     template:
       type: Opaque
       data:
-        service.yaml: |
-          event_source: "http://publisher-prod.publisher.svc"
-          kafka:
-            brokers:
-              - cluster-cd-kafka-bootstrap:9092
-            topic: cd-publishing-requests-prod
-            client_id: publisher-prod
-          redis:
-            addr: "redis-master:6379"
-            db: 0
-            password: {{ .redis_password }}
-        worker.yaml: |
+        config.yaml: |
           tiup:
             kafka:
               brokers:
                 - cluster-cd-kafka-bootstrap:9092
-              topic: cd-publishing-requests-prod
-              consumer_group: publisher-prod-tiup
+              topic: cd-publishing-requests
+              consumer_group: publisher-worker-tiup-staging
 
             options:
+              mirror_name: staging # will match the subject of the cloud event.
               mirror_url: {{ .tiup_mirror_url}}
               lark_webhook_url: {{ .lark_webhook_url }}
               nightly_interval: 12h
@@ -45,7 +35,7 @@ spec:
         key: prod2_publisher_redis_password
     - secretKey: tiup_mirror_url
       remoteRef:
-        key: tiup-prod-mirror-url
+        key: tiup-staging-mirror-url
     - secretKey: lark_webhook_url
       remoteRef:
         key: prod2_publisher_failure_lark_webhook_url
