@@ -6,4 +6,5 @@ resources:
   - redis
   - kafka
   - publisher-packages-config.yaml
+  - external-secrets
   - releases.yaml
