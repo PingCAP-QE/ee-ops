@@ -28,11 +28,11 @@ spec:
       tag: v2025.11.30-17-gbeadfd1
     resources:
       limits:
-        cpu: 500m
-        memory: 512Mi
+        cpu: "1"
+        memory: 4Gi
       requests:
-        cpu: 200m
-        memory: 256Mi
+        cpu: 500m
+        memory: 1Gi
     worker:
       config:
         secretName: publisher-worker-config-tiup-staging
