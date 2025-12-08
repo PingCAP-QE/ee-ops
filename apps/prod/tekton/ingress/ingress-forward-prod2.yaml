@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: fwd-prod2-tekton
+  name: fwd-prod2
   namespace: tekton-pipelines
 spec:
   type: ExternalName
@@ -46,7 +46,7 @@ spec:
             path: "${path_for_dashboard_prod2}(/|$)(.*)" # the path is top level, it will cover event-listeners service paths.
             backend:
               service:
-                name: fwd-prod2-tekton
+                name: fwd-prod2
                 port:
                   name: http
 ---
@@ -78,6 +78,6 @@ spec:
             path: "${path_for_hook_prod2}(/|$)(.*)"
             backend:
               service:
-                name: fwd-prod2-tekton
+                name: fwd-prod2
                 port:
                   name: http
