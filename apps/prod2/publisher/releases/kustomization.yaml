@@ -5,3 +5,4 @@ resources:
   - worker-tiup-fileserver.yaml
   - worker-tiup-prod.yaml
   - worker-tiup-staging.yaml
+  - publisher-ext-ingress.yaml
