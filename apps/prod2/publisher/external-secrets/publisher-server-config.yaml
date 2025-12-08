@@ -23,9 +23,9 @@ spec:
             addr: "redis-master:6379"
             db: 0
             password: {{ .redis_password }}
-          # services:
-          #   tiup:
-          #     delivery_config_file_path: /etc/config/delivery.yaml
+          services:
+            tiup:
+              delivery_config_file: /etc/packages/delivery.yaml
   data:
     - secretKey: redis_password
       remoteRef:
