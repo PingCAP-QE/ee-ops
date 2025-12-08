@@ -4,4 +4,3 @@ resources:
   - ingress-dashboard.yaml
   - ingress-event-listener.yaml
   - ingress-forward-prod2.yaml
-  - ingress-forward-prod2-publisher.yaml
