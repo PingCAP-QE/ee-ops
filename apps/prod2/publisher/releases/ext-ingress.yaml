@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+  name: publisher-ext
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: internal2-do.pingcap.net
+      http:
+        paths:
+          - backend:
+              service:
+                name: publisher
+                port:
+                  number: 80
+            path: /publisher(/|$)(.*)
+            pathType: ImplementationSpecific
