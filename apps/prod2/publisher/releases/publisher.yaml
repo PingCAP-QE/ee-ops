@@ -41,10 +41,17 @@ spec:
     ingress:
       enabled: true
       className: "nginx"
+      annotations:
+        nginx.ingress.kubernetes.io/use-regex: "true"
+        nginx.ingress.kubernetes.io/rewrite-target: /$2
       hosts:
         - host: publisher.pingcap.net
           paths:
             - path: /
+              pathType: Prefix
+        - host: internal2-do.pingcap.net
+          paths:
+            - path: /publisher(/|$)(.*)
               pathType: ImplementationSpecific
     volumes:
       - name: packages-config
