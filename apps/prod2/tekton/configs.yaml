@@ -25,7 +25,7 @@ spec:
           value: ee-cd
   postBuild:
     substitute:
-      domain: do.pingcap.net # not available yet.
+      domain: do2.pingcap.net # not available yet.
       domain_internal: internal2-do.pingcap.net
       path_for_el_public: /tekton/hook
       path_for_el_internal: /tekton/hook-internal
