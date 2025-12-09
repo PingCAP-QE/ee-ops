@@ -12,13 +12,14 @@ spec:
           namespaces:
             - brc
             - buildbarn
+            - cs
             - jenkins-beta
             - kafka
             - publisher
             - tekton-operator
             - tekton-pipelines
-            - zot
             - tibuild
+            - zot
       mutate:
         patchStrategicMerge:
           spec:
