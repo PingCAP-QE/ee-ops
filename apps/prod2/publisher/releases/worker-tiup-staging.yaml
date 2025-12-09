@@ -45,7 +45,7 @@ spec:
           secretName: tiup-credentials-staging
       - name: worker-oci-cred
         secret:
-          secretName: worker-registry-cred
+          secretName: registry-reader-cred
     volumeMounts:
       - name: tiup-credentials
         subPath: private.json
