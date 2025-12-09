@@ -1,0 +1,15 @@
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: cloudevents-default-channel
+  labels:
+    strimzi.io/cluster: cluster-cs
+spec: {}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: cloudevents-dead-letter
+  labels:
+    strimzi.io/cluster: cluster-cs
+spec: {}
