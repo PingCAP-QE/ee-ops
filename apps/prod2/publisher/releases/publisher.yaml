@@ -50,8 +50,14 @@ spec:
       - name: packages-config
         configMap:
           name: packages-config
+      - name: worker-oci-cred
+        secret:
+          secretName: registry-reader-cred
     volumeMounts:
       - name: packages-config
         subPath: delivery.yaml
         mountPath: /etc/packages/delivery.yaml
+        readOnly: true
+      - name: worker-oci-cred
+        mountPath: /root/.docker
         readOnly: true

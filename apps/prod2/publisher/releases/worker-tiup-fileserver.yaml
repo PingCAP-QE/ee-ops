@@ -42,7 +42,7 @@ spec:
     volumes:
       - name: worker-oci-cred
         secret:
-          secretName: worker-registry-cred
+          secretName: registry-reader-cred
     volumeMounts:
       - name: worker-oci-cred
         mountPath: /root/.docker
