@@ -1,13 +1,13 @@
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: worker-registry-cred
+  name: registry-reader-cred
 spec:
   secretStoreRef:
     name: ee-gcp-sm
     kind: ClusterSecretStore
   target:
-    name: worker-registry-cred
+    name: registry-reader-cred
     template:
       type: kubernetes.io/dockerconfigjson
   data:
