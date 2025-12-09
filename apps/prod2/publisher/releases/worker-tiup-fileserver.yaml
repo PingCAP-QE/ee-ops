@@ -38,3 +38,12 @@ spec:
         secretName: publisher-worker-config-fileserver
         secretKey: config.yaml
         debug: true
+
+    volumes:
+      - name: worker-oci-cred
+        secret:
+          secretName: worker-registry-cred
+    volumeMounts:
+      - name: worker-oci-cred
+        mountPath: /root/.docker
+        readOnly: true

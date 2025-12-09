@@ -1,0 +1,17 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: worker-registry-cred
+spec:
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: worker-registry-cred
+    template:
+      type: kubernetes.io/dockerconfigjson
+  data:
+    - secretKey: .dockerconfigjson
+      remoteRef:
+        key: prod2_publisher_worker_dockerconfig_json
+  refreshInterval: 1h

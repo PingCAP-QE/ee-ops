@@ -43,8 +43,14 @@ spec:
       - name: tiup-credentials
         secret:
           secretName: tiup-credentials-prod
+      - name: worker-oci-cred
+        secret:
+          secretName: worker-registry-cred
     volumeMounts:
       - name: tiup-credentials
         subPath: private.json
         mountPath: /root/.tiup/keys/private.json
+        readOnly: true
+      - name: worker-oci-cred
+        mountPath: /root/.docker
         readOnly: true
