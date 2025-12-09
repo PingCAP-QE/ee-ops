@@ -7,3 +7,4 @@ resources:
   - publisher-worker-config-tiup-staging.yaml
   - tiup-credentials-prod.yaml
   - tiup-credentials-staging.yaml
+  - publisher-worker-registry-cred.yaml
