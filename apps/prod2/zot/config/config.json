@@ -51,14 +51,25 @@
       }
     },
     "accessControl": {
+      "groups": {
+        "releasors": {
+          "users": ["cd-bot"]
+        }
+      },
       "repositories": {
         "**": {
+          "policies": [
+            {
+              "groups": ["releasors"],
+              "actions": ["read", "create", "update"]
+            }
+          ],
           "anonymousPolicy": ["read"],
           "defaultPolicy": ["read"]
         }
       },
       "adminPolicy": {
-        "users": ["admin"],
+        "users": ["admin", "wuhui.zuo@pingcap.com"],
         "actions": ["read", "create", "update", "delete"]
       }
     },
