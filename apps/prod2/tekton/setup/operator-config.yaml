@@ -21,7 +21,7 @@ spec:
     metrics.count.enable-reason: true
 
     ###### optional items #######
-    default-timeout-minutes: 60 # unit is minutes, default timeout for TaskRun and PipelineRun.
+    default-timeout-minutes: 180 # unit is minutes, default timeout for TaskRun and PipelineRun.
     default-service-account: "default"
     # default empty dir, can not be shared between tasks.
     default-task-run-workspace-binding: >
@@ -39,7 +39,7 @@ spec:
     resources:
       - taskrun
       - pipelinerun
-    keep-since: 30 # unit: minute
+    keep-since: 600 # unit: minute
     schedule: "0 * * * *" # hourly
   hub:
     params:
