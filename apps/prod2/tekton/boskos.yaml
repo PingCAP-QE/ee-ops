@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: tekton-boskos
+spec:
+  dependsOn:
+    - name: tekton-setup
+    - name: tekton-configs
+  targetNamespace: ee-cd
+  interval: 10m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/prod2/tekton/boskos
+  prune: true
+  wait: true
+  timeout: 5m0s
