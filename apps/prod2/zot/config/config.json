@@ -103,28 +103,12 @@
               "prefix": "/pingcap-testing-account/dev/**",
               "destination": "/mirrors/dev",
               "stripPrefix": true
-            }
-          ],
-          "onDemand": true,
-          "tlsVerify": true
-        },
-        {
-          "urls": ["https://us-docker.pkg.dev"],
-          "preserveDigest": true,
-          "content": [
+            },
             {
               "prefix": "/pingcap-testing-account/tidbx/**",
               "destination": "/mirrors/tidbx",
               "stripPrefix": true
-            }
-          ],
-          "onDemand": true,
-          "tlsVerify": true
-        },
-        {
-          "urls": ["https://us-docker.pkg.dev"],
-          "preserveDigest": true,
-          "content": [
+            },
             {
               "prefix": "/pingcap-testing-account/hub/**",
               "destination": "/mirrors/hub",
