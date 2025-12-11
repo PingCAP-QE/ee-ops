@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudevents-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudevents-server
+  template:
+    metadata:
+      labels:
+        app: cloudevents-server
+    spec:
+      containers:
+      - name: cloudevents-server
+        image: cloudevents-server:latest
+        ports:
+        - containerPort: 8080
