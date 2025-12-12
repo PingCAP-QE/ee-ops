@@ -8,4 +8,4 @@ resources:
   - prow
   - tekton
   - kafka
-  # - cloudevents-server
+  - cloudevents-server
