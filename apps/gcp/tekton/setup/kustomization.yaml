@@ -8,6 +8,7 @@ resources:
   - operator-manual-approval-gate.yaml
   - dashboard-extension-cronjobs.yaml
   - http-route.yaml
+  - cm-config-events.yaml
   # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
   - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrole.yaml
   - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrolebinding.yaml
