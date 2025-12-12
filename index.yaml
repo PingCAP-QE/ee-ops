@@ -1,5 +1,19 @@
 apiVersion: v1
 entries:
+  ats:
+  - apiVersion: v2
+    appVersion: v9.1.3
+    created: "2025-12-12T06:46:46.51651246Z"
+    description: Apache traffic server
+    digest: e2bbc7f2619563edca2c00ca146ea20c1b6569a7737d91bd38559a51148f3a77
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: ats
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/ats-0.1.1/ats-0.1.1.tgz
+    version: 0.1.1
   bazel-remote:
   - apiVersion: v2
     appVersion: v2.3.8
@@ -221,6 +235,20 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/git-cdn-0.1.0/git-cdn-0.1.0.tgz
     version: 0.1.0
+  greenhouse:
+  - apiVersion: v2
+    appVersion: v20221109-9447e23b56
+    created: "2025-12-12T06:46:46.815453572Z"
+    description: kubernetes greenhouse bazel remote server.
+    digest: bc7109394de767eca5a47295721b9fa68c42e4aaec1afeab2ceb35299d924dff
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: greenhouse
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/greenhouse-0.2.1/greenhouse-0.2.1.tgz
+    version: 0.2.1
   jenkins:
   - annotations:
       artifacthub.io/category: integration-delivery
@@ -864,4 +892,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-28T10:03:36.077967596Z"
+generated: "2025-12-12T06:46:47.12071333Z"
