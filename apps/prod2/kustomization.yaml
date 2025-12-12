@@ -8,6 +8,7 @@ resources:
   - publisher
   - zot
   - cloudevents-server
+  - cache
   - tibuild # experiment for v2
   - buildbarn # experiment
   - jenkins/beta # experiment
