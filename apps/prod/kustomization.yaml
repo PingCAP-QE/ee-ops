@@ -19,5 +19,4 @@ resources:
   - dl
   - harbor
   - redis
-  - publisher
   - chatops-lark
