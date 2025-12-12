@@ -1,9 +1,9 @@
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
-  name: controller-cs
+  name: controller-cd
   labels:
-    strimzi.io/cluster: cluster-cs
+    strimzi.io/cluster: cluster-cd
 spec:
   replicas: 3
   roles:
@@ -21,9 +21,9 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
 metadata:
-  name: broker-cs
+  name: broker-cd
   labels:
-    strimzi.io/cluster: cluster-cs
+    strimzi.io/cluster: cluster-cd
 spec:
   replicas: 3
   roles:
@@ -41,7 +41,7 @@ spec:
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: cluster-cs
+  name: cluster-cd
   annotations:
     strimzi.io/node-pools: enabled
     strimzi.io/kraft: enabled
