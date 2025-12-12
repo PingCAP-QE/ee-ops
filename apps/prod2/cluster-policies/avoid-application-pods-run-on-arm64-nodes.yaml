@@ -20,6 +20,7 @@ spec:
             - tekton-pipelines
             - tibuild
             - zot
+            - cache
       mutate:
         patchStrategicMerge:
           spec:
