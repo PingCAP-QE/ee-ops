@@ -7,4 +7,4 @@ resources:
   - cla-assistant
   - prow
   - tekton
-  - cloudevents-server
+  # - cloudevents-server
