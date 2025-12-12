@@ -7,4 +7,4 @@ resources:
   - gateways
   - kyverno
   - external-secrets
-  # TODO(wuhuizuo): move the gateway from `apps` folder to here.
+  # - operators
