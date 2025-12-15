@@ -10,7 +10,7 @@ spec:
       interceptors:
         - name: filter on image push events on inner container repositories.
           ref:
-            name: "cel"
+            name: cel
           params:
             - name: filter
               value: >-

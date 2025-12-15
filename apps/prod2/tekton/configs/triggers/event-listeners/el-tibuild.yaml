@@ -70,7 +70,7 @@ spec:
             name: cel
           params:
             - name: filter
-              value: >
+              value: >-
                 header.canonical('ce-type') in ['net.pingcap.tibuild.devbuild.create', 'net.pingcap.tibuild.hotfix.create']
                 &&
                 body.ref_type == 'tag'
