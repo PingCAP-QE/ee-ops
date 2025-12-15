@@ -27,5 +27,6 @@ spec:
     substitute:
       domain: do2.pingcap.net # not available yet.
       domain_internal: internal2-do.pingcap.net
-      path_for_el_public: /tekton/hook
-      path_for_el_internal: /tekton/hook-internal
+      path_for_el_github: /tekton/hook
+      path_for_el_harbor: /tekton/hook-harbor
+      path_for_el_tibuild: /tekton/hook-tibuild

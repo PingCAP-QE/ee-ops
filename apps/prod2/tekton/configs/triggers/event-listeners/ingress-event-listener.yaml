@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: el-public
+  name: el-github
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$2
@@ -13,9 +13,51 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: "${path_for_el_public}(/|$)(.*)"
+            path: "${path_for_el_github}(/|$)(.*)"
             backend:
               service:
                 name: el-github
+                port:
+                  name: http-listener
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: el-harbor
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "${domain_internal}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "${path_for_el_harbor}(/|$)(.*)"
+            backend:
+              service:
+                name: el-harbor
+                port:
+                  name: http-listener
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: el-tibuild
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: "${domain_internal}"
+      http:
+        paths:
+          - pathType: Prefix
+            path: "${path_for_el_tibuild}(/|$)(.*)"
+            backend:
+              service:
+                name: el-tibuild
                 port:
                   name: http-listener

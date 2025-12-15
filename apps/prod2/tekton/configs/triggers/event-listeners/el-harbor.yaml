@@ -1,0 +1,28 @@
+---
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: harbor
+spec:
+  serviceAccountName: tekton-trigger-eventlistener
+  triggerGroups:
+    - name: harbor-image-pushed
+      interceptors:
+        - name: filter on image push events on inner container repositories.
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: >-
+                body.type == 'PUSH_ARTIFACT'
+                &&
+                body.event_data.repository.namespace in ['pingcap', 'tikv', 'pingcap_enterprise', 'pingkai', 'devbuild']
+                &&
+                ! body.event_data.resources[0].tag.startsWith('sha256:')
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: image-push

@@ -16,7 +16,7 @@ Official docs (recommended): https://openebs.io/docs/quickstart-guide/prerequisi
 
 --------------------------------------------------------------------------------
 
-## Safety prerequisites (cluster and nodes) 
+## Safety prerequisites (cluster and nodes)
 
 Mandatory
 - Kubernetes version: 1.23 or higher
