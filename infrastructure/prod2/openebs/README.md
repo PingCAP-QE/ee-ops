@@ -16,7 +16,7 @@ Official docs (recommended): https://openebs.io/docs/quickstart-guide/prerequisi
 
 --------------------------------------------------------------------------------
 
-## Safety prerequisites (cluster and nodes)
+## Safety prerequisites (cluster and nodes) 
 
 Mandatory
 - Kubernetes version: 1.23 or higher
@@ -29,6 +29,7 @@ Mandatory
 - Minimum 3 worker nodes (for replication and quorum)
 - Node labels: label nodes that will run io-engine with:
   - openebs.io/engine=mayastor
+- Node labels for mounting Mayastor PVCs: The label `openebs.io/csi-node=mayastor` will be automatically added by the OpenEBS CSI node daemonset. But you should ensure the node has the `nvme-tcp` kernel module loaded to make the daemonset pod ready.
 - Open network ports on storage nodes:
   - 10124 — Mayastor gRPC
   - 8420, 4421 — NVMe-oF target ports
@@ -53,6 +54,8 @@ Preflight checklist
      - Important: restart kubelet or reboot the node so kubelet reports correct huge pages
 3) Node labels
    - kubectl label node <node-name> openebs.io/engine=mayastor
+4) Node labels for mounting Mayastor PVCs
+   - The label `openebs.io/csi-node=mayastor` will be automatically added by the OpenEBS CSI node daemonset. Ensure the node has the `nvme-tcp` kernel module loaded.
 4) Kubelet root dir
    - Confirm kubelet root is /data/kubelet on all worker nodes
    - If it differs in your cluster, update KUBELET_DIR substitution in openebs/release.yaml accordingly
@@ -189,6 +192,8 @@ Notes
 - PVC Pending:
   - Ensure at least one Online pool exists with enough free space
   - Check that nodes are labeled openebs.io/engine=mayastor
+- Pod Pending:
+  - Ensure that nodes have the `nvme-tcp` kernel module loaded if mounting Mayastor PVCs. The label `openebs.io/csi-node=mayastor` is automatically added by the OpenEBS CSI node daemonset.
 - CSI mount failures:
   - Verify KUBELET_DIR matches actual kubelet root directory on the nodes
 
