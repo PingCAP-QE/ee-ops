@@ -3,5 +3,7 @@ kind: Kustomization
 resources:
   - rbac.yaml
   - el-github.yaml
+  - el-harbor.yaml
   - el-notify.yaml
+  - el-tibuild.yaml
   - ingress-event-listener.yaml
