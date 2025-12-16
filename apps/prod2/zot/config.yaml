@@ -17,7 +17,7 @@ spec:
     substitute:
       EXTERNAL_URL: https://hub-zot.pingcap.net
       # TODO: we should put it in secret that managed by external-secret
-      ZOT_EVENT_SINKER_URL: https://zot-sinker.free.beeceptor.com # free public mock test endpoint
+      ZOT_EVENT_SINKER_URL: https://webhook-test.com/5e5b8e3cc0cbd10543adabee7c1a2a39 # free public mock test endpoint
       # the json file should have content with this format:
       #   {
       #     "127.0.0.1:8080": {
