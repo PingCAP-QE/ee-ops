@@ -99,6 +99,9 @@ spec:
           memory: 1Gi
     redis:
       master:
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/redis
         resourcesPreset: medium
     registry:
       controller:
