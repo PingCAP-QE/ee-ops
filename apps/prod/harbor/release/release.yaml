@@ -64,16 +64,25 @@ spec:
         ingressClassName: nginx
         pathType: ImplementationSpecific
     core:
+      image:
+        registry: docker.io
+        repository: bitnamilegacy/harbor-core
       resources:
         limits:
           cpu: "1"
           memory: 1Gi
     exporter:
+      image:
+        registry: docker.io
+        repository: bitnamilegacy/harbor-exporter
       resources:
         limits:
           cpu: "1"
           memory: 1Gi
     jobservice:
+      image:
+        registry: docker.io
+        repository: bitnamilegacy/harbor-jobservice
       resources:
         limits:
           cpu: "1"
@@ -81,6 +90,9 @@ spec:
     metrics:
       enabled: false
     portal:
+      image:
+        registry: docker.io
+        repository: bitnamilegacy/harbor-portal
       resources:
         limits:
           cpu: 500m
@@ -90,6 +102,9 @@ spec:
         resourcesPreset: medium
     registry:
       controller:
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/harbor-registryctl
         resources:
           limits:
             cpu: 100m
@@ -105,6 +120,9 @@ spec:
             cpu: "4"
             memory: 4Gi
     trivy:
+      image:
+        registry: docker.io
+        repository: bitnamilegacy/harbor-adapter-trivy
       resources:
         limits:
           cpu: "1"
