@@ -1,0 +1,17 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-config
+spec:
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  refreshInterval: 1h
+  target:
+    name: dl-config
+  dataFrom:
+    - extract:
+        # json object contains keys:
+        # - ks3.yaml
+        # - oci.yaml
+        key: prod2_dl_config_json
