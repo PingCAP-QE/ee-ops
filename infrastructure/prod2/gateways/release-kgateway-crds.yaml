@@ -11,5 +11,4 @@ spec:
       version: v2.1.2
       sourceRef:
         kind: HelmRepository
-        name: kgatewiay
-        namespace: flux-system
+        name: kgateway

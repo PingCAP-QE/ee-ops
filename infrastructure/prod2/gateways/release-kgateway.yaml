@@ -14,5 +14,4 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kgateway
-        namespace: flux-system
   values: {}
