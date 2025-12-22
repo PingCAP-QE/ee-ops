@@ -6,6 +6,7 @@ resources:
   - openebs
   - nfs-pvc-provisioner
   - nginx
+  - gateways # will replace nginx ingress controller
   - secret-generator
   - external-secrets
   - kyverno
