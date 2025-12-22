@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: infra
 resources:
   - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.4.0/standard-install.yaml
+  - source-kgateway.yaml
   - release-kgateway-crds.yaml
   - release-kgateway.yaml
   # - ksy-gateway.yaml
