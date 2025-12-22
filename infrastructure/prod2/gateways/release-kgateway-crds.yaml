@@ -12,3 +12,4 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kgateway
+        namespace: infra
