@@ -3,9 +3,12 @@ kind: Kustomization
 resources:
   - ../_base
   - cluster-policies
-  - acr-runners
+  # applications
   - cla-assistant
   - prow
   - tekton
   - kafka
   - cloudevents-server
+  # workloads
+  - acr-runners
+  - jenkins-agents
