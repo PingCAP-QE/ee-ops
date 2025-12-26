@@ -3,6 +3,7 @@ kind: Policy
 metadata:
   name: restrict-to-node-instance-types
 spec:
+  validationFailureAction: Enforce
   rules:
     - name: restrict-non-el-pods-to-c4-c4a
       match:
@@ -28,4 +29,25 @@ spec:
                           operator: In
                           values: ["spot"]
 
+---
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-tekton-tasksruns
+spec:
   validationFailureAction: Enforce
+  rules:
+    - name: inject-annotation-for-tekton-taskruns
+      match:
+        resources:
+          kinds:
+            - Pod
+          selector:
+            matchLabels:
+              app.kubernetes.io/managed-by: tekton-pipelines
+              tekton.dev/memberOf: tasks
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
