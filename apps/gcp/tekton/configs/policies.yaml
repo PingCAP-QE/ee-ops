@@ -3,7 +3,6 @@ kind: Policy
 metadata:
   name: restrict-to-node-instance-types
 spec:
-  validationFailureAction: Enforce
   rules:
     - name: restrict-non-el-pods-to-c4-c4a
       match:
@@ -35,7 +34,6 @@ kind: Policy
 metadata:
   name: protect-tekton-tasksruns
 spec:
-  validationFailureAction: Enforce
   rules:
     - name: inject-annotation-for-tekton-taskruns
       match:
@@ -43,9 +41,9 @@ spec:
           kinds:
             - Pod
           selector:
-            matchLabels:
-              app.kubernetes.io/managed-by: tekton-pipelines
-              tekton.dev/memberOf: tasks
+            matchExpressions:
+              - key: tekton.dev/taskRun
+                operator: Exists
       mutate:
         patchStrategicMerge:
           metadata:
