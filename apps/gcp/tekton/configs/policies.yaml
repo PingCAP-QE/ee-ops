@@ -32,10 +32,10 @@ spec:
 apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
-  name: protect-tekton-tasksruns
+  name: protect-tekton-taskruns
 spec:
   rules:
-    - name: inject-annotation-for-tekton-taskruns
+    - name: inject-annotation-for-tekton-taskrun-pod
       match:
         resources:
           kinds:
