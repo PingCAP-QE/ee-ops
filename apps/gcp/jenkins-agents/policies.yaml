@@ -11,6 +11,9 @@ spec:
             - Pod
       mutate:
         patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
           spec:
             affinity:
               nodeAffinity:

@@ -28,4 +28,24 @@ spec:
                           operator: In
                           values: ["spot"]
 
-  validationFailureAction: Enforce
+---
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-tekton-taskruns
+spec:
+  rules:
+    - name: inject-annotation-for-tekton-taskrun-pod
+      match:
+        resources:
+          kinds:
+            - Pod
+          selector:
+            matchExpressions:
+              - key: tekton.dev/taskRun
+                operator: Exists
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
