@@ -3,7 +3,7 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.462.3-jdk17"
+    tag: "2.528.3-jdk17"
   resources:
     requests:
       cpu: "16"
@@ -40,7 +40,7 @@ controller:
   # Optionally specify additional init-containers
   customInitContainers:
     - name: init-create-logs-dir
-      image: "alpine:3.20.3"
+      image: "alpine:3.23.2"
       imagePullPolicy: Always
       command: ["mkdir", "-p", "/var/jenkins_home/logs"]
       securityContext:

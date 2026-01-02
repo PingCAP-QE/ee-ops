@@ -1,34 +1,35 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  initContainerEnv:
-    - name: JENKINS_UC
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-    - name: JENKINS_UC_DOWNLOAD
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
-  containerEnv:
-    - name: JENKINS_UC
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-    - name: JENKINS_UC_DOWNLOAD
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  # initContainerEnv:
+  #   - name: JENKINS_UC
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+  #   - name: JENKINS_UC_DOWNLOAD
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  # containerEnv:
+  #   - name: JENKINS_UC
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+  #   - name: JENKINS_UC_DOWNLOAD
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
   overwritePlugins: true
-  installLatestPlugins: false
-  initializeOnce: true
-
+  installLatestPlugins: true
+  initializeOnce: false
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
     - prometheus:795.v995762102f28
-    - blueocean:1.27.16
-    - job-dsl:1.89
+    - blueocean:1.27.23
+    - job-dsl:1.93
+    - blueocean:1.27.23
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - pipeline-utility-steps:2.18.0
+    - pipeline-utility-steps:2.20.0
     - http_request:1.18
-    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
+    - jenkins-pipeline-cache:0.2.2:https://github.com/wuhuizuo/jenkins-pipeline-cache-plugin/releases/download/v0.2.2/jenkins-pipeline-cache.hpi
     - generic-webhook-trigger:2.2.5
     - ssh-agent:376.v8933585c69d3
     - cdevents:1-40.vb_3d2c94f2379
+    - kubernetes-credentials-provider:1.299.v610fa_e76761a_
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus
