@@ -3,7 +3,7 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.528.1-jdk17"
+    tag: "2.528.3-jdk21"
   resources:
     requests:
       cpu: "4"
@@ -16,10 +16,11 @@ controller:
   # current jenkins using java-11.
   # Set min/max heap here if needed with:
   javaOpts: >-
-    -Xms8192m -Xmx8192m -XX:+UseG1GC -XX:+AlwaysPreTouch
+    -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0 -XX:MaxRAMPercentage=60.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
     -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled
     -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
     -XX:+UnlockDiagnosticVMOptions
+    -XX:+HeapDumpOnOutOfMemoryError
     -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
 
   # Optionally specify additional init-containers
