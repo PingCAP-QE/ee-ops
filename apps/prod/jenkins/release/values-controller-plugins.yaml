@@ -1,15 +1,15 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  initContainerEnv:
-    - name: JENKINS_UC
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-    - name: JENKINS_UC_DOWNLOAD
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
-  containerEnv:
-    - name: JENKINS_UC
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-    - name: JENKINS_UC_DOWNLOAD
-      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  # initContainerEnv:
+  #   - name: JENKINS_UC
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+  #   - name: JENKINS_UC_DOWNLOAD
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  # containerEnv:
+  #   - name: JENKINS_UC
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
+  #   - name: JENKINS_UC_DOWNLOAD
+  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
   overwritePlugins: true
   installLatestPlugins: true
@@ -29,6 +29,7 @@ controller:
     - generic-webhook-trigger:2.2.5
     - ssh-agent:376.v8933585c69d3
     - cdevents:1-40.vb_3d2c94f2379
+    - kubernetes-credentials-provider:1.299.v610fa_e76761a_
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus

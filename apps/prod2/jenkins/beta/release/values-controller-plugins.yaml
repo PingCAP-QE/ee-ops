@@ -29,6 +29,8 @@ controller:
     - pipeline-utility-steps:2.20.0
     - prometheus:795.v995762102f28
     - ssh-agent:386.v36cc0c7582f0
+    - kubernetes-credentials-provider:1.299.v610fa_e76761a_
+
   initializeOnce: false
 
   # for plugin build-failure-analyzer
