@@ -72,3 +72,5 @@ spec:
             averageUtilization: 70
             type: Utilization
         type: Resource
+    tcp:
+      "50000": jenkins-beta/jenkins-agent:50000
