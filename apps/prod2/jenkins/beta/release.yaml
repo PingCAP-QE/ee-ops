@@ -17,6 +17,6 @@ spec:
   postBuild:
     substitute:
       AGENT_NAMESPACE: jenkins-beta-agents
-      INGRESS_HOST: internal2-do.pingcap.net
+      INGRESS_HOST: do2.pingcap.net
       INGRESS_PATH: /jenkins-beta
       ADMIN_EMAIL: lifu.wu@pingcap.net

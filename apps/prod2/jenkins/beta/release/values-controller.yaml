@@ -1,4 +1,4 @@
-# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES.md
 controller:
   image:
     registry: "docker.io"
@@ -51,6 +51,9 @@ controller:
     apiVersion: networking.k8s.io/v1
     kubernetes.io/tls-acme: "true"
     ingressClassName: nginx
+    annotations:
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600" # 1 hour
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
 
   # Expose Prometheus metrics
   prometheus:
