@@ -20,11 +20,32 @@ spec:
                 - https://github.com/PingCAP-QE/ci/raw/main/scripts/plugins/s3-cache.ts
                 - --op=shrink
                 - --keep-size-g=1000
-              envFrom:
-                - secretRef:
-                    name: ci-pipeline-cache2
-                - configMapRef:
-                    name: ci-pipeline-cache2
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: access-key
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: access-secret
+                - name: BUCKET_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: endpoint
+                - name: BUCKET_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: bucket
+                - name: BUCKET_REGION
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: region
               resources:
                 requests:
                   memory: "128Mi"
@@ -58,11 +79,32 @@ spec:
                 - --threshold-mb=2500
                 - --feishu-webhook=$(CI_MONITOR_FEISHU_WEBHOOK_URL)
                 - --cleanup
-              envFrom:
-                - secretRef:
-                    name: ci-pipeline-cache2
-                - configMapRef:
-                    name: s3-ci-pipeline-cache2
+              env:
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: access-key
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: access-secret
+                - name: BUCKET_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: endpoint
+                - name: BUCKET_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: bucket
+                - name: BUCKET_REGION
+                  valueFrom:
+                    secretKeyRef:
+                      name: jenkins-cache
+                      key: region
               resources:
                 requests:
                   memory: "128Mi"
