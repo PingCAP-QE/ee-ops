@@ -25,6 +25,7 @@ spec:
         digest: ""
         image: ksyun/ingress-nginx-controller
         registry: hub.kce.ksyun.com
+      allowSnippetAnnotations: true
       config:
         compute-full-forwarded-for: "true"
         enable-underscores-in-headers: "true"

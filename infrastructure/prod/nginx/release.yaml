@@ -29,3 +29,4 @@ spec:
           https: "30443"
       ingressClassResource:
         default: true
+      allowSnippetAnnotations: true
