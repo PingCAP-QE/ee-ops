@@ -53,4 +53,4 @@ controller:
   prometheus:
     # If enabled, add the prometheus plugin to the list of plugins to install
     # https://plugins.jenkins.io/prometheus
-    enabled: true
+    enabled: false
