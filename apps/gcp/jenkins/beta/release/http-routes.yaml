@@ -16,5 +16,5 @@ spec:
           port: 8080
       matches:
         - path:
-            type: PathPrefix
+            type: RegularExpression
             value: "${INGRESS_PATH}"
