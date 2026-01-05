@@ -76,7 +76,7 @@ prow:
       configMapName: prow-job
 
 persistent:
-  type: mem    # s3|gcs|mem, file is not ready yet.
+  type: mem # s3|gcs|mem, file is not ready yet.
   bucketName: prow
   credentials:
     secretName: ""
@@ -433,80 +433,80 @@ pipeline:
   # kubeconfigSecret: external kubeconfig secret contain keys: "config"
   kubeconfigSecret: ""
 
-jenkinsOperator:
-  enabled: false
-  additionalArgs: []
-    # - --options-arg=val
-  image:
-    repository: gcr.io/k8s-prow/jenkins-operator
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: ""
-  replicaCount: 1
-  autoscaling:
+jenkinsOperators:
+  # List of Jenkins operators to deploy
+  # Each operator can be configured independently
+  - name: "default"
     enabled: false
-    minReplicas: 1
-    maxReplicas: 100
-    targetCPUUtilizationPercentage: 80
-    # targetMemoryUtilizationPercentage: 80
-  service:
-    type: ClusterIP
-    port: 80
-  serviceAccount:
-    # Specifies whether a service account should be created
-    create: true
-    # Annotations to add to the service account
-    annotations: {}
-    # The name of the service account to use.
-    # If not set and create is true,
-    # a name is generated using the `fullname` template
-    name: ""
-    roleBinding:
+    additionalArgs: []
+      # - --options-arg=val
+    image:
+      repository: gcr.io/k8s-prow/jenkins-operator
+      pullPolicy: IfNotPresent
+      # Overrides the image tag whose default is the chart appVersion.
+      tag: ""
+    replicaCount: 1
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 100
+      targetCPUUtilizationPercentage: 80
+      # targetMemoryUtilizationPercentage: 80
+    service:
+      type: ClusterIP
+      port: 80
+    serviceAccount:
+      # Specifies whether a service account should be created
       create: true
+      # Annotations to add to the service account
+      annotations: {}
+      # The name of the service account to use.
+      # If not set and create is true,
+      # a name is generated using the `fullname` template
       name: ""
-  resources: {}
-  kubeconfigSecret: ""
+      roleBinding:
+        create: true
+        name: ""
+    resources: {}
+    kubeconfigSecret: ""
 
-  # Whether or not to make mutating API calls to GitHub/Kubernetes/Jenkins.
-  dryRun: true
-  # Whether or not to ignore report with githubClient
-  skipReport: false
+    # Whether or not to make mutating API calls to GitHub/Kubernetes/Jenkins.
+    dryRun: true
+    # Whether or not to ignore report with githubClient
+    skipReport: false
 
-  # Jenkins URL
-  jenkinsUrl: http://jenkins-proxy
-  # If CSRF protection is enabled in Jenkins, --csrf-protect=true needs to be used on the operator's side to allow Prow to work correctly.
-  csrfProtect: false
+    # Jenkins URL
+    jenkinsUrl: http://jenkins-proxy
+    # If CSRF protection is enabled in Jenkins, --csrf-protect=true needs to be used on the operator's side to allow Prow to work correctly.
+    csrfProtect: false
 
-  auth:
-    # store auth secret contents.
-    secretName: ""
+    auth:
+      # store auth secret contents.
+      secretName: ""
 
-    # Basic auth and bearer token are mutually exclusive options whereas cert-based auth is complementary to both of them.
-    #
-    # basic auth, using --jenkins-user and --jenkins-token-file.
-    #
-    secretKeyJenkinsUser: jenkins-admin-user
-    secretKeyJenkinsToken: jenkins-admin-password
+      # Basic auth and bearer token are mutually exclusive options whereas cert-based auth is complementary to both of them.
+      #
+      # basic auth, using --jenkins-user and --jenkins-token-file.
+      #
+      secretKeyJenkinsUser: jenkins-admin-user
+      secretKeyJenkinsToken: jenkins-admin-password
 
-    # OpenShift bearer token auth, using --jenkins-bearer-token-file.
-    #
-    secretKeyJenkinsBearerToken: ""
+      # OpenShift bearer token auth, using --jenkins-bearer-token-file.
+      #
+      secretKeyJenkinsBearerToken: ""
 
-    # certificate-based auth, using --cert-file, --key-file, and optionally --ca-cert-file.
-    #
-    secretKeyCert: ""
-    secretKeyKey: ""
-    secretKeyCaCert: ""
-  config:
-    maxConcurrency: 100
-    maxGoroutines: 10
+      # certificate-based auth, using --cert-file, --key-file, and optionally --ca-cert-file.
+      #
+      secretKeyCert: ""
+      secretKeyKey: ""
+      secretKeyCaCert: ""
+    config:
+      maxConcurrency: 100
+      maxGoroutines: 10
 
-  # TODO(wuhuizuo): implement sharding deployment
-  # sharding:
-  #   # will add run args to each jenkins-operator intance container with `--label-selector=<key=value>`
-  #   labelSelectors:
-  #     - master=jenkins-master1
-  #     - master=jenkins-master2
+    # Label selector for sharding deployment
+    # This will add run args to the jenkins-operator instance container with `--label-selector=<key=value>`
+    labelSelector: ""
 
 thirdPlugins: {}
   # needs-rebase:
