@@ -11,4 +11,5 @@ resources:
   - cloudevents-server
   # workloads
   - acr-runners
+  - jenkins/beta
   - jenkins-agents

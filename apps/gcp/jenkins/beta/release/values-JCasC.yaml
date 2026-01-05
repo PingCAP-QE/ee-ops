@@ -1,0 +1,308 @@
+controller:
+  # 'name' is a name of an existing secret in same namespace as jenkins,
+  # 'keyName' is the name of one of the keys inside current secret.
+  # the 'name' and 'keyName' are concatenated with a '-' in between, so for example:
+  # an existing secret "secret-credentials" and a key inside it named "github-password" should be used in Jcasc as ${secret-credentials-github-password}
+  # 'name' and 'keyName' must be lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-',
+  # and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc')
+  additionalExistingSecrets:
+    # for login with google
+    - { name: google-oauth, keyName: client-id }
+    - { name: google-oauth, keyName: client-secret }
+
+    # for git clone for private repo.
+    - { name: github, keyName: git-private-key }
+    - { name: github, keyName: git-username }
+    - { name: github, keyName: bot-token }
+    - { name: github, keyName: pr-diff-token }
+
+    # for codecov.io uploading
+    - { name: codecov-token, keyName: tidb }
+    - { name: codecov-token, keyName: tikv-migration }
+    - { name: codecov-token, keyName: tiflow }
+    - { name: codecov-token, keyName: tiproxy }
+
+    # for harbor
+    - { name: harbor, keyName: tiflow-engine-username }
+    - { name: harbor, keyName: tiflow-engine-password }
+
+    # for ci cache, no need create manually.
+    - { name: jenkins-cache, keyName: region }
+    - { name: jenkins-cache, keyName: bucket }
+    - { name: jenkins-cache, keyName: endpoint }
+    - { name: jenkins-cache, keyName: access-key }
+    - { name: jenkins-cache, keyName: access-secret }
+
+    # for s3 upload
+    - { name: docs-cn, keyName: aws-ak }
+    - { name: docs-cn, keyName: aws-sk }
+    - { name: docs-cn, keyName: aws-region }
+    - { name: docs-cn, keyName: aws-bn }
+    - { name: docs-cn, keyName: qiniu-ak }
+    - { name: docs-cn, keyName: qiniu-sk }
+    - { name: docs-cn, keyName: qiniu-bn }
+
+    # for ks3util
+    - { name: ks3util, keyName: config }
+
+  additionalSecrets: []
+  #  - name: nameOfSecret
+  #    value: secretText
+
+  JCasC:
+    defaultConfig: true
+    # Ignored if authorizationStrategy is defined in controller.JCasC.configScripts
+    authorizationStrategy: |-
+      # loggedInUsersCanDoAnything:
+      #   allowAnonymousRead: true # allow users to read builds logs without logging in.
+      #
+      roleBased:
+        permissionTemplates:
+          - name: "read-build-template"
+            permissions:
+              - "Job/Cancel"
+              - "Job/Build"
+              - "Job/Read"
+          - name: "configure-template"
+            permissions:
+              - "Job/Cancel"
+              - "Job/Build"
+              - "Job/Read"
+              - "Job/Configure"
+        roles:
+          global:
+            # Full administrator
+            - name: "admin"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "Overall/Administer"
+              entries:
+                - user: "wuhui.zuo@pingcap.com"
+
+            # Reader
+            - name: "builder"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "Job/Read"
+                - "Job/Build"
+                - "Job/Cancel"
+                - "Run/Read"
+                - "View/Read"
+                - "Metrics/Read"
+              entries:
+                - user: "lifu.wu@pingcap.com"
+
+            # Readonly
+            - name: "readonly"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "Job/Read"
+                - "Run/Read"
+                - "View/Read"
+              entries:
+                - user: anonymous
+                - group: authenticated
+
+    # for security.
+    security:
+      globalJobDslSecurityConfiguration:
+        useScriptSecurity: false
+
+    securityRealm: |-
+      # local:
+      #   allowsSignup: false
+      #   enableCaptcha: false
+      #   users:
+      #   - id: "${chart-admin-username}"
+      #     name: "Jenkins Admin"
+      #     password: "${chart-admin-password}"
+      googleOAuth2:
+        clientId: "${google-oauth-client-id}"
+        clientSecret: "${google-oauth-client-secret}"
+        domain: "pingcap.com"
+
+    # REF Doc: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/README.md
+    #
+    # Notable: if you want delete some key, first please delete the conetnt but keep the key.
+    #   after deployed, then create other commit and push to delete the key.
+    configScripts:
+      #  welcome-message: |
+      #    jenkins:
+      #      systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+      # Ignored if securityRealm is defined in controller.JCasC.configScripts and
+      # ignored if controller.enableXmlConfig=true as controller.securityRealm takes precedence
+      # securityRealm: |
+      #   jenkins:
+      #     securityRealm:
+      #       googleOAuth2:
+      #         # will read from key `client-id` from secret `google-oauth2`
+      #         clientId: "${google-oauth2-client-id}"
+      #         # will read from key `client-secret` from secret `google-oauth2`
+      #         clientSecret: "${google-oauth2-client-secret}"
+
+      # for credentials, REF Doc: https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/credentials
+      credentials: |
+        credentials:
+          system:
+            domainCredentials:
+              - credentials:
+                  - file:
+                      scope: GLOBAL
+                      id: "ks3util-config"
+                      fileName: "ks3util.conf"
+                      secretBytes: "${base64:${ks3util-config}}"
+              - domain:
+                  name: github.com
+                  description: github ssh and open api
+                credentials:
+                  - basicSSHUserPrivateKey:
+                      id: github-sre-bot-ssh # TODO: change the id.
+                      privateKeySource:
+                        directEntry:
+                          privateKey: ${github-git-private-key}
+                      scope: GLOBAL
+                      username: ${github-git-username}
+                      usernameSecret: true
+                  - string:
+                      id: github-bot-token
+                      description: github private token to call api.
+                      scope: GLOBAL
+                      secret: ${github-bot-token}
+                  - string:
+                      id: github-pr-diff-token
+                      description: github token to list pr diff files.
+                      scope: GLOBAL
+                      secret: ${github-pr-diff-token}
+              - domain:
+                  name: codecov.io
+                credentials:
+                  - string:
+                      id: codecov-token-tidb
+                      description: codecov token for tidb
+                      scope: GLOBAL
+                      secret: ${codecov-token-tidb}
+                  - string:
+                      id: codecov-token-tikv-migration
+                      description: codecov token for tikv/migration
+                      scope: GLOBAL
+                      secret: ${codecov-token-tikv-migration}
+                  - string:
+                      id: codecov-token-tiflow
+                      description: codecov token for tiflow
+                      scope: GLOBAL
+                      secret: ${codecov-token-tiflow}
+                  - string:
+                      id: codecov-token-tiproxy
+                      description: codecov token for tiproxy
+                      scope: GLOBAL
+                      secret: ${codecov-token-tiproxy}
+              - domain:
+                  name: ci.service
+                credentials:
+                  - string:
+                      id: docs-cn-aws-ak
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-ak}
+                  - string:
+                      id: docs-cn-aws-sk
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-sk}
+                  - string:
+                      id: docs-cn-aws-region
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-region}
+                  - string:
+                      id: docs-cn-aws-bn
+                      description: aws token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-aws-bn}
+                  - string:
+                      id: docs-cn-qiniu-ak
+                      description: qiniu token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-qiniu-ak}
+                  - string:
+                      id: docs-cn-qiniu-sk
+                      description: qiniu token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-qiniu-sk}
+                  - string:
+                      id: docs-cn-qiniu-bn
+                      description: qiniu token for docs-cn
+                      scope: GLOBAL
+                      secret: ${docs-cn-qiniu-bn}
+              - domain:
+                  name: hub.pingcap.net
+                credentials:
+                  - usernamePassword:
+                      scope: GLOBAL
+                      id: harbor-tiflow-engine
+                      description: user/password for tiflow engine test in harbor
+                      username: ${harbor-tiflow-engine-username}
+                      password: ${harbor-tiflow-engine-password}
+
+      # for jobs.
+      jobs-dsl: |
+        jobs:
+          - script: |
+              job('seed') {
+                description('''
+                    Jenkins jobs As Code
+                    No need to configure job on Jenkins Web UI anymore.
+                ''')
+                scm {
+                  git {
+                    remote {
+                      github('PingCAP-QE/ci', 'https')
+                    }
+                    branch('main')
+                  }
+                }
+                triggers {
+                  githubPush()
+                }
+                steps {
+                  jobDsl {
+                    targets('jobs/**/*.groovy')
+                    failOnMissingPlugin(false)
+                    ignoreMissingFiles(true)
+                    ignoreExisting(false)
+                    removedJobAction('DELETE')
+                    removedConfigFilesAction('DELETE')
+                    removedViewAction('DELETE')
+                    lookupStrategy('SEED_JOB')
+                    sandbox(false)
+                  }
+                }
+              }
+
+              queue('seed')
+      github-plugin-config: |
+        unclassified:
+          gitHubConfiguration:
+            apiRateLimitChecker: ThrottleOnOver
+          gitHubPluginConfig:
+            hookUrl: "https://${INGRESS_HOST}${INGRESS_PATH}/github-webhook/"
+      pipeline-cache: |
+        unclassified:
+          pipeline-cache:
+            region: ${jenkins-cache-region}
+            bucket: ${jenkins-cache-bucket}
+            endpoint: ${jenkins-cache-endpoint}
+            username: ${jenkins-cache-access-key}
+            password: ${jenkins-cache-access-secret}
+            threshold: 400000 # limit to 400GiB
+      # for global env variables
+      env-vars: |
+        jenkins:
+          globalNodeProperties:
+            - envVars:
+                env:
+                  - key: "GOPROXY"
+                    value: "http://goproxy.apps.svc,https://proxy.golang.org,direct"
