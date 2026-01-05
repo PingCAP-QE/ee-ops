@@ -20,4 +20,4 @@ spec:
       INGRESS_HOST: prow.tidb.net
       INGRESS_PATH: /jenkins
       ADMIN_EMAIL: wuhui.zuo@pingcap.com
-      PERSISTENCE_STORAGE_CLASS: hyperdisk-rwo
+      PERSISTENCE_STORAGE_CLASS: standard-rwo
