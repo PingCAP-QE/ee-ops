@@ -1,0 +1,23 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: jenkins-release
+spec:
+  targetNamespace: jenkins
+  dependsOn:
+    - name: jenkins-pre
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/gcp/jenkins/beta/release
+  prune: true
+  postBuild:
+    substitute:
+      AGENT_NAMESPACE: jenkins-agents
+      INGRESS_HOST: prow.tidb.net
+      INGRESS_PATH: /jenkins
+      ADMIN_EMAIL: wuhui.zuo@pingcap.com
+      PERSISTENCE_STORAGE_CLASS: hyperdisk-rwo

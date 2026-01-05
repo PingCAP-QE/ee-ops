@@ -17,6 +17,7 @@ spec:
             - tekton-pipelines
             - kafka
             - kafka-operator
+            - jenkins
       mutate:
         patchStrategicMerge:
           spec:

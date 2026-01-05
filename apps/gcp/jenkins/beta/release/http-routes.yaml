@@ -1,0 +1,20 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: controller
+  namespace: jenkins
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: infra
+  hostnames:
+    - "${INGRESS_HOST}"
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 8080
+      matches:
+        - path:
+            type: PathPrefix
+            value: "${INGRESS_PATH}"
