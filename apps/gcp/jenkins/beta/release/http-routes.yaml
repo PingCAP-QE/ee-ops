@@ -16,5 +16,5 @@ spec:
           port: 8080
       matches:
         - path:
-            type: Exact
+            type: PathPrefix
             value: "${INGRESS_PATH}"
