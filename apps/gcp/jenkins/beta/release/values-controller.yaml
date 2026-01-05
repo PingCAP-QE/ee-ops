@@ -1,0 +1,56 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES.md
+controller:
+  image:
+    registry: "docker.io"
+    repository: "jenkins/jenkins"
+    tag: "2.528.3-jdk21"
+  resources:
+    requests:
+      cpu: "3"
+      memory: 12Gi
+    limits:
+      cpu: "6"
+      memory: 24Gi
+
+  # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
+  # current jenkins using java-11.
+  # Set min/max heap here if needed with:
+  javaOpts: >-
+    -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0 -XX:MaxRAMPercentage=60.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
+    -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled
+    -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
+    -XX:+UnlockDiagnosticVMOptions
+    -XX:+HeapDumpOnOutOfMemoryError
+    -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
+
+  # Optionally specify additional init-containers
+  customInitContainers:
+    - name: init-create-logs-dir
+      image: "alpine:3.20.3"
+      imagePullPolicy: Always
+      command: ["mkdir", "-p", "/var/jenkins_home/logs"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsGroup: 1000
+        runAsUser: 1000
+      volumeMounts:
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
+
+  # jenkinsOpts: ""
+  # If you are using the ingress definitions provided by this chart via the `controller.ingress` block the configured hostname will be the ingress hostname starting with `https://` or `http://` depending on the `tls` configuration.
+  # The Protocol can be overwritten by specifying `controller.jenkinsUrlProtocol`.
+  # jenkinsUrlProtocol: "https"
+  # If you are not using the provided ingress you can specify `controller.jenkinsUrl` to change the url definition.
+  # jenkinsUrl: ""
+  # If you set this prefix and use ingress controller then you might want to set the ingress path below
+
+  ingress:
+    enabled: false
+
+  # Expose Prometheus metrics
+  prometheus:
+    # If enabled, add the prometheus plugin to the list of plugins to install
+    # https://plugins.jenkins.io/prometheus
+    enabled: true
