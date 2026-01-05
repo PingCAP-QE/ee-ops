@@ -27,6 +27,10 @@ spec:
         nodePorts:
           http: "30080"
           https: "30443"
+          tcp:
+            "50000": "30500"
       ingressClassResource:
         default: true
       allowSnippetAnnotations: true
+    tcp:
+      "50000": apps/jenkins-agent:50000
