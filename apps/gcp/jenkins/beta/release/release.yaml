@@ -34,12 +34,11 @@ spec:
       containerCap: 200
 
     controller:
+      servicePort: 80
+      targetPort: 80
       jenkinsUriPrefix: "${INGRESS_PATH}"
       jenkinsUrl: "https://${INGRESS_HOST}${INGRESS_PATH}"
       jenkinsAdminEmail: "${ADMIN_EMAIL}"
-      # ingress:
-      #   path: "${INGRESS_PATH}"
-      #   hostName: "${INGRESS_HOST}"
 
     persistence:
       enabled: true
