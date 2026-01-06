@@ -1,19 +1,19 @@
-apiVersion: networking.gke.io/v1
-kind: HealthCheckPolicy
-metadata:
-  name: controller-backend
-spec:
-  default:
-    config:
-      type: HTTP
-      httpHealthCheck:
-        port: 8080
-        requestPath: "${INGRESS_PATH}"
-        response: "200"
-  targetRef:
-    group: ""
-    kind: Service
-    name: jenkins
+# apiVersion: networking.gke.io/v1
+# kind: HealthCheckPolicy
+# metadata:
+#   name: controller-backend
+# spec:
+#   default:
+#     config:
+#       type: HTTP
+#       httpHealthCheck:
+#         port: 8080
+#         requestPath: "${INGRESS_PATH}/login"
+#         response: "200"
+#   targetRef:
+#     group: ""
+#     kind: Service
+#     name: jenkins
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
