@@ -6,14 +6,13 @@ controller:
     tag: "2.528.3-jdk21"
   resources:
     requests:
+      cpu: "2"
+      memory: 8Gi
+    limits:
       cpu: "3"
       memory: 12Gi
-    limits:
-      cpu: "6"
-      memory: 24Gi
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
-  # current jenkins using java-11.
   # Set min/max heap here if needed with:
   javaOpts: >-
     -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0 -XX:MaxRAMPercentage=60.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
