@@ -6,8 +6,8 @@ controller:
     tag: "2.528.3-jdk21"
   resources:
     requests:
-      cpu: "2"
-      memory: 8Gi
+      cpu: "3"
+      memory: 12Gi
     limits:
       cpu: "3"
       memory: 12Gi
