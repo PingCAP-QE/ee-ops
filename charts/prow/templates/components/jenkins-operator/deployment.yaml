@@ -1,14 +1,12 @@
-{{- if .Values.jenkinsOperators }}
-{{- $firstOperator := index .Values.jenkinsOperators 0 }}
-{{- if $firstOperator.serviceAccount.create }}
-{{- range $index, $operator := .Values.jenkinsOperators }}
-{{- if $operator.enabled }}
+{{- if .Values.jenkinsOperator.enable }}
+{{- range $index, $operator := .Values.jenkinsOperator.instances }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "prow.fullname.jenkinsoperator" (list $ $operator.name) }}
+  name: {{ include "prow.fullname.jenkinsoperator" . }}-{{ $index }}
   labels:
-    {{- include "prow.labels.jenkinsoperator" (list $ $operator.name) | nindent 4 }}
+    {{- include "prow.labels" . | nindent 4 }}
+    app.kubernetes.io/app: jenkins-operator-{{ $index }}
 spec:
   {{- if not $operator.autoscaling.enabled }}
   replicas: {{ $operator.replicaCount }}
@@ -17,7 +15,8 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      {{- include "prow.selectorLabels.jenkinsoperator" (list $ $operator.name) | nindent 6 }}
+      {{ include "prow.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/app: jenkins-operator-{{ $index }}
   template:
     metadata:
       {{- with $.Values.podAnnotations }}
@@ -25,21 +24,22 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "prow.selectorLabels.jenkinsoperator" (list $ $operator.name) | nindent 8 }}
+        {{ include "prow.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/app: jenkins-operator-{{ $index }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "prow.serviceAccountName.jenkinsoperator" (list $ "default" 0) }}
+      serviceAccountName: {{ include "prow.serviceAccountName.jenkinsoperator" . }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ $.Chart.Name }}
           securityContext:
             {{- toYaml $.Values.securityContext | nindent 12 }}
-          image: "{{ $operator.image.repository }}:{{ $operator.image.tag | default $.Chart.AppVersion }}"
-          imagePullPolicy: {{ $operator.image.pullPolicy | default $.Values.imagePullPolicy }}
+          image: "{{ $.Values.jenkinsOperator.image.repository }}:{{ $.Values.jenkinsOperator.image.tag | default $.Chart.AppVersion }}"
+          imagePullPolicy: {{ $.Values.jenkinsOperator.image.pullPolicy | default $.Values.jenkinsOperator.image.imagePullPolicy }}
           args:
             - --github-token-path=/etc/github/token
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" $ }}
@@ -167,8 +167,3 @@ spec:
 ---
 {{- end }}
 {{- end }}
-{{- end }}
-{{- end }}
-``` -->
-
-Now, let's update the `hpa.yaml` file to use the single `ServiceAccount` and ensure it works correctly with multiple Jenkins operators. Here's the complete file content:

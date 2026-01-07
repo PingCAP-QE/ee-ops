@@ -1,13 +1,12 @@
-{{- if .Values.jenkinsOperators }}
-{{- $firstOperator := index .Values.jenkinsOperators 0 }}
-{{- if and $firstOperator.enabled $firstOperator.serviceAccount.roleBinding.create }}
+{{- if .Values.jenkinsOperator.enable }}
+{{- if .Values.jenkinsOperator.serviceAccount.roleBinding.create }}
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  namespace: {{ $.Values.prow.podsNamespace }}
-  name: {{ include "prow.roleName.jenkinsoperator" (list $ "default" 0) }}
+  name: {{ include "prow.roleName.jenkinsoperator" . }}
   labels:
-    {{- include "prow.labels.jenkinsoperator" (list $ "default") | nindent 4 }}
+    {{- include "prow.labels" . | nindent 4 }}
+    app.kubernetes.io/app: jenkins-operator
 rules:
   - apiGroups:
       - prow.k8s.io
@@ -31,19 +30,16 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: {{ include "prow.roleBindingName.jenkinsoperator" (list $ "default" 0) }}
+  name: {{ include "prow.roleBindingName.jenkinsoperator" . }}
   labels:
-    {{- include "prow.labels.jenkinsoperator" (list $ "default") | nindent 4 }}
+    {{- include "prow.labels" . | nindent 4 }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: {{ include "prow.roleName.jenkinsoperator" (list $ "default" 0) }}
+  name: {{ include "prow.roleName.jenkinsoperator" . }}
 subjects:
   - kind: ServiceAccount
-    name: {{ include "prow.serviceAccountName.jenkinsoperator" (list $ "default" 0) }}
+    name: {{ include "prow.serviceAccountName.jenkinsoperator" . }}
     namespace: {{ $.Release.Namespace }}
 {{- end }}
 {{- end }}
-``` -->
-
-Now, let's update the `deployment.yaml` file to add the `--label-selector` argument if it is configured. I'll provide the updated file content.

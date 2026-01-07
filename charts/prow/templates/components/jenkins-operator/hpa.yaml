@@ -1,17 +1,18 @@
-{{- if .Values.jenkinsOperators }}
-{{- range $index, $operator := .Values.jenkinsOperators }}
+{{- if .Values.jenkinsOperator.enable }}
+{{- range $index, $operator := .Values.jenkinsOperator.instances }}
 {{- if and $operator.enabled $operator.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "prow.fullname.jenkinsoperator" (list $ $operator.name) }}
+  name: {{ include "prow.fullname.jenkinsoperator" . }}-{{ $index }}
   labels:
-    {{- include "prow.labels.jenkinsoperator" (list $ $operator.name) | nindent 4 }}
+    {{- include "prow.labels" . | nindent 4 }}
+    app.kubernetes.io/app: jenkins-operator-{{ $index }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "prow.fullname.jenkinsoperator" (list $ $operator.name) }}
+    name: {{ include "prow.fullname.jenkinsoperator" . }}-{{ $index }}
   minReplicas: {{ $operator.autoscaling.minReplicas }}
   maxReplicas: {{ $operator.autoscaling.maxReplicas }}
   metrics:

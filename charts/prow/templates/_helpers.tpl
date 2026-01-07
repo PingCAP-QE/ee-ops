@@ -102,12 +102,7 @@ full name for component tide
 {{- end }}
 
 {{/*
-full name for jenkins operator with name
-*/}}
-{{- define "prow.fullname.jenkinsoperator" -}}
-{{- $name := index . 1 -}}
-{{ include "prow.fullname" . }}-jenkins-operator-{{ $name }}
-{{- end }}
+
 
 {{/*
 Create chart name and version as used by the chart label.
@@ -193,14 +188,6 @@ app.kubernetes.io/app: pipeline
 {{- end }}
 
 {{/*
-Labels for jenkins operator
-*/}}
-{{- define "prow.labels.jenkinsoperator" -}}
-{{ include "prow.labels" . }}
-app.kubernetes.io/app: jenkins-operator
-{{- end }}
-
-{{/*
 Labels for status-reconciler
 */}}
 {{- define "prow.labels.statusReconciler" -}}
@@ -214,14 +201,6 @@ Labels for tide
 {{- define "prow.labels.tide" -}}
 {{ include "prow.labels" . }}
 app.kubernetes.io/app: tide
-{{- end }}
-
-{{/*
-Labels for jenkins operator with name
-*/}}
-{{- define "prow.labels.jenkinsoperator" -}}
-{{ include "prow.labels" . }}
-app.kubernetes.io/app: jenkins-operator-{{ index . 1 }}
 {{- end }}
 
 {{/*
@@ -322,14 +301,6 @@ app.kubernetes.io/app: tide
 {{- end }}
 
 {{/*
-Selector labels for jenkins operator with name
-*/}}
-{{- define "prow.selectorLabels.jenkinsoperator" -}}
-{{ include "prow.selectorLabels" . }}
-app.kubernetes.io/app: jenkins-operator-{{ index . 1 }}
-{{- end }}
-
-{{/*
 Create the name of the service account to use
 */}}
 {{- define "prow.serviceAccountName.crier" -}}
@@ -412,18 +383,6 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
-{{/*
-Create the name of the service account to use for jenkins operator with name
-*/}}
-{{- define "prow.serviceAccountName.jenkinsoperator" -}}
-{{- $name := index . 1 -}}
-{{- $operator := (index .Values.jenkinsOperators (atoi (index . 2))) -}}
-{{- if $operator.serviceAccount.create }}
-{{- default (include "prow.fullname.jenkinsoperator" (list . $name)) $operator.serviceAccount.name }}
-{{- else }}
-{{- default "default" $operator.serviceAccount.name }}
-{{- end }}
-{{- end }}
 
 {{/*
 Create the name of the role
@@ -485,17 +444,6 @@ Create the name of the role
 {{- define "prow.roleName.tide" -}}
 {{- if .Values.tide.serviceAccount.roleBinding.create }}
 {{- default (include "prow.fullname.tide" .) .Values.tide.serviceAccount.roleBinding.name }}
-{{- end }}
-{{- end }}
-
-{{/*
-Create the name of the role for jenkins operator with name
-*/}}
-{{- define "prow.roleName.jenkinsoperator" -}}
-{{- $name := index . 1 -}}
-{{- $operator := (index .Values.jenkinsOperators (atoi (index . 2))) -}}
-{{- if $operator.serviceAccount.roleBinding.create }}
-{{- default (include "prow.fullname.jenkinsoperator" (list . $name)) $operator.serviceAccount.roleBinding.name }}
 {{- end }}
 {{- end }}
 
@@ -563,16 +511,6 @@ Create the name of the role binding
 {{- end }}
 {{- end }}
 
-{{/*
-Create the name of the role binding for jenkins operator with name
-*/}}
-{{- define "prow.roleBindingName.jenkinsoperator" -}}
-{{- $name := index . 1 -}}
-{{- $operator := (index .Values.jenkinsOperators (atoi (index . 2))) -}}
-{{- if $operator.serviceAccount.roleBinding.create }}
-{{- default (include "prow.fullname.jenkinsoperator" (list . $name)) $operator.serviceAccount.roleBinding.name }}
-{{- end }}
-{{- end }}
 
 
 {{- define "prow.persistent.scheme" -}}
