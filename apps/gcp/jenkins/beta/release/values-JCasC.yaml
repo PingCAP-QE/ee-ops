@@ -298,11 +298,16 @@ controller:
             username: ${jenkins-cache-access-key}
             password: ${jenkins-cache-access-secret}
             threshold: 400000 # limit to 400GiB
+      cdevents: |
+        unclassified:
+          cDEventsGlobalConfig:
+            httpSinkUrl: "http://cloudevents-server.cs.svc"
+            sinkType: "http"
       # for global env variables
-      env-vars: |
-        jenkins:
-          globalNodeProperties:
-            - envVars:
-                env:
-                  - key: "GOPROXY"
-                    value: "http://goproxy.apps.svc,https://proxy.golang.org,direct"
+      # env-vars: |
+      #   jenkins:
+      #     globalNodeProperties:
+      #       - envVars:
+      #           env:
+      #             - key: "GOPROXY"
+      #               value: "http://goproxy.apps.svc,https://proxy.golang.org,direct"
