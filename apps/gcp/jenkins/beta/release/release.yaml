@@ -11,6 +11,9 @@ spec:
         kind: HelmRepository
         name: jenkins
         namespace: flux-system
+  dependsOn:
+    - name: cloudevents-server
+      namespace: cs
   interval: 1h0m0s
   timeout: 15m
   install:
