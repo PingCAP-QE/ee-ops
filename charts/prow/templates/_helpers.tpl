@@ -102,6 +102,9 @@ full name for component tide
 {{- end }}
 
 {{/*
+
+
+{{/*
 Create chart name and version as used by the chart label.
 */}}
 {{- define "prow.chart" -}}
@@ -182,14 +185,6 @@ Labels for pipeline
 {{- define "prow.labels.pipeline" -}}
 {{ include "prow.labels" . }}
 app.kubernetes.io/app: pipeline
-{{- end }}
-
-{{/*
-Labels for jenkins operator
-*/}}
-{{- define "prow.labels.jenkinsoperator" -}}
-{{ include "prow.labels" . }}
-app.kubernetes.io/app: jenkins-operator
 {{- end }}
 
 {{/*
@@ -388,6 +383,7 @@ Create the name of the service account to use
 {{- end }}
 {{- end }}
 
+
 {{/*
 Create the name of the role
 */}}
@@ -514,6 +510,7 @@ Create the name of the role binding
 {{- default (include "prow.fullname.tide" .) .Values.tide.serviceAccount.roleBinding.name }}
 {{- end }}
 {{- end }}
+
 
 
 {{- define "prow.persistent.scheme" -}}
