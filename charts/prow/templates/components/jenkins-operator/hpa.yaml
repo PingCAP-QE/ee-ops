@@ -1,30 +1,38 @@
-{{- if .Values.jenkinsOperator.enabled }}
-{{- if .Values.jenkinsOperator.autoscaling.enabled }}
-apiVersion: autoscaling/v2beta1
+{{- if .Values.jenkinsOperator.enable }}
+{{- range $index, $operator := .Values.jenkinsOperator.instances }}
+{{- if and $operator.enabled $operator.autoscaling.enabled }}
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "prow.fullname.jenkinsoperator" . }}
+  name: {{ include "prow.fullname.jenkinsoperator" . }}-{{ $index }}
   labels:
-    {{- include "prow.labels.jenkinsoperator" . | nindent 4 }}
+    {{- include "prow.labels" . | nindent 4 }}
+    app.kubernetes.io/app: jenkins-operator-{{ $index }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "prow.fullname.jenkinsoperator" . }}
-  minReplicas: {{ .Values.jenkinsOperator.autoscaling.minReplicas }}
-  maxReplicas: {{ .Values.jenkinsOperator.autoscaling.maxReplicas }}
+    name: {{ include "prow.fullname.jenkinsoperator" . }}-{{ $index }}
+  minReplicas: {{ $operator.autoscaling.minReplicas }}
+  maxReplicas: {{ $operator.autoscaling.maxReplicas }}
   metrics:
-    {{- with .Values.jenkinsOperator.autoscaling.targetCPUUtilizationPercentage }}
+    {{- with $operator.autoscaling.targetCPUUtilizationPercentage }}
     - type: Resource
       resource:
         name: cpu
-        targetAverageUtilization: {{ . }}
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
     {{- end }}
-    {{- with .Values.jenkinsOperator.autoscaling.targetMemoryUtilizationPercentage }}
+    {{- with $operator.autoscaling.targetMemoryUtilizationPercentage }}
     - type: Resource
       resource:
         name: memory
-        targetAverageUtilization: {{ . }}
+        target:
+          type: Utilization
+          averageUtilization: {{ . }}
     {{- end }}
+---
+{{- end }}
 {{- end }}
 {{- end }}
