@@ -76,7 +76,8 @@ prow:
       configMapName: prow-job
 
 persistent:
-  type: mem # s3|gcs|mem, file is not ready yet.
+  # s3|gcs|mem, file is not ready yet.
+  type: mem
   bucketName: prow
   credentials:
     secretName: ""
