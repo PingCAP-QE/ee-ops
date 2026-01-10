@@ -1,6 +1,6 @@
 {{- if .Values.jenkinsOperator.enable }}
 {{- range $index, $operator := .Values.jenkinsOperator.instances }}
-{{- if and $operator.enabled $operator.autoscaling.enabled }}
+{{- if $operator.autoscaling.enabled }}
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
