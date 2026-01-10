@@ -151,6 +151,7 @@ spec:
             enabled: false
           skipReport: true
           dryRun: false
+          csrfProtect: false
           jenkinsUrl: ${JENKINS_BASE_URL}
           auth:
             secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
