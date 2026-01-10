@@ -29,7 +29,7 @@ deck:
   {{- if .Values.jenkinsOperator.enabled }}
   external_agent_logs:
   - agent: jenkins
-    url_template: 'http://{{ include "prow.fullname.jenkinsoperator" . }}/job/{{`{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/consoleText`}}'
+    url_template: 'http://{{ include "prow.fullname.jenkinsoperator" . }}-{{ or (index .Labels "master") "0" }}/job/{{.Spec.Job}}/{{.Status.JenkinsBuildID}}/consoleText'
   {{- end }}
 plank:
   job_url_prefix_config:
