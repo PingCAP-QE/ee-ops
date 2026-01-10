@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.10.1
+      version: 0.9.10
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -144,18 +144,13 @@ spec:
       image:
         repository: ghcr.io/ti-community-infra/prow/jenkins-operator
         tag: v20251229-c8fca2457
-      instances:
-        - name: default
-          replicaCount: 1
-          autoscaling:
-            enabled: false
-          skipReport: true
-          dryRun: false
-          jenkinsUrl: ${JENKINS_BASE_URL}
-          auth:
-            secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
-            secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
-            secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
+      skipReport: true
+      dryRun: false
+      jenkinsUrl: ${JENKINS_BASE_URL}
+      auth:
+        secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
+        secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
+        secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
     thirdPlugins:
       chatgpt:
         service:
