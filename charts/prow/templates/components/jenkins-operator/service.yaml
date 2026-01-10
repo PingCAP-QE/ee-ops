@@ -1,21 +1,21 @@
-{{- if .Values.jenkinsOperator.enable }}
+{{- if .Values.jenkinsOperator.enabled }}
 {{- range $index, $operator := .Values.jenkinsOperator.instances }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "prow.fullname.jenkinsoperator" . }}-{{ $index }}
+  name: {{ include "prow.fullname.jenkinsoperator" $ }}-{{ $index }}
   labels:
-    {{- include "prow.labels" . | nindent 4 }}
+    {{- include "prow.labels" $ | nindent 4 }}
     app.kubernetes.io/app: jenkins-operator-{{ $index }}
 spec:
-  type: {{ .Values.jenkinsOperator.service.type }}
+  type: {{ $.Values.jenkinsOperator.service.type }}
   ports:
-    - port: {{ .Values.jenkinsOperator.service.port }}
+    - port: {{ $.Values.jenkinsOperator.service.port }}
       targetPort: http
       protocol: TCP
       name: http
   selector:
-    {{ include "prow.selectorLabels" . | nindent 4 }}
+    {{ include "prow.selectorLabels" $ | nindent 4 }}
     app.kubernetes.io/app: jenkins-operator-{{ $index }}
 ---
 {{- end }}

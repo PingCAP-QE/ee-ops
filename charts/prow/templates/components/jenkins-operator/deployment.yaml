@@ -1,11 +1,11 @@
-{{- if .Values.jenkinsOperator.enable }}
+{{- if .Values.jenkinsOperator.enabled }}
 {{- range $index, $operator := .Values.jenkinsOperator.instances }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "prow.fullname.jenkinsoperator" . }}-{{ $index }}
+  name: {{ include "prow.fullname.jenkinsoperator" $ }}-{{ $index }}
   labels:
-    {{- include "prow.labels" . | nindent 4 }}
+    {{- include "prow.labels" $ | nindent 4 }}
     app.kubernetes.io/app: jenkins-operator-{{ $index }}
 spec:
   {{- if not $operator.autoscaling.enabled }}
@@ -15,7 +15,7 @@ spec:
     type: Recreate
   selector:
     matchLabels:
-      {{ include "prow.selectorLabels" . | nindent 6 }}
+      {{ include "prow.selectorLabels" $ | nindent 6 }}
       app.kubernetes.io/app: jenkins-operator-{{ $index }}
   template:
     metadata:
@@ -24,14 +24,14 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{ include "prow.selectorLabels" . | nindent 8 }}
+        {{ include "prow.selectorLabels" $ | nindent 8 }}
         app.kubernetes.io/app: jenkins-operator-{{ $index }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "prow.serviceAccountName.jenkinsoperator" . }}
+      serviceAccountName: {{ include "prow.serviceAccountName.jenkinsoperator" $ }}
       securityContext:
         {{- toYaml $.Values.podSecurityContext | nindent 8 }}
       containers:
