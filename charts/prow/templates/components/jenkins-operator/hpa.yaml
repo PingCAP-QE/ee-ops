@@ -1,4 +1,4 @@
-{{- if .Values.jenkinsOperator.enable }}
+{{- if .Values.jenkinsOperator.enabled }}
 {{- range $index, $operator := .Values.jenkinsOperator.instances }}
 {{- if $operator.autoscaling.enabled }}
 apiVersion: autoscaling/v2
