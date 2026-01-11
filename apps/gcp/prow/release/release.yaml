@@ -157,6 +157,19 @@ spec:
             secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
             secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
             secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
+        - name: dedicated-for-ticdc
+          replicaCount: 1
+          autoscaling:
+            enabled: false
+          skipReport: true
+          dryRun: false
+          csrfProtect: false
+          jenkinsUrl: ${JENKINS_BASE_URL_TICDC}
+          labelSelector: master=1 # the second Jenkins operator
+          auth:
+            secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME_TICDC}
+            secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER_TICDC}
+            secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN_TICDC}
     thirdPlugins:
       chatgpt:
         service:

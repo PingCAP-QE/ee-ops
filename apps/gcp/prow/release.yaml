@@ -30,3 +30,11 @@ spec:
       JENKINS_OPERATOR_AUTH_SEC_KEY_USER: user
       JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN: token
       JENKINS_BASE_URL: https://do.pingcap.net/jenkins
+
+      ### need secret `prow-jenkins-operator-auth-ticdc` with keys:
+      # - user
+      # - token
+      JENKINS_OPERATOR_AUTH_SEC_NAME_TICDC: prow-jenkins-operator-ticdc-auth
+      JENKINS_OPERATOR_AUTH_SEC_KEY_USER_TICDC: user
+      JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN_TICDC: token
+      JENKINS_BASE_URL_TICDC: https://prow.tidb.net/jenkins
