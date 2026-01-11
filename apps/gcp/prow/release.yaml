@@ -34,7 +34,7 @@ spec:
       ### need secret `prow-jenkins-operator-auth-ticdc` with keys:
       # - user
       # - token
-      JENKINS_OPERATOR_AUTH_SEC_NAME_TICDC: prow-jenkins-operator-auth-ticdc
+      JENKINS_OPERATOR_AUTH_SEC_NAME_TICDC: prow-jenkins-operator-ticdc-auth
       JENKINS_OPERATOR_AUTH_SEC_KEY_USER_TICDC: user
       JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN_TICDC: token
       JENKINS_BASE_URL_TICDC: https://prow.tidb.net/jenkins
