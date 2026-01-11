@@ -165,6 +165,7 @@ spec:
           dryRun: false
           csrfProtect: false
           jenkinsUrl: ${JENKINS_BASE_URL_TICDC}
+          labelSelector: master=1 # the second Jenkins operator
           auth:
             secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME_TICDC}
             secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER_TICDC}
