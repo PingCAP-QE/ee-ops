@@ -153,6 +153,7 @@ spec:
           dryRun: false
           csrfProtect: false
           jenkinsUrl: ${JENKINS_BASE_URL}
+          labelSelector: master=0 # the first Jenkins operator
           auth:
             secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
             secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
