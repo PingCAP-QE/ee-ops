@@ -8,3 +8,4 @@ resources:
   - secret-harbor.yaml
   - secret-docs-cn.yaml
   - secret-ks3util.yaml
+  - secret-tidbx-docker-config.yaml
