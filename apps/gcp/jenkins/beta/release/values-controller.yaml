@@ -6,16 +6,16 @@ controller:
     tag: "2.528.3-jdk21"
   resources:
     requests:
-      cpu: "3"
-      memory: 12Gi
+      cpu: "6"
+      memory: 24Gi
     limits:
-      cpu: "3"
-      memory: 12Gi
+      cpu: "6"
+      memory: 24Gi
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # Set min/max heap here if needed with:
   javaOpts: >-
-    -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0 -XX:MaxRAMPercentage=60.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
+    -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0 -XX:MaxRAMPercentage=70.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
     -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled
     -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
     -XX:+UnlockDiagnosticVMOptions
