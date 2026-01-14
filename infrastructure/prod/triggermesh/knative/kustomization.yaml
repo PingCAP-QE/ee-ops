@@ -1,0 +1,5 @@
+namespace: apps
+resources:
+  - namespace.yaml
+  - https://github.com/knative/operator/releases/download/knative-v1.8.5/operator.yaml
+  - knative-serving.yaml
