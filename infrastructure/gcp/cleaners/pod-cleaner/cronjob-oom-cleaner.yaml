@@ -9,7 +9,7 @@ spec:
     spec:
       template:
         spec:
-          serviceAccountName: pod-cleaner-sa
+          serviceAccountName: pod-cleaner
           containers:
             - name: kubectl-container
               image: bitnami/kubectl:latest
