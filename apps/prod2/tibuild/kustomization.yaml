@@ -3,5 +3,5 @@ kind: Kustomization
 namespace: tibuild
 resources:
   - namespace.yaml
-  - v2/external-secret-config.yaml
-  - v2/release.yaml
+  - v1
+  - v2
