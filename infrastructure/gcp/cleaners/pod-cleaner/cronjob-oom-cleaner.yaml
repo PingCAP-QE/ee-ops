@@ -17,6 +17,9 @@ spec:
                 - /bin/sh
                 - -c
                 - |
+                  #!/usr/bin/env bash
+                  set -eo pipefail
+
                   echo "Starting cleanup of OOMKilled pods..."
                   kubectl get pods -A -o json | jq -r '.items[] | select(.status.containerStatuses[]?.lastState.terminated.reason=="OOMKilled" or .status.containerStatuses[]?.state.terminated.reason=="OOMKilled") | .metadata.namespace + " " + .metadata.name' | while read -r ns name; do
                     echo "Deleting pod $ns/$name due to OOMKilled status"
