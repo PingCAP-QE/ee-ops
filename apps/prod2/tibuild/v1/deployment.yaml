@@ -20,7 +20,7 @@ spec:
         app: tibuild
     spec:
       containers:
-        - image: ghcr.io/pingcap-qe/ee-apps/tibuild:v2025.11.16-1-g616fce1
+        - image: ghcr.io/pingcap-qe/ee-apps/tibuild:v2025.12.14-1-g9dbf1e7
           imagePullPolicy: Always
           name: tibuild
           ports:
@@ -41,13 +41,13 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 3
           volumeMounts:
-            - name: configs
+            - name: config
               mountPath: "/app/configs"
               readOnly: true
       nodeSelector:
         kubernetes.io/arch: "amd64"
       volumes:
-        - name: configs
+        - name: config
           secret:
-            secretName: tibuild-configs
+            secretName: v1-config
       terminationGracePeriodSeconds: 30

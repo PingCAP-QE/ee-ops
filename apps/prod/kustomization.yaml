@@ -15,7 +15,6 @@ resources:
   - cloudevents-server
   - boskos
   - git-cdn
-  - tibuild
   - dl
   - harbor
   - redis
