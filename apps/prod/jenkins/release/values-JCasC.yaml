@@ -310,4 +310,3 @@ controller:
       #       testResultParsingEnabled: false
       #       testResultCategories: "UT"
       #       fallbackCategoriesAsString: unknown
-
