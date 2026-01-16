@@ -11,10 +11,10 @@ resources:
   - goproxy
   - prow-worker
   - kafka
-  - cloudevents-server
+
   - boskos
   - git-cdn
   - dl
   - harbor
-  - redis
+
   - chatops-lark
