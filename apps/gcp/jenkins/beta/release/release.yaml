@@ -35,6 +35,16 @@ spec:
       namespace: "${AGENT_NAMESPACE}"
       maxRequestsPerHostStr: "100" # need to restart controller after updated it.
       containerCap: 100
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 100m
+          memory: 256Mi
+      envVars:
+        - name: JAVA_OPTS
+          value: "-Xms128m -Xmx224m -XX:MaxDirectMemorySize=32m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djenkins.agent.protocol=false"
 
     controller:
       servicePort: 80
