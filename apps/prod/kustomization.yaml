@@ -9,7 +9,7 @@ resources:
   - greenhouse
   - ats
   - goproxy
-  - tekton
+
   - prow-worker
   - kafka
   - cloudevents-server
