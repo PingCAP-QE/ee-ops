@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: notready-pod-cleaner
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: pod-cleaner
+          containers:
+            - name: kubectl-container
+              image: bitnami/kubectl:latest
+              command:
+                - /bin/sh
+                - -c
+                - |
+                  #!/usr/bin/env bash
+                  set -eo pipefail
+
+                  echo "Starting cleanup of NotReady pods with ready container count > 0 and age > 3 hours..."
+                  kubectl get pods -A -o json | jq -r '
+                    .items[] |
+                    select(
+                      .status.phase == "NotReady" and
+                      (.status.containerStatuses[]? | select(.ready == true)) and
+                      (.metadata.creationTimestamp | fromdateiso8601 < (now - 10800))
+                    ) |
+                    .metadata.namespace + " " + .metadata.name
+                  ' | while read -r ns name; do
+                    echo "Deleting pod $ns/$name due to NotReady status with ready containers and age > 3 hours"
+                    kubectl delete pod "$name" -n "$ns" --wait=false
+                  done
+                  echo "Cleanup complete."
+          restartPolicy: OnFailure
