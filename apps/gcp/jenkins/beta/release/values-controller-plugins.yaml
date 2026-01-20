@@ -19,6 +19,7 @@ controller:
     - prometheus:795.v995762102f28
     - ssh-agent:386.v36cc0c7582f0
     - kubernetes-credentials-provider:1.299.v610fa_e76761a_
+    - lockable-resources:1438.v3c0f8c9e2060
 
   initializeOnce: false
 
