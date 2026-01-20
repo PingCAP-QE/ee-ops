@@ -1,0 +1,22 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+agent:
+  maxRequestsPerHostStr: "100" # need to restart controller after updated it.
+  containerCap: 100
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi
+  envVars:
+    - name: JAVA_OPTS
+      value: "-Xms128m -Xmx224m -XX:MaxDirectMemorySize=32m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Djenkins.agent.protocol=false"
+  garbageCollection:
+    enabled: true
+    timeout: 300
+    namespaces: |-
+      jenkins-tiflow
+      jenkins-tidb
+      jenkins-tiflash
+      jenkins-tikv
