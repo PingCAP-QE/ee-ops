@@ -29,8 +29,6 @@ spec:
   values:
     agent:
       namespace: "${AGENT_NAMESPACE}"
-      maxRequestsPerHostStr: "200" # need to restart controller after updated it.
-      containerCap: 200
 
     controller:
       jenkinsUriPrefix: "${INGRESS_PATH}"
