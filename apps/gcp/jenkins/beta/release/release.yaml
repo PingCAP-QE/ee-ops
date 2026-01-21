@@ -30,6 +30,7 @@ spec:
     - { kind: Secret, name: jenkins-release-values, valuesKey: values2.yaml }
     - { kind: Secret, name: jenkins-release-values, valuesKey: values3.yaml }
     - { kind: Secret, name: jenkins-release-values, valuesKey: values4.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: values5.yaml }
   values:
     agent:
       namespace: "${AGENT_NAMESPACE}"
