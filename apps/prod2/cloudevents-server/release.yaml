@@ -47,3 +47,13 @@ spec:
         - name: config
           secret:
             secretName: cloudevents-server-config
+    ingress:
+      enabled: true
+      className: "nginx"
+      annotations:
+        nginx.ingress.kubernetes.io/use-regex: "true"
+      hosts:
+        - host: internal2-do.pingcap.net
+          paths:
+            - path: /cloudevents-server(/|$)(.*)
+              pathType: Prefix
