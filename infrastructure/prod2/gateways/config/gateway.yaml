@@ -2,7 +2,6 @@ apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyProxy
 metadata:
   name: ksc-gateway-config
-  namespace: infra
 spec:
   provider:
     type: Kubernetes
@@ -16,7 +15,6 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: internal-gateway
-  namespace: infra
 spec:
   gatewayClassName: envoy-gateway
   infrastructure:
