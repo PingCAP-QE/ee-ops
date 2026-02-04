@@ -10,9 +10,6 @@ resources:
   - goproxy
   - prow-worker
   - kafka
-
-  - boskos
   - dl
   - harbor
-
   - chatops-lark
