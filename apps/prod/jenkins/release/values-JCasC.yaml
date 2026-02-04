@@ -15,7 +15,7 @@ controller:
     - { name: codecov-token, keyName: tidb }
     - { name: codecov-token, keyName: tikv-migration }
     - { name: codecov-token, keyName: tiflow }
-    - { name: codecov-token, keyName: tiproxy}
+    - { name: codecov-token, keyName: tiproxy }
     # for coveralls uploading
     - { name: coveralls-token, keyName: tiflow }
 
@@ -29,8 +29,6 @@ controller:
     - { name: jenkins-cache, keyName: endpoint }
     - { name: jenkins-cache, keyName: access-key }
     - { name: jenkins-cache, keyName: access-secret }
-    # for build failure knowledge base, secret created by mongodb helm release, no need create manually.
-    - { name: mongodb, keyName: mongodb-root-password }
 
     # for s3 upload
     - { name: docs-cn, keyName: aws-ak }
@@ -284,32 +282,6 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "http://goproxy.apps.svc,https://proxy.golang.org,direct"
-      # build-failure-analyzer: |
-      #   unclassified:
-      #     buildFailureAnalyzer:
-      #       doNotAnalyzeAbortedJob: true
-      #       gerritTriggerEnabled: false
-      #       globalEnabled: true
-      #       graphsEnabled: false
-      #       knowledgeBase:
-      #         mongoDB:
-      #           dbName: jenkins-failure-pattern
-      #           enableStatistics: true
-      #           host: mongodb.apps.svc
-      #           password: "${mongodb-mongodb-root-password}"
-      #           port: 27017
-      #           successfulLogging: true
-      #           userName: root
-      #       maxLogSize: 0
-      #       metricSquashingEnabled: true
-      #       noCausesEnabled: true
-      #       noCausesMessage: >-
-      #         No problems were identified. If you know why this problem occurred,
-      #         please add a suitable Cause in https://pingcap.feishu.cn/wiki/wikcno79XYpVsvJeiRsMm38b5eh, add a config it.
-      #       nrOfScanThreads: 3
-      #       testResultParsingEnabled: false
-      #       testResultCategories: "UT"
-      #       fallbackCategoriesAsString: unknown
 
       # for cloudevents plugin config.
       # FIXME: should use cdevents plugin when the issue solved:

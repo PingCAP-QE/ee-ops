@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - ../_base
   - namespace.yaml
-  - mongodb
   - jenkins
   - jenkins-pingkai.yaml
   - greenhouse
