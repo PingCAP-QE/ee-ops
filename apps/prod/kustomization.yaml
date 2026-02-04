@@ -9,7 +9,6 @@ resources:
   - ats
   - goproxy
   - prow-worker
-  - kafka
   - dl
   - harbor
   - chatops-lark
