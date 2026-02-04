@@ -10,9 +10,9 @@ resources:
   - goproxy
   - prow-worker
   - kafka
-  - cloudevents-server
+
   - boskos
   - dl
   - harbor
-  - redis
+
   - chatops-lark
