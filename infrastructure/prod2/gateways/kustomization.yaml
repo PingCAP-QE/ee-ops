@@ -4,5 +4,3 @@ namespace: infra
 resources:
   - source-envoyproxy.yaml
   - release-envoy-gateway.yaml
-  - gatewayclass.yaml
-  - gateway.yaml
