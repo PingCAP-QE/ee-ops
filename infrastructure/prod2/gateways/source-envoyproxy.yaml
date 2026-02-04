@@ -2,8 +2,8 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
-  name: kgateway
+  name: envoyproxy
 spec:
   interval: 1h
   type: oci
-  url: oci://cr.kgateway.dev/kgateway-dev/charts
+  url: oci://docker.io/envoyproxy
