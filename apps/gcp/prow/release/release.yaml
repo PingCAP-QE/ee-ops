@@ -107,6 +107,7 @@ spec:
             pingcap/docs
             pingcap/docs-cn
             pingcap/docs-tidb-operator
+            pingcap/kvproto
             pingcap/ticdc
             pingcap/tidb
             pingcap/tidb-binlog
