@@ -25,7 +25,7 @@ spec:
     # Additional volumes on the output Deployment definition.
     image:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher versioning=semver
-      tag: v2025.12.7-4-ga926ebb
+      tag: v2026.2.8-2-g9da93d7
     resources:
       limits:
         cpu: 500m
@@ -50,6 +50,12 @@ spec:
       - name: packages-config
         configMap:
           name: packages-config
+      - name: publisher-services-configs
+        secret:
+          secretName: tidbcloud-ops-config
+          items:
+            - key: service-tidbcloud-ops.yaml
+            - key: service-tidbcloud-testplatforms.yaml
       - name: worker-oci-cred
         secret:
           secretName: registry-reader-cred
