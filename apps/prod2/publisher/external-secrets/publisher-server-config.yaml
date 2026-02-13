@@ -39,7 +39,7 @@ spec:
             prod:
               api_base_url: "{{ .ops-prod-api_base_url }}"
               api_key: "{{ .ops-prod-api_key }}"
-              components:
+              components: &tidbcloud_components
                 ci: # for debugging.
                   cluster_type: SHARED_POOL
                   base_image: ghcr.io/pingcap-qe/ci/base
@@ -95,59 +95,7 @@ spec:
             dev:
               api_base_url: "{{ .ops-dev-api_base_url }}"
               api_key: "{{ .ops-dev-api_key }}"
-              components:
-                ci: # for debugging
-                  cluster_type: SHARED_POOL
-                  base_image: ghcr.io/pingcap-qe/ci/base
-                  github_repo: PingCAP-QE/ci
-                tikv:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
-                tikv_worker:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
-                pd:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/pd
-                  github_repo: tikv/pd
-                pd_tso:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/pd
-                  github_repo: tikv/pd
-                pd_scheduling:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/pd
-                  github_repo: tikv/pd
-                tiflash_write:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/tiflash
-                  github_repo: pingcap/tiflash
-                tiflash_compute:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/tiflash
-                  github_repo: pingcap/tiflash
-                tidb_worker:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/tidb
-                  github_repo: pingcap/tidb
-                coprocessor_worker:
-                  cluster_type: SHARED_POOL
-                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
-                tidb:
-                  cluster_type: LOGICAL_CLUSTER
-                  base_image: us.gcr.io/pingcap-public/tidbx/tidb
-                  github_repo: pingcap/tidb
-                tiproxy:
-                  cluster_type: LOGICAL_CLUSTER
-                  base_image: us.gcr.io/pingcap-public/tidbx/tiproxy
-                  github_repo: pingcap/tiproxy
-                ticdc:
-                  cluster_type: TICDC_NG
-                  base_image: us.gcr.io/pingcap-public/tidbx/ticdc
-                  github_repo: pingcap/ticdc
+              components: *tidbcloud_components
 
         service-tidbcloud-testplatforms.yaml: |
           tcms:
