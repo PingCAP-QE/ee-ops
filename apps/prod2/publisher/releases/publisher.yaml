@@ -55,7 +55,9 @@ spec:
           secretName: publisher-server-config
           items:
             - key: service-tidbcloud-ops.yaml
+              path: service-tidbcloud-ops.yaml
             - key: service-tidbcloud-testplatforms.yaml
+              path: service-tidbcloud-testplatforms.yaml
       - name: worker-oci-cred
         secret:
           secretName: registry-reader-cred
@@ -68,10 +70,4 @@ spec:
         mountPath: /root/.docker
         readOnly: true
       - name: publisher-services-configs
-        mountPath: /etc/publisher/service-tidbcloud-ops.yaml
-        subPath: service-tidbcloud-ops.yaml
-        readOnly: true
-      - name: publisher-services-configs
-        mountPath: /etc/publisher/service-tidbcloud-testplatforms.yaml
-        subPath: service-tidbcloud-testplatforms.yaml
-        readOnly: true
+        mountPath: /etc/publisher
