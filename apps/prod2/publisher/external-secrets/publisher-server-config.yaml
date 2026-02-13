@@ -29,16 +29,17 @@ spec:
             tidbcloud:
               ops_config_file: /etc/publisher/service-tidbcloud-ops.yaml
               testplatforms_config_file: /etc/publisher/service-tidbcloud-testplatforms.yaml
+
         service-tidbcloud-ops.yaml: |
           tibuild_v2:
-            api_base_url: "{{ .tibuild-api_base_url }}"
-            user: "{{ .tibuild-user }}"
-            password: "{{ .tibuild-password }}"
+            api_base_url: "{{ .tibuild_api_base_url }}"
+            user: "{{ .tibuild_user }}"
+            password: "{{ .tibuild_password }}"
 
           stages:
             prod:
-              api_base_url: "{{ .ops-prod-api_base_url }}"
-              api_key: "{{ .ops-prod-api_key }}"
+              api_base_url: "{{ .ops_prod_api_base_url }}"
+              api_key: "{{ .ops_prod_api_key }}"
               components: &tidbcloud_components
                 ci: # for debugging.
                   cluster_type: SHARED_POOL
@@ -93,8 +94,8 @@ spec:
                   base_image: us.gcr.io/pingcap-public/tidbx/ticdc
                   github_repo: pingcap/ticdc
             dev:
-              api_base_url: "{{ .ops-dev-api_base_url }}"
-              api_key: "{{ .ops-dev-api_key }}"
+              api_base_url: "{{ .ops_dev_api_base_url }}"
+              api_key: "{{ .ops_dev_api_key }}"
               components: *tidbcloud_components
 
         service-tidbcloud-testplatforms.yaml: |
@@ -112,25 +113,25 @@ spec:
       rewrite:
         - regexp:
             source: "(.*)"
-            target: "tibuild-$1"
+            target: "tibuild_$1"
     - extract:
         # json object contains keys: api_base_url, api_key
         key: tidbcloud_ops_api_prod_json
       rewrite:
         - regexp:
             source: "(.*)"
-            target: "ops-prod-$1"
+            target: "ops_prod_$1"
     - extract:
         # json object contains keys: api_base_url, api_key
         key: tidbcloud_ops_api_dev_json
       rewrite:
         - regexp:
             source: "(.*)"
-            target: "ops-dev-$1"
+            target: "ops_dev_$1"
     - extract:
         # json object contains keys: api_base_url, api_key
         key: tcms_api_json
       rewrite:
         - regexp:
             source: "(.*)"
-            target: "tcms-$1"
+            target: "tcms_$1"
