@@ -26,7 +26,111 @@ spec:
           services:
             tiup:
               delivery_config_file: /etc/packages/delivery.yaml
+            tidbcloud:
+              ops_config_file: /etc/publisher/service-tidbcloud-ops.yaml
+              testplatforms_config_file: /etc/publisher/service-tidbcloud-testplatforms.yaml
+        service-tidbcloud-ops.yaml: |
+          tibuild_v2:
+            api_base_url: "{{ .tibuild-api_base_url }}"
+            user: "{{ .tibuild-user }}"
+            password: "{{ .tibuild-password }}"
+
+          stages:
+            prod:
+              api_base_url: "{{ .ops-prod-api_base_url }}"
+              api_key: "{{ .ops-prod-api_key }}"
+              components: &tidbcloud_components
+                ci: # for debugging.
+                  cluster_type: SHARED_POOL
+                  base_image: ghcr.io/pingcap-qe/ci/base
+                  github_repo: PingCAP-QE/ci
+                tikv:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
+                  github_repo: tidbcloud/cloud-storage-engine
+                tikv_worker:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
+                  github_repo: tidbcloud/cloud-storage-engine
+                pd:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/pd
+                  github_repo: tikv/pd
+                pd_tso:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/pd
+                  github_repo: tikv/pd
+                pd_scheduling:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/pd
+                  github_repo: tikv/pd
+                tiflash_write:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tiflash
+                  github_repo: pingcap/tiflash
+                tiflash_compute:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tiflash
+                  github_repo: pingcap/tiflash
+                tidb_worker:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tidb
+                  github_repo: pingcap/tidb
+                coprocessor_worker:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
+                  github_repo: tidbcloud/cloud-storage-engine
+                tidb:
+                  cluster_type: LOGICAL_CLUSTER
+                  base_image: us.gcr.io/pingcap-public/tidbx/tidb
+                  github_repo: pingcap/tidb
+                tiproxy:
+                  cluster_type: LOGICAL_CLUSTER
+                  base_image: us.gcr.io/pingcap-public/tidbx/tiproxy
+                  github_repo: pingcap/tiproxy
+                ticdc:
+                  cluster_type: TICDC_NG
+                  base_image: us.gcr.io/pingcap-public/tidbx/ticdc
+                  github_repo: pingcap/ticdc
+            dev:
+              api_base_url: "{{ .ops-dev-api_base_url }}"
+              api_key: "{{ .ops-dev-api_key }}"
+              components: *tidbcloud_components
+
+        service-tidbcloud-testplatforms.yaml: |
+          tcms:
+            api_base_url: "{{ .tcms-api_base_url }}"
+            auth_token: "{{ .tcms-auth_token }}"
+
   data:
     - secretKey: redis_password
       remoteRef:
         key: prod2_publisher_redis_password
+  dataFrom:
+    - extract:
+        key: prod2_publisher_tibuild_v2_api_json
+      rewrite:
+        - regexp:
+            source: "(.*)"
+            target: "tibuild-$1"
+    - extract:
+        # json object contains keys: api_base_url, api_key
+        key: tidbcloud_ops_api_prod_json
+      rewrite:
+        - regexp:
+            source: "(.*)"
+            target: "ops-prod-$1"
+    - extract:
+        # json object contains keys: api_base_url, api_key
+        key: tidbcloud_ops_api_dev_json
+      rewrite:
+        - regexp:
+            source: "(.*)"
+            target: "ops-dev-$1"
+    - extract:
+        # json object contains keys: api_base_url, api_key
+        key: tcms_api_json
+      rewrite:
+        - regexp:
+            source: "(.*)"
+            target: "tcms-$1"
