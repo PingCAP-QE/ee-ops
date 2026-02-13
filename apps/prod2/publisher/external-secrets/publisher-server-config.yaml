@@ -100,8 +100,8 @@ spec:
 
         service-tidbcloud-testplatforms.yaml: |
           tcms:
-            api_base_url: "{{ .tcms-api_base_url }}"
-            auth_token: "{{ .tcms-auth_token }}"
+            api_base_url: "{{ .tcms_api_base_url }}"
+            auth_token: "{{ .tcms_auth_token }}"
 
   data:
     - secretKey: redis_password
