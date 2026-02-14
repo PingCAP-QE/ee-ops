@@ -67,7 +67,8 @@ spec:
         mountPath: /etc/packages/delivery.yaml
         readOnly: true
       - name: worker-oci-cred
-        mountPath: /root/.docker
+        subPath: .dockerconfigjson
+        mountPath: /root/.docker/docker.json
         readOnly: true
       - name: publisher-services-configs
         mountPath: /etc/publisher
