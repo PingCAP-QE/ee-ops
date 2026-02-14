@@ -10,3 +10,4 @@ spec:
     namespace: flux-system
   path: ./tekton/v1/triggers/triggers/env-gcp
   prune: true
+  force: true
