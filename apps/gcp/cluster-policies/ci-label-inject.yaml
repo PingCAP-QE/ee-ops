@@ -1,0 +1,35 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: inject-ci-labels
+spec:
+  failurePolicy: Ignore
+  rules:
+    - name: inject-labels-from-annotations
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - jenkins-tiflow
+      context:
+        - name: whitelist
+          configMap:
+            name: ci-label-whitelist
+            namespace: infra
+      preconditions:
+        all:
+          - key: "{{ request.object.metadata.annotations.\"ci_pingcap_com_label_inject\" || '' }}"
+            operator: Equals
+            value: "true"
+          - key: "{{ request.object.metadata.annotations.\"ci_pingcap_com_job\" || '' }}"
+            operator: In
+            value: "{{ whitelist.data.jobs | from_json(@) }}"
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            labels:
+              author: "{{ request.object.metadata.annotations.\"ci_pingcap_com_author\" }}"
+              org: "{{ request.object.metadata.annotations.\"ci_pingcap_com_org\" }}"
+              repo: "{{ request.object.metadata.annotations.\"ci_pingcap_com_repo\" }}"
+              env: "{{ request.object.metadata.annotations.\"ci_pingcap_com_env\" }}"
