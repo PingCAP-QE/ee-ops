@@ -19,17 +19,17 @@ spec:
             namespace: infra
       preconditions:
         all:
-          - key: "{{ request.object.metadata.annotations.\"ci_pingcap_com_refs\" || '' }}"
+          - key: "{{ request.object.metadata.annotations.\"ci_refs\" || '' }}"
             operator: NotEquals
             value: ""
-          - key: "{{ request.object.metadata.annotations.\"ci_pingcap_com_job\" || '' }}"
+          - key: "{{ request.object.metadata.annotations.\"ci_job\" || '' }}"
             operator: In
             value: "{{ whitelist.data.jobs | from_json(@) }}"
       mutate:
         patchStrategicMerge:
           metadata:
             labels:
-              author: "{{ not_null((request.object.metadata.annotations.\"ci_pingcap_com_refs\" | from_json(@)).pulls[0].author, request.object.metadata.annotations.\"ci_pingcap_com_trigger_user\", '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
-              org: "{{ not_null((request.object.metadata.annotations.\"ci_pingcap_com_refs\" | from_json(@)).org, '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
-              repo: "{{ not_null((request.object.metadata.annotations.\"ci_pingcap_com_refs\" | from_json(@)).repo, '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
-              env: "cicd"
+              author: "{{ not_null((request.object.metadata.annotations.\"ci_refs\" | from_json(@)).pulls[0].author, request.object.metadata.annotations.\"ci_trigger_user\", '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
+              org: "{{ not_null((request.object.metadata.annotations.\"ci_refs\" | from_json(@)).org, '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
+              repo: "{{ not_null((request.object.metadata.annotations.\"ci_refs\" | from_json(@)).repo, '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
+              env: cicd
