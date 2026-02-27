@@ -19,9 +19,9 @@ spec:
             namespace: infra
       preconditions:
         all:
-          - key: "{{ request.object.metadata.annotations.\"ci_pingcap_com_label_inject\" || '' }}"
-            operator: Equals
-            value: "true"
+          - key: "{{ request.object.metadata.annotations.\"ci_pingcap_com_refs\" || '' }}"
+            operator: NotEquals
+            value: ""
           - key: "{{ request.object.metadata.annotations.\"ci_pingcap_com_job\" || '' }}"
             operator: In
             value: "{{ whitelist.data.jobs | from_json(@) }}"
@@ -29,7 +29,7 @@ spec:
         patchStrategicMerge:
           metadata:
             labels:
-              author: "{{ request.object.metadata.annotations.\"ci_pingcap_com_author\" }}"
-              org: "{{ request.object.metadata.annotations.\"ci_pingcap_com_org\" }}"
-              repo: "{{ request.object.metadata.annotations.\"ci_pingcap_com_repo\" }}"
-              env: "{{ request.object.metadata.annotations.\"ci_pingcap_com_env\" }}"
+              author: "{{ not_null((request.object.metadata.annotations.\"ci_pingcap_com_refs\" | from_json(@)).pulls[0].author, request.object.metadata.annotations.\"ci_pingcap_com_trigger_user\", '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
+              org: "{{ not_null((request.object.metadata.annotations.\"ci_pingcap_com_refs\" | from_json(@)).org, '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
+              repo: "{{ not_null((request.object.metadata.annotations.\"ci_pingcap_com_refs\" | from_json(@)).repo, '') | to_lower(@) | regex_replace_all(@, '[^a-z0-9_-]', '_') | regex_replace_all(@, '^[-_]+|[-_]+$', '') | regex_replace_all(@, '^(.{0,63}).*$', '$1') }}"
+              env: "cicd"
