@@ -20,10 +20,10 @@ spec:
         - name: parsed_refs
           variable:
             default: {}
-            jmesPath: "request.object.metadata.annotations.\"ci_refs\" | parse_json(@)"
+            jmesPath: "request.object.metadata.annotations.ci_refs | parse_json(@)"
       preconditions:
         all:
-          - key: "{{ request.object.metadata.annotations.\"ci_refs\" || '' }}"
+          - key: "{{ request.object.metadata.annotations.ci_refs || '' }}"
             operator: NotEquals
             value: ""
           - key: "{{ request.object.metadata.annotations.\"ci_job\" || '' }}"
