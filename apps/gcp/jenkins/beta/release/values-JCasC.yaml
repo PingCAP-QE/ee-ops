@@ -79,6 +79,7 @@ controller:
                 - "Overall/Administer"
               entries:
                 - user: "wuhui.zuo@pingcap.com"
+                - user: "wei.zheng@pingcap.com"
 
             # Reader
             - name: "builder"
@@ -94,7 +95,6 @@ controller:
                 - "Metrics/Read"
               entries:
                 - user: "lifu.wu@pingcap.com"
-                - user: "wei.zheng@pingcap.com"
 
             # Readonly
             - name: "readonly"
