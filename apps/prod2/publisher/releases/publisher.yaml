@@ -25,7 +25,7 @@ spec:
     # Additional volumes on the output Deployment definition.
     image:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher versioning=semver
-      tag: v2026.2.8-2-g9da93d7
+      tag: v2026.2.8-5-g8aea7c0
     resources:
       limits:
         cpu: 500m
