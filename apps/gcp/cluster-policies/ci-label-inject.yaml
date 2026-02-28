@@ -17,6 +17,10 @@ spec:
           configMap:
             name: ci-label-whitelist
             namespace: infra
+        - name: parsed_refs
+          variable:
+            default: {}
+            jmesPath: "request.object.metadata.annotations.\"ci_refs\" | parse_json(@)"
       preconditions:
         all:
           - key: "{{ request.object.metadata.annotations.\"ci_refs\" || '' }}"
@@ -29,7 +33,7 @@ spec:
         patchStrategicMerge:
           metadata:
             labels:
-              author: "{{ not_null((request.object.metadata.annotations.\"ci_refs\" | parse_json(@)).pulls[0].author, request.object.metadata.annotations.\"ci_trigger_user\", '') | to_lower(@) | regex_replace_all('[^a-z0-9_-]', @, '_') | regex_replace_all('^[-_]+|[-_]+$', @, '') | regex_replace_all('^(.{0,63}).*$', @, '$1') }}"
-              org: "{{ not_null((request.object.metadata.annotations.\"ci_refs\" | parse_json(@)).org, '') | to_lower(@) | regex_replace_all('[^a-z0-9_-]', @, '_') | regex_replace_all('^[-_]+|[-_]+$', @, '') | regex_replace_all('^(.{0,63}).*$', @, '$1') }}"
-              repo: "{{ not_null((request.object.metadata.annotations.\"ci_refs\" | parse_json(@)).repo, '') | to_lower(@) | regex_replace_all('[^a-z0-9_-]', @, '_') | regex_replace_all('^[-_]+|[-_]+$', @, '') | regex_replace_all('^(.{0,63}).*$', @, '$1') }}"
+              author: "{{ not_null(parsed_refs.pulls[0].author, request.object.metadata.annotations.\"ci_trigger_user\", '') | to_lower(@) | regex_replace_all('[^a-z0-9_-]', @, '_') | regex_replace_all('^[-_]+|[-_]+$', @, '') | regex_replace_all('^(.{0,63}).*$', @, '$1') }}"
+              org: "{{ not_null(parsed_refs.org, '') | to_lower(@) | regex_replace_all('[^a-z0-9_-]', @, '_') | regex_replace_all('^[-_]+|[-_]+$', @, '') | regex_replace_all('^(.{0,63}).*$', @, '$1') }}"
+              repo: "{{ not_null(parsed_refs.repo, '') | to_lower(@) | regex_replace_all('[^a-z0-9_-]', @, '_') | regex_replace_all('^[-_]+|[-_]+$', @, '') | regex_replace_all('^(.{0,63}).*$', @, '$1') }}"
               env: cicd
