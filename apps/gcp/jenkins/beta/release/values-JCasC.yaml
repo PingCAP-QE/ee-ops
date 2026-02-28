@@ -89,6 +89,7 @@ controller:
                 - "Job/Build"
                 - "Job/Cancel"
                 - "Run/Read"
+                - "Run/Replay"
                 - "View/Read"
                 - "Metrics/Read"
               entries:
