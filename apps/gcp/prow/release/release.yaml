@@ -79,7 +79,7 @@ spec:
     tide:
       image:
         repository: ghcr.io/ti-community-infra/prow/tide
-        tag: v20250905-a0cfed255
+        tag: v20260224-5ba85b827
       additionalArgs:
         - --sync-hourly-tokens=1200 # default is 800
         - --status-hourly-tokens=600 # default is 400

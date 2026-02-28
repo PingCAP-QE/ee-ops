@@ -22,6 +22,15 @@
         "(?:tag|version|appVersion): (?<currentValue>\\S+)[\\s\\S]*?datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: versioning=(?<versioning>\\S+))?(?: registryUrl=(?<registryUrl>\\S+))?"
       ],
       "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{/if}}"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["apps/gcp/prow/release/release\\.yaml$$"],
+      "matchStrings": [
+        "repository:\\s*(?<depName>[^\\s]+)[\\s\\S]*?tag:\\s*(?<currentValue>[^\\s]+)"
+      ],
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "docker"
     }
   ]
 }
