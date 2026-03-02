@@ -26,9 +26,9 @@ spec:
           - key: "{{ request.object.metadata.annotations.ci_refs || '' }}"
             operator: NotEquals
             value: ""
-          - key: "{{ request.object.metadata.annotations.\"ci_job\" || '' }}"
-            operator: In
-            value: "{{ whitelist.data.jobs | parse_json(@) }}"
+          - key: "{{ regex_match(whitelist.data.jobs_pattern, request.object.metadata.annotations.\"ci_job\" || '') }}"
+            operator: Equals
+            value: true
       mutate:
         patchStrategicMerge:
           metadata:
