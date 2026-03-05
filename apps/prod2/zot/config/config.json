@@ -113,6 +113,11 @@
               "prefix": "/pingcap-testing-account/hub/**",
               "destination": "/mirrors/hub",
               "stripPrefix": true
+            },
+            {
+              "prefix": "/pingcap-testing-account/internal/**",
+              "destination": "/mirrors/internal",
+              "stripPrefix": true
             }
           ],
           "onDemand": true,
