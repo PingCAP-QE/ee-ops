@@ -13,10 +13,6 @@ spec:
           namespaces:
             - jenkins-tiflow
       context:
-        - name: whitelist
-          configMap:
-            name: ci-label-whitelist
-            namespace: infra
         - name: parsed_refs
           variable:
             default: {}
@@ -26,9 +22,6 @@ spec:
           - key: "{{ request.object.metadata.annotations.ci_refs || '' }}"
             operator: NotEquals
             value: ""
-          - key: "{{ regex_match(whitelist.data.jobs_pattern, request.object.metadata.annotations.ci_job || '') }}"
-            operator: Equals
-            value: true
       mutate:
         patchStrategicMerge:
           metadata:
