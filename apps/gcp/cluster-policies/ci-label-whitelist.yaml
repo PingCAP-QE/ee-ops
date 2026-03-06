@@ -4,4 +4,4 @@ metadata:
   name: ci-label-whitelist
   namespace: infra
 data:
-  jobs_pattern: '^pingcap/ticdc/(release-[^/]+/)?pull_cdc_.*'
+  jobs_pattern: '^pingcap/(ticdc/(release-[^/]+/)?pull_cdc_.*|tiflow/(release-[^/]+/)?pull_.*)$'
