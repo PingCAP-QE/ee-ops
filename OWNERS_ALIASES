@@ -2,8 +2,10 @@ aliases:
   # for whole repo.
   sig-root-approvers:
     - wuhuizuo
+    - dillon-zheng
   sig-root-reviewers:
     - purelind
+    - lybcodes
 
   sig-apps-prod-approvers:
     - purelind

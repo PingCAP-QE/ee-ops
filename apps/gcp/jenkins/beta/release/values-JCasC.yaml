@@ -112,6 +112,8 @@ controller:
     security:
       globalJobDslSecurityConfiguration:
         useScriptSecurity: false
+      gitHostKeyVerificationConfiguration:
+        sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
 
     securityRealm: |-
       # local:
