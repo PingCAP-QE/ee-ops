@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: jenkins-tidb
 resources:
   - namespace.yaml
+  - serviceaccount.yaml
   - ../_base
 configMapGenerator:
   - name: bazel
