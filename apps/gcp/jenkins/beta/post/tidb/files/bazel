@@ -1,1 +1,3 @@
-build --remote_cache=http://ats.apps.svc/brc/tidb --remote_timeout="30s"
+build --remote_cache=https://storage.googleapis.com/pingcap-ci-bazel-remote-cache-us-central1
+build --google_default_credentials=true
+build --remote_timeout="30s"
