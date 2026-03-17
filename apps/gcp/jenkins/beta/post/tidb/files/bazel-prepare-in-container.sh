@@ -3,7 +3,7 @@
 # Requirements:
 # 1. need a PV or PVC mounted at: /bazel-out-lower
 # 2. need a emptyDir volume mounted at: /bazel-out-overlay
-# 3. need a emptyDir volume mounted at: /home/jenkins/.tidb/tmp
+# 3. need an emptyDir volume mounted at: /home/jenkins/.tidb
 # 4.1 (optional) mount downward api volume to /etc/containerinfo:
 #    volumes:
 #    - name: containerinfo
@@ -34,14 +34,19 @@ else
     exit 0
 fi
 
+mkdir -p /home/jenkins/.tidb/tmp 2>/dev/null || true
+
 # generate file $HOME/.bazelrc
 # ref: https://docs.bazel.build/versions/5.3.1/user-manual.html
 :> ~/.bazelrc
 
 # fix bazel OOM in container.
 if [ -d /etc/containerinfo ]; then
-    cpu_limit=$(cat /etc/containerinfo/cpu_limit)
-    mem_limit=$(cat /etc/containerinfo/mem_limit)
-    mem_limit=$(((mem_limit / 1048576) * 9 / 10 ))
-    echo "build --local_ram_resources=${mem_limit} --local_cpu_resources=${cpu_limit} --jobs=${cpu_limit}" >> ~/.bazelrc
+    cpu_limit=$(cat /etc/containerinfo/cpu_limit 2>/dev/null || true)
+    mem_limit=$(cat /etc/containerinfo/mem_limit 2>/dev/null || true)
+    if [ -n "$cpu_limit" ] && [ -n "$mem_limit" ]; then
+        mem_limit=$(((mem_limit / 1048576) * 9 / 10 ))
+        # Use $var (not ${var}) to avoid Flux postBuild substitution stripping values.
+        echo "build --local_ram_resources=$mem_limit --local_cpu_resources=$cpu_limit --jobs=$cpu_limit" >> ~/.bazelrc
+    fi
 fi
