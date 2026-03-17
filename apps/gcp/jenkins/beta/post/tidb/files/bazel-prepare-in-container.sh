@@ -42,8 +42,8 @@ mkdir -p /home/jenkins/.tidb/tmp 2>/dev/null || true
 
 # fix bazel OOM in container.
 if [ -d /etc/containerinfo ]; then
-    cpu_limit=$(cat /etc/containerinfo/cpu_limit 2>/dev/null || true)
-    mem_limit=$(cat /etc/containerinfo/mem_limit 2>/dev/null || true)
+    cpu_limit=$(cat /etc/containerinfo/cpu_limit 2>/dev/null)
+    mem_limit=$(cat /etc/containerinfo/mem_limit 2>/dev/null)
     if [ -n "$cpu_limit" ] && [ -n "$mem_limit" ]; then
         mem_limit=$(((mem_limit / 1048576) * 9 / 10 ))
         # Use $var (not ${var}) to avoid Flux postBuild substitution stripping values.
