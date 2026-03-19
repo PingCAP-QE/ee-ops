@@ -93,6 +93,7 @@ controller:
                 - "Metrics/Read"
               entries:
                 - user: "lifu.wu@pingcap.com"
+                - user: "wei.zheng@pingcap.com"
 
             # Readonly
             - name: "readonly"
