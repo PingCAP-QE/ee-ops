@@ -58,7 +58,7 @@ spec:
       #   GKE, AWS & OpenStack)
       #
       storageClass: "${PERSISTENCE_STORAGE_CLASS}"
-      size: "100Gi"
+      size: "300Gi"
 
     serviceAccount:
       create: true
