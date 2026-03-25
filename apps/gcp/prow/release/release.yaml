@@ -32,6 +32,11 @@ spec:
     enable: true
     ignoreFailures: false
   values:
+    podLabels:
+      author: wei_zheng
+      team: qe
+      env: cicd
+      service: prow
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
       domainName: ${DOMAIN_NAME}
