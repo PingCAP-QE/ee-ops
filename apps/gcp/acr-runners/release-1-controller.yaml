@@ -14,3 +14,9 @@ spec:
         namespace: flux-system
   interval: 15m
   timeout: 10m
+  values:
+    podLabels:
+      author: wei_zheng
+      team: qe
+      env: cicd
+      service: arc
