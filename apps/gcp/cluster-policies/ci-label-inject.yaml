@@ -10,8 +10,6 @@ spec:
         resources:
           kinds:
             - Pod
-          namespaces:
-            - jenkins-tiflow
       context:
         - name: parsed_refs
           variable:
