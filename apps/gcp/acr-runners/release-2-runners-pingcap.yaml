@@ -20,6 +20,12 @@ spec:
     runnerGroup: "Docker-Group" # must be created first.
     maxRunners: 2
     template:
+      metadata:
+        labels:
+          author: wei_zheng
+          team: qe
+          env: cicd
+          service: arc
       spec:
         containers:
           - name: runner

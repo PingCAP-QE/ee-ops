@@ -26,6 +26,11 @@ spec:
     ignoreFailures: false
   values:
     replicaCount: 2
+    podLabels:
+      author: wei_zheng
+      team: qe
+      env: cicd
+      service: cla
     image:
       pullPolicy: Always
       tag: pingcap
