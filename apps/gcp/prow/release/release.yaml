@@ -357,7 +357,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-format-checker-plugin
-          tag: v2.4.2
+          tag: v2.4.5
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
