@@ -17,3 +17,4 @@ agent:
     timeout: 300
     namespaces: |-
       jenkins-tiflow
+      jenkins-tidb
