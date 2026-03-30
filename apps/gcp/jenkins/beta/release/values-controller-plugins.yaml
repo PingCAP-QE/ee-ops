@@ -6,6 +6,7 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
+    - blueocean:1.27.25
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents:1-40.vb_3d2c94f2379
     - generic-webhook-trigger:2.4.1
