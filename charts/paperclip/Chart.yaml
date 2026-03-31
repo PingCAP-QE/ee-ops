@@ -1,0 +1,35 @@
+apiVersion: v2
+name: paperclip
+description: A Helm chart for deploying Paperclip with persistent state and optional Gateway API HTTPRoute exposure.
+type: application
+version: 0.1.0
+appVersion: "sha-98337f5"
+home: https://paperclip.ing
+icon: https://paperclip.ing/favicon.ico
+sources:
+  - https://github.com/paperclipai/paperclip
+  - https://docs.paperclip.ing/deploy/overview
+maintainers:
+  - name: wuhuizuo
+    email: wuhuizuo@126.com
+keywords:
+  - ai
+  - agents
+  - orchestration
+  - automation
+  - paperclip
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/changes: |
+    - kind: added
+      description: Initial Helm chart for Paperclip with PVC-backed state, authenticated deployment defaults, and Gateway API HTTPRoute support.
+  artifacthub.io/images: |
+    - name: paperclip
+      image: ghcr.io/paperclipai/paperclip:sha-98337f5
+  artifacthub.io/links: |
+    - name: Chart Source
+      url: https://github.com/PingCAP-QE/ee-ops/tree/main/charts/paperclip
+    - name: Upstream
+      url: https://github.com/paperclipai/paperclip
+    - name: Deployment Docs
+      url: https://docs.paperclip.ing/deploy/overview

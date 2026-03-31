@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "paperclip.fullname" . }}
+  labels:
+    {{- include "paperclip.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "paperclip.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "paperclip.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "paperclip.serviceAccountName" . }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.paperclip.port }}
+              protocol: TCP
+          {{- with .Values.command }}
+          command: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.args }}
+          args: {{- toYaml . | nindent 12 }}
+          {{- end }}
+          env:
+            - name: HOST
+              value: {{ .Values.paperclip.host | quote }}
+            - name: PORT
+              value: {{ .Values.paperclip.port | toString | quote }}
+            - name: SERVE_UI
+              value: {{ .Values.paperclip.serveUI | toString | quote }}
+            - name: PAPERCLIP_HOME
+              value: {{ .Values.paperclip.home | quote }}
+            - name: PAPERCLIP_INSTANCE_ID
+              value: {{ .Values.paperclip.instanceId | quote }}
+            - name: PAPERCLIP_DEPLOYMENT_MODE
+              value: {{ .Values.paperclip.deploymentMode | quote }}
+            {{- if and (eq .Values.paperclip.deploymentMode "authenticated") .Values.paperclip.deploymentExposure }}
+            - name: PAPERCLIP_DEPLOYMENT_EXPOSURE
+              value: {{ .Values.paperclip.deploymentExposure | quote }}
+            - name: BETTER_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "paperclip.authSecretName" . }}
+                  key: {{ .Values.auth.secretKey }}
+            {{- end }}
+            {{- if .Values.paperclip.publicUrl }}
+            - name: PAPERCLIP_PUBLIC_URL
+              value: {{ .Values.paperclip.publicUrl | quote }}
+            {{- end }}
+            {{- if .Values.paperclip.allowedHostnames }}
+            - name: PAPERCLIP_ALLOWED_HOSTNAMES
+              value: {{ join "," .Values.paperclip.allowedHostnames | quote }}
+            {{- end }}
+            {{- if .Values.config.existingSecret }}
+            - name: PAPERCLIP_CONFIG
+              value: {{ include "paperclip.configMountPath" . | quote }}
+            {{- end }}
+            {{- with .Values.paperclip.extraEnv }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- with .Values.envFrom }}
+          envFrom:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.livenessProbe }}
+          livenessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.readinessProbe }}
+          readinessProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: paperclip-home
+              mountPath: {{ .Values.paperclip.home }}
+            {{- if .Values.config.existingSecret }}
+            - name: paperclip-config
+              mountPath: {{ include "paperclip.configMountPath" . }}
+              subPath: {{ .Values.config.secretKey }}
+              readOnly: true
+            {{- end }}
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: paperclip-home
+        {{- if .Values.persistence.enabled }}
+          persistentVolumeClaim:
+            claimName: {{ .Values.persistence.existingClaim | default (include "paperclip.fullname" .) }}
+        {{- else }}
+          emptyDir: {}
+        {{- end }}
+        {{- if .Values.config.existingSecret }}
+        - name: paperclip-config
+          secret:
+            secretName: {{ .Values.config.existingSecret }}
+        {{- end }}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
