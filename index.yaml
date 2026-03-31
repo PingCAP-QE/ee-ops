@@ -352,6 +352,47 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/mcp-tool-0.1.0/mcp-tool-0.1.0.tgz
     version: 0.1.0
+  paperclip:
+  - annotations:
+      artifacthub.io/changes: |
+        - kind: added
+          description: Initial Helm chart for Paperclip with PVC-backed state, authenticated deployment defaults, and Gateway API HTTPRoute support.
+      artifacthub.io/images: |
+        - name: paperclip
+          image: ghcr.io/paperclipai/paperclip:sha-98337f5
+      artifacthub.io/license: Apache-2.0
+      artifacthub.io/links: |
+        - name: Chart Source
+          url: https://github.com/PingCAP-QE/ee-ops/tree/main/charts/paperclip
+        - name: Upstream
+          url: https://github.com/paperclipai/paperclip
+        - name: Deployment Docs
+          url: https://docs.paperclip.ing/deploy/overview
+    apiVersion: v2
+    appVersion: sha-98337f5
+    created: "2026-03-31T12:30:23.879304717Z"
+    description: A Helm chart for deploying Paperclip with persistent state and optional
+      Gateway API HTTPRoute exposure.
+    digest: 4facf9bd99d309fe2fa150be620f7a92d602ab3b90bcfc0e86ade40d49641cea
+    home: https://paperclip.ing
+    icon: https://paperclip.ing/favicon.ico
+    keywords:
+    - ai
+    - agents
+    - orchestration
+    - automation
+    - paperclip
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: paperclip
+    sources:
+    - https://github.com/paperclipai/paperclip
+    - https://docs.paperclip.ing/deploy/overview
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/paperclip-0.1.0/paperclip-0.1.0.tgz
+    version: 0.1.0
   prow:
   - apiVersion: v2
     appVersion: v20230418-23b5d25059
@@ -931,4 +972,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2026-01-10T17:09:15.158314824Z"
+generated: "2026-03-31T12:30:23.879430367Z"
