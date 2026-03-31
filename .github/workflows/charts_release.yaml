@@ -37,3 +37,20 @@ jobs:
           skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Publish Artifact Hub repository metadata
+        run: |
+          git fetch origin gh-pages
+          worktree="$(mktemp -d)"
+          git worktree add -B gh-pages "${worktree}" origin/gh-pages
+          cp artifacthub-repo.yml "${worktree}/artifacthub-repo.yml"
+          pushd "${worktree}"
+            if git diff --quiet -- artifacthub-repo.yml; then
+              echo "artifacthub-repo.yml is already up to date"
+              exit 0
+            fi
+
+            git add artifacthub-repo.yml
+            git commit -m "chore(charts): publish artifact hub repo metadata"
+            git push origin HEAD:gh-pages
+          popd
