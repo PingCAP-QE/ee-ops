@@ -86,7 +86,7 @@ spec:
                   base_image: us.gcr.io/pingcap-public/tidbx/tidb
                   github_repo: pingcap/tidb
                 tiproxy:
-                  cluster_type: LOGICAL_CLUSTER
+                  cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tiproxy
                   github_repo: pingcap/tiproxy
                 ticdc:
