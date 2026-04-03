@@ -89,10 +89,11 @@ controller:
                 - "Job/Build"
                 - "Job/Cancel"
                 - "Run/Read"
+                - "Run/Replay"
                 - "View/Read"
                 - "Metrics/Read"
               entries:
-                - user: "lifu.wu@pingcap.com"
+                - user: "yebin.li@pingcap.com"
                 - user: "wei.zheng@pingcap.com"
 
             # Readonly
@@ -111,6 +112,8 @@ controller:
     security:
       globalJobDslSecurityConfiguration:
         useScriptSecurity: false
+      gitHostKeyVerificationConfiguration:
+        sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
 
     securityRealm: |-
       # local:
@@ -299,11 +302,14 @@ controller:
             username: ${jenkins-cache-access-key}
             password: ${jenkins-cache-access-secret}
             threshold: 400000 # limit to 400GiB
+      cdevents: |
+        unclassified:
+          cDEventsGlobalConfig:
+            httpSinkUrl: "http://cloudevents-server.cs.svc"
+            sinkType: "http"
       # for global env variables
       env-vars: |
         jenkins:
           globalNodeProperties:
             - envVars:
-                env:
-                  - key: "GOPROXY"
-                    value: "http://goproxy.apps.svc,https://proxy.golang.org,direct"
+                env: []
