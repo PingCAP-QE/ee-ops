@@ -1,23 +1,12 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  # initContainerEnv:
-  #   - name: JENKINS_UC
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-  #   - name: JENKINS_UC_DOWNLOAD
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
-  # containerEnv:
-  #   - name: JENKINS_UC
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-  #   - name: JENKINS_UC_DOWNLOAD
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
-
   overwritePlugins: true
   installLatestPlugins: true
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - blueocean:1.27.23
+    - blueocean:1.27.25
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents:1-40.vb_3d2c94f2379
     - generic-webhook-trigger:2.4.1
@@ -30,7 +19,8 @@ controller:
     - prometheus:795.v995762102f28
     - ssh-agent:386.v36cc0c7582f0
     - kubernetes-credentials-provider:1.299.v610fa_e76761a_
-    - lockable-resources:1438.v3c0f8c9e2060
+    - lockable-resources:1469.v52dff5a_80e32
+    - pipeline-graph-view:819.ved496c19e082
 
   initializeOnce: false
 

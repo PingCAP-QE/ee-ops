@@ -3,7 +3,7 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.528.3-jdk21"
+    tag: "2.541.3-jdk21"
   resources:
     requests:
       cpu: "4"
@@ -47,16 +47,7 @@ controller:
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
 
   ingress:
-    enabled: true
-    apiVersion: networking.k8s.io/v1
-    kubernetes.io/tls-acme: "true"
-    ingressClassName: nginx
-    annotations:
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600" # 1 hour
-      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
-      nginx.ingress.kubernetes.io/configuration-snippet: |
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
+    enabled: false
 
   # Expose Prometheus metrics
   prometheus:
