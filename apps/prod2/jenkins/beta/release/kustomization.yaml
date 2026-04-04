@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace-agent.yaml
   - release.yaml
+  - http-routes.yaml
 secretGenerator:
   - name: jenkins-release-values
     files:
