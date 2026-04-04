@@ -1,7 +1,7 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 agent:
-  maxRequestsPerHostStr: "100" # need to restart controller after updated it.
-  containerCap: 100
+  maxRequestsPerHostStr: "400" # need to restart controller after updated it.
+  containerCap: 400
   resources:
     requests:
       cpu: 100m
