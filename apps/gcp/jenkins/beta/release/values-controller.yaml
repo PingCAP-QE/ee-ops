@@ -6,11 +6,11 @@ controller:
     tag: "2.541.3-jdk21"
   resources:
     requests:
-      cpu: "6"
-      memory: 24Gi
+      cpu: "12"
+      memory: 48Gi
     limits:
-      cpu: "6"
-      memory: 24Gi
+      cpu: "12"
+      memory: 48Gi
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # Set min/max heap here if needed with:
@@ -25,7 +25,7 @@ controller:
   # Optionally specify additional init-containers
   customInitContainers:
     - name: init-create-logs-dir
-      image: "alpine:3.20.3"
+      image: "alpine:3.23.3"
       imagePullPolicy: Always
       command: ["mkdir", "-p", "/var/jenkins_home/logs"]
       securityContext:
