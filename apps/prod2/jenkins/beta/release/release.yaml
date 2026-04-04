@@ -34,8 +34,6 @@ spec:
       namespace: "${AGENT_NAMESPACE}"
 
     controller:
-      servicePort: 80
-      targetPort: 80
       jenkinsUriPrefix: "${INGRESS_PATH}"
       jenkinsUrl: "https://${INGRESS_HOST}${INGRESS_PATH}"
       jenkinsAdminEmail: "${ADMIN_EMAIL}"
