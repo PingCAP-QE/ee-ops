@@ -269,9 +269,7 @@ controller:
                     branch('main')
                   }
                 }
-                triggers {
-                  githubPush()
-                }
+                // Triggered by the Prow postsubmit job added in PingCAP-QE/ci#4347.
                 steps {
                   jobDsl {
                     targets('jobs/**/*.groovy')
