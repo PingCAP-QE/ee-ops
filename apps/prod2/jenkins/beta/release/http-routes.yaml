@@ -12,7 +12,7 @@ spec:
   rules:
     - backendRefs:
         - name: jenkins
-          port: 80
+          port: 8080
       matches:
         - path:
             type: PathPrefix
