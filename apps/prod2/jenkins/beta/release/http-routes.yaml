@@ -5,7 +5,7 @@ metadata:
 spec:
   parentRefs:
     - kind: Gateway
-      name: internal-gateway
+      name: external-https
       namespace: infra
   hostnames:
     - "${INGRESS_HOST}"
