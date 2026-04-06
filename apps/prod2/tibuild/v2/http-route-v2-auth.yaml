@@ -1,0 +1,38 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v2-tibuild-v2-auth
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: infra
+  hostnames:
+    - do2.pingcap.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild/api/v2
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: v2-tibuild-v2-auth
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: v2-tibuild-v2-auth
+  basicAuth:
+    users:
+      name: httproute-auth-secret
