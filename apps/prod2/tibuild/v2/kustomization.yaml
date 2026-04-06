@@ -6,3 +6,4 @@ resources:
   - release.yaml
   - ingress.yaml
   - http-route-v2-auth.yaml
+  - envoy-security-policy-v2-auth.yaml

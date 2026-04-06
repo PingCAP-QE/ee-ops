@@ -23,16 +23,3 @@ spec:
             path:
               type: ReplacePrefixMatch
               replacePrefixMatch: /
----
-apiVersion: gateway.envoyproxy.io/v1alpha1
-kind: SecurityPolicy
-metadata:
-  name: cloudevents-server-external
-spec:
-  targetRefs:
-    - group: gateway.networking.k8s.io
-      kind: HTTPRoute
-      name: cloudevents-server-external
-  basicAuth:
-    users:
-      name: httproute-auth-secret
