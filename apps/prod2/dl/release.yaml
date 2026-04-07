@@ -68,7 +68,7 @@ spec:
       enabled: true
       parentRefs:
         - kind: Gateway
-          name: external-https
+          name: internal-gateway
           namespace: infra
       hostnames:
         - internal2-do.pingcap.net
