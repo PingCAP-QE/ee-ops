@@ -26,3 +26,30 @@ spec:
                 name: tekton-dashboard
                 port:
                   name: http
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tekton-dashboard-internal
+  namespace: tekton-pipelines
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: internal-gateway
+      namespace: infra
+  hostnames:
+    - "${domain_internal}"
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: "${path_for_dashboard}"
+      backendRefs:
+        - name: tekton-dashboard
+          port: 9097
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
