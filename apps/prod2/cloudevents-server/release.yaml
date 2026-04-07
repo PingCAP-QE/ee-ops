@@ -58,3 +58,22 @@ spec:
           paths:
             - path: /cloudevents-server(/|$)(.*)
               pathType: ImplementationSpecific
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: external-https
+          namespace: infra
+      hostnames:
+        - internal2-do.pingcap.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /cloudevents-server
+          filters:
+            - type: URLRewrite
+              urlRewrite:
+                path:
+                  type: ReplacePrefixMatch
+                  replacePrefixMatch: /
