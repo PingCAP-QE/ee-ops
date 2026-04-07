@@ -5,4 +5,7 @@ resources:
   - namespace.yaml
   - kafka
   - external-secret.yaml
+  - external-secret-httproute-auth.yaml
+  - http-route.yaml
+  - envoy-security-policy.yaml
   - release.yaml

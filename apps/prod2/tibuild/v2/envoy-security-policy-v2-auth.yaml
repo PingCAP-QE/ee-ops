@@ -1,0 +1,12 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: v2-tibuild-v2-auth
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: v2-tibuild-v2-auth
+  basicAuth:
+    users:
+      name: httproute-auth-secret
