@@ -43,7 +43,8 @@ spec:
       config:
         secretName: v2-config
         secretKey: config.yaml
-
+    serviceAccount:
+      create: false
     ingress:
       enabled: true
       className: "nginx"
@@ -55,5 +56,22 @@ spec:
           paths:
             - path: /tibuild/api/v2(/|$)(.*)
               pathType: Prefix
-    serviceAccount:
-      create: false
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: internal-gateway
+          namespace: infra
+      hostnames:
+        - internal2-do.pingcap.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /tibuild/api/v2
+          filters:
+            - type: URLRewrite
+              urlRewrite:
+                path:
+                  type: ReplacePrefixMatch
+                  replacePrefixMatch: /api/v2
