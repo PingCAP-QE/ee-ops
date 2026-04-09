@@ -2,6 +2,9 @@
 
 GitOps everything for Efficiency Engineering
 
+Additional design documents
+- `docs/gar-controlled-delivery/README.md`: controlled private-delivery design for GAR, Terraform, FluxCD, and customer-side sync
+
 ## How to Setup it in you k8s cluster
 
 Before all please fork it into you personal account or organization.
