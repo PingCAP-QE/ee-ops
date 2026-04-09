@@ -46,6 +46,19 @@ spec:
           paths:
             - path: /
               pathType: ImplementationSpecific
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: internal-gateway
+          namespace: infra
+      hostnames:
+        - publisher.pingcap.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
     volumes:
       - name: packages-config
         configMap:
