@@ -7,7 +7,7 @@ spec:
     spec:
       chart: zot
       # renovate: datasource=helm depName=zot registryUrl=https://zotregistry.dev/helm-charts
-      version: 0.1.97
+      version: 0.1.104
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
@@ -20,19 +20,14 @@ spec:
     secretFiles: false # We are in charge of managing it(the secret `zot-secret`)
     mountConfig: true
     configFiles: false # We are in charge of managing it(the config map `zot-config`)
-    ingress:
-      annotations:
-        kubernetes.io/tls-acme: "true"
-        nginx.ingress.kubernetes.io/proxy-body-size: "0"
-        nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
-        nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
-      className: nginx
+    httpRoute:
       enabled: true
-      hosts:
-        - host: hub-zot.pingcap.net
-          paths:
-            - path: /
-      pathtype: ImplementationSpecific
+      parentRefs:
+        - kind: Gateway
+          name: internal-gateway
+          namespace: infra
+      hostnames:
+        - hub-zot.pingcap.net
     persistence: true
     pvc:
       accessMode: ReadWriteOnce

@@ -54,16 +54,6 @@ spec:
 
     serviceAccount:
       create: false
-    ingress:
-      enabled: true
-      className: "nginx"
-      annotations:
-        nginx.ingress.kubernetes.io/rewrite-target: /$2
-      hosts:
-        - host: internal2-do.pingcap.net
-          paths:
-            - path: /dl(/|$)(.*)
-              pathType: Prefix
     httpRoute:
       enabled: true
       parentRefs:

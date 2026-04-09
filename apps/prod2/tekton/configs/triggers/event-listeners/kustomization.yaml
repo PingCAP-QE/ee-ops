@@ -7,4 +7,3 @@ resources:
   - el-notify.yaml
   - el-tibuild.yaml
   - http-route-event-listener.yaml
-  - ingress-event-listener.yaml
