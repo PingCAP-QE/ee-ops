@@ -86,6 +86,8 @@ Delivery object model
   - digest list
   - optional SBOM and signatures
 - Delivery is validated by digest, not by tag alone.
+- Customer synchronization should prefer registry-to-registry copy methods such as `crane copy` or `skopeo copy --all`.
+- Plain `docker pull/tag/push` should be treated as fallback only because some registries may rewrite manifests and report a different destination digest.
 
 Example `images.lock`
 ```yaml
@@ -127,7 +129,7 @@ Operational workflow
 3. Terraform creates or updates the GAR repository.
 4. Delivery bot copies images by digest from production into the delivery repository.
 5. Delivery metadata and manifests are published.
-6. Customer synchronizes images into the internal registry.
+6. Customer synchronizes images into the internal registry, preferably with registry-to-registry copy tooling.
 7. Expiration automation revokes access and removes expired repositories.
 
 Audit requirements
