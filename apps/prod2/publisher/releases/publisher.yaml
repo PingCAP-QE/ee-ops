@@ -38,14 +38,6 @@ spec:
         secretName: publisher-server-config
         secretKey: config.yaml
         debug: true
-    ingress:
-      enabled: true
-      className: "nginx"
-      hosts:
-        - host: publisher.pingcap.net
-          paths:
-            - path: /
-              pathType: ImplementationSpecific
     httpRoute:
       enabled: true
       parentRefs:
