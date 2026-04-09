@@ -45,17 +45,6 @@ spec:
         secretKey: config.yaml
     serviceAccount:
       create: false
-    ingress:
-      enabled: true
-      className: "nginx"
-      annotations:
-        nginx.ingress.kubernetes.io/use-regex: "true"
-        nginx.ingress.kubernetes.io/rewrite-target: /api/v2/$2
-      hosts:
-        - host: internal2-do.pingcap.net
-          paths:
-            - path: /tibuild/api/v2(/|$)(.*)
-              pathType: Prefix
     httpRoute:
       enabled: true
       parentRefs:
