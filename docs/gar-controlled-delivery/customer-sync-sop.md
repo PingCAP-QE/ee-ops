@@ -19,20 +19,43 @@ Prerequisites
 - Customer environment can reach GAR.
 
 Synchronization rules
-- Pull by digest, not by tag only.
-- Push into the customer's internal registry under the customer's naming policy.
-- Validate the final digest before declaring success.
+- Treat the source digest in `images.lock` as the authoritative delivery reference.
+- Prefer registry-to-registry copy methods that preserve the published manifest as much as possible.
+- Do not use `docker pull -> docker tag -> docker push` as the default delivery path.
+- Validate the target result before declaring success.
 
 Recommended workflow
 1. Authenticate to the delivery GAR repository.
 2. Authenticate to the customer's internal registry.
-3. Pull each image by digest from GAR.
-4. Retag each image for the internal registry.
-5. Push to the internal registry.
-6. Verify digest or image metadata after push.
-7. Record the synchronization result for the delivery batch.
+3. Copy each image from GAR into the internal registry by digest.
+4. Verify the copied artifact in the internal registry.
+5. If the destination registry reports a different digest, compare manifest type and copy method before escalating.
+6. Record the synchronization result for the delivery batch.
+7. Use fallback pull/tag/push procedures only when registry-to-registry copy tooling is unavailable.
 
-Docker example
+Preferred method: `crane copy`
+```bash
+set -euo pipefail
+
+SRC="asia-east1-docker.pkg.dev/delivery-project/customer-a-r2026q2"
+DST="registry.customer.example.com/private-delivery"
+
+crane copy "${SRC}/tidb@sha256:1111" "${DST}/tidb:v8.5.0"
+crane copy "${SRC}/tikv@sha256:2222" "${DST}/tikv:v8.5.0"
+```
+
+Preferred method for multi-arch artifacts: `skopeo copy --all`
+```bash
+set -euo pipefail
+
+SRC="asia-east1-docker.pkg.dev/delivery-project/customer-a-r2026q2"
+DST="registry.customer.example.com/private-delivery"
+
+skopeo copy --all "docker://${SRC}/tidb@sha256:1111" "docker://${DST}/tidb:v8.5.0"
+skopeo copy --all "docker://${SRC}/tikv@sha256:2222" "docker://${DST}/tikv:v8.5.0"
+```
+
+Fallback only: `docker pull/tag/push`
 ```bash
 set -euo pipefail
 
@@ -42,27 +65,17 @@ DST="registry.customer.example.com/private-delivery"
 docker pull "${SRC}/tidb@sha256:1111"
 docker tag "${SRC}/tidb@sha256:1111" "${DST}/tidb:v8.5.0"
 docker push "${DST}/tidb:v8.5.0"
-
-docker pull "${SRC}/tikv@sha256:2222"
-docker tag "${SRC}/tikv@sha256:2222" "${DST}/tikv:v8.5.0"
-docker push "${DST}/tikv:v8.5.0"
 ```
 
-Containerd example
-```bash
-set -euo pipefail
-
-SRC="asia-east1-docker.pkg.dev/delivery-project/customer-a-r2026q2"
-DST="registry.customer.example.com/private-delivery"
-
-ctr images pull "${SRC}/tidb@sha256:1111"
-ctr images tag "${SRC}/tidb@sha256:1111" "${DST}/tidb:v8.5.0"
-ctr images push "${DST}/tidb:v8.5.0"
-```
+Why fallback is not preferred
+- Different registries may rewrite manifest schemas, media types, or compression.
+- Multi-arch indexes are especially likely to produce a different reported digest at the destination.
+- The copied image may still be functionally equivalent, but the final digest shown by the target registry may not match the source digest exactly.
 
 Validation checklist
-- The pulled digest matches `images.lock`.
-- The pushed artifact in the internal registry matches the expected component and version.
+- The source reference matches `images.lock`.
+- The target artifact exists in the internal registry under the expected component and version.
+- If the target digest differs from the source digest, the operator verifies whether the difference comes from registry-side manifest rewriting rather than content loss.
 - Deployment automation references the customer internal registry, not the GAR delivery repository.
 - Synchronization is completed before the delivery repository expiration date.
 
@@ -72,7 +85,7 @@ Failure handling
 - If push fails:
   verify internal registry permissions and storage policy.
 - If digest does not match:
-  stop and escalate before deployment.
+  compare source and target manifest type and copy method first, then escalate before deployment if the difference cannot be explained.
 
 Exit criteria
 - All required images are present in the customer's internal registry.
