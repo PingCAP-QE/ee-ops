@@ -23,3 +23,6 @@ spec:
                         - key: cloud.google.com/gke-provisioning
                           operator: NotIn
                           values: ["spot"]
+                        - key: cloud.google.com/machine-family
+                          operator: In
+                          values: [c4, c4a]
