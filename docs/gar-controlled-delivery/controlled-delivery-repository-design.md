@@ -70,7 +70,12 @@ Identity and access model
   - `delivery-bot`: writes to delivery repositories
   - `platform-admin`: creates repositories, manages IAM, retirement, and exceptions
 - Customer identities:
-  - preferred: customer-managed Google identity or service account
+  - supported for repository-level reader grants:
+    - Google user account
+    - Google service account
+  - recommended default:
+    - Google user account for one-off or manual synchronization
+    - customer-managed Google service account for automated synchronization
   - fallback: PingCAP-managed dedicated read-only identity for that customer only
 - Required customer role:
   - `roles/artifactregistry.reader`
@@ -125,12 +130,28 @@ Repository labels
 
 Operational workflow
 1. Delivery request is approved.
-2. Git declares the repository, IAM, and expiration.
-3. Terraform creates or updates the GAR repository.
-4. Delivery bot copies images by digest from production into the delivery repository.
-5. Delivery metadata and manifests are published.
-6. Customer synchronizes images into the internal registry, preferably with registry-to-registry copy tooling.
-7. Expiration automation revokes access and removes expired repositories.
+2. Customer provides the identity to be authorized for repository read access.
+   - accepted default inputs:
+     - one Google user account email
+     - one customer-managed Google service account email
+3. Git declares the repository, IAM, and expiration.
+4. Terraform creates or updates the GAR repository.
+5. Terraform or automation grants `roles/artifactregistry.reader` on that repository to the customer-provided identity.
+6. Delivery bot copies images by digest from production into the delivery repository.
+7. Delivery metadata and manifests are published.
+8. Customer synchronizes images into the internal registry, preferably with registry-to-registry copy tooling.
+9. Expiration automation revokes access and removes expired repositories.
+
+Customer request requirements
+- Each delivery request must include:
+  - the requested delivery batch or ticket identifier
+  - the image list or release manifest to be delivered
+  - the requested expiration date
+  - one customer identity to authorize for repository read access
+- The authorized customer identity must be one of:
+  - a Google user account email
+  - a Google service account email
+- If the customer cannot provide either of the above, this online GAR delivery workflow should not be the default path; use an approved fallback such as offline image package delivery instead.
 
 Audit requirements
 - Track who created a repository.
