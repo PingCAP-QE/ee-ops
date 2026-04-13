@@ -55,7 +55,7 @@ spec:
     serviceAccount:
       create: false
     httpRoute:
-      enabled: true
+      enabled: false
       parentRefs:
         - kind: Gateway
           name: internal-gateway

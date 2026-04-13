@@ -28,6 +28,14 @@ spec:
           namespace: infra
       hostnames:
         - hub-zot.pingcap.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          # Registry pulls and pushes can stream large layers for a long time.
+          timeouts:
+            request: 0s
     persistence: true
     pvc:
       accessMode: ReadWriteOnce
