@@ -12,11 +12,28 @@ Audience
 Prerequisites
 - Customer has received:
   - GAR repository address
-  - access credentials or access instructions
+  - confirmation of which Google identity has been granted read access to the delivery repository
+  - GAR authentication instructions
   - `images.lock`
   - expiration date
   - target image naming convention in the internal registry
 - Customer environment can reach GAR.
+
+Authenticating to GAR
+- PingCAP does not need to hand over a long-lived Docker password for this workflow.
+- Instead, the customer uses a Google identity that has already been granted `Artifact Registry Reader` access to the delivery repository.
+- After authenticating that identity with `gcloud`, the customer can obtain a short-lived access token and log in to GAR.
+
+Example
+```bash
+gcloud auth login
+gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin us-docker.pkg.dev
+```
+
+How to interpret this prerequisite
+1. PingCAP confirms which Google identity is authorized to read the delivery repository.
+2. The customer authenticates that identity locally with `gcloud`.
+3. The customer uses the short-lived access token to pull or copy images from GAR.
 
 Synchronization rules
 - Treat the source digest in `images.lock` as the authoritative delivery reference.
