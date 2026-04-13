@@ -4,4 +4,5 @@ namespace: dl
 resources:
   - namespace.yaml
   - external-secrets
+  - http-route.yaml
   - release.yaml
