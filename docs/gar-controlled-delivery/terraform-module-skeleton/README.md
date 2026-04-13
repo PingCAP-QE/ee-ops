@@ -3,18 +3,22 @@
 This skeleton demonstrates the minimum Terraform shape for managing a
 customer-batch GAR repository with repository-level IAM.
 
-What it covers
+## Overview
+- This is a reference skeleton, not yet a production module.
+- It demonstrates the minimum structure for repository creation and repository-level IAM bindings.
+
+## What It Covers
 - GAR standard Docker repository
 - repository labels
 - `delivery-bot` writer binding
 - customer reader binding
 
-What it does not cover yet
+## What It Does Not Cover Yet
 - cleanup policy resources, because provider support and rollout policy may vary
 - publication jobs
 - expiration automation
 
-Suggested usage
+## Suggested Usage
 ```hcl
 module "customer_a_r2026q2" {
   source = "./docs/gar-controlled-delivery/terraform-module-skeleton"

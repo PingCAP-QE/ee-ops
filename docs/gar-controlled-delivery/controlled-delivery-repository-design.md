@@ -1,27 +1,26 @@
-GAR Controlled Delivery Repository Design
-=========================================
+# GAR Controlled Delivery Repository Design
 
-Overview
+## 📘 Overview
 - This design defines a controlled image-delivery plane for private delivery.
 - The objective is to deliver product images to customers without exposing the
   internal production registry and without giving customers write access to
   PingCAP-managed registries.
 - Google Artifact Registry (GAR) is the delivery backend.
 
-Design goals
+## 🎯 Goals
 - Protect PingCAP-owned product content during private delivery.
 - Provide a customer-specific pull endpoint for image synchronization.
 - Enforce repository-level isolation across customers and delivery batches.
 - Make every delivery action auditable, time-bounded, and revocable.
 - Use digest-based delivery as the source of truth.
 
-Non-goals
+## Non-goals
 - Replacing the customer's internal registry.
 - Allowing customers to push back into PingCAP-managed registries.
 - Using the production artifact registry directly as the delivery surface.
 - Building a self-service platform in phase 1.
 
-Principles
+## Principles
 - Least privilege: customers get read-only access only.
 - Repository isolation: one customer must not see another customer's content.
 - Time-bound delivery: temporary repositories must expire.
@@ -29,12 +28,12 @@ Principles
 - GitOps-first: repository lifecycle, IAM, and publication intent are declared in Git.
 - Auditability: repository creation, access grants, image publication, and cleanup must be traceable.
 
-Platform constraints
+## Platform Constraints
 - GAR standard Docker repositories are the recommended delivery target.
 - GAR cleanup policies apply to standard repositories and fit the temporary-delivery use case.
 - Virtual repositories are not the primary delivery surface because lifecycle and customer isolation should be explicit at repository level.
 
-Architecture
+## 🏗️ Architecture
 - Production artifact plane:
   stores internally published product images and is not directly exposed to customers.
 - Delivery artifact plane:
@@ -42,7 +41,7 @@ Architecture
 - Customer sync plane:
   customers pull from the delivery repository and push into their own internal registry.
 
-Repository model
+## Repository Model
 - Default model: one repository per customer per delivery batch.
 - Naming pattern:
   `<customer>-<delivery-batch>`
@@ -51,13 +50,13 @@ Repository model
 - Example image path:
   `asia-east1-docker.pkg.dev/<delivery-project>/customer-a-r2026q2/tidb:v8.5.0`
 
-Why the batch repository model is preferred
+### Why the Batch Repository Model Is Preferred
 - Repository-level IAM is clearer than path-level conventions.
 - Expiration and cleanup are easier to implement and audit.
 - Customer scope is explicit and easy to revoke.
 - Batch repositories reduce accidental reuse of stale content.
 
-Long-lived repository exception
+### Long-lived Repository Exception
 - A long-lived customer repository may be used for strategic customers with frequent deliveries.
 - It must still keep:
   - repository-level read-only IAM
@@ -65,7 +64,7 @@ Long-lived repository exception
   - quarterly credential rotation
   - GitOps-managed publication manifests
 
-Identity and access model
+## 🔐 Identity and Access Model
 - Internal identities:
   - `delivery-bot`: writes to delivery repositories
   - `platform-admin`: creates repositories, manages IAM, retirement, and exceptions
@@ -84,7 +83,7 @@ Identity and access model
   - writer grants for customers
   - shared identities across multiple customers
 
-Delivery object model
+## Delivery Object Model
 - Each delivery batch must publish:
   - `images.lock`
   - `release-manifest.yaml`
@@ -94,7 +93,7 @@ Delivery object model
 - Customer synchronization should prefer registry-to-registry copy methods such as `crane copy` or `skopeo copy --all`.
 - Plain `docker pull/tag/push` should be treated as fallback only because some registries may rewrite manifests and report a different destination digest.
 
-Example `images.lock`
+### Example `images.lock`
 ```yaml
 batch: customer-a-r2026q2
 owner: delivery-team
@@ -110,7 +109,7 @@ images:
     digest: sha256:2222
 ```
 
-Lifecycle model
+## Lifecycle Model
 - Temporary repositories:
   - default TTL: 14 or 30 days
   - IAM revoked before or at expiration
@@ -120,7 +119,7 @@ Lifecycle model
   - rotate customer access regularly
   - require owner confirmation before extending retention
 
-Repository labels
+## Repository Labels
 - Each repository should include:
   - `customer`
   - `owner`
@@ -128,7 +127,7 @@ Repository labels
   - `expire_at`
   - `ticket`
 
-Operational workflow
+## 🔄 Operational Workflow
 1. Delivery request is approved.
 2. Customer provides the identity to be authorized for repository read access.
    - accepted default inputs:
@@ -142,7 +141,7 @@ Operational workflow
 8. Customer synchronizes images into the internal registry, preferably with registry-to-registry copy tooling.
 9. Expiration automation revokes access and removes expired repositories.
 
-Customer request requirements
+## Customer Request Requirements
 - Each delivery request must include:
   - the requested delivery batch or ticket identifier
   - the image list or release manifest to be delivered
@@ -153,21 +152,21 @@ Customer request requirements
   - a Google service account email
 - If the customer cannot provide either of the above, this online GAR delivery workflow should not be the default path; use an approved fallback such as offline image package delivery instead.
 
-Audit requirements
+## Audit Requirements
 - Track who created a repository.
 - Track which customer identity received reader access.
 - Track which digests were published into which repository.
 - Track expiration, revocation, and deletion events.
 - Preserve an immutable batch manifest in Git.
 
-Security guardrails
+## 🚧 Guardrails
 - Do not expose the production artifact registry directly.
 - Do not grant customers write access to GAR.
 - Do not use shared customer credentials.
 - Do not deliver by tag only.
 - Do not keep temporary delivery repositories without an expiration policy.
 
-Recommended phase plan
+## Recommended Phase Plan
 - Phase 1:
   manual request intake, Git-driven repo definitions, delivery bot publication
 - Phase 2:
@@ -175,7 +174,7 @@ Recommended phase plan
 - Phase 3:
   self-service front end backed by the same GitOps flow
 
-Decision
+## ✅ Decision
 - Use GAR standard repositories as the controlled delivery surface.
 - Default to one repository per customer per batch.
 - Manage repository lifecycle, IAM, publication intent, and retirement through GitOps.
