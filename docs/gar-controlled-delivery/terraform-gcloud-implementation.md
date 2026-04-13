@@ -1,16 +1,15 @@
-Terraform and gcloud Implementation Checklist
-============================================
+# Terraform and gcloud Implementation Checklist
 
-Purpose
+## 📘 Purpose
 - This document provides a practical implementation checklist for controlled delivery on GAR.
 - It includes repository creation, IAM binding, image copy, manifest generation, and retirement actions.
 
-Implementation boundaries
+## Implementation Boundaries
 - Terraform is the source of truth for repository and IAM definitions.
 - `gcloud` and `crane` are used as operational tools where appropriate.
 - Publication and retirement must be triggered by GitOps workflows, not by manual ad hoc console changes.
 
-Implementation checklist
+## 🧩 Implementation Checklist
 - Create a dedicated delivery project or dedicated repository namespace.
 - Create a dedicated `delivery-bot` service account.
 - Create a GAR standard Docker repository for each customer batch.
@@ -22,7 +21,7 @@ Implementation checklist
 - Record the publication in Git.
 - Revoke access and delete expired repositories.
 
-Suggested directory model in Git
+## Suggested Directory Model in Git
 ```text
 docs/gar-controlled-delivery/
 docs/gar-controlled-delivery/terraform-module-skeleton/
@@ -32,13 +31,13 @@ infrastructure/gcp/delivery-repositories/
     repo.auto.tfvars.json
 ```
 
-Terraform resources to manage
+## Terraform Resources to Manage
 - `google_artifact_registry_repository`
 - `google_artifact_registry_repository_iam_member`
 - `google_service_account`
 - optional IAM customizations for delivery automation
 
-Operational tools
+## 🛠️ Operational Tools
 - `gcloud`:
   bootstrap, inspection, and emergency operations
 - `crane`:
@@ -46,7 +45,7 @@ Operational tools
 - `flux`:
   reconciles Git state into the management cluster
 
-Example bootstrap commands
+## Example Bootstrap Commands
 ```bash
 gcloud artifacts repositories create customer-a-r2026q2 \
   --project="${PROJECT_ID}" \
@@ -67,7 +66,7 @@ gcloud artifacts repositories add-iam-policy-binding customer-a-r2026q2 \
   --role="roles/artifactregistry.reader"
 ```
 
-Example image publication commands
+## Example Image Publication Commands
 ```bash
 crane copy \
   asia-east1-docker.pkg.dev/prod-release/tidb/tidb@sha256:1111 \
@@ -77,7 +76,7 @@ crane digest \
   asia-east1-docker.pkg.dev/delivery-project/customer-a-r2026q2/tidb:v8.5.0
 ```
 
-Example retirement commands
+## Example Retirement Commands
 ```bash
 gcloud artifacts repositories remove-iam-policy-binding customer-a-r2026q2 \
   --project="${PROJECT_ID}" \
@@ -91,7 +90,7 @@ gcloud artifacts repositories delete customer-a-r2026q2 \
   --quiet
 ```
 
-Minimal delivery automation commands
+## Minimal Delivery Automation Commands
 - `create-delivery-repo`
 - `grant-delivery-reader`
 - `publish-images-by-digest`
@@ -99,12 +98,12 @@ Minimal delivery automation commands
 - `revoke-delivery-reader`
 - `cleanup-expired-delivery-repos`
 
-Recommended validations
+## ✅ Recommended Validations
 - Validate repository labels and IAM after Terraform apply.
 - Validate every copied image digest after publication.
 - Validate that customer identities cannot access repositories outside their own batch.
 - Validate expiration workflow in a dry-run environment before enabling automatic deletion.
 
-Operational note
+## Operational Note
 - Manual `gcloud` commands may be used during bootstrap or break-glass events.
 - The desired steady state is still Git-declared and Git-reconciled, with `gcloud` used as an execution tool behind automation.

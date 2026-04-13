@@ -3,14 +3,18 @@
 This document set describes a controlled private-delivery model for product
 images using Google Artifact Registry (GAR), Terraform, and FluxCD.
 
-Contents
+## 📘 Overview
+- Audience: platform engineers, delivery owners, and reviewers of the private-delivery design.
+- Theme: controlled image delivery with repository isolation, GitOps-managed access, and customer-side synchronization.
+
+## 🗂️ Documents
 - `controlled-delivery-repository-design.md`: repository, IAM, lifecycle, and audit design
 - `terraform-gcloud-implementation.md`: implementation checklist and operational commands
 - `gitops-with-fluxcd-and-terraform.md`: GitOps operating model using FluxCD and Terraform
 - `customer-sync-sop.md`: customer-side synchronization procedure
 - `terraform-module-skeleton/`: reference Terraform module skeleton
 
-Scope
+## 🎯 Scope
 - Protect PingCAP-owned product content during private delivery.
 - Let customers pull from a controlled delivery repository and sync into their
   internal registry themselves.
