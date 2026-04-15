@@ -17,9 +17,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Configure Git
         run: |
@@ -27,20 +28,22 @@ jobs:
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
 
       - name: Install Helm
-        uses: azure/setup-helm@v4
+        uses: azure/setup-helm@bf6a7d304bc2fdb57e0331155b7ebf2c504acf0a # v4
         with:
           version: v3.8.1
 
       - name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.7.0
+        uses: helm/chart-releaser-action@a0d2dc62c5e491af8ef6ba64a2e02bcf3fb33aa1 # v1.7.0
         with:
           skip_existing: true
         env:
           CR_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
       - name: Publish Artifact Hub repository metadata
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
         run: |
-          git fetch origin gh-pages
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: bearer ${GITHUB_TOKEN}" fetch origin gh-pages
           worktree="$(mktemp -d)"
           git worktree add -B gh-pages "${worktree}" origin/gh-pages
           cp artifacthub-repo.yml "${worktree}/artifacthub-repo.yml"
@@ -52,5 +55,5 @@ jobs:
 
             git add artifacthub-repo.yml
             git commit -m "chore(charts): publish artifact hub repo metadata"
-            git push origin HEAD:gh-pages
+            git -c http.https://github.com/.extraheader="AUTHORIZATION: bearer ${GITHUB_TOKEN}" push origin HEAD:gh-pages
           popd
