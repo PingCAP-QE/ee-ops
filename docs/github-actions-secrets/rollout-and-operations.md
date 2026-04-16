@@ -31,6 +31,208 @@
 - Ensure ESO is healthy in the chosen cluster.
 - If you need declarative org-secret visibility control, upgrade ESO from chart `0.19.0` before implementation.
 
+## Prepare GCP IAM For Workload Identity
+
+The current design uses the Kubernetes-service-account to Google-service-account link pattern for GKE Workload Identity:
+
+- Kubernetes service account: `github-actions-secrets/gcp-sm-github-actions`
+- Google service account: `gcp-sm-github-actions@pingcap-testing-account.iam.gserviceaccount.com`
+- source store: namespaced `SecretStore` `gcp-sm-github-actions`
+
+The currently selected active writer cluster is the repo's `gcp` cluster. In the local environment used to validate this design, that cluster is:
+
+- cluster: `prow`
+- location: `us-central1-c`
+- project: `pingcap-testing-account`
+- workload pool: `pingcap-testing-account.svc.id.goog`
+
+### Recommended Variables
+
+Use these variables when preparing the environment:
+
+```bash
+export PROJECT_ID=pingcap-testing-account
+export CLUSTER_NAME=prow
+export CLUSTER_LOCATION=us-central1-c
+
+export KSA_NAMESPACE=github-actions-secrets
+export KSA_NAME=gcp-sm-github-actions
+
+export GSA_NAME=gcp-sm-github-actions
+export GSA_EMAIL="${GSA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
+```
+
+### 1. Confirm Workload Identity Is Enabled On The Cluster
+
+```bash
+gcloud container clusters describe "${CLUSTER_NAME}" \
+  --project="${PROJECT_ID}" \
+  --location="${CLUSTER_LOCATION}" \
+  --format='value(workloadIdentityConfig.workloadPool)'
+```
+
+Expected output:
+
+```text
+pingcap-testing-account.svc.id.goog
+```
+
+If this value is empty, stop here and enable GKE Workload Identity Federation before proceeding.
+
+### 2. Create The Google Service Account
+
+```bash
+gcloud iam service-accounts create "${GSA_NAME}" \
+  --project="${PROJECT_ID}" \
+  --display-name="ESO GitHub Actions Secret Manager access"
+```
+
+Verify:
+
+```bash
+gcloud iam service-accounts describe "${GSA_EMAIL}" \
+  --project="${PROJECT_ID}"
+```
+
+### 3. Grant Secret Manager Access To The Google Service Account
+
+Recommended role:
+
+- `roles/secretmanager.secretAccessor`
+
+Preferred grant model:
+
+- grant access at the individual secret level
+- only use project-level access if secret-level bindings become operationally unmanageable
+
+#### Option A: Secret-level bindings, preferred
+
+Grant the GSA access to each required secret explicitly.
+
+Example for the GitHub App private key:
+
+```bash
+gcloud secrets add-iam-policy-binding gha__system__github_app_private_key \
+  --project="${PROJECT_ID}" \
+  --member="serviceAccount:${GSA_EMAIL}" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+Example for one shared credential:
+
+```bash
+gcloud secrets add-iam-policy-binding gha__shared__dockerhub_token \
+  --project="${PROJECT_ID}" \
+  --member="serviceAccount:${GSA_EMAIL}" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+Repeat for every secret that the `gcp-sm-github-actions` `SecretStore` must read.
+
+#### Option B: Project-level binding, broader access
+
+Use this only if secret-level management is too costly for your current rollout stage.
+
+```bash
+gcloud projects add-iam-policy-binding "${PROJECT_ID}" \
+  --member="serviceAccount:${GSA_EMAIL}" \
+  --role="roles/secretmanager.secretAccessor"
+```
+
+Tradeoff:
+
+- simpler to operate
+- significantly broader blast radius
+
+### 4. Create The Kubernetes Namespace And Service Account
+
+```bash
+kubectl create namespace "${KSA_NAMESPACE}"
+
+kubectl create serviceaccount "${KSA_NAME}" \
+  --namespace "${KSA_NAMESPACE}"
+```
+
+If the namespace already exists, only create or reconcile the service account.
+
+### 5. Allow The Kubernetes Service Account To Impersonate The Google Service Account
+
+Grant the Kubernetes service account permission to act as the Google service account:
+
+```bash
+gcloud iam service-accounts add-iam-policy-binding "${GSA_EMAIL}" \
+  --project="${PROJECT_ID}" \
+  --role="roles/iam.workloadIdentityUser" \
+  --member="serviceAccount:${PROJECT_ID}.svc.id.goog[${KSA_NAMESPACE}/${KSA_NAME}]"
+```
+
+This binding is required for the linked KSA-to-GSA Workload Identity model used in this design.
+
+### 6. Annotate The Kubernetes Service Account
+
+```bash
+kubectl annotate serviceaccount "${KSA_NAME}" \
+  --namespace "${KSA_NAMESPACE}" \
+  iam.gke.io/gcp-service-account="${GSA_EMAIL}" \
+  --overwrite
+```
+
+Optional:
+
+```bash
+kubectl annotate serviceaccount "${KSA_NAME}" \
+  --namespace "${KSA_NAMESPACE}" \
+  iam.gke.io/return-principal-id-as-email="true" \
+  --overwrite
+```
+
+### 7. Verify The Binding Before Applying ESO Resources
+
+Verify the GSA exists:
+
+```bash
+gcloud iam service-accounts describe "${GSA_EMAIL}" \
+  --project="${PROJECT_ID}" \
+  --format='value(email)'
+```
+
+Verify the KSA annotation:
+
+```bash
+kubectl get serviceaccount "${KSA_NAME}" \
+  --namespace "${KSA_NAMESPACE}" \
+  -o yaml
+```
+
+Verify the Workload Identity IAM binding:
+
+```bash
+gcloud iam service-accounts get-iam-policy "${GSA_EMAIL}" \
+  --project="${PROJECT_ID}" \
+  --format=json
+```
+
+Verify secret-level access for one example secret:
+
+```bash
+gcloud secrets get-iam-policy gha__system__github_app_private_key \
+  --project="${PROJECT_ID}" \
+  --format=json
+```
+
+### 8. Roles That Are Not Required For This Design
+
+You do not need:
+
+- a JSON service account key stored in Kubernetes
+- `roles/iam.serviceAccountTokenCreator` for the ESO source-read path
+- broad owner/editor roles on the project
+
+The minimal intended access pattern is:
+
+- `roles/iam.workloadIdentityUser` on the GSA for `github-actions-secrets/gcp-sm-github-actions`
+- `roles/secretmanager.secretAccessor` on only the secrets, or at most the project, that the design needs to read
+
 ## Rollout Phases
 
 ### Phase 0: Control plane setup
