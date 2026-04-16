@@ -18,11 +18,15 @@
 - Grant it access only to the GitHub-related secrets.
 - Store the GitHub App private key in GCP Secret Manager.
 - Store each logical credential in GCP Secret Manager.
+- Bind the Kubernetes service account `github-actions-secrets/gcp-sm-github-actions` to that GCP service account through GKE Workload Identity.
 
 ### Kubernetes and Flux
 
 - Pick one active writer cluster. Recommendation: `gcp`.
 - Create the `github-actions-secrets` namespace.
+- Ensure GKE Workload Identity Federation is enabled on the chosen cluster.
+- Create the Kubernetes service account `gcp-sm-github-actions` in `github-actions-secrets`.
+- Annotate it with `iam.gke.io/gcp-service-account: <gcp-service-account>@<project>.iam.gserviceaccount.com`.
 - Ensure Kubernetes secret encryption at rest is enabled on the chosen cluster.
 - Ensure ESO is healthy in the chosen cluster.
 - If you need declarative org-secret visibility control, upgrade ESO from chart `0.19.0` before implementation.
@@ -34,7 +38,8 @@
 Deliver:
 
 - dedicated namespace
-- restricted GCP `ClusterSecretStore`
+- Workload-Identity-backed Kubernetes service account for GCP Secret Manager access
+- namespaced GCP `SecretStore` `gcp-sm-github-actions`
 - GitHub App private key `ExternalSecret`
 - first GitHub target `SecretStore`
 
@@ -190,6 +195,20 @@ Fix:
 
 - confirm the app installation exists in the target org
 - update the `installationID` in the target `SecretStore`
+
+### Wrong Workload Identity binding
+
+Symptoms:
+
+- source `ExternalSecret` is not ready
+- ESO logs show permission denied or token exchange failures against GCP
+
+Fix:
+
+- confirm GKE Workload Identity Federation is enabled on the cluster
+- confirm the Kubernetes service account annotation matches the intended GCP service account
+- confirm the GCP service account grants `roles/iam.workloadIdentityUser` to the Kubernetes service account
+- confirm the GCP service account has `roles/secretmanager.secretAccessor` on the required secrets or project
 
 ### Secret pushed to the wrong scope
 

@@ -16,8 +16,6 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: github-actions-secrets
-  labels:
-    ee.pingcap.com/allow-github-actions-sync: "true"
 ```
 
 ## Naming Conventions
@@ -26,7 +24,8 @@ metadata:
 
 | Resource | Convention | Example |
 | --- | --- | --- |
-| source `ClusterSecretStore` | `ee-gcp-sm-github-actions` | `ee-gcp-sm-github-actions` |
+| source `ServiceAccount` | `gcp-sm-github-actions` | `gcp-sm-github-actions` |
+| source `SecretStore` | `gcp-sm-github-actions` | `gcp-sm-github-actions` |
 | source `ExternalSecret` | `es-src-<logical-secret>` | `es-src-dockerhub-token` |
 | source materialized `Secret` | `src-<logical-secret>` | `src-dockerhub-token` |
 | GitHub App key `ExternalSecret` | `es-github-app-private-key` | `es-github-app-private-key` |
@@ -56,34 +55,51 @@ Examples:
 
 ## Source Store Pattern
 
-Use a dedicated `ClusterSecretStore` instead of the broad shared one.
+Use a dedicated namespaced `SecretStore` named `gcp-sm-github-actions`.
+
+The source-side authentication model is:
+
+- one Kubernetes service account in `github-actions-secrets`
+- that service account is annotated for GKE Workload Identity
+- the namespaced `SecretStore` references that service account through `auth.workloadIdentity.serviceAccountRef`
+- no static `secret-access-credentials` secret is used
+
+Recommended service account:
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gcp-sm-github-actions
+  namespace: github-actions-secrets
+  annotations:
+    iam.gke.io/gcp-service-account: gcp-sm-github-actions@pingcap-testing-account.iam.gserviceaccount.com
+```
+
+Recommended source store:
 
 ```yaml
 apiVersion: external-secrets.io/v1
-kind: ClusterSecretStore
+kind: SecretStore
 metadata:
-  name: ee-gcp-sm-github-actions
+  name: gcp-sm-github-actions
+  namespace: github-actions-secrets
 spec:
-  conditions:
-    - namespaceSelector:
-        matchLabels:
-          ee.pingcap.com/allow-github-actions-sync: "true"
   provider:
     gcpsm:
       auth:
-        secretRef:
-          secretAccessKeySecretRef:
-            namespace: flux-system
-            name: gcp-sm-sa-secret
-            key: secret-access-credentials
+        workloadIdentity:
+          serviceAccountRef:
+            name: gcp-sm-github-actions
       projectID: pingcap-testing-account
 ```
 
 Notes:
 
-- If the selected active writer cluster is `gcp`, the credential secret can follow the same existing pattern used by `ee-gcp-sm`.
+- This uses the same GKE annotation pattern already present elsewhere in the repo, for example `iam.gke.io/gcp-service-account`.
 - `gcp` is also the only cluster in this repo that already uses `PushSecret` today, so it is the least-surprise default for outbound secret sync.
-- Prefer a separate GCP service account for this store with access limited to GitHub-related secrets only.
+- Prefer a dedicated GCP service account for this store with access limited to GitHub-related secrets only.
+- ESO `v0.19.0` supports `gcpsm.auth.workloadIdentity.serviceAccountRef` for GKE Workload Identity.
 
 ## GitHub App Private Key Pattern
 
@@ -98,8 +114,8 @@ metadata:
 spec:
   refreshInterval: 1h
   secretStoreRef:
-    name: ee-gcp-sm-github-actions
-    kind: ClusterSecretStore
+    name: gcp-sm-github-actions
+    kind: SecretStore
   target:
     name: github-app-private-key
     creationPolicy: Owner
@@ -122,8 +138,8 @@ metadata:
 spec:
   refreshInterval: 1h
   secretStoreRef:
-    name: ee-gcp-sm-github-actions
-    kind: ClusterSecretStore
+    name: gcp-sm-github-actions
+    kind: SecretStore
   target:
     name: src-dockerhub-token
     creationPolicy: Owner
@@ -366,8 +382,9 @@ Reuse a GitHub `SecretStore` when all of the following are the same:
 ## Recommended Policy Guardrails
 
 - deny `PushSecret` creation outside `github-actions-secrets`
+- deny source GCP `SecretStore` creation outside `github-actions-secrets`
 - deny GitHub `SecretStore` creation outside `github-actions-secrets`
-- deny use of the restricted `ee-gcp-sm-github-actions` store outside the labeled namespace
+- deny `ExternalSecret` creation in `github-actions-secrets` unless it references `gcp-sm-github-actions`
 - deny cross-team write access to the delivery namespace
 
 These controls fit well with the Kyverno footprint already present in this repository.

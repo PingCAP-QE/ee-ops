@@ -56,12 +56,12 @@ Recommended delivery namespace: `github-actions-secrets`
 The namespace is separate from `infra`:
 
 - `infra` keeps hosting the ESO controllers.
-- `github-actions-secrets` hosts the source `ExternalSecret`, materialized Kubernetes `Secret`, GitHub `SecretStore`, and `PushSecret` objects.
+- `github-actions-secrets` hosts the Workload-Identity-backed Kubernetes service account, source `SecretStore`, source `ExternalSecret`, materialized Kubernetes `Secret`, GitHub `SecretStore`, and `PushSecret` objects.
 
 ```mermaid
 flowchart LR
     A[GCP Secret Manager\nsource of truth]
-    B[ClusterSecretStore\nrestricted to github-actions-secrets]
+    B[Namespaced SecretStore\n+ Workload Identity KSA]
     C[ExternalSecret]
     D[Kubernetes Secret\nin github-actions-secrets]
     E[PushSecret]
@@ -100,13 +100,15 @@ Reasons:
 
 ### 3. Restrict the shared GCP source store
 
-Create a dedicated source `ClusterSecretStore` for GitHub secret delivery, instead of reusing a very broad shared store without restrictions.
+Create a dedicated source `SecretStore` named `gcp-sm-github-actions` in `github-actions-secrets`, instead of reusing a broad shared store.
 
 Recommendation:
 
-- use a separate GCP service account for GitHub secret delivery
+- keep the source store namespaced to `github-actions-secrets`
+- use GKE Workload Identity instead of a static JSON key secret
+- use a dedicated Kubernetes service account and dedicated GCP service account for GitHub secret delivery
 - scope it to only the required GCP secrets or prefixes
-- add `ClusterSecretStore.spec.conditions` so only the `github-actions-secrets` namespace can use it
+- do not keep long-lived GCP credentials in Kubernetes Secrets for this path
 
 ### 4. Use one logical source secret per credential value
 
@@ -166,6 +168,7 @@ Required protections:
 - strict RBAC on `ExternalSecret`, `PushSecret`, `SecretStore`, and `Secret`
 - no application-team write access in the delivery namespace
 - egress-restricted NetworkPolicies for ESO
+- use Workload Identity so the GCP source path does not depend on a static `secret-access-credentials` secret
 
 ### GitHub authentication
 
@@ -187,9 +190,12 @@ This document does not implement the manifests, but the future structure should 
 infrastructure/gcp/github-actions-secrets/
 ├── kustomization.yaml
 ├── namespace.yaml
+├── serviceaccounts/
+│   ├── kustomization.yaml
+│   └── sa-gcp-sm-github-actions.yaml
 ├── source-store/
 │   ├── kustomization.yaml
-│   └── css-ee-gcp-sm-github-actions.yaml
+│   └── ss-gcp-sm-github-actions.yaml
 ├── source-secrets/
 │   ├── kustomization.yaml
 │   ├── es-github-app-private-key.yaml
@@ -219,5 +225,7 @@ infrastructure/gcp/github-actions-secrets/
 - External Secrets Operator GitHub provider: https://external-secrets.io/latest/provider/github/
 - External Secrets Operator PushSecret API: https://external-secrets.io/latest/api/pushsecret/
 - External Secrets Operator security best practices: https://external-secrets.io/latest/guides/security-best-practices/
+- External Secrets Operator Google Secret Manager provider: https://external-secrets.io/latest/provider/google-secrets-manager/
 - GitHub Actions secrets reference: https://docs.github.com/en/actions/reference/security/secrets
 - GitHub App permissions for secrets APIs: https://docs.github.com/en/rest/overview/permissions-required-for-github-apps
+- GKE Workload Identity Federation: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
