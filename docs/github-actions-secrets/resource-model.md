@@ -146,7 +146,7 @@ spec:
   data:
     - secretKey: value
       remoteRef:
-        key: projects/pingcap-testing-account/secrets/gha__shared__dockerhub_token/versions/latest
+        key: gha__shared__dockerhub_token
 ```
 
 ## GitHub Target Store Patterns
