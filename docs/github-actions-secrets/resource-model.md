@@ -122,7 +122,7 @@ spec:
   data:
     - secretKey: privateKey.pem
       remoteRef:
-        key: projects/pingcap-testing-account/secrets/gha__system__github_app_private_key/versions/latest
+        key: gha__system__github_app_private_key
 ```
 
 ## Source Secret Pattern
