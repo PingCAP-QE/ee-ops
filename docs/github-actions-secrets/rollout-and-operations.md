@@ -26,7 +26,7 @@
 - Create the `github-actions-secrets` namespace.
 - Ensure GKE Workload Identity Federation is enabled on the chosen cluster.
 - Create the Kubernetes service account `gcp-sm-github-actions` in `github-actions-secrets`.
-- Annotate it with `iam.gke.io/gcp-service-account: <gcp-service-account>@<project>.iam.gserviceaccount.com`.
+- Annotate it with `iam.gke.io/gcp-service-account: __REPLACE_WITH_GCP_GSA_EMAIL__`.
 - Ensure Kubernetes secret encryption at rest is enabled on the chosen cluster.
 - Ensure ESO is healthy in the chosen cluster.
 - If you need declarative org-secret visibility control, upgrade ESO from chart `0.19.0` before implementation.
@@ -36,24 +36,24 @@
 The current design uses the Kubernetes-service-account to Google-service-account link pattern for GKE Workload Identity:
 
 - Kubernetes service account: `github-actions-secrets/gcp-sm-github-actions`
-- Google service account: `gcp-sm-github-actions@pingcap-testing-account.iam.gserviceaccount.com`
+- Google service account: `__REPLACE_WITH_GCP_GSA_EMAIL__`
 - source store: namespaced `SecretStore` `gcp-sm-github-actions`
 
 The currently selected active writer cluster is the repo's `gcp` cluster. In the local environment used to validate this design, that cluster is:
 
-- cluster: `prow`
-- location: `us-central1-c`
-- project: `pingcap-testing-account`
-- workload pool: `pingcap-testing-account.svc.id.goog`
+- cluster: `__REPLACE_WITH_GCP_CLUSTER_NAME__`
+- location: `__REPLACE_WITH_GCP_CLUSTER_LOCATION__`
+- project: `__REPLACE_WITH_GCP_PROJECT_ID__`
+- workload pool: `__REPLACE_WITH_GCP_WORKLOAD_POOL__`
 
 ### Recommended Variables
 
 Use these variables when preparing the environment:
 
 ```bash
-export PROJECT_ID=pingcap-testing-account
-export CLUSTER_NAME=prow
-export CLUSTER_LOCATION=us-central1-c
+export PROJECT_ID=__REPLACE_WITH_GCP_PROJECT_ID__
+export CLUSTER_NAME=__REPLACE_WITH_GCP_CLUSTER_NAME__
+export CLUSTER_LOCATION=__REPLACE_WITH_GCP_CLUSTER_LOCATION__
 
 export KSA_NAMESPACE=github-actions-secrets
 export KSA_NAME=gcp-sm-github-actions
@@ -74,7 +74,7 @@ gcloud container clusters describe "${CLUSTER_NAME}" \
 Expected output:
 
 ```text
-pingcap-testing-account.svc.id.goog
+__REPLACE_WITH_GCP_WORKLOAD_POOL__
 ```
 
 If this value is empty, stop here and enable GKE Workload Identity Federation before proceeding.

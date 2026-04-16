@@ -73,7 +73,7 @@ metadata:
   name: gcp-sm-github-actions
   namespace: github-actions-secrets
   annotations:
-    iam.gke.io/gcp-service-account: gcp-sm-github-actions@pingcap-testing-account.iam.gserviceaccount.com
+    iam.gke.io/gcp-service-account: __REPLACE_WITH_GCP_GSA_EMAIL__
 ```
 
 Recommended source store:
@@ -91,7 +91,7 @@ spec:
         workloadIdentity:
           serviceAccountRef:
             name: gcp-sm-github-actions
-      projectID: pingcap-testing-account
+      projectID: __REPLACE_WITH_GCP_PROJECT_ID__
 ```
 
 Notes:
