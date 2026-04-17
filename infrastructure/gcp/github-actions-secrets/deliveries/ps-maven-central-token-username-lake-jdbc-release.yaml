@@ -1,0 +1,25 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: ps-maven-central-token-username-lake-jdbc-release
+  namespace: github-actions-secrets
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/github-secret-name: MAVEN_CENTRAL_TOKEN_USERNAME
+spec:
+  deletionPolicy: Delete
+  refreshInterval: 1h
+  secretStoreRefs:
+    - name: gh-env-tidbcloud-lake-jdbc-maven-central-com-tidbcloud-release
+      kind: SecretStore
+  selector:
+    secret:
+      name: src-maven-central-token-username
+  data:
+    - match:
+        secretKey: value
+        remoteRef:
+          remoteKey: MAVEN_CENTRAL_TOKEN_USERNAME

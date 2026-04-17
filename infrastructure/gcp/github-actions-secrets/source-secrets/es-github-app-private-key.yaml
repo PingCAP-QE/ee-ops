@@ -1,0 +1,22 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: es-github-app-private-key
+  namespace: github-actions-secrets
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+  annotations:
+    ee.pingcap.com/source-secret-id: gha__system__github_app_private_key
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: gcp-sm-github-actions
+    kind: SecretStore
+  target:
+    name: github-app-private-key
+    creationPolicy: Owner
+  data:
+    - secretKey: privateKey.pem
+      remoteRef:
+        key: gha__system__github_app_private_key

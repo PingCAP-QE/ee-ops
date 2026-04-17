@@ -1,0 +1,25 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: ps-maven-gpg-private-key-lake-jdbc-release
+  namespace: github-actions-secrets
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/github-secret-name: MAVEN_GPG_PRIVATE_KEY
+spec:
+  deletionPolicy: Delete
+  refreshInterval: 1h
+  secretStoreRefs:
+    - name: gh-env-tidbcloud-lake-jdbc-maven-central-com-tidbcloud-release
+      kind: SecretStore
+  selector:
+    secret:
+      name: src-maven-gpg-private-key
+  data:
+    - match:
+        secretKey: value
+        remoteRef:
+          remoteKey: MAVEN_GPG_PRIVATE_KEY
