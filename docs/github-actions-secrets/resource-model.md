@@ -173,8 +173,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: 123456
-      installationID: 10000001
+      appID: "123456"
+      installationID: "10000001"
       organization: pingcap-qe
       auth:
         privateKey:
@@ -193,8 +193,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: 123456
-      installationID: 10000001
+      appID: "123456"
+      installationID: "10000001"
       organization: pingcap-qe
       orgSecretVisibility: private
       auth:
@@ -216,8 +216,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: 123456
-      installationID: 10000001
+      appID: "123456"
+      installationID: "10000001"
       organization: pingcap-qe
       repository: ci
       auth:
@@ -239,8 +239,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: 123456
-      installationID: 10000001
+      appID: "123456"
+      installationID: "10000001"
       organization: pingcap-qe
       repository: ci
       environment: production

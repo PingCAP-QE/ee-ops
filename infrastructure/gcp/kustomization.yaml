@@ -7,5 +7,6 @@ resources:
   - gateways
   - kyverno
   - external-secrets
+  - github-actions-secrets
   - operators
   - cleaners

@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: github-actions-secrets
+resources:
+  - es-github-app-private-key.yaml
+  - es-src-maven-central-token-username.yaml
+  - es-src-maven-central-token-password.yaml
+  - es-src-maven-gpg-private-key.yaml
+  - es-src-maven-gpg-passphrase.yaml
