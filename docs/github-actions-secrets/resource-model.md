@@ -161,6 +161,7 @@ Compatibility note:
 - on that version, newly created org secrets default to `all`
 - if the org secret already exists in GitHub, ESO preserves its existing visibility when updating the value
 - if you need declarative `private` vs `all` control in Git, upgrade ESO before implementation
+- `appID` and `installationID` must be numeric values, not quoted strings, to pass schema validation
 
 Current repo-compatible org store:
 
@@ -173,8 +174,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: "123456"
-      installationID: "10000001"
+      appID: 123456
+      installationID: 10000001
       organization: pingcap-qe
       auth:
         privateKey:
@@ -193,8 +194,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: "123456"
-      installationID: "10000001"
+      appID: 123456
+      installationID: 10000001
       organization: pingcap-qe
       orgSecretVisibility: private
       auth:
@@ -216,8 +217,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: "123456"
-      installationID: "10000001"
+      appID: 123456
+      installationID: 10000001
       organization: pingcap-qe
       repository: ci
       auth:
@@ -239,8 +240,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: "123456"
-      installationID: "10000001"
+      appID: 123456
+      installationID: 10000001
       organization: pingcap-qe
       repository: ci
       environment: production
