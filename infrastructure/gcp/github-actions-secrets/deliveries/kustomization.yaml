@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: github-actions-secrets
+resources:
+  - ps-maven-central-token-username-lake-jdbc-release.yaml
+  - ps-maven-central-token-password-lake-jdbc-release.yaml
+  - ps-maven-gpg-private-key-lake-jdbc-release.yaml
+  - ps-maven-gpg-passphrase-lake-jdbc-release.yaml
