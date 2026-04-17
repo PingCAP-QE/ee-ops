@@ -20,7 +20,7 @@ controller:
     - ssh-agent:386.v36cc0c7582f0
     - kubernetes-credentials-provider:1.299.v610fa_e76761a_
     - lockable-resources:1469.v52dff5a_80e32
-    - pipeline-graph-view:819.ved496c19e082
+    - pipeline-graph-view:836.v68ef091500dd
 
   initializeOnce: false
 
