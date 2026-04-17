@@ -2,7 +2,6 @@ apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
   name: gh-env-tidbcloud-lake-jdbc-maven-central-com-tidbcloud-release
-  namespace: github-actions-secrets
   labels:
     ee.pingcap.com/owner-team: platform
     ee.pingcap.com/managed-by: fluxcd
