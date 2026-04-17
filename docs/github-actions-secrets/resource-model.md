@@ -161,7 +161,7 @@ Compatibility note:
 - on that version, newly created org secrets default to `all`
 - if the org secret already exists in GitHub, ESO preserves its existing visibility when updating the value
 - if you need declarative `private` vs `all` control in Git, upgrade ESO before implementation
-- `appID` and `installationID` must be numeric values, not quoted strings, to pass schema validation
+- appID and installationID must be integers, not quoted strings, in all GitHub SecretStore types to pass schema validation
 
 Current repo-compatible org store:
 
