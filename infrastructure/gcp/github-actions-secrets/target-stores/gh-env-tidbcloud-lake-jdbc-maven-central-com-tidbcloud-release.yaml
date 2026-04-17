@@ -9,8 +9,8 @@ metadata:
 spec:
   provider:
     github:
-      appID: "214286"
-      installationID: "65036159"
+      appID: 214286
+      installationID: 65036159
       organization: tidbcloud
       repository: lake-jdbc # current implementation assumes Maven release target repo is tidbcloud/lake-jdbc
       environment: maven-central-com-tidbcloud-release
