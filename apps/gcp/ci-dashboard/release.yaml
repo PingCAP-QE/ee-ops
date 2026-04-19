@@ -1,0 +1,65 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ci-dashboard
+spec:
+  releaseName: ci-dashboard
+  chart:
+    spec:
+      chart: ci-dashboard
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    replicaCount: 1
+    nodeSelector:
+      kubernetes.io/arch: amd64
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/ci-dashboard
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/ci-dashboard versioning=semver
+      tag: v2026.4.19-1-g8cc80f4
+    resources:
+      requests:
+        cpu: "2"
+        memory: 4Gi
+      limits:
+        cpu: "4"
+        memory: 8Gi
+    httpRoute:
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: external-https
+          namespace: infra
+      hostnames:
+        - prow.tidb.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /dashboard/
+          filters:
+            - type: URLRewrite
+              urlRewrite:
+                path:
+                  type: ReplacePrefixMatch
+                  replacePrefixMatch: /
+    secretEnvFrom:
+      - ci-dashboard-eq-prd-insight-db
