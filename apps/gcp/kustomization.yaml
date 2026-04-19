@@ -9,6 +9,7 @@ resources:
   - tekton
   - kafka
   - cloudevents-server
+  - ci-dashboard
   # workloads
   - acr-runners
   - jenkins/beta
