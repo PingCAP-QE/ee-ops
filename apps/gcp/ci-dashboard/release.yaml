@@ -2,6 +2,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: ci-dashboard
+  namespace: apps
 spec:
   releaseName: ci-dashboard
   chart:
@@ -34,7 +35,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/ci-dashboard
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/ci-dashboard versioning=semver
-      tag: v2026.4.19-4-gda86f3b
+      tag: v2026.4.19-8-g25222cc
     resources:
       requests:
         cpu: "2"
