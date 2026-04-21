@@ -4,3 +4,4 @@ namespace: apps
 resources:
   - release.yaml
   - cronjobs.yaml
+  - sync-pods-rbac.yaml
