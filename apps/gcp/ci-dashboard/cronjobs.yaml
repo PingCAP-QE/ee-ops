@@ -27,7 +27,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-builds
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-3-gca3e999
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-4-gda86f3b
               imagePullPolicy: IfNotPresent
               args: ["sync-builds"]
               envFrom:
@@ -75,7 +75,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-pr-events
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-3-gca3e999
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-4-gda86f3b
               imagePullPolicy: IfNotPresent
               args: ["sync-pr-events"]
               envFrom:
@@ -123,7 +123,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: refresh-build-derived
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-3-gca3e999
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-4-gda86f3b
               imagePullPolicy: IfNotPresent
               args: ["refresh-build-derived"]
               envFrom:
@@ -136,6 +136,8 @@ spec:
                   value: INFO
                 - name: CI_DASHBOARD_REFRESH_GROUP_BATCH_SIZE
                   value: "25"
+                - name: CI_DASHBOARD_REFRESH_BUILD_LIMIT
+                  value: "5000"
               resources:
                 requests:
                   cpu: "1"
@@ -173,7 +175,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-flaky-issues
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-3-gca3e999
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-4-gda86f3b
               imagePullPolicy: IfNotPresent
               args: ["sync-flaky-issues"]
               envFrom:
