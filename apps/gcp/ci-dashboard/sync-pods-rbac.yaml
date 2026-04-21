@@ -1,0 +1,50 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ci-dashboard-sync-pods-reader
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-dashboard-sync-pods-reader
+  namespace: prow-test-pods
+subjects:
+  - kind: ServiceAccount
+    name: ci-dashboard
+    namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ci-dashboard-sync-pods-reader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-dashboard-sync-pods-reader
+  namespace: jenkins-tidb
+subjects:
+  - kind: ServiceAccount
+    name: ci-dashboard
+    namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ci-dashboard-sync-pods-reader
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-dashboard-sync-pods-reader
+  namespace: jenkins-tiflow
+subjects:
+  - kind: ServiceAccount
+    name: ci-dashboard
+    namespace: apps
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ci-dashboard-sync-pods-reader
