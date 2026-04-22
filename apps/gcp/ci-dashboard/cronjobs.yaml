@@ -155,7 +155,7 @@ metadata:
     app.kubernetes.io/name: ci-dashboard-sync-pods
     app.kubernetes.io/part-of: ci-dashboard
 spec:
-  schedule: "15 * * * *"
+  schedule: "*/15 * * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
