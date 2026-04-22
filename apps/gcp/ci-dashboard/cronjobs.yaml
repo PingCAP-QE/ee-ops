@@ -157,8 +157,7 @@ metadata:
 spec:
   schedule: "15 * * * *"
   timeZone: Asia/Shanghai
-  # Keep the recurring job suspended until Cloud Logging runtime permission is wired for the ci-dashboard service account.
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 3
