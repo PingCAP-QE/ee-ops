@@ -103,7 +103,7 @@ metadata:
     app.kubernetes.io/name: ci-dashboard-refresh-build-derived
     app.kubernetes.io/part-of: ci-dashboard
 spec:
-  schedule: "35 * * * *"
+  schedule: "20,50 * * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
