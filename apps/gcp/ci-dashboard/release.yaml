@@ -43,6 +43,9 @@ spec:
       limits:
         cpu: "4"
         memory: 8Gi
+    serviceAccount:
+      annotations:
+        iam.gke.io/gcp-service-account: ci-dashboard@pingcap-testing-account.iam.gserviceaccount.com
     httpRoute:
       enabled: true
       parentRefs:
