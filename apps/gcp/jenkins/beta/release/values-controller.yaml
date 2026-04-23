@@ -12,6 +12,12 @@ controller:
       cpu: "12"
       memory: 48Gi
 
+  # Keep the controller on the e2 node type that is compatible with the
+  # existing pd-balanced Jenkins data disk in us-central1-b.
+  nodeSelector:
+    node.kubernetes.io/instance-type: e2-standard-32
+    topology.gke.io/zone: us-central1-b
+
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # Set min/max heap here if needed with:
   javaOpts: >-
