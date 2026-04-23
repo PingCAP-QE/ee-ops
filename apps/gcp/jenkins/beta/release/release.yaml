@@ -34,6 +34,11 @@ spec:
   values:
     agent:
       namespace: "${AGENT_NAMESPACE}"
+      podLabels:
+        author: wei_zheng
+        team: qe
+        env: cicd
+        service: jenkins
 
     controller:
       servicePort: 80
@@ -41,6 +46,11 @@ spec:
       jenkinsUriPrefix: "${INGRESS_PATH}"
       jenkinsUrl: "https://${INGRESS_HOST}${INGRESS_PATH}"
       jenkinsAdminEmail: "${ADMIN_EMAIL}"
+      podLabels:
+        author: wei_zheng
+        team: qe
+        env: cicd
+        service: jenkins
 
     persistence:
       enabled: true

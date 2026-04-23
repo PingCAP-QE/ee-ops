@@ -23,6 +23,11 @@ spec:
     enable: true
     ignoreFailures: false
   values:
+    podLabels:
+      author: wei_zheng
+      team: qe
+      env: cicd
+      service: cla
     image:
       registry: docker.io
       repository: bitnamilegacy/mongodb
