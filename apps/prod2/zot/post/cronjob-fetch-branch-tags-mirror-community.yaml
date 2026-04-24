@@ -33,6 +33,7 @@ spec:
                   ocis=(
                     pingcap/monitoring/image:master
                     pingcap/ng-monitoring/image:main
+                    pingcap/tiproxy/image:main 
                     pingcap/ticdc/image:master
                     pingcap/tidb/images/br:master
                     pingcap/tidb/images/dumpling:master
