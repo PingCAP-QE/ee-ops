@@ -4,4 +4,3 @@ namespace: kafka
 resources:
   - cluster.yaml
   - topics/cloudevents-server.yaml
-  - topics/jenkins-event.yaml

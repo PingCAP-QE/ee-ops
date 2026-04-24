@@ -13,3 +13,13 @@ metadata:
   labels:
     strimzi.io/cluster: cluster-cd
 spec: {}
+---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: jenkins-event
+  labels:
+    strimzi.io/cluster: cluster-cd
+spec:
+  partitions: 3
+  replicas: 3
