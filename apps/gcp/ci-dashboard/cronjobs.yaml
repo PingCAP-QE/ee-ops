@@ -9,7 +9,7 @@ metadata:
 spec:
   schedule: "5 * * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -57,7 +57,7 @@ metadata:
 spec:
   schedule: "15 * * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -105,7 +105,7 @@ metadata:
 spec:
   schedule: "20,50 * * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -157,7 +157,7 @@ metadata:
 spec:
   schedule: "*/15 * * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 3
@@ -218,7 +218,7 @@ metadata:
 spec:
   schedule: "0 */4 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
