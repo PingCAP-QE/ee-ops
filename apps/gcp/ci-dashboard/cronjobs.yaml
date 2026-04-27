@@ -27,7 +27,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-builds
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-11-gad85ad3
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-1-g97da47a
               imagePullPolicy: IfNotPresent
               args: ["sync-builds"]
               envFrom:
@@ -75,7 +75,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-pr-events
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-11-gad85ad3
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-1-g97da47a
               imagePullPolicy: IfNotPresent
               args: ["sync-pr-events"]
               envFrom:
@@ -123,7 +123,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: refresh-build-derived
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-11-gad85ad3
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-1-g97da47a
               imagePullPolicy: IfNotPresent
               args: ["refresh-build-derived"]
               envFrom:
@@ -176,7 +176,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-pods
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-11-gad85ad3
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-1-g97da47a
               imagePullPolicy: IfNotPresent
               args: ["sync-pods"]
               envFrom:
@@ -236,7 +236,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-flaky-issues
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.19-11-gad85ad3
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-1-g97da47a
               imagePullPolicy: IfNotPresent
               args: ["sync-flaky-issues"]
               envFrom:

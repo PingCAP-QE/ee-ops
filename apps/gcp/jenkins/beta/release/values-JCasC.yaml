@@ -312,7 +312,7 @@ controller:
       cdevents: |
         unclassified:
           cDEventsGlobalConfig:
-            httpSinkUrl: "http://cloudevents-server.cs.svc"
+            httpSinkUrl: "http://cloudevents-server.cs.svc/events"
             sinkType: "http"
       # for global env variables
       env-vars: |
