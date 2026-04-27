@@ -20,7 +20,7 @@ spec:
 
     # Controller settings
     replicaCount: 1
-    concurrency: 24
+    concurrency: 8
 
     # Runner configuration
     runner:
