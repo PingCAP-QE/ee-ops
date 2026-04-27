@@ -8,7 +8,7 @@ controller:
     # but without outer `plugin` key.
     - blueocean:1.27.25
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - cdevents:1-40.vb_3d2c94f2379
+    - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
     - generic-webhook-trigger:2.4.1
     - google-login:109.v022b_cf87b_e5b_
     - http_request:1.22
