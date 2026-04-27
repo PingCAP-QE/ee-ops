@@ -6,4 +6,4 @@ resources:
   - el-harbor.yaml
   - el-notify.yaml
   - el-tibuild.yaml
-  - ingress-event-listener.yaml
+  - http-route-event-listener.yaml

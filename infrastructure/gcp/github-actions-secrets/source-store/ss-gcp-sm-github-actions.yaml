@@ -1,0 +1,15 @@
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: gcp-sm-github-actions
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+spec:
+  provider:
+    gcpsm:
+      auth:
+        workloadIdentity:
+          serviceAccountRef:
+            name: gcp-sm-github-actions
+      projectID: pingcap-testing-account

@@ -261,6 +261,15 @@ controller:
                     Jenkins jobs As Code
                     No need to configure job on Jenkins Web UI anymore.
                 ''')
+                logRotator {
+                    daysToKeep(7)
+                }
+                parameters {
+                    // Ref: https://docs.prow.k8s.io/docs/jobs/#job-environment-variables
+                    stringParam("BUILD_ID", "", "Build ID")
+                    stringParam("PROW_JOB_ID", "", "Prow job ID")
+                    stringParam("JOB_SPEC", "", "Prow job spec struct data")
+                }
                 scm {
                   git {
                     remote {
@@ -268,9 +277,6 @@ controller:
                     }
                     branch('main')
                   }
-                }
-                triggers {
-                  githubPush()
                 }
                 steps {
                   jobDsl {

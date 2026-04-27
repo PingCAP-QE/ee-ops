@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-fetch-branch-tags-mirror-community
+spec:
+  schedule: "30 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: fetch-tags
+              image: ghcr.io/pingcap-qe/cd/utils/release:v2026.3.29-14-g90ae7ef
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              env:
+                - name: DST_REPO_PREFIX
+                  value: "hub-zot.pingcap.net/mirrors/hub"
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+                  #!/usr/bin/env bash
+                  set -euo pipefail
+
+                  ocis=(
+                    pingcap/monitoring/image:master
+                    pingcap/ng-monitoring/image:main
+                    pingcap/tiproxy/image:main
+                    pingcap/ticdc/image:master
+                    pingcap/tidb/images/br:master
+                    pingcap/tidb/images/dumpling:master
+                    pingcap/tidb/images/tidb-lightning:master
+                    pingcap/tidb/images/tidb-server:master
+                    pingcap/tiflash/image:master
+                    pingcap/tiflow/images/dm:master
+                    tikv/pd/image:master
+                    tikv/tikv/image:master
+                    # lts 8.5.6
+                    pingcap/monitoring/image:v8.5.6
+                    pingcap/ng-monitoring/image:v8.5.6
+                    pingcap/ticdc/image:v8.5.6
+                    pingcap/tidb/images/br:v8.5.6
+                    pingcap/tidb/images/dumpling:v8.5.6
+                    pingcap/tidb/images/tidb-lightning:v8.5.6
+                    pingcap/tidb/images/tidb-server:v8.5.6
+                    pingcap/tiflash/image:v8.5.6
+                    pingcap/tiflow/images/dm:v8.5.6
+                    tikv/pd/image:v8.5.6
+                    tikv/tikv/image:v8.5.6
+                  )
+
+                  any_failed=false
+                  for oci in "${ocis[@]}"; do
+                    DEST="$DST_REPO_PREFIX/$oci"
+                    echo "Updating $DEST"
+                    # Try to get the digest. Redirect stdout to /dev/null as we only care about success/failure.
+                    if crane digest "$DEST" >/dev/null; then
+                      echo "Successfully processed $DEST"
+                    else
+                      # This will catch 'not found' as well as other errors.
+                      echo "Could not process $DEST"
+                      any_failed=true
+                    fi
+                  done
+
+                  if [ "$any_failed" = "true" ]; then
+                    echo "Error: Failed to process some image tags. Please check logs for details." >&2
+                    exit 1
+                  fi

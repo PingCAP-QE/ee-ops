@@ -11,7 +11,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: fetch-tags
-              image: ghcr.io/pingcap-qe/cd/utils/release:v2025.10.26-7-geb77a69
+              image: ghcr.io/pingcap-qe/cd/utils/release:v2026.3.29-14-g90ae7ef
               resources:
                 requests:
                   cpu: 100m
@@ -37,17 +37,19 @@ spec:
                     pingcap/tidb/images/tidb-lightning:master-next-gen
                     pingcap/tidb/images/tidb-server:master-next-gen
                     pingcap/tiflash/image:master-next-gen
+                    pingcap/tiflow/images/dm:master-next-gen
                     tikv/pd/image:master-next-gen
-                    tikv/tikv/image:dedicated-next-gen
+                    tikv/tikv/image:cloud-engine-next-gen
 
-                    pingcap/ticdc/image:release-nextgen-20251011
-                    pingcap/tidb/images/br:release-nextgen-20251011
-                    pingcap/tidb/images/dumpling:release-nextgen-20251011
-                    pingcap/tidb/images/tidb-lightning:release-nextgen-20251011
-                    pingcap/tidb/images/tidb-server:release-nextgen-20251011
-                    pingcap/tiflash/image:release-nextgen-20251011
-                    tikv/pd/image:release-nextgen-20251011
-                    tikv/tikv/image:release-nextgen-20251011
+                    pingcap/ticdc/image:release-nextgen-202603
+                    pingcap/tidb/images/br:release-nextgen-202603
+                    pingcap/tidb/images/dumpling:release-nextgen-202603
+                    pingcap/tidb/images/tidb-lightning:release-nextgen-202603
+                    pingcap/tidb/images/tidb-server:release-nextgen-202603
+                    pingcap/tiflash/image:release-nextgen-202603
+                    pingcap/tiflow/images/dm:release-nextgen-202603
+                    tikv/pd/image:release-nextgen-202603
+                    tikv/tikv/image:release-nextgen-202603
 
                     pingcap/tidb/images/br:feature-fts-next-gen
                     pingcap/tidb/images/dumpling:feature-fts-next-gen

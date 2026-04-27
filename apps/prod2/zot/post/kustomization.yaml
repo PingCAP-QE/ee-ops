@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - cronjob-fetch-branch-tags-mirror-tidbx.yaml
   - cronjob-fetch-branch-tags-mirror-tidbx-binaries.yaml
+  - cronjob-fetch-branch-tags-mirror-community.yaml

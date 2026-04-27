@@ -3,29 +3,29 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.528.3-jdk21"
+    tag: "2.555.1-jdk21"
   resources:
     requests:
-      cpu: "6"
-      memory: 24Gi
+      cpu: "12"
+      memory: 48Gi
     limits:
-      cpu: "6"
-      memory: 24Gi
+      cpu: "12"
+      memory: 48Gi
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # Set min/max heap here if needed with:
   javaOpts: >-
-    -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0 -XX:MaxRAMPercentage=70.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
+    -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0
+    -XX:MaxRAMPercentage=70.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
     -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled
     -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
-    -XX:+UnlockDiagnosticVMOptions
-    -XX:+HeapDumpOnOutOfMemoryError
+    -XX:+UnlockDiagnosticVMOptions -XX:+HeapDumpOnOutOfMemoryError
     -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
 
   # Optionally specify additional init-containers
   customInitContainers:
     - name: init-create-logs-dir
-      image: "alpine:3.20.3"
+      image: "alpine:3.23.3"
       imagePullPolicy: Always
       command: ["mkdir", "-p", "/var/jenkins_home/logs"]
       securityContext:

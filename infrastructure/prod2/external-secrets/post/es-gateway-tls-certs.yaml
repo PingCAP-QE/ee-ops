@@ -1,0 +1,25 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: wildcard-pingcap-net-cert
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: wildcard-pingcap-net-cert
+    creationPolicy: Owner
+    template:
+      type: kubernetes.io/tls
+  dataFrom:
+    - extract:
+        # GCP Secret Manager secret should be a JSON object with `tls.crt` and `tls.key`.
+        # `tls.crt` must be the full PEM certificate chain in order: leaf certificate first,
+        # followed by intermediate certificate(s). Do not store only the leaf certificate.
+        #
+        # How to update the gcp secret key, follow these commands:
+        #
+        #   jq -n --rawfile crt <tls-crt-file> --rawfile key <tls-key-file> '{"tls.crt":$crt,"tls.key":$key}' | \
+        #   gcloud secrets create gcp_wildcard_pingcap_net_cert_json --data-file=-
+        key: gcp_wildcard_pingcap_net_cert_json

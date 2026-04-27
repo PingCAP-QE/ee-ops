@@ -21,5 +21,8 @@ spec:
                   nodeSelectorTerms:
                     - matchExpressions:
                         - key: cloud.google.com/gke-provisioning
-                          operator: In
+                          operator: NotIn
                           values: ["spot"]
+                        - key: cloud.google.com/machine-family
+                          operator: In
+                          values: [c4, c4a]

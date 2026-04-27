@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: cronjob-fetch-branch-tags-mirror-tidbx-binaries
 spec:
-  schedule: "0 * * * *"
+  schedule: "10 * * * *"
   jobTemplate:
     spec:
       template:
@@ -11,7 +11,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: fetch-tags
-              image: ghcr.io/pingcap-qe/cd/utils/release:v2025.10.26-7-geb77a69
+              image: ghcr.io/pingcap-qe/cd/utils/release:v2026.3.29-14-g90ae7ef
               resources:
                 requests:
                   cpu: 100m
@@ -34,17 +34,16 @@ spec:
                     pingcap/ticdc/package:master-next-gen_linux_amd64
                     pingcap/tidb/package:master-next-gen_linux_amd64
                     pingcap/tiflash/package:master-next-gen_linux_amd64
+                    pingcap/tiflow/package:master-next-gen_linux_amd64
                     tikv/pd/package:master-next-gen_linux_amd64
-                    tikv/tikv/package:dedicated-next-gen_linux_amd64
+                    tikv/tikv/package:cloud-engine-next-gen_linux_amd64
 
-                    pingcap/ticdc/package:release-nextgen-20251011_linux_amd64
-                    pingcap/tidb/package:release-nextgen-20251011_linux_amd64
-                    pingcap/tiflash/package:release-nextgen-20251011_linux_amd64
-                    tikv/pd/package:release-nextgen-20251011_linux_amd64
-                    tikv/tikv/package:release-nextgen-20251011_linux_amd64
-
-                    pingcap/tidb/package:feature-fts-next-gen_linux_amd64
-                    pingcap/tiflash/package:feature-fts-next-gen_linux_amd64
+                    pingcap/ticdc/package:release-nextgen-202603_linux_amd64
+                    pingcap/tidb/package:release-nextgen-202603_linux_amd64
+                    pingcap/tiflash/package:release-nextgen-202603_linux_amd64
+                    pingcap/tiflow/package:release-nextgen-202603_linux_amd64
+                    tikv/pd/package:release-nextgen-202603_linux_amd64
+                    tikv/tikv/package:release-nextgen-202603_linux_amd64
                   )
 
                   any_failed=false

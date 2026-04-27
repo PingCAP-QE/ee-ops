@@ -1,7 +1,7 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyProxy
 metadata:
-  name: ksc-gateway-config
+  name: ksc-gateway-config-internal
 spec:
   provider:
     type: Kubernetes
@@ -21,14 +21,27 @@ spec:
     parametersRef:
       group: gateway.envoyproxy.io
       kind: EnvoyProxy
-      name: ksc-gateway-config
+      name: ksc-gateway-config-internal
   listeners:
-    - allowedRoutes:
+    - name: wildcard-pingcap-net-http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
         kinds:
           - group: gateway.networking.k8s.io
             kind: HTTPRoute
         namespaces:
           from: All
-      name: wildcard-pingcap-net
-      port: 80
-      protocol: HTTP
+    - name: wildcard-pingcap-net-https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-pingcap-net-cert
+      allowedRoutes:
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+        namespaces:
+          from: All
