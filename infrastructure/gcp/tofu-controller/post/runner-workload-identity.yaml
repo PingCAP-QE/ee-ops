@@ -13,18 +13,38 @@ metadata:
     # Replace with your actual GCP SA email before deployment:
     iam.gke.io/gcp-service-account: tf-controller@pingcap-testing-account.iam.gserviceaccount.com
 ---
-# ClusterRoleBinding for the runner SA.
-# NOTE: cluster-admin grants broad permissions. If the runner only manages GCP
-# resources (via Workload Identity), consider scoping down to a narrower
-# ClusterRole or namespace-scoped Role for better security (least privilege).
+# Namespace-scoped Role for the runner SA.
+# The runner executes Terraform in the `terraform` namespace and needs access
+# to read Terraform inputs (secrets/configmaps) and monitor its own pods.
+# GCP resource permissions are handled via Workload Identity, not Kubernetes RBAC.
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: Role
 metadata:
-  name: tofu-controller-runner-terraform
+  name: tofu-controller-runner
+  namespace: terraform
+rules:
+  # Read Terraform variable files and backend configs
+  - apiGroups: [""]
+    resources: ["secrets", "configmaps"]
+    verbs: ["get", "list", "watch"]
+  # Monitor runner pod status
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  # Write events for observability
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "patch", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tofu-controller-runner
+  namespace: terraform
 roleRef:
   apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: cluster-admin
+  kind: Role
+  name: tofu-controller-runner
 subjects:
   - kind: ServiceAccount
     name: tofu-controller-runner
