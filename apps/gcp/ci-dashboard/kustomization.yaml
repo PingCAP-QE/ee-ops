@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - release.yaml
   - cronjobs.yaml
+  - jenkins-worker.yaml
   - sync-pods-rbac.yaml

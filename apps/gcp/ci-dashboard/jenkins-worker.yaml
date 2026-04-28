@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ci-dashboard-jenkins-worker
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: ci-dashboard-jenkins-worker
+    app.kubernetes.io/part-of: ci-dashboard
+    ci-dashboard.pingcap.com/instance: jenkins-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ci-dashboard-jenkins-worker
+      app.kubernetes.io/part-of: ci-dashboard
+      ci-dashboard.pingcap.com/instance: jenkins-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ci-dashboard-jenkins-worker
+        app.kubernetes.io/part-of: ci-dashboard
+        ci-dashboard.pingcap.com/instance: jenkins-worker
+    spec:
+      serviceAccountName: ci-dashboard
+      restartPolicy: Always
+      containers:
+        - name: jenkins-worker
+          image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-5-g07bdb70
+          imagePullPolicy: IfNotPresent
+          args:
+            - consume-jenkins-events
+          envFrom:
+            - secretRef:
+                name: ci-dashboard-eq-prd-insight-db
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: CI_DASHBOARD_LOG_LEVEL
+              value: INFO
+            - name: CI_DASHBOARD_KAFKA_BOOTSTRAP_SERVERS
+              value: cluster-cd-kafka-bootstrap.kafka.svc:9092
+            - name: CI_DASHBOARD_KAFKA_JENKINS_EVENTS_TOPIC
+              value: jenkins-event
+            - name: CI_DASHBOARD_KAFKA_JENKINS_GROUP_ID
+              value: ci-dashboard-v3-jenkins-worker
+            - name: CI_DASHBOARD_KAFKA_POLL_TIMEOUT_MS
+              value: "1000"
+            - name: CI_DASHBOARD_JENKINS_FINISHED_EVENT_TYPE
+              value: dev.cdevents.pipelinerun.finished.0.1.0
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
