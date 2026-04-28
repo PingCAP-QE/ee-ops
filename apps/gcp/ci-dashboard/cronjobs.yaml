@@ -308,8 +308,6 @@ spec:
                   value: INFO
                 - name: CI_DASHBOARD_GCS_BUCKET
                   value: pingcap-ci-console-logs-us-central1
-                - name: CI_DASHBOARD_GCS_PREFIX
-                  value: ci-dashboard/v3/jenkins-logs
                 - name: CI_DASHBOARD_ARCHIVE_LOG_TAIL_BYTES
                   value: "262144"
                 - name: CI_DASHBOARD_JENKINS_INTERNAL_BASE_URL
