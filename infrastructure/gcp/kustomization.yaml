@@ -7,6 +7,7 @@ resources:
   - gateways
   - kyverno
   - external-secrets
+  - tofu-controller
   - github-actions-secrets
   - operators
   - cleaners
