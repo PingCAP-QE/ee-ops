@@ -5,7 +5,7 @@ metadata:
   name: tofu-controller-release
 spec:
   targetNamespace: infra
-  interval: 1h
+  interval: 15m
   sourceRef:
     kind: GitRepository
     name: flux-system

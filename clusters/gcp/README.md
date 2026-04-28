@@ -18,6 +18,22 @@
 
 This cluster uses [tofu-controller](https://flux-iac.github.io/tofu-controller/) to manage GCP resources via GitOps.
 
+### Prerequisites
+
+- FluxCD installed and bootstrapped on the cluster
+- `kubectl` configured with cluster access
+- `gcloud` CLI installed and authenticated
+- GCP project with required APIs enabled (IAM, GKE, DNS, Storage, etc.)
+
+### Namespace Convention
+
+| Namespace    | Purpose                                                             |
+| ------------ | ------------------------------------------------------------------- |
+| `infra`      | tofu-controller deployment (controller pod)                         |
+| `terraform`  | Terraform CRs and runner pods (runner SA with Workload Identity)    |
+
+The controller runs in `infra`, while the runner SA and Terraform CRs live in `terraform`.
+
 ### Setup
 
 1. **Create GCP Service Account** (if not already exists):
@@ -40,21 +56,27 @@ gcloud projects add-iam-policy-binding pingcap-testing-account \
 2. **Configure Workload Identity** (optional, recommended for GKE):
 
 ```bash
-# Get the GKE cluster name
-gcloud container clusters list --project=pingcap-testing-account
-
-# Create IAM policy binding between KSA and GCP SA
+# Create IAM policy binding between KSA (in terraform namespace) and GCP SA
 gcloud iam service-accounts add-iam-policy-binding \
     tf-controller@pingcap-testing-account.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
     --member "serviceAccount:pingcap-testing-account.svc.id.goog[terraform/tofu-controller-runner]"
 ```
 
-3. **Deploy**: After the above prerequisites are met, tofu-controller will be deployed automatically via FluxCD.
+> **Note**: The runner ServiceAccount `tofu-controller-runner` is created in the `terraform` namespace
+> with the Workload Identity annotation by the FluxCD post-install kustomization. Update the
+> GCP SA email in `infrastructure/gcp/tofu-controller/post/runner-workload-identity.yaml` before deployment.
+
+3. **Deploy**: After the above prerequisites are met, push changes to main. FluxCD will
+   automatically reconcile and deploy tofu-controller. Key resources:
+   - `HelmRepository` → defines the tofu-controller Helm chart source
+   - `HelmRelease` → deploys tofu-controller to `infra` namespace
+   - `Namespace` (`terraform`) → created for Terraform CRs and runner pods
+   - `ServiceAccount` → runner SA with Workload Identity annotation in `terraform` namespace
 
 ### Usage
 
-Terraform resources are defined as Kubernetes CRDs in `infrastructure/gcp/terraform/`:
+Terraform resources are defined as Kubernetes CRDs in `infrastructure/gcp/terraform/` and deployed to the `terraform` namespace:
 
 ```
 infrastructure/gcp/terraform/
@@ -70,7 +92,7 @@ infrastructure/gcp/terraform/
 To add new GCP resources managed by Terraform:
 1. Create a new directory under `infrastructure/gcp/terraform/`
 2. Add Terraform HCL files (e.g., `main.tf`, `variables.tf`, `outputs.tf`)
-3. Create a `terraform.yaml` with the `Terraform` CRD
+3. Create a `terraform.yaml` with the `Terraform` CRD (set `metadata.namespace: terraform`)
 4. Add the resource to `kustomization.yaml`
 
 ### Workflow
@@ -81,14 +103,30 @@ To add new GCP resources managed by Terraform:
 4. After merge, tofu-controller will reconcile the Terraform resources
 5. Check status: `kubectl get terraform -n terraform`
 6. View logs: `kubectl logs -n infra deployment/tofu-controller`
+7. Check runner logs if Terraform apply fails: `kubectl logs -n terraform -l app=tofu-controller-runner`
 
 ### Manual Approval
 
 For production resources, set `spec.approvePlan` explicitly instead of `auto`:
+
 ```yaml
-# First, let the controller generate a plan
-# Then find the plan name:
-kubectl get terraform gcp-dns-example -n terraform -o jsonpath='{.status.plan}'
-# Finally, set the plan name to apply:
-# approvePlan: plan-main-<generated-id>
+# First, let the controller generate a plan:
+kubectl get terraform <resource-name> -n terraform -o jsonpath='{.status.plan}'
+# Then set the plan name to apply (under spec.approvePlan):
+#   approvePlan: plan-main-<generated-id>
 ```
+
+This ensures a human reviews the plan before Terraform applies changes.
+
+### Troubleshooting
+
+| Symptom                              | Likely Cause                                   | Check                                                           |
+| ------------------------------------ | ---------------------------------------------- | --------------------------------------------------------------- |
+| Controller pod not starting          | Missing HelmRepository or chart version        | `kubectl get helmrelease -n infra tofu-controller`              |
+| Terraform CR not reconciling         | Namespace mismatch or RBAC issue               | `kubectl describe terraform -n terraform <name>`                |
+| Runner pod fails with auth error     | Workload Identity not configured correctly     | `kubectl describe sa -n terraform tofu-controller-runner`       |
+| Terraform plan stuck in "pending"    | Concurrency limit reached or plan in progress  | Check `tofu-controller` logs and runner status                  |
+
+For further investigation, check:
+- `kubectl get kustomizations -n flux-system` to verify FluxCD reconciliation
+- `flux logs --all-namespaces` for FluxCD reconciliation logs

@@ -7,7 +7,7 @@ spec:
   targetNamespace: infra
   dependsOn:
     - name: tofu-controller-release
-  interval: 30m0s
+  interval: 10m
   sourceRef:
     kind: GitRepository
     name: flux-system

@@ -23,13 +23,15 @@ spec:
     concurrency: 8
 
     # Runner configuration
+    # Note: The runner ServiceAccount is managed via the post-install manifest
+    # (post/runner-workload-identity.yaml) in the `terraform` namespace, where
+    # runner pods execute. HelmRelease SA creation is disabled to avoid
+    # duplicate SA creation (Helm would create it in 'infra', but runner pods
+    # need it in 'terraform' namespace).
     runner:
       serviceAccount:
-        create: true
-        # Runner SA annotations for GCP Workload Identity
-        # Uncomment and configure when GCP SA is created:
-        # annotations:
-        #   iam.gke.io/gcp-service-account: tf-controller@pingcap-testing-account.iam.gserviceaccount.com
+        create: false
+        name: tofu-controller-runner
         allowedNamespaces:
           - flux-system
           - infra

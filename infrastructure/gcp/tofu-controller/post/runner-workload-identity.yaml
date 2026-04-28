@@ -1,15 +1,22 @@
 ---
+# ServiceAccount for tofu-controller runner pods.
+# Runner pods execute Terraform in the `terraform` namespace.
+# Workload Identity links this KSA to a GCP SA for GCP resource management.
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: tofu-controller-runner
   namespace: terraform
   annotations:
-    # GCP Workload Identity: link this KSA to a GCP SA
-    # The GCP SA must be created manually and granted appropriate roles
-    # Replace with your actual GCP SA email when ready:
+    # GCP Workload Identity: link this KSA to a GCP SA.
+    # The GCP SA must be created manually and granted appropriate roles.
+    # Replace with your actual GCP SA email before deployment:
     iam.gke.io/gcp-service-account: tf-controller@pingcap-testing-account.iam.gserviceaccount.com
 ---
+# ClusterRoleBinding for the runner SA.
+# NOTE: cluster-admin grants broad permissions. If the runner only manages GCP
+# resources (via Workload Identity), consider scoping down to a narrower
+# ClusterRole or namespace-scoped Role for better security (least privilege).
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
