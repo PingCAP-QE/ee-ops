@@ -271,7 +271,7 @@ metadata:
     app.kubernetes.io/name: ci-dashboard-archive-error-logs
     app.kubernetes.io/part-of: ci-dashboard
 spec:
-  schedule: "35 * * * *"
+  schedule: "5,25,45 * * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -329,7 +329,7 @@ metadata:
     app.kubernetes.io/name: ci-dashboard-analyze-errors
     app.kubernetes.io/part-of: ci-dashboard
 spec:
-  schedule: "45 * * * *"
+  schedule: "15,35,55 * * * *"
   timeZone: Asia/Shanghai
   suspend: true
   concurrencyPolicy: Forbid
