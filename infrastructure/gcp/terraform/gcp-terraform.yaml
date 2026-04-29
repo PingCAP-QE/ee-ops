@@ -7,34 +7,15 @@
 apiVersion: infra.contrib.fluxcd.io/v1alpha2
 kind: Terraform
 metadata:
-  name: gcp-storage-bucket-example
+  name: gcp-terraform
 spec:
   interval: 1h
   retryInterval: 20s
   # Set to "auto" to auto-apply plans:
   # approvePlan: auto
   destroyResourcesOnDeletion: true
+  path: ./infrastructure/gcp/terraform/resources
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./infrastructure/gcp/terraform/resources/gcp-storage-bucket
-  vars:
-    - name: project_id
-      value: "pingcap-testing-account"
-    - name: bucket_name
-      value: "ee-gitops-tf-example-bucket"
-    - name: location
-      value: "ASIA-EAST1"
-    - name: storage_class
-      value: "STANDARD"
-    - name: force_destroy
-      value: false
-    - name: labels
-      value:
-        managed-by: "tofu-controller"
-        env: "production"
-        team: "ee"
-  writeOutputsToSecret:
-    name: gcp-storage-bucket-example-outputs
-  serviceAccountName: tofu-controller-runner
