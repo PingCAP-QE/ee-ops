@@ -18,7 +18,7 @@ spec:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
-  path: ./infrastructure/gcp/terraform/gcp-storage-bucket
+  path: ./infrastructure/gcp/terraform/resources/gcp-storage-bucket
   vars:
     - name: project_id
       value: "pingcap-testing-account"
