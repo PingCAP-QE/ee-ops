@@ -7,7 +7,7 @@ spec:
     spec:
       chart: zot
       # renovate: datasource=helm depName=zot registryUrl=https://zotregistry.dev/helm-charts
-      version: 0.1.104
+      version: 0.1.106
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
@@ -42,6 +42,10 @@ spec:
       create: true
       storage: 8Gi
       storageClassName: openebs-3-replicas
+    # Enable the governing headless service so cluster members get stable
+    # pod DNS names such as zot-0.zot-headless.zot.svc:5000.
+    serviceHeadless:
+      enabled: true
     replicaCount: 2
     service:
       type: ClusterIP
