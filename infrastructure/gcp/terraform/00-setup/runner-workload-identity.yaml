@@ -5,7 +5,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: tofu-controller-runner
+  name: tf-runner
   annotations:
     # GCP Workload Identity: link this KSA to a GCP SA.
     # The GCP SA must be created manually and granted appropriate roles.
@@ -18,17 +18,22 @@ automountServiceAccountToken: true
 ---
 # Namespace-scoped Role for the runner SA.
 # The runner executes Terraform in the `terraform` namespace and needs access
-# to read Terraform inputs (secrets/configmaps) and monitor its own pods.
+# to read Terraform inputs, store Terraform state in the Kubernetes backend,
+# manage state locks, and monitor its own pods.
 # GCP resource permissions are handled via Workload Identity, not Kubernetes RBAC.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tofu-controller-runner
+  name: tf-runner
 rules:
-  # Read Terraform variable files and backend configs
+  # Read input secrets/configmaps and manage Terraform state storage.
   - apiGroups: [""]
     resources: ["secrets", "configmaps"]
-    verbs: ["get", "list", "watch"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  # Manage Kubernetes backend state locks.
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
   # Monitor runner pod status
   - apiGroups: [""]
     resources: ["pods", "pods/log"]
@@ -41,11 +46,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tofu-controller-runner
+  name: tf-runner
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: tofu-controller-runner
+  name: tf-runner
 subjects:
   - kind: ServiceAccount
-    name: tofu-controller-runner
+    name: tf-runner
