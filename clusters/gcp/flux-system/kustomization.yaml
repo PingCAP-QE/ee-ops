@@ -4,4 +4,4 @@ resources:
   - gotk-components.yaml
   - gotk-sync.yaml
   - notification.yaml
-  - tofu-controller-release.yaml
+  - https://raw.githubusercontent.com/flux-iac/tofu-controller/v0.15.1/docs/release.yaml
