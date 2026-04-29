@@ -16,7 +16,7 @@ variable "bucket_name" {
 variable "project" {
   description = "GCP project ID where the bucket will be created."
   type        = string
-  default = "pingcap-testing-account"
+  default     = "pingcap-testing-account"
 }
 
 variable "location" {
