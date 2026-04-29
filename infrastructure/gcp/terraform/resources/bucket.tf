@@ -13,6 +13,12 @@ variable "bucket_name" {
   default = "hello"
 }
 
+variable "project" {
+  description = "GCP project ID where the bucket will be created."
+  type        = string
+  default = "pingcap-testing-account"
+}
+
 variable "location" {
   description = "The location for the bucket (e.g. US, EU, ASIA)."
   type        = string
@@ -33,6 +39,7 @@ variable "force_destroy" {
 
 resource "google_storage_bucket" "this" {
   name          = var.bucket_name
+  project       = var.project
   location      = var.location
   storage_class = var.storage_class
 
