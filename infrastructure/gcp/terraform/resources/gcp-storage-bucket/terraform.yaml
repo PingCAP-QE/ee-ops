@@ -8,18 +8,17 @@ apiVersion: infra.contrib.fluxcd.io/v1alpha2
 kind: Terraform
 metadata:
   name: gcp-storage-bucket-example
-  namespace: terraform
 spec:
   interval: 1h
   retryInterval: 20s
   # Set to "auto" to auto-apply plans:
   # approvePlan: auto
   destroyResourcesOnDeletion: true
-  path: ./infrastructure/gcp/terraform/gcp-storage-bucket
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  path: ./infrastructure/gcp/terraform/resources/gcp-storage-bucket
   vars:
     - name: project_id
       value: "pingcap-testing-account"
