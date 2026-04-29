@@ -6,7 +6,6 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: tofu-controller-runner
-  namespace: terraform
   annotations:
     # GCP Workload Identity: link this KSA to a GCP SA.
     # The GCP SA must be created manually and granted appropriate roles.
@@ -24,7 +23,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: tofu-controller-runner
-  namespace: terraform
 rules:
   # Read Terraform variable files and backend configs
   - apiGroups: [""]
@@ -43,7 +41,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: tofu-controller-runner
-  namespace: terraform
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -51,4 +48,3 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: tofu-controller-runner
-    namespace: terraform
