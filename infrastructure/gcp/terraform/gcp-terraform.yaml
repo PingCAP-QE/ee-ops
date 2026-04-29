@@ -9,7 +9,7 @@ kind: Terraform
 metadata:
   name: gcp-terraform
 spec:
-  approvePlan: plan-main-4d485c9e6d
+  approvePlan: plan-main-56cae5dc03
   interval: 1h
   retryInterval: 20s
   # Set to "auto" to auto-apply plans:
