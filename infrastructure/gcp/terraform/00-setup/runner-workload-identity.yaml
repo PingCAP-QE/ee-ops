@@ -11,9 +11,10 @@ metadata:
     # The GCP SA must be created manually and granted appropriate roles.
     # Replace with your actual GCP SA email before deployment:
     iam.gke.io/gcp-service-account: tf-controller@pingcap-testing-account.iam.gserviceaccount.com
-# Disable automounting the Kubernetes API token since the runner uses
-# GCP Workload Identity for resource management, not the K8s API.
-automountServiceAccountToken: false
+# The runner still needs the Kubernetes service account token to build
+# in-cluster client config and talk to the Kubernetes API. GCP access is
+# handled separately through Workload Identity.
+automountServiceAccountToken: true
 ---
 # Namespace-scoped Role for the runner SA.
 # The runner executes Terraform in the `terraform` namespace and needs access
