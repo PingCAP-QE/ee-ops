@@ -5,6 +5,7 @@ resources:
   - cronjobs.yaml
   - jenkins-worker.yaml
   - sync-pods-rbac.yaml
+# Keep ci-dashboard app and worker/job images on the same release tag.
 replacements:
   - source:
       kind: HelmRelease
