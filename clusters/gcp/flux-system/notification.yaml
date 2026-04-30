@@ -1,4 +1,4 @@
-apiVersion: notification.toolkit.fluxcd.io/v1beta1
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Provider
 metadata:
   name: lark
@@ -8,7 +8,7 @@ spec:
   secretRef:
     name: lark-token
 ---
-apiVersion: notification.toolkit.fluxcd.io/v1beta1
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Provider
 metadata:
   name: lark-error
@@ -18,7 +18,7 @@ spec:
   secretRef:
     name: lark-token-error
 ---
-apiVersion: notification.toolkit.fluxcd.io/v1beta1
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Alert
 metadata:
   name: lark
@@ -36,7 +36,7 @@ spec:
     - kind: HelmRelease
       name: '*'
 ---
-apiVersion: notification.toolkit.fluxcd.io/v1beta1
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
 kind: Alert
 metadata:
   name: lark-error

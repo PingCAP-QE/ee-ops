@@ -130,3 +130,20 @@ This ensures a human reviews the plan before Terraform applies changes.
 For further investigation, check:
 - `kubectl get kustomizations -n flux-system` to verify FluxCD reconciliation
 - `flux logs --all-namespaces` for FluxCD reconciliation logs
+
+## Flux Upgrade Preflight
+
+Before bumping `clusters/gcp/flux-system/gotk-components.yaml` in the next upgrade phase, run the repo-side and cluster-side checks below:
+
+```bash
+./scripts/check_gcp_flux_api_versions.sh
+./scripts/flux_gcp_preflight.sh --context <gke-context> --min-k8s <major.minor> --max-k8s <major.minor>
+```
+
+The first check verifies that all GCP `GitRepository`, Flux `Kustomization`, `Alert` / `Provider`, and `HelmRelease` manifests have already moved to the PR1 API targets.
+
+The second check verifies two live-cluster prerequisites:
+- the GKE control plane version is inside the support window for the target Flux release
+- `status.storedVersions` no longer contains the deprecated Flux API versions removed by the next phase
+
+Set `--min-k8s` and `--max-k8s` from the target Flux release notes before upgrading `flux-system`. Use `--allow-non-gke` only when testing the script against a non-GKE cluster.
