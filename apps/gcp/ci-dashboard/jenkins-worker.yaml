@@ -25,7 +25,7 @@ spec:
       restartPolicy: Always
       containers:
         - name: jenkins-worker
-          image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-10-gd9b14ff
+          image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
           imagePullPolicy: IfNotPresent
           args:
             - consume-jenkins-events
