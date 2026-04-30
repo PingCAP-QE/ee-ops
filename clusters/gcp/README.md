@@ -147,3 +147,26 @@ The second check verifies two live-cluster prerequisites:
 - `status.storedVersions` no longer contains the deprecated Flux API versions removed by the next phase
 
 Set `--min-k8s` and `--max-k8s` from the target Flux release notes before upgrading `flux-system`. Use `--allow-non-gke` only when testing the script against a non-GKE cluster.
+
+## Flux v2.7 Upgrade
+
+PR2 upgrades GCP `flux-system` from Flux `v2.2.3` to Flux `v2.7.5`, which is the latest `v2.7.x` patch as of 2026-04-30.
+
+Before applying the new `clusters/gcp/flux-system/gotk-components.yaml` to the live cluster:
+
+```bash
+flux --version
+./scripts/flux_gcp_preflight.sh --context <gke-context> --min-k8s <major.minor> --max-k8s <major.minor>
+flux --context <gke-context> migrate
+```
+
+After the new manifests are applied and reconciled, verify the live upgrade result with:
+
+```bash
+./scripts/flux_gcp_post_upgrade_verify.sh --context <gke-context>
+```
+
+The post-upgrade verification asserts that:
+- all Flux controller deployments in `flux-system` are available
+- Flux CRD `status.storedVersions` have migrated to the current storage versions, including `helmreleases=v2`
+- `flux check` succeeds and `flux get all --all-namespaces --status-selector=ready=false` returns no resources
