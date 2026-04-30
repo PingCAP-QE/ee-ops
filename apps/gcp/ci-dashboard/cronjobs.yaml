@@ -27,7 +27,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-builds
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
               imagePullPolicy: IfNotPresent
               args: ["sync-builds"]
               envFrom:
@@ -75,7 +75,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-pr-events
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
               imagePullPolicy: IfNotPresent
               args: ["sync-pr-events"]
               envFrom:
@@ -123,7 +123,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: refresh-build-derived
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
               imagePullPolicy: IfNotPresent
               args: ["refresh-build-derived"]
               envFrom:
@@ -176,7 +176,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-pods
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
               imagePullPolicy: IfNotPresent
               args: ["sync-pods"]
               envFrom:
@@ -236,7 +236,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-flaky-issues
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
               imagePullPolicy: IfNotPresent
               args: ["sync-flaky-issues"]
               envFrom:
@@ -292,7 +292,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: archive-error-logs
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
               imagePullPolicy: IfNotPresent
               args:
                 - archive-error-logs
@@ -350,7 +350,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: analyze-errors
-              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.4.26-12-g215a3ab
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
               imagePullPolicy: IfNotPresent
               args:
                 - analyze-errors
