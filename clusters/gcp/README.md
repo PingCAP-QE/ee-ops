@@ -140,7 +140,7 @@ Before bumping `clusters/gcp/flux-system/gotk-components.yaml` in the next upgra
 ./scripts/flux_gcp_preflight.sh --context <gke-context> --min-k8s <major.minor> --max-k8s <major.minor>
 ```
 
-The first check verifies that all GCP `GitRepository`, Flux `Kustomization`, `Alert` / `Provider`, and `HelmRelease` manifests have already moved to the PR1 API targets.
+The first check verifies that all GCP Flux `GitRepository` / `HelmRepository`, Flux `Kustomization`, `Alert` / `Provider`, and `HelmRelease` manifests have already moved to the PR1 API targets.
 
 The second check verifies two live-cluster prerequisites:
 - the GKE control plane version is inside the support window for the target Flux release

@@ -146,6 +146,7 @@ check_stored_versions() {
 }
 
 check_stored_versions gitrepositories.source.toolkit.fluxcd.io v1
+check_stored_versions helmrepositories.source.toolkit.fluxcd.io v1
 check_stored_versions kustomizations.kustomize.toolkit.fluxcd.io v1
 check_stored_versions alerts.notification.toolkit.fluxcd.io v1beta3
 check_stored_versions providers.notification.toolkit.fluxcd.io v1beta3

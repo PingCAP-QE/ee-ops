@@ -20,7 +20,7 @@ while IFS= read -r -d '' file; do
     expected=""
 
     case "${kind}" in
-      GitRepository)
+      GitRepository|HelmRepository)
         if [[ "${api_version}" == source.toolkit.fluxcd.io/* ]]; then
           expected="source.toolkit.fluxcd.io/v1"
         fi
