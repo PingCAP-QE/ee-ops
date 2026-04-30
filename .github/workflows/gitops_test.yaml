@@ -21,6 +21,11 @@ jobs:
           persist-credentials: false
       - name: Setup tools
         uses: ./.github/actions/flux2/tools
+      - name: Verify GCP Flux API versions
+        if: matrix.path == 'clusters'
+        run: |
+          chmod +x scripts/check_gcp_flux_api_versions.sh
+          ${{ github.workspace }}/scripts/check_gcp_flux_api_versions.sh
       - name: Validate ${{ matrix.path }} manifests
         run: |
           chmod +x scripts/validate_k8s_yaml.sh
