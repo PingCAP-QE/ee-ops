@@ -10,6 +10,8 @@ rules:
     resources: ["pods", "events"]
     verbs: ["get", "list", "watch"]
 ---
+# Bind the shared ClusterRole separately in each watched namespace so the
+# service account cannot watch pods/events cluster-wide.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:

@@ -20,6 +20,7 @@ spec:
     spec:
       serviceAccountName: ci-dashboard
       restartPolicy: Always
+      terminationGracePeriodSeconds: 30
       containers:
         - name: pod-watcher
           image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
