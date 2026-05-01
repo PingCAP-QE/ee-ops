@@ -4,9 +4,10 @@ resources:
   - release.yaml
   - cronjobs.yaml
   - jenkins-worker.yaml
-  - sync-pods-rbac.yaml
+  - pod-watcher.yaml
+  - pod-watcher-rbac.yaml
 # Keep ci-dashboard app and worker/job images on the HelmRelease tag.
-# CronJobs and the Jenkins worker use a placeholder tag in source and are
+# CronJobs, workers, and the pod watcher use a placeholder tag in source and are
 # rewritten during kustomize rendering, so releases only update release.yaml.
 replacements:
   - source:
@@ -24,6 +25,14 @@ replacements:
       - select:
           kind: Deployment
           name: ci-dashboard-jenkins-worker
+        fieldPaths:
+          - spec.template.spec.containers.0.image
+        options:
+          delimiter: ":"
+          index: 1
+      - select:
+          kind: Deployment
+          name: ci-dashboard-pod-watcher
         fieldPaths:
           - spec.template.spec.containers.0.image
         options:
