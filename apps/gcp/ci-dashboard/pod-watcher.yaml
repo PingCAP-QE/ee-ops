@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ci-dashboard-pod-watcher
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ci-dashboard-pod-watcher
+      app.kubernetes.io/part-of: ci-dashboard
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ci-dashboard-pod-watcher
+        app.kubernetes.io/part-of: ci-dashboard
+    spec:
+      serviceAccountName: ci-dashboard
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      containers:
+        - name: pod-watcher
+          image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
+          imagePullPolicy: IfNotPresent
+          args: ["watch-pods"]
+          ports:
+            - name: health
+              containerPort: 8081
+          envFrom:
+            - secretRef:
+                name: ci-dashboard-eq-prd-insight-db
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: CI_DASHBOARD_LOG_LEVEL
+              value: INFO
+            - name: CI_DASHBOARD_GCP_PROJECT
+              value: pingcap-testing-account
+            - name: CI_DASHBOARD_POD_EVENT_NAMESPACES
+              value: prow-test-pods,jenkins-tidb,jenkins-tiflow
+            - name: CI_DASHBOARD_POD_WATCH_TIMEOUT_SECONDS
+              value: "300"
+            - name: CI_DASHBOARD_POD_WATCH_RETRY_DELAY_SECONDS
+              value: "5"
+            - name: CI_DASHBOARD_POD_WATCH_HEALTH_PORT
+              value: "8081"
+            - name: CI_DASHBOARD_POD_WATCH_STALE_AFTER_SECONDS
+              value: "720"
+            - name: CI_DASHBOARD_JENKINS_POD_NAME_PREFIX_CACHE_SECONDS
+              value: "900"
+            - name: CI_DASHBOARD_KUBERNETES_CLUSTER_NAME
+              value: prow
+            - name: CI_DASHBOARD_KUBERNETES_LOCATION
+              value: us-central1-c
+          startupProbe:
+            httpGet:
+              path: /livez
+              port: health
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: health
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 2Gi
