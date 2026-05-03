@@ -25,7 +25,9 @@ spec:
                 requiredDuringSchedulingIgnoredDuringExecution:
                   nodeSelectorTerms:
                     - matchExpressions:
-                        - key: cloud.google.com/gke-spot
+                        - key: cloud.google.com/machine-family
+                          operator: In
+                          values: [t2d, n2d, e2]
+                        - key: cloud.google.com/gke-provisioning
                           operator: NotIn
-                          values:
-                            - "true"
+                          values: ["spot"]
