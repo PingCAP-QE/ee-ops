@@ -11,7 +11,6 @@ spec:
             - Pod
           namespaces:
             - apps
-            - cla
             - arc-systems
             - tekton-operator
             - tekton-pipelines

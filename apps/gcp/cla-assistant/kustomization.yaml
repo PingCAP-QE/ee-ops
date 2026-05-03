@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: cla
 resources:
   - namespace.yaml
+  - policies.yaml
   - mongodb-secret.yaml
   - mongodb-release.yaml
   - cla-release.yaml

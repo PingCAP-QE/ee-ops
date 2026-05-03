@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: limit-pods-run-on-t2d-ondemand-nodes
+spec:
+  rules:
+    - name: restrict-non-el-pods-to-c4-c4a
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        patchStrategicMerge:
+          spec:
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: cloud.google.com/machine-family
+                          operator: In
+                          values: [t2d]
+                        - key: cloud.google.com/gke-provisioning
+                          operator: NotIn
+                          values: ["spot"]
