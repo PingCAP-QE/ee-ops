@@ -25,13 +25,13 @@ variable "location" {
   default     = "US"
 }
 
-variable "storage_class" {
+variable "bucket_storage_class" {
   description = "The storage class of the bucket (e.g. STANDARD, NEARLINE)."
   type        = string
   default     = "STANDARD"
 }
 
-variable "force_destroy" {
+variable "bucket_force_destroy" {
   description = "If true, objects will be deleted from the bucket when the bucket is destroyed."
   type        = bool
   default     = false
@@ -41,10 +41,10 @@ resource "google_storage_bucket" "this" {
   name          = var.bucket_name
   project       = var.project
   location      = var.location
-  storage_class = var.storage_class
+  bucket_storage_class = var.bucket_storage_class
 
   uniform_bucket_level_access = true
-  force_destroy               = var.force_destroy
+  bucket_force_destroy               = var.bucket_force_destroy
 
   labels = {
     managed_by = "ee-ops"
