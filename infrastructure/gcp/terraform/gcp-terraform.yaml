@@ -20,9 +20,14 @@ spec:
     name: flux-system
     namespace: flux-system
   path: ./infrastructure/gcp/terraform/resources
-  values:
-    project: "pingcap-testing-account"
-    location: "US"
-    bucket_name: "hello-pingcap-testing-account"
-    bucket_storage_class: "STANDARD"
-    bucket_force_destroy: false
+  vars:
+    - name: project
+      value: "pingcap-testing-account"
+    - name: location
+      value: "US"
+    - name: bucket_name
+      value: "hello-pingcap-testing-account"
+    - name: bucket_storage_class
+      value: "STANDARD"
+    - name: bucket_force_destroy
+      value: false
