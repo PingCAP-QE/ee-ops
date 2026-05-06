@@ -41,10 +41,10 @@ resource "google_storage_bucket" "this" {
   name          = var.bucket_name
   project       = var.project
   location      = var.location
-  bucket_storage_class = var.bucket_storage_class
+  storage_class = var.bucket_storage_class
 
   uniform_bucket_level_access = true
-  bucket_force_destroy               = var.bucket_force_destroy
+  force_destroy               = var.bucket_force_destroy
 
   labels = {
     managed_by = "ee-ops"
