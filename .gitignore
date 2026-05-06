@@ -20,3 +20,7 @@ Chart.lock
 
 # IDEs
 .vscode
+
+# GitOps
+.terraform
+.terraform.lock.hcl
