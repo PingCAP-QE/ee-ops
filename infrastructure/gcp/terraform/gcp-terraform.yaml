@@ -15,8 +15,14 @@ spec:
   # Set to "auto" to auto-apply plans:
   # approvePlan: auto
   destroyResourcesOnDeletion: true
-  path: ./infrastructure/gcp/terraform/resources
   sourceRef:
     kind: GitRepository
     name: flux-system
     namespace: flux-system
+  path: ./infrastructure/gcp/terraform/resources
+  values:
+    project: "pingcap-testing-account"
+    location: "US"
+    bucket_name: "hello-pingcap-testing-account"
+    bucket_storage_class: "STANDARD"
+    bucket_force_destroy: false
