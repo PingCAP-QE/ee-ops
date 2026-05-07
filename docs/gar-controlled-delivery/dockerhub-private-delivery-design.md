@@ -24,6 +24,10 @@
   - `tidbcloud`
 - Subscription plan:
   - Docker Team
+- Supported Docker Hub organization roles:
+  - `member`
+  - `editor`
+  - `owner`
 - Access-control primitives used in this design:
   - private repositories
   - organization teams
@@ -70,6 +74,12 @@
 - Rationale:
   - avoid additional paid seats for multiple customer accounts under the same
     customer
+- Customer role rule:
+  - the customer account added to the organization should use the `member`
+    organization role
+- PingCAP operator role rule:
+  - use `editor` or `owner` only for internal maintainers that need repository,
+    team, or membership administration
 
 ## Repository Permission Model
 - Each customer team gets read-only access only to that customer's repositories.
@@ -104,6 +114,9 @@
   - destination repository
   - destination tags
   - ticket or batch id
+- Each delivery batch must also produce:
+  - `images.lock`
+  - `release-manifest.yaml`
 - Customer-facing tags are convenience references.
 - Internal audit must still record source digests as the source of truth.
 
@@ -131,6 +144,9 @@
 5. Platform admin grants read-only repository access to the team.
 6. Delivery bot pushes images into the customer repositories.
 7. Delivery manifests and pull instructions are sent to the customer.
+   - required delivery files:
+     - `images.lock`
+     - `release-manifest.yaml`
 8. Customer logs in with the authorized Docker Hub account and pulls the
    requested tags.
 9. When delivery access expires, PingCAP revokes team access or removes the
@@ -140,6 +156,7 @@
 - Record which customer account was added to which team.
 - Record which repositories were granted to that team.
 - Record which source digests were published to which tags.
+- Record the `images.lock` content that belongs to the delivery batch.
 - Record who changed repository permissions and when.
 - Preserve the delivery manifest and ticket reference in Git.
 

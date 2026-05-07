@@ -3,7 +3,7 @@
 ## 📘 Purpose
 - This SOP standardizes how customers synchronize delivered images from PingCAP-managed GAR repositories into their own internal registry.
 - If the agreed backend is Docker Hub private repositories instead of GAR, use
-  `customer-dockerhub-private-repo-sop.md` instead of this document.
+  `customer-dockerhub-private-repo-sync-sop.md` instead of this document.
 
 ## Audience
 - Customer platform engineers
