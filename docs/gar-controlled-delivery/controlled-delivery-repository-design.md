@@ -1,11 +1,13 @@
-# GAR Controlled Delivery Repository Design
+# Controlled Delivery Repository Design
 
 ## 📘 Overview
 - This design defines a controlled image-delivery plane for private delivery.
 - The objective is to deliver product images to customers without exposing the
   internal production registry and without giving customers write access to
   PingCAP-managed registries.
-- Google Artifact Registry (GAR) is the delivery backend.
+- Google Artifact Registry (GAR) is the default delivery backend.
+- Docker Hub private repositories are an approved exception backend for
+  customers that can only reach Docker Hub and cannot reach GAR.
 
 ## 🎯 Goals
 - Protect PingCAP-owned product content during private delivery.
@@ -29,15 +31,42 @@
 - Auditability: repository creation, access grants, image publication, and cleanup must be traceable.
 
 ## Platform Constraints
-- GAR standard Docker repositories are the recommended delivery target.
-- GAR cleanup policies apply to standard repositories and fit the temporary-delivery use case.
-- Virtual repositories are not the primary delivery surface because lifecycle and customer isolation should be explicit at repository level.
+- GAR standard Docker repositories are the recommended default delivery target.
+- GAR cleanup policies apply to standard repositories and fit the
+  temporary-delivery use case.
+- Virtual repositories are not the primary delivery surface because lifecycle
+  and customer isolation should be explicit at repository level.
+- Docker Hub private repositories are not the default delivery plane because
+  customer access, internal automation credentials, and repository lifecycle are
+  governed differently than in GAR and require separate operating controls.
+
+## Delivery Backend Selection
+- Default online mode:
+  - GAR controlled delivery
+- Exception online mode:
+  - Docker Hub private-repository delivery
+- Fallback when the customer can use neither online mode:
+  - approved offline image package delivery
+
+### When GAR Should Be Used
+- The customer can reach GAR endpoints.
+- The customer can provide one Google user account or one Google service
+  account.
+- The customer needs repository-level reader access and customer-side
+  synchronization into an internal registry.
+
+### When Docker Hub Private Repositories May Be Used
+- The customer explicitly cannot reach GAR.
+- The customer environment can reach Docker Hub.
+- The customer can use one Docker Hub account for pull access.
+- Delivery owners accept that repository isolation, team membership, and tag
+  lifecycle are governed by Docker Hub rather than by GAR IAM.
 
 ## 🏗️ Architecture
 - Production artifact plane:
   stores internally published product images and is not directly exposed to customers.
 - Delivery artifact plane:
-  stores customer-approved delivery copies in GAR.
+  stores customer-approved delivery copies in the selected delivery backend.
 - Customer sync plane:
   customers pull from the delivery repository and push into their own internal registry.
 
@@ -64,24 +93,79 @@
   - quarterly credential rotation
   - GitOps-managed publication manifests
 
+## Docker Hub Private-repository Model
+- Namespace:
+  - use the Docker Hub organization `tidbcloud`
+- Subscription baseline:
+  - Docker Team plan
+- Repository isolation model:
+  - one private repository per customer per component
+- Naming pattern:
+  - `<customer>-<component>`
+- Example:
+  - `tidbcloud/customer-a-tidb`
+  - `tidbcloud/customer-a-tikv`
+- Batch management model:
+  - manage delivery batches by tag, not by repository creation
+- Example tags:
+  - `v8.5.1`
+  - `v8.5.1-r20260507`
+  - `v8.5.1-r20260507-hotfix1`
+
+### Why the Docker Hub Model Uses Repository-per-customer-per-component
+- Team-based repository permissions are clearer at repository level than at tag
+  level.
+- Customer access can be scoped without letting customers see other customers'
+  repositories.
+- Batch tags stay within one repository, which avoids creating a large number of
+  temporary repositories for repeated deliveries of the same component.
+- Component-level separation makes pull authorization and retirement easier than
+  putting all components for one customer into one broad repository.
+
 ## 🔐 Identity and Access Model
 - Internal identities:
   - `delivery-bot`: writes to delivery repositories
   - `platform-admin`: creates repositories, manages IAM, retirement, and exceptions
 - Customer identities:
-  - supported for repository-level reader grants:
-    - Google user account
-    - Google service account
-  - recommended default:
-    - Google user account for one-off or manual synchronization
-    - customer-managed Google service account for automated synchronization
-  - fallback: PingCAP-managed dedicated read-only identity for that customer only
+  - GAR mode:
+    - supported for repository-level reader grants:
+      - Google user account
+      - Google service account
+    - recommended default:
+      - Google user account for one-off or manual synchronization
+      - customer-managed Google service account for automated synchronization
+  - Docker Hub private-repository mode:
+    - one Docker Hub account per customer
+    - that account is added to one Docker Hub team dedicated to that customer
 - Required customer role:
-  - `roles/artifactregistry.reader`
+  - GAR mode:
+    - `roles/artifactregistry.reader`
+  - Docker Hub private-repository mode:
+    - team-level read-only access to the customer's repositories
 - Forbidden:
   - project-level reader grants
   - writer grants for customers
   - shared identities across multiple customers
+  - one customer account added to multiple customer teams
+
+## Docker Hub Team and Membership Model
+- Organization:
+  - `tidbcloud`
+- Team naming rule:
+  - use the customer name as the team name
+- Example:
+  - `customer-a`
+- Membership rule:
+  - each customer team contains exactly one customer account
+- Reason:
+  - avoid increasing seat cost for multiple accounts under the same customer
+- Repository permission rule:
+  - each team gets read-only access only to the repositories that belong to that
+    customer
+- Internal automation rule:
+  - image publication automation should use Docker organization-owned
+    credentials, not an individual maintainer password
+  - prefer Docker organization access tokens when automation is needed
 
 ## Delivery Object Model
 - Each delivery batch must publish:
@@ -129,28 +213,50 @@ images:
 
 ## 🔄 Operational Workflow
 1. Delivery request is approved.
-2. Customer provides the identity to be authorized for repository read access.
-   - accepted default inputs:
+2. Delivery owner selects the online backend:
+   - GAR by default
+   - Docker Hub private repository only when the customer cannot use GAR
+3. Customer provides the identity to be authorized for repository read access.
+   - GAR mode:
      - one Google user account email
-     - one customer-managed Google service account email
-3. Git declares the repository, IAM, and expiration.
-4. Terraform creates or updates the GAR repository.
-5. Terraform or automation grants `roles/artifactregistry.reader` on that repository to the customer-provided identity.
-6. Delivery bot copies images by digest from production into the delivery repository.
+     - or one customer-managed Google service account email
+   - Docker Hub mode:
+     - one Docker Hub account name controlled by that customer
+4. Git declares the repository, access model, expiration, and manifests.
+5. Backend-specific automation creates or updates the delivery surface.
+   - GAR mode:
+     - Terraform creates or updates the GAR repository
+     - Terraform or automation grants `roles/artifactregistry.reader`
+   - Docker Hub mode:
+     - create or verify the Docker Hub private repositories
+     - create or verify the Docker Hub customer team
+     - grant read-only repository permissions to that team
+6. Delivery bot copies or publishes images by digest into the selected delivery backend.
 7. Delivery metadata and manifests are published.
-8. Customer synchronizes images into the internal registry, preferably with registry-to-registry copy tooling.
-9. Expiration automation revokes access and removes expired repositories.
+8. Customer synchronizes images into the internal registry or directly pulls them for deployment, depending on the agreed workflow.
+9. Expiration or retirement automation revokes access and removes or archives delivery content according to backend policy.
 
 ## Customer Request Requirements
 - Each delivery request must include:
   - the requested delivery batch or ticket identifier
   - the image list or release manifest to be delivered
   - the requested expiration date
+  - the requested delivery backend:
+    - GAR
+    - or Docker Hub private repository
   - one customer identity to authorize for repository read access
 - The authorized customer identity must be one of:
-  - a Google user account email
-  - a Google service account email
-- If the customer cannot provide either of the above, this online GAR delivery workflow should not be the default path; use an approved fallback such as offline image package delivery instead.
+  - GAR mode:
+    - a Google user account email
+    - or a Google service account email
+  - Docker Hub mode:
+    - one Docker Hub account name
+- Additional Docker Hub mode inputs:
+  - normalized customer short name used for repository and team naming
+  - component list to be delivered
+- If the customer cannot provide a supported identity for either online mode,
+  use an approved offline delivery fallback instead of forcing an unsupported
+  online workflow.
 
 ## Audit Requirements
 - Track who created a repository.
@@ -163,7 +269,7 @@ images:
 - Do not expose the production artifact registry directly.
 - Do not grant customers write access to GAR.
 - Do not use shared customer credentials.
-- Do not deliver by tag only.
+- Do not use tag-only delivery records without source digest traceability.
 - Do not keep temporary delivery repositories without an expiration policy.
 
 ## Recommended Phase Plan
@@ -175,6 +281,11 @@ images:
   self-service front end backed by the same GitOps flow
 
 ## ✅ Decision
-- Use GAR standard repositories as the controlled delivery surface.
-- Default to one repository per customer per batch.
-- Manage repository lifecycle, IAM, publication intent, and retirement through GitOps.
+- Use GAR standard repositories as the default controlled delivery surface.
+- Approve Docker Hub private repositories as an exception delivery surface for
+  customers that can only reach Docker Hub.
+- In GAR mode, default to one repository per customer per batch.
+- In Docker Hub mode, default to one repository per customer per component and
+  use tags to represent delivery batches.
+- Manage repository lifecycle, access control, publication intent, and
+  retirement through GitOps or equivalent reviewed control flows.
