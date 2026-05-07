@@ -98,6 +98,10 @@
   - use the Docker Hub organization `tidbcloud`
 - Subscription baseline:
   - Docker Team plan
+- Supported Docker Hub organization roles:
+  - `member`
+  - `editor`
+  - `owner`
 - Repository isolation model:
   - one private repository per customer per component
 - Naming pattern:
@@ -166,6 +170,10 @@
   - image publication automation should use Docker organization-owned
     credentials, not an individual maintainer password
   - prefer Docker organization access tokens when automation is needed
+- Recommended organization role usage:
+  - customer accounts use `member`
+  - PingCAP delivery operators use `editor` or `owner` only when they need to
+    manage repositories, teams, or membership
 
 ## Delivery Object Model
 - Each delivery batch must publish:
@@ -240,6 +248,7 @@ images:
 - Each delivery request must include:
   - the requested delivery batch or ticket identifier
   - the image list or release manifest to be delivered
+  - `images.lock` or the source information required to generate it
   - the requested expiration date
   - the requested delivery backend:
     - GAR
@@ -262,6 +271,7 @@ images:
 - Track who created a repository.
 - Track which customer identity received reader access.
 - Track which digests were published into which repository.
+- Track the `images.lock` content for each delivery batch.
 - Track expiration, revocation, and deletion events.
 - Preserve an immutable batch manifest in Git.
 

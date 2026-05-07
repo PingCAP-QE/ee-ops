@@ -20,8 +20,8 @@ set also includes a Docker Hub private-repository delivery mode.
 - `terraform-gcloud-implementation.md`: implementation checklist and operational commands
 - `gitops-with-fluxcd-and-terraform.md`: GitOps operating model using FluxCD and Terraform
 - `customer-sync-sop.md`: customer-side synchronization procedure for GAR mode
-- `customer-dockerhub-private-repo-sop.md`: customer-side pull procedure for
-  Docker Hub private-repository mode
+- `customer-dockerhub-private-repo-sync-sop.md`: customer-side synchronization
+  procedure for Docker Hub private-repository mode
 - `terraform-module-skeleton/`: reference Terraform module skeleton
 
 ## 🎯 Scope
