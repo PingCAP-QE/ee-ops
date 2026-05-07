@@ -14,10 +14,9 @@
 ## ✅ Prerequisites
 - Customer has received:
   - the repository list
-  - the image tags for the delivery batch
-  - the Docker Hub account that PingCAP authorized for pull access
   - `images.lock`
   - the delivery manifest or equivalent image list
+  - the Docker Hub account that PingCAP authorized for pull access
 - Customer environment can reach Docker Hub.
 - Customer environment can reach the customer's internal registry if the
   images will be mirrored there.
@@ -66,6 +65,10 @@ echo "${DOCKERHUB_TOKEN}" | docker login -u "${DOCKERHUB_USERNAME}" --password-s
   copy tooling is unavailable.
 - Validate the destination result against `images.lock` before declaring the
   batch synchronized.
+
+## Recommended Tools
+- `crane`: https://github.com/google/go-containerregistry
+- `skopeo`: https://github.com/containers/skopeo
 
 ## 🔄 Recommended Workflow
 1. Authenticate to Docker Hub with the authorized customer account.
