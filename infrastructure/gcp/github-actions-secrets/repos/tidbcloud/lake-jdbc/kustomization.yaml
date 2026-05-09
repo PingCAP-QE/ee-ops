@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - 00-target-stores/h-env-tidbcloud-lake-jdbc-maven-central-com-tidbcloud-release.yaml
+  - 01-source-secrets/es-src-maven-central-token-password.yaml
+  - 01-source-secrets/es-src-maven-central-token-username.yaml
+  - 01-source-secrets/es-src-maven-gpg-passphrase.yaml
+  - 01-source-secrets/es-src-maven-gpg-private-key.yaml
+  - 02-deliveries/ps-maven-central-token-password-lake-jdbc-release.yaml
+  - 02-deliveries/ps-maven-central-token-username-lake-jdbc-release.yaml
+  - 02-deliveries/ps-maven-gpg-passphrase-lake-jdbc-release.yaml
+  - 02-deliveries/ps-maven-gpg-private-key-lake-jdbc-release.yaml

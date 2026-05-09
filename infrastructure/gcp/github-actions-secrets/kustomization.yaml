@@ -4,6 +4,4 @@ resources:
   - namespace.yaml
   - serviceaccounts
   - source-store
-  - source-secrets
-  - target-stores
-  - deliveries
+  - repos
