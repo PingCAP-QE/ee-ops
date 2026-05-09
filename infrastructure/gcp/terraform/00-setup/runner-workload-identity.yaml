@@ -5,7 +5,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: tf-runner
+  name: tofu-runner
   annotations:
     # GCP Workload Identity: link this KSA to a GCP SA.
     # The GCP SA must be created manually and granted appropriate roles.
@@ -24,7 +24,7 @@ automountServiceAccountToken: true
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: tf-runner
+  name: tofu-runner
 rules:
   # Read input secrets/configmaps and manage Terraform state storage.
   - apiGroups: [""]
@@ -46,11 +46,11 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: tf-runner
+  name: tofu-runner
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
-  name: tf-runner
+  name: tofu-runner
 subjects:
   - kind: ServiceAccount
-    name: tf-runner
+    name: tofu-runner
