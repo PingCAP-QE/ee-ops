@@ -1,0 +1,25 @@
+# Reference: https://flux-iac.github.io/tofu-controller/
+# This Terraform CR creates a GCS bucket using the module in the same directory.
+# Prerequisites:
+#   1. GCP Workload Identity is configured (see tofu-controller/post/runner-workload-identity.yaml)
+#   2. The GCP SA has roles/storage.admin permission
+#   3. Update the spec.approvePlan when you're ready to apply
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: gcp-pingcap-testing-account
+spec:
+  approvePlan: auto
+  interval: 1h
+  retryInterval: 20s
+  # Set to "auto" to auto-apply plans:
+  # approvePlan: auto
+  destroyResourcesOnDeletion: true
+  sourceRef:
+    kind: GitRepository
+    name: ee-infra
+    namespace: flux-system
+  path: ./terraform/gcp/pingcap-testing-account
+  vars:
+    - name: project
+      value: "pingcap-testing-account"
