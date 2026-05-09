@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - git-repo-ci.yaml
+  - git-repo-ee-infra.yaml
   - git-repo-prow-configs.yaml
   - helm-repo-bitnami-legacy.yaml
   - helm-repo-bitnami.yaml
