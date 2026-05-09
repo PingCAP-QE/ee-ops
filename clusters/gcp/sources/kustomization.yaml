@@ -3,15 +3,11 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - git-repo-ci.yaml
-  - git-repo-prometheus-operator.yaml
   - git-repo-prow-configs.yaml
   - helm-repo-bitnami-legacy.yaml
   - helm-repo-bitnami.yaml
   - helm-repo-ee-apps.yaml
   - helm-repo-ee-ops.yaml
   - helm-repo-external-secrets.yaml
-  - helm-repo-ingress-nginx.yaml
   - helm-repo-kyverno.yaml
-  - helm-repo-nfs-server-provisioner.yaml
   - helm-repo-others.yaml
-  - helm-repo-rook.yaml
