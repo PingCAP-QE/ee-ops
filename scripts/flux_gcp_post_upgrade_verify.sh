@@ -78,7 +78,7 @@ check_stored_versions() {
   local actual_sorted
 
   expected_sorted=$(printf '%s\n' "$@" | sort | paste -sd ',' -)
-  actual_sorted=$(kubectl "${kubectl_args[@]}" get crd "${crd}" -o json | jq -r '.status.storedVersions | sort | join(",")')
+  actual_sorted=$(kubectl "${kubectl_args[@]}" get crd "${crd}" -o json | jq -r '.status.storedVersions // [] | sort | join(",")')
 
   if [[ -z "${actual_sorted}" ]]; then
     echo "ERROR - ${crd}: status.storedVersions is empty"
