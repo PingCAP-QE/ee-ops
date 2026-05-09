@@ -1,0 +1,9 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: ti-community-infra-configs
+spec:
+  interval: 1m0s
+  ref:
+    branch: main
+  url: https://github.com/ti-community-infra/configs.git

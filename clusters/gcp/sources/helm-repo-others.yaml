@@ -1,0 +1,25 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: mittwald
+spec:
+  interval: 24h
+  url: https://helm.mittwald.de
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: strimzi
+spec:
+  interval: 24h
+  type: oci
+  url: oci://quay.io/strimzi-helm
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jenkins
+spec:
+  interval: 24h
+  url: https://charts.jenkins.io
