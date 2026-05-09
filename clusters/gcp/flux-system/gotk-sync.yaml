@@ -12,7 +12,7 @@ spec:
   ref:
     branch: main
   secretRef:
-    name: flux-system2
+    name: flux-system
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
