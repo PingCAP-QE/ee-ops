@@ -9,4 +9,4 @@ spec:
     branch: main
   secretRef:
     name: flux-system2
-  url: ssh://git@github.com/PingCAP-QE/ee-infra
+  url: https://github.com/PingCAP-QE/ee-infra
