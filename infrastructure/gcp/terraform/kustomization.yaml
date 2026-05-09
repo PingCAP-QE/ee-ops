@@ -3,4 +3,3 @@ kind: Kustomization
 namespace: terraform
 resources:
   - 00-setup
-  - gcp-terraform.yaml
