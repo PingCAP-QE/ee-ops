@@ -6,7 +6,7 @@ usage() {
   cat <<'EOF'
 Usage: flux_gcp_post_upgrade_verify.sh [--context <kubectl-context>] [--namespace <flux-namespace>]
 
-Checks after the GCP Flux v2.7 upgrade:
+Checks after the GCP Flux v2.8.6 upgrade:
   1. Flux controllers in the target namespace are rolled out
   2. Flux CRD status.storedVersions have migrated to the current storage versions
   3. `flux check` passes and no Flux resources remain NotReady
