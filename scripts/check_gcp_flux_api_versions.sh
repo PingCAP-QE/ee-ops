@@ -37,7 +37,7 @@ while IFS= read -r -d '' file; do
         ;;
       HelmRelease)
         if [[ "${api_version}" == helm.toolkit.fluxcd.io/* ]]; then
-          expected="helm.toolkit.fluxcd.io/v2beta2"
+          expected="helm.toolkit.fluxcd.io/v2"
         fi
         ;;
     esac
