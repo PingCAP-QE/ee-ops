@@ -1,7 +1,7 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - 00-target-stores/h-env-tidbcloud-lake-jdbc-maven-central-com-tidbcloud-release.yaml
+  - 00-target-stores/gh-environments.yaml
   - 01-source-secrets/es-src-maven-central-token-password.yaml
   - 01-source-secrets/es-src-maven-central-token-username.yaml
   - 01-source-secrets/es-src-maven-gpg-passphrase.yaml

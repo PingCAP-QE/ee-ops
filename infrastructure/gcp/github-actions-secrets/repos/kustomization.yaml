@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: github-actions-secrets
 resources:
   - tidbcloud/lake-jdbc
+  - tidbcloud/lakesql
