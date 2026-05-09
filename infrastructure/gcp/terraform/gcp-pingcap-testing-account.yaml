@@ -7,7 +7,7 @@
 apiVersion: infra.contrib.fluxcd.io/v1alpha2
 kind: Terraform
 metadata:
-  name: gcp-terraform
+  name: gcp-pingcap-testing-account
 spec:
   approvePlan: auto
   interval: 1h
@@ -17,9 +17,9 @@ spec:
   destroyResourcesOnDeletion: true
   sourceRef:
     kind: GitRepository
-    name: flux-system
+    name: ee-infra
     namespace: flux-system
-  path: ./infrastructure/gcp/terraform/configs
+  path: ./terraform/gcp/pingcap-testing-account
   vars:
     - name: project
       value: "pingcap-testing-account"
