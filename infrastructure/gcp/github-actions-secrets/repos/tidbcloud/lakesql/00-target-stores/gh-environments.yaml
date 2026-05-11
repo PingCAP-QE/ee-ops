@@ -42,26 +42,6 @@ spec:
 apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
-  name: gh-env-tidbcloud-lakesql-release-pypi
-  labels:
-    ee.pingcap.com/owner-team: ee
-    ee.pingcap.com/github-org: tidbcloud
-spec:
-  provider:
-    github:
-      appID: 214286
-      installationID: 65036159
-      organization: tidbcloud
-      repository: lakesql
-      environment: release-pypi
-      auth:
-        privateKey:
-          name: github-app-private-key
-          key: privateKey.pem
----
-apiVersion: external-secrets.io/v1
-kind: SecretStore
-metadata:
   name: gh-env-tidbcloud-lakesql-release-s3
   labels:
     ee.pingcap.com/owner-team: ee

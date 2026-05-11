@@ -1,0 +1,23 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: ps-cargo-registry-token-release-crates
+  labels:
+    ee.pingcap.com/owner-team: ee
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/github-secret-name: CARGO_REGISTRY_TOKEN
+spec:
+  deletionPolicy: Delete
+  refreshInterval: 1h
+  secretStoreRefs:
+    - name: gh-env-tidbcloud-lakesql-release-crates
+      kind: SecretStore
+  selector:
+    secret:
+      name: src-cargo-registry-token
+  data:
+    - match:
+        secretKey: value
+        remoteRef:
+          remoteKey: CARGO_REGISTRY_TOKEN

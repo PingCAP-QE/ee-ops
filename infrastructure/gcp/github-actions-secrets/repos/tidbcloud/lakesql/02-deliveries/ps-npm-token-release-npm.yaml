@@ -1,0 +1,23 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: ps-npm-token-release-npm
+  labels:
+    ee.pingcap.com/owner-team: ee
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/github-secret-name: NPM_TOKEN
+spec:
+  deletionPolicy: Delete
+  refreshInterval: 1h
+  secretStoreRefs:
+    - name: gh-env-tidbcloud-lakesql-release-npm
+      kind: SecretStore
+  selector:
+    secret:
+      name: src-npm-token
+  data:
+    - match:
+        secretKey: value
+        remoteRef:
+          remoteKey: NPM_TOKEN
