@@ -2,3 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - 00-target-stores/gh-environments.yaml
+  - 01-source-secrets/es-src-cargo-registry-token.yaml
+  - 01-source-secrets/es-src-npm-token.yaml
+  - 02-deliveries/ps-cargo-registry-token-release-crates.yaml
+  - 02-deliveries/ps-npm-token-release-npm.yaml

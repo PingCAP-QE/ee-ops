@@ -1,0 +1,22 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: es-src-npm-token
+  labels:
+    ee.pingcap.com/owner-team: ee
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/source-secret-id: gha__env__tidbcloud__lakesql__release-npm__npm_token
+    ee.pingcap.com/github-secret-name: NPM_TOKEN
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: gcp-sm-github-actions
+    kind: SecretStore
+  target:
+    name: src-npm-token
+    creationPolicy: Owner
+  data:
+    - secretKey: value
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-npm__npm_token
