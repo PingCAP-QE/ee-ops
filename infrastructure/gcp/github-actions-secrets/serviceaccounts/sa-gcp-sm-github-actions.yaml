@@ -3,7 +3,6 @@ kind: ServiceAccount
 metadata:
   name: gcp-sm-github-actions
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
   annotations:
     iam.gke.io/gcp-service-account: gcp-sm-github-actions@pingcap-testing-account.iam.gserviceaccount.com

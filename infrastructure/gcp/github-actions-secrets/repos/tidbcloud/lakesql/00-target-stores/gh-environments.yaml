@@ -4,8 +4,7 @@ kind: SecretStore
 metadata:
   name: gh-env-tidbcloud-lakesql-release-crates
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
     ee.pingcap.com/github-org: tidbcloud
 spec:
   provider:
@@ -25,8 +24,7 @@ kind: SecretStore
 metadata:
   name: gh-env-tidbcloud-lakesql-release-npm
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
     ee.pingcap.com/github-org: tidbcloud
 spec:
   provider:
@@ -46,8 +44,7 @@ kind: SecretStore
 metadata:
   name: gh-env-tidbcloud-lakesql-release-pypi
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
     ee.pingcap.com/github-org: tidbcloud
 spec:
   provider:
@@ -67,8 +64,7 @@ kind: SecretStore
 metadata:
   name: gh-env-tidbcloud-lakesql-release-s3
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
     ee.pingcap.com/github-org: tidbcloud
 spec:
   provider:

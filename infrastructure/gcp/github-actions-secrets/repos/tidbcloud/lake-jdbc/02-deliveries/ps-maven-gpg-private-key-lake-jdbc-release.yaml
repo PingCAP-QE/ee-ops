@@ -3,8 +3,7 @@ kind: PushSecret
 metadata:
   name: ps-maven-gpg-private-key-lake-jdbc-release
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
     ee.pingcap.com/github-org: tidbcloud
   annotations:
     ee.pingcap.com/github-secret-name: MAVEN_GPG_PRIVATE_KEY

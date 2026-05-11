@@ -3,5 +3,4 @@ kind: Namespace
 metadata:
   name: github-actions-secrets
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee

@@ -3,8 +3,7 @@ kind: ExternalSecret
 metadata:
   name: es-github-app-private-key
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
   annotations:
     ee.pingcap.com/source-secret-id: gha__system__github_app_private_key
 spec:
