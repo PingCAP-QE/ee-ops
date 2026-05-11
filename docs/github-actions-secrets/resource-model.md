@@ -345,9 +345,8 @@ Recommended labels:
 ```yaml
 metadata:
   labels:
-    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/owner-team: ee
     ee.pingcap.com/github-org: pingcap-qe
-    ee.pingcap.com/managed-by: fluxcd
 ```
 
 Recommended annotations:

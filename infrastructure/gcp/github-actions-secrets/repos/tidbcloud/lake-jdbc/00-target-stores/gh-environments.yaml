@@ -3,8 +3,7 @@ kind: SecretStore
 metadata:
   name: gh-env-tidbcloud-lake-jdbc-maven-central-com-tidbcloud-release
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
     ee.pingcap.com/github-org: tidbcloud
 spec:
   provider:

@@ -3,8 +3,7 @@ kind: SecretStore
 metadata:
   name: gcp-sm-github-actions
   labels:
-    ee.pingcap.com/owner-team: platform
-    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/owner-team: ee
 spec:
   provider:
     gcpsm:
