@@ -15,6 +15,11 @@ spec:
   dependsOn:
     - name: redis
   interval: 1h
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 1
+      remediateLastFailure: true
   values:
     mountSecret: true
     secretFiles: false # We are in charge of managing it(the secret `zot-secret`)
