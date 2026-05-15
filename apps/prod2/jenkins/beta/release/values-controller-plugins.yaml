@@ -10,14 +10,14 @@ controller:
     - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
     - generic-webhook-trigger:2.4.1
     - google-login:109.v022b_cf87b_e5b_
-    - http_request:1.22
+    - http_request:1.25
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
-    - job-dsl:1.93
+    - job-dsl:3654.vdf58f53e2d15
     - role-strategy:840.v206ff7f7312e
     - pipeline-utility-steps:2.20.0
-    - prometheus:795.v995762102f28
+    - prometheus:852.v317db_5d17a_b_0
     - ssh-agent:386.v36cc0c7582f0
-    - kubernetes-credentials-provider:1.299.v610fa_e76761a_
+    - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1469.v52dff5a_80e32
     - pipeline-graph-view:836.v68ef091500dd
 
