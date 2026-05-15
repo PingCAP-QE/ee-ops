@@ -6,9 +6,8 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - blueocean:1.27.25
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - cdevents:1-40.vb_3d2c94f2379
+    - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
     - generic-webhook-trigger:2.4.1
     - google-login:109.v022b_cf87b_e5b_
     - http_request:1.22
@@ -20,7 +19,7 @@ controller:
     - ssh-agent:386.v36cc0c7582f0
     - kubernetes-credentials-provider:1.299.v610fa_e76761a_
     - lockable-resources:1469.v52dff5a_80e32
-    - pipeline-graph-view:819.ved496c19e082
+    - pipeline-graph-view:836.v68ef091500dd
 
   initializeOnce: false
 
@@ -33,25 +32,11 @@ controller:
       - sourceLabels: [__name__]
         regex: jenkins_bfa_category_(.*)
         targetLabel: category
-      - sourceLabels: [__name__]
-        regex: jenkins_bfa_job_category:_:.*:_:(.*)
-        targetLabel: category
 
       # add label: cause
       - sourceLabels: [__name__]
         regex: jenkins_bfa_cause_(.*)
         targetLabel: cause
-      - sourceLabels: [__name__]
-        regex: jenkins_bfa_job_cause:_:.*:_:(.*)
-        targetLabel: cause
-
-      # add label: jobname
-      - sourceLabels: [__name__]
-        regex: jenkins_bfa_job_category:_:(.*):_:.*
-        targetLabel: jobname
-      - sourceLabels: [__name__]
-        regex: jenkins_bfa_job_cause:_:(.*):_:.*
-        targetLabel: jobname
 
       # aggerate to uniq metric: jenkins_bfa
       - sourceLabels: [__name__]
