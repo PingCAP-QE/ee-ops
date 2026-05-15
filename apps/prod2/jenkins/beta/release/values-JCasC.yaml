@@ -307,6 +307,29 @@ controller:
           cDEventsGlobalConfig:
             httpSinkUrl: "http://cloudevents-server.cs.svc"
             sinkType: "http"
+      # for global shared libraries
+      global-library: |
+        unclassified:
+          globalLibraries:
+            libraries:
+              - name: "tipipeline"
+                retriever:
+                  modernSCM:
+                    scm:
+                      github:
+                        configuredByUrl: true
+                        repoOwner: "PingCAP-QE"
+                        repository: "ci"
+                        repositoryUrl: "https://github.com/PingCAP-QE/ci"
+                    libraryPath: "libraries/tipipeline"
+                defaultVersion: "main"
+                implicit: false
+                allowVersionOverride: true
+                includeInChangesets: true
+                cachingConfiguration:
+                  refreshTimeMinutes: 60
+                  excludedVersionsStr: "feature/ fix/ bugfix/"
+
       # for global env variables
       env-vars: |
         jenkins:
