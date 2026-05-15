@@ -9,6 +9,7 @@ resources:
   - kafka
   - cloudevents-server
   - ci-dashboard
+  - roster
   # workloads
   - acr-runners
   - jenkins/beta
