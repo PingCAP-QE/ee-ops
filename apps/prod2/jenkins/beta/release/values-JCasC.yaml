@@ -316,16 +316,13 @@ controller:
                 retriever:
                   modernSCM:
                     scm:
-                      github:
-                        configuredByUrl: true
-                        repoOwner: "PingCAP-QE"
-                        repository: "ci"
-                        repositoryUrl: "https://github.com/PingCAP-QE/ci"
+                      gitSource:
+                        remote: "https://github.com/pingcap-qe/ci.git"
                     libraryPath: "libraries/tipipeline"
                 defaultVersion: "main"
                 implicit: false
                 allowVersionOverride: true
-                includeInChangesets: true
+                includeInChangesets: false
                 cachingConfiguration:
                   refreshTimeMinutes: 60
                   excludedVersionsStr: "feature/ fix/ bugfix/"
