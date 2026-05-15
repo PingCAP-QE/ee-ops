@@ -1,35 +1,24 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
-  # initContainerEnv:
-  #   - name: JENKINS_UC
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-  #   - name: JENKINS_UC_DOWNLOAD
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
-  # containerEnv:
-  #   - name: JENKINS_UC
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates
-  #   - name: JENKINS_UC_DOWNLOAD
-  #     value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
-
   overwritePlugins: true
   installLatestPlugins: true
-  initializeOnce: false
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - prometheus:847.v8440e5c21e7c
     - blueocean:1.27.25
-    - job-dsl:1.93
-    - blueocean:1.27.23
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
-    - pipeline-utility-steps:2.20.0
-    - http_request:1.24
-    - jenkins-pipeline-cache:0.2.2:https://github.com/wuhuizuo/jenkins-pipeline-cache-plugin/releases/download/v0.2.2/jenkins-pipeline-cache.hpi
+    - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
     - generic-webhook-trigger:2.4.1
-    - ssh-agent:386.v36cc0c7582f0
-    - cdevents:1-40.vb_3d2c94f2379
-    - kubernetes-credentials-provider:1.299.v610fa_e76761a_
+    - http_request:1.25
+    - jenkins-pipeline-cache:0.2.2:https://github.com/wuhuizuo/jenkins-pipeline-cache-plugin/releases/download/v0.2.2/jenkins-pipeline-cache.hpi
+    - job-dsl:3654.vdf58f53e2d15
+    - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
+    - pipeline-utility-steps:3.810.va_7672d206740
+    - prometheus:852.v317db_5d17a_b_0
+    - ssh-agent:396.vcc7d84e622ec
+
+  initializeOnce: false
 
   # for plugin build-failure-analyzer
   #   Exporting to prometheus

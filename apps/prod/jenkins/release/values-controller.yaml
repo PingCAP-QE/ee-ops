@@ -3,7 +3,7 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.528.3-jdk21"
+    tag: "2.555.2-jdk21"
   resources:
     requests:
       cpu: "16"
@@ -71,14 +71,6 @@ controller:
     path: "/jenkins"
     # configures the hostname e.g. jenkins.example.com
     hostName: do.pingcap.net
-  secondaryingress:
-    enabled: false
-    apiVersion: networking.k8s.io/v1
-    kubernetes.io/tls-acme: "true"
-    ingressClassName: nginx
-    path: "/jenkins"
-    # configures the hostname e.g. jenkins.example.com
-    hostName: internal-do.pingcap.net
 
   # Expose Prometheus metrics
   prometheus:
