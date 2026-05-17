@@ -26,7 +26,7 @@ controller:
   # Optionally specify additional init-containers
   customInitContainers:
     - name: init-create-logs-dir
-      image: "alpine:3.20.3"
+      image: "alpine:3.23.3"
       imagePullPolicy: Always
       command: ["mkdir", "-p", "/var/jenkins_home/logs"]
       securityContext:
