@@ -16,7 +16,6 @@ controller:
     - role-strategy:840.v206ff7f7312e
     - pipeline-utility-steps:2.20.0
     - prometheus:852.v317db_5d17a_b_0
-    - ssh-agent:386.v36cc0c7582f0
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1469.v52dff5a_80e32
     - pipeline-graph-view:836.v68ef091500dd
