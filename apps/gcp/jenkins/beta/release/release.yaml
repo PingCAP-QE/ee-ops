@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: jenkins
-      version: 5.9.18
+      version: 5.9.19
       sourceRef:
         kind: HelmRepository
         name: jenkins
@@ -26,11 +26,11 @@ spec:
     enable: true
     ignoreFailures: false
   valuesFrom:
-    - {kind: Secret, name: jenkins-release-values, valuesKey: values1.yaml}
-    - {kind: Secret, name: jenkins-release-values, valuesKey: values2.yaml}
-    - {kind: Secret, name: jenkins-release-values, valuesKey: values3.yaml}
-    - {kind: Secret, name: jenkins-release-values, valuesKey: values4.yaml}
-    - {kind: Secret, name: jenkins-release-values, valuesKey: values5.yaml}
+    - { kind: Secret, name: jenkins-release-values, valuesKey: values1.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: values2.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: values3.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: values4.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: values5.yaml }
   values:
     agent:
       namespace: "${AGENT_NAMESPACE}"

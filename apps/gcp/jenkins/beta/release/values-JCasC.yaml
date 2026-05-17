@@ -293,7 +293,6 @@ controller:
                 }
               }
 
-              queue('seed')
       github-plugin-config: |
         unclassified:
           gitHubConfiguration:
@@ -314,6 +313,25 @@ controller:
           cDEventsGlobalConfig:
             httpSinkUrl: "http://cloudevents-server.cs.svc/events"
             sinkType: "http"
+      # for global shared libraries
+      global-library: |
+        unclassified:
+          globalLibraries:
+            libraries:
+              - name: "tipipeline"
+                retriever:
+                  modernSCM:
+                    scm:
+                      gitSource:
+                        remote: "https://github.com/pingcap-qe/ci.git"
+                    libraryPath: "libraries/tipipeline"
+                defaultVersion: "main"
+                implicit: false
+                allowVersionOverride: true
+                includeInChangesets: false
+                cachingConfiguration:
+                  refreshTimeMinutes: 60
+                  excludedVersionsStr: "feature/ fix/ bugfix/"
       # for global env variables
       env-vars: |
         jenkins:
