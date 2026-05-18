@@ -32,5 +32,16 @@
       "datasourceTemplate": "docker",
       "versioningTemplate": "docker"
     }
+  ],
+  "packageRules": [
+    {
+      "description": "Disable Flux system updates for prod and prod2 only",
+      "matchManagers": ["flux"],
+      "matchFileNames": [
+        "clusters/prod/flux-system/gotk-components.yaml",
+        "clusters/prod2/flux-system/gotk-components.yaml"
+      ],
+      "enabled": false
+    }
   ]
 }
