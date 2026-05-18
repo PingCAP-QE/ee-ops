@@ -6,20 +6,21 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
+    - blueocean:1.27.25
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
-    - generic-webhook-trigger:2.4.2
+    - generic-webhook-trigger:2.4.1
     - google-login:109.v022b_cf87b_e5b_
     - http_request:1.25
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
     - job-dsl:3654.vdf58f53e2d15
-    - role-strategy:848.va_a_ea_673cf0b_c
+    - role-strategy:840.v206ff7f7312e
     - pipeline-utility-steps:3.810.va_7672d206740
     - prometheus:852.v317db_5d17a_b_0
     - ssh-agent:396.vcc7d84e622ec
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
-    - lockable-resources:1515.v380548282a_59
-    - pipeline-graph-view:899.vc24457b_18a_b_1
+    - lockable-resources:1469.v52dff5a_80e32
+    - pipeline-graph-view:836.v68ef091500dd
 
   initializeOnce: false
 
