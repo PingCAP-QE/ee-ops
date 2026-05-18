@@ -333,10 +333,3 @@ controller:
                   refreshTimeMinutes: 60
                   includedVersionsStr: "main"
                   excludedVersionsStr: "feature/ fix/ bugfix/"
-
-      # for global env variables
-      env-vars: |
-        jenkins:
-          globalNodeProperties:
-            - envVars:
-                env: []
