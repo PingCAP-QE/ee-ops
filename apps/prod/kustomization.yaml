@@ -10,5 +10,4 @@ resources:
   - goproxy
   - prow-worker
   - dl
-  - harbor
   - chatops-lark
