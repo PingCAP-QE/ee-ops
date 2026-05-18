@@ -274,6 +274,28 @@ controller:
             username: ${jenkins-cache-access-key}
             password: ${jenkins-cache-access-secret}
             threshold: 400000 # limit to 400GiB
+
+      # for global shared libraries
+      global-library: |
+        unclassified:
+          globalLibraries:
+            libraries:
+              - name: "tisys"
+                retriever:
+                  modernSCM:
+                    scm:
+                      gitSource:
+                        remote: "https://github.com/pingcap-qe/ci.git"
+                    libraryPath: "libraries/tisys"
+                defaultVersion: "main"
+                implicit: true
+                allowVersionOverride: true
+                includeInChangesets: false
+                cachingConfiguration:
+                  refreshTimeMinutes: 60
+                  includedVersionsStr: "main"
+                  excludedVersionsStr: "feature/ fix/ bugfix/"
+
       # for global env variables
       env-vars: |
         jenkins:

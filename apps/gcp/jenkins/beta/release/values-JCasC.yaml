@@ -318,20 +318,22 @@ controller:
         unclassified:
           globalLibraries:
             libraries:
-              - name: "tipipeline"
+              - name: "tisys"
                 retriever:
                   modernSCM:
                     scm:
                       gitSource:
                         remote: "https://github.com/pingcap-qe/ci.git"
-                    libraryPath: "libraries/tipipeline"
+                    libraryPath: "libraries/tisys"
                 defaultVersion: "main"
-                implicit: false
+                implicit: true
                 allowVersionOverride: true
                 includeInChangesets: false
                 cachingConfiguration:
                   refreshTimeMinutes: 60
+                  includedVersionsStr: "main"
                   excludedVersionsStr: "feature/ fix/ bugfix/"
+
       # for global env variables
       env-vars: |
         jenkins:
