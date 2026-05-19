@@ -83,13 +83,6 @@
       ]
     }
   },
-  "cluster": {
-    "members": [
-      "zot-0.zot-headless.zot.svc:5000",
-      "zot-1.zot-headless.zot.svc:5000"
-    ],
-    "hashKey": "prod2zotcluster0"
-  },
   "extensions": {
     "ui": {
       "enable": true
