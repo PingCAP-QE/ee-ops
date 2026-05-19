@@ -9,5 +9,4 @@ resources:
   - ats
   - goproxy
   - prow-worker
-  - dl
   - chatops-lark
