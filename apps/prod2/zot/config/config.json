@@ -10,7 +10,7 @@
     "gcInterval": "24h",
     "storageDriver": {
       "name": "s3",
-      "rootdirectory": "/zot",
+      "rootdirectory": "/",
       "secure": true,
       "skipverify": false,
       "forcepathstyle": false,
