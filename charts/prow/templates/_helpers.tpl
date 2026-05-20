@@ -301,6 +301,17 @@ app.kubernetes.io/app: tide
 {{- end }}
 
 {{/*
+Merge user-provided Pod labels with labels required by selectors.
+Selector labels take precedence so Deployment selectors continue to match Pod templates.
+*/}}
+{{- define "prow.podLabels" -}}
+{{- $root := .root -}}
+{{- $selectorLabels := include .selector $root | fromYaml -}}
+{{- $extraLabels := .extra | default dict -}}
+{{- toYaml (mergeOverwrite (deepCopy ($root.Values.podLabels | default dict)) $selectorLabels $extraLabels) -}}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "prow.serviceAccountName.crier" -}}

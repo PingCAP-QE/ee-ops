@@ -20,7 +20,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "prow.selectorLabels.pipeline" . | nindent 8 }}
+        {{- include "prow.podLabels" (dict "root" . "selector" "prow.selectorLabels.pipeline") | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

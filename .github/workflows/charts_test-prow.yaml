@@ -39,6 +39,10 @@ jobs:
       - name: Add test optional files for charts/prow
         env:
           ORG_NAME: ${{ github.event.repository.owner.login }}
+          PROW_APP_ID: ${{ secrets.PROW_APP_ID }}
+          PROW_APP_CERT: ${{ secrets.PROW_APP_CERT }}
+          PROW_HMAC_TOKEN: ${{ secrets.PROW_HMAC_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           ns=prow && kubectl create ns $ns
 
@@ -71,12 +75,23 @@ jobs:
               final_redirect_url: https://prow.test.io/pr
 
           EOF
-          yq -i e '.stringData["app-id"] = "${{ secrets.PROW_APP_ID }}"' prow-github.yaml
-          yq -i e '.stringData["app-private-key"] = "${{ secrets.PROW_APP_CERT }}"' prow-github.yaml
-          yq -i e '.stringData["token"] = "${{ secrets.GITHUB_TOKEN }}"' prow-github.yaml
+          prow_test_app_id="${PROW_APP_ID}"
+          prow_test_app_cert="${PROW_APP_CERT}"
+          if [ -z "$prow_test_app_id" ] || [ -z "$prow_test_app_cert" ]; then
+            prow_test_app_id="1"
+            prow_test_app_cert="$(openssl genrsa -traditional 2048 2>/dev/null || openssl genrsa 2048)"
+          fi
+          export prow_test_app_id prow_test_app_cert GITHUB_TOKEN
+          yq -i e '.stringData["app-id"] = strenv(prow_test_app_id)' prow-github.yaml
+          yq -i e '.stringData["app-private-key"] = strenv(prow_test_app_cert)' prow-github.yaml
+          yq -i e '.stringData["token"] = strenv(GITHUB_TOKEN)' prow-github.yaml
           kubectl -n $ns apply -f prow-github.yaml && rm prow-github.yaml
           # prow-webhook secret
-          kubectl -n $ns create secret generic prow-webhook --from-literal hmac="${{ secrets.PROW_HMAC_TOKEN }}"
+          prow_test_hmac="${PROW_HMAC_TOKEN}"
+          if [ -z "$prow_test_hmac" ]; then
+            prow_test_hmac="$(openssl rand -hex 32)"
+          fi
+          kubectl -n $ns create secret generic prow-webhook --from-literal hmac="$prow_test_hmac"
 
           # prow-oauth-cookie secret
           kubectl -n $ns create secret generic prow-oauth-cookie --from-literal secret="$(openssl rand -base64 32)"
