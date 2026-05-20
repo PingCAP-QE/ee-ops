@@ -125,7 +125,7 @@ spec:
     pcm:
       image:
         repository: ghcr.io/ti-community-infra/prow/prow-controller-manager
-        tag: v20250905-a0cfed255
+        tag: v20260520-5d43b45c8
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config

@@ -18,7 +18,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "prow.selectorLabels.statusReconciler" . | nindent 8 }}
+        {{- include "prow.podLabels" (dict "root" . "selector" "prow.selectorLabels.statusReconciler") | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:

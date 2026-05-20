@@ -12,6 +12,7 @@ nodeSelector: {}
 tolerations: []
 affinity: {}
 podAnnotations: {}
+podLabels: {}
 podSecurityContext: {}
 securityContext: {}
 

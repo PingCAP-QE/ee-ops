@@ -24,8 +24,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{ include "prow.selectorLabels" $ | nindent 8 }}
-        app.kubernetes.io/app: jenkins-operator-{{ $index }}
+        {{ include "prow.podLabels" (dict "root" $ "selector" "prow.selectorLabels" "extra" (dict "app.kubernetes.io/app" (printf "jenkins-operator-%d" $index))) | nindent 8 }}
     spec:
       {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
