@@ -7,6 +7,7 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcp-billing-export
     app.kubernetes.io/part-of: cost-insight
 spec:
+  # Interpreted with timeZone below: 21:10 Asia/Shanghai, intentionally outside BJ work time.
   schedule: "10 21 * * *"
   timeZone: Asia/Shanghai
   suspend: false
@@ -71,6 +72,7 @@ metadata:
     app.kubernetes.io/name: cost-insight-refresh-attribution-daily
     app.kubernetes.io/part-of: cost-insight
 spec:
+  # Interpreted with timeZone below: 23:10 Asia/Shanghai, after the raw sync window.
   schedule: "10 23 * * *"
   timeZone: Asia/Shanghai
   suspend: false
@@ -88,6 +90,8 @@ spec:
             app.kubernetes.io/name: cost-insight-refresh-attribution-daily
             app.kubernetes.io/part-of: cost-insight
         spec:
+          # This job only uses DB credentials from envFrom; keep it off Workload Identity.
+          serviceAccountName: default
           automountServiceAccountToken: false
           restartPolicy: Never
           containers:
