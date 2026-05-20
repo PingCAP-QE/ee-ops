@@ -2,9 +2,33 @@ prow:
   domainName: prow.test.io
 jenkinsOperator:
   enabled: true
-  dryRun: false
-  auth:
-    secretName: prow-jenkins
+  instances:
+    - name: default
+      additionalArgs: []
+      replicaCount: 1
+      autoscaling:
+        enabled: false
+        minReplicas: 1
+        maxReplicas: 100
+        targetCPUUtilizationPercentage: 80
+      resources: {}
+      kubeconfigSecret: ""
+      dryRun: true
+      skipReport: false
+      jenkinsUrl: http://jenkins-proxy
+      csrfProtect: false
+      auth:
+        secretName: prow-jenkins
+        secretKeyJenkinsUser: jenkins-admin-user
+        secretKeyJenkinsToken: jenkins-admin-password
+        secretKeyJenkinsBearerToken: ""
+        secretKeyCert: ""
+        secretKeyKey: ""
+        secretKeyCaCert: ""
+      config:
+        maxConcurrency: 100
+        maxGoroutines: 10
+      labelSelector: ""
 hook:
   additionalEnv:
     - name: FOO
