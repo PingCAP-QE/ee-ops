@@ -13,7 +13,7 @@ jenkinsOperator:
         targetCPUUtilizationPercentage: 80
       resources: {}
       kubeconfigSecret: ""
-      dryRun: true
+      dryRun: false
       skipReport: false
       jenkinsUrl: http://jenkins-proxy
       csrfProtect: false
