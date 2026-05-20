@@ -16,7 +16,7 @@ spec:
   failedJobsHistoryLimit: 5
   jobTemplate:
     spec:
-      backoffLimit: 2
+      backoffLimit: 4
       activeDeadlineSeconds: 7200
       template:
         metadata:
@@ -32,6 +32,8 @@ spec:
             - name: sync-gcp-billing-export
               image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.17-4-ge7e0ea6
               imagePullPolicy: IfNotPresent
+              command:
+                - cost-insight
               args:
                 - sync-gcp-billing-export
               envFrom:
@@ -78,7 +80,7 @@ spec:
   failedJobsHistoryLimit: 5
   jobTemplate:
     spec:
-      backoffLimit: 2
+      backoffLimit: 4
       activeDeadlineSeconds: 3600
       template:
         metadata:
@@ -86,6 +88,7 @@ spec:
             app.kubernetes.io/name: cost-insight-refresh-attribution-daily
             app.kubernetes.io/part-of: cost-insight
         spec:
+          automountServiceAccountToken: false
           restartPolicy: Never
           containers:
             - name: refresh-attribution-daily
@@ -96,11 +99,18 @@ spec:
                 - -ec
               args:
                 - |
-                  start_date="$(date -u -d '7 days ago' +%F)"
-                  end_date="$(date -u -d 'yesterday' +%F)"
+                  dates="$(python - <<'PY'
+                  from datetime import datetime, timedelta, timezone
+
+                  end_date = datetime.now(timezone.utc).date() - timedelta(days=1)
+                  start_date = end_date - timedelta(days=6)
+                  print(start_date.isoformat(), end_date.isoformat())
+                  PY
+                  )"
+                  set -- ${dates}
                   cost-insight refresh-cost-attribution-daily \
-                    --start-date "${start_date}" \
-                    --end-date "${end_date}" \
+                    --start-date "$1" \
+                    --end-date "$2" \
                     --split-by-day
               envFrom:
                 - secretRef:
