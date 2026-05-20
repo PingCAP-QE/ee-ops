@@ -9,6 +9,7 @@ resources:
   - kafka
   - cloudevents-server
   - ci-dashboard
+  - cost-insight
   - roster
   # workloads
   - acr-runners
