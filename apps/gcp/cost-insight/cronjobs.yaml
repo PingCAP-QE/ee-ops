@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcp-billing-export
     app.kubernetes.io/part-of: cost-insight
 spec:
-  schedule: "10 10 * * *"
+  schedule: "10 21 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -69,7 +69,7 @@ metadata:
     app.kubernetes.io/name: cost-insight-refresh-attribution-daily
     app.kubernetes.io/part-of: cost-insight
 spec:
-  schedule: "40 12 * * *"
+  schedule: "10 23 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
