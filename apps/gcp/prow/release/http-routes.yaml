@@ -13,7 +13,7 @@ spec:
       type: HTTP
       httpHealthCheck:
         requestPath: /tichi
-        port: 80
+        portSpecification: USE_SERVING_PORT
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
