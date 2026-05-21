@@ -21,3 +21,89 @@ spec:
       TEST_PODS_NAMESPACE: prow-test-pods
       BUCKET_NAME: prow-tidb-logs
       DOMAIN_NAME: prow.tidb.net
+  patches:
+    - target:
+        kind: CronJob
+        name: prow-branch-protector-others
+      patch: |-
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: prow-branch-protector-others
+        spec:
+          jobTemplate:
+            spec:
+              template:
+                metadata:
+                  labels:
+                    env: cicd
+                    team: eq
+                    author: wuhuizuo
+    - target:
+        kind: CronJob
+        name: prow-branch-protector-pingcap
+      patch: |-
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: prow-branch-protector-pingcap
+        spec:
+          jobTemplate:
+            spec:
+              template:
+                metadata:
+                  labels:
+                    env: cicd
+                    team: eq
+                    author: wuhuizuo
+    - target:
+        kind: CronJob
+        name: prow-branch-protector-tikv
+      patch: |-
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: prow-branch-protector-tikv
+        spec:
+          jobTemplate:
+            spec:
+              template:
+                metadata:
+                  labels:
+                    env: cicd
+                    team: eq
+                    author: wuhuizuo
+    - target:
+        kind: CronJob
+        name: prow-label-sync-pingcap
+      patch: |-
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: prow-label-sync-pingcap
+        spec:
+          jobTemplate:
+            spec:
+              template:
+                metadata:
+                  labels:
+                    env: cicd
+                    team: eq
+                    author: wuhuizuo
+    - target:
+        kind: CronJob
+        name: prow-label-sync-tikv
+      patch: |-
+        apiVersion: batch/v1
+        kind: CronJob
+        metadata:
+          name: prow-label-sync-tikv
+        spec:
+          jobTemplate:
+            spec:
+              template:
+                metadata:
+                  labels:
+                    env: cicd
+                    team: eq
+                    author: wuhuizuo

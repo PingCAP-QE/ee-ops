@@ -1,5 +1,10 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES.md
 controller:
+  podLabels:
+    env: cicd
+    team: eq
+    author: wuhuizuo
+
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"

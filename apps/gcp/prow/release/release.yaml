@@ -9,7 +9,7 @@ spec:
   chart:
     spec:
       chart: prow
-      version: 0.10.2
+      version: 0.10.3
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -32,6 +32,11 @@ spec:
     enable: true
     ignoreFailures: false
   values:
+    podLabels:
+      env: cicd
+      team: eq
+      author: wuhuizuo
+
     prow:
       podsNamespace: ${TEST_PODS_NAMESPACE} # should delete old prow-pcm pods when changed.
       domainName: ${DOMAIN_NAME}
