@@ -12,7 +12,6 @@
 | flux-system | gcs-credentials            | `service-account.json`                             | GCS credentials for prow                                                                                                                                                                        |             |
 | apps        | prow-jenkins-operator-auth | `user`, `token`                                    | auth to external jenkins controller                                                                                                                                                             |             |
 | apps        | prow-tls                   |                                                    | prow site ingress cert secret                                                                                                                                                                   |             |
-| flux-system | tf-runner-gcp-sa         | `kubectl -n flux-system create secret generic ...` | GCP service account JSON key (alternative to Workload Identity)                                                                                                                                 |             |
 
 ## Terraform GitOps (tofu-controller)
 
