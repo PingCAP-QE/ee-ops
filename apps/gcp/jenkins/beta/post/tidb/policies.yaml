@@ -25,4 +25,4 @@ spec:
                           values: ["spot"]
                         - key: cloud.google.com/machine-family
                           operator: In
-                          values: [c4, c4a]
+                          values: [c4d, c4, c4a]

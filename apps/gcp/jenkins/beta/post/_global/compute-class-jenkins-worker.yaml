@@ -1,0 +1,36 @@
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: jenkins-worker
+spec:
+  nodePoolAutoCreation:
+    enabled: true
+  whenUnsatisfiable: ScaleUpAnyway
+  priorities:
+    # --------- spot types -----------
+    - machineFamily: c4d
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+    - machineFamily: c4
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+    - machineFamily: c4a
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+
+    # --------- on-demand types -----------
+    - machineFamily: c4d
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+    - machineFamily: c4
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+    - machineFamily: c4a
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
