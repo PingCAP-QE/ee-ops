@@ -4,3 +4,4 @@ namespace: jenkins-tiflow
 resources:
   - namespace.yaml
   - ../_base
+  - policies.yaml
