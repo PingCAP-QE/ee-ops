@@ -5,6 +5,7 @@ resources:
   - namespace.yaml
   - serviceaccount.yaml
   - ../_base
+  - policies.yaml
 configMapGenerator:
   - name: bazel
     options:
