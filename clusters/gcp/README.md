@@ -89,7 +89,7 @@ To add new GCP resources managed by Terraform:
 
 ### Workflow
 
-1. Make changes to Terraform CRs in the cluster's flux-system directory
+1. Make changes to Terraform CRs in the infrastructure/gcp/terraform/ directory
 2. Commit and push to feature branch
 3. Create PR to main
 4. After merge, tofu-controller will reconcile the Terraform resources
