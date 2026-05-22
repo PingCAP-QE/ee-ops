@@ -12,7 +12,7 @@
 | flux-system | gcs-credentials            | `service-account.json`                             | GCS credentials for prow                                                                                                                                                                        |             |
 | apps        | prow-jenkins-operator-auth | `user`, `token`                                    | auth to external jenkins controller                                                                                                                                                             |             |
 | apps        | prow-tls                   |                                                    | prow site ingress cert secret                                                                                                                                                                   |             |
-| infra       | tf-controller-gcp-sa       | `kubectl -n infra create secret generic ...`       | GCP service account JSON key (alternative to Workload Identity)                                                                                                                                 |             |
+| flux-system | tf-runner-gcp-sa         | `kubectl -n flux-system create secret generic ...` | GCP service account JSON key (alternative to Workload Identity)                                                                                                                                 |             |
 
 ## Terraform GitOps (tofu-controller)
 
@@ -27,56 +27,48 @@ This cluster uses [tofu-controller](https://flux-iac.github.io/tofu-controller/)
 
 ### Namespace Convention
 
-| Namespace    | Purpose                                                             |
-| ------------ | ------------------------------------------------------------------- |
-| `infra`      | tofu-controller deployment (controller pod)                         |
-| `terraform`  | Terraform CRs and runner pods (runner SA with Workload Identity)    |
-
-The controller runs in `infra`, while the runner SA and Terraform CRs live in `terraform`.
+| Namespace    | Purpose                                                              |
+| ------------ | -------------------------------------------------------------------- |
+| `flux-system`| tofu-controller deployment, runner SA with Workload Identity         |
 
 ### Setup
 
 1. **Create GCP Service Account** (if not already exists):
 
 ```bash
-gcloud iam service-accounts create tf-controller \
+gcloud iam service-accounts create tf-runner \
     --project=pingcap-testing-account \
-    --display-name="Terraform Controller Runner"
+    --display-name="Tofu Controller Runner"
 
 # Grant necessary roles (adjust as needed):
 gcloud projects add-iam-policy-binding pingcap-testing-account \
-    --member="serviceAccount:tf-controller@pingcap-testing-account.iam.gserviceaccount.com" \
+    --member="serviceAccount:tf-runner@pingcap-testing-account.iam.gserviceaccount.com" \
     --role="roles/dns.admin"
 
 gcloud projects add-iam-policy-binding pingcap-testing-account \
-    --member="serviceAccount:tf-controller@pingcap-testing-account.iam.gserviceaccount.com" \
+    --member="serviceAccount:tf-runner@pingcap-testing-account.iam.gserviceaccount.com" \
     --role="roles/storage.admin"
 ```
 
 2. **Configure Workload Identity** (optional, recommended for GKE):
 
 ```bash
-# Create IAM policy binding between KSA (in terraform namespace) and GCP SA
+# Create IAM policy binding between KSA (in flux-system namespace) and GCP SA
 gcloud iam service-accounts add-iam-policy-binding \
-    tf-controller@pingcap-testing-account.iam.gserviceaccount.com \
+    tf-runner@pingcap-testing-account.iam.gserviceaccount.com \
     --role roles/iam.workloadIdentityUser \
-    --member "serviceAccount:pingcap-testing-account.svc.id.goog[terraform/tofu-controller-runner]"
+    --member "serviceAccount:pingcap-testing-account.svc.id.goog[flux-system/tf-runner]"
 ```
-
-> **Note**: The runner ServiceAccount `tofu-controller-runner` is created in the `terraform` namespace
-> with the Workload Identity annotation by the FluxCD post-install kustomization. Update the
-> GCP SA email in `infrastructure/gcp/tofu-controller/post/runner-workload-identity.yaml` before deployment.
 
 3. **Deploy**: After the above prerequisites are met, push changes to main. FluxCD will
    automatically reconcile and deploy tofu-controller. Key resources:
    - `HelmRepository` → defines the tofu-controller Helm chart source
-   - `HelmRelease` → deploys tofu-controller to `infra` namespace
-   - `Namespace` (`terraform`) → created for Terraform CRs and runner pods
-   - `ServiceAccount` → runner SA with Workload Identity annotation in `terraform` namespace
+   - `HelmRelease` → deploys tofu-controller to `flux-system` namespace
+   - `ServiceAccount` → runner SA (`tf-runner`) with Workload Identity annotation in `flux-system` namespace
 
 ### Usage
 
-Terraform resources are defined as Kubernetes CRDs in `infrastructure/gcp/terraform/` and deployed to the `terraform` namespace:
+Terraform resources are defined as Kubernetes CRDs in the cluster's `flux-system` directory:
 
 ```
 infrastructure/gcp/terraform/
@@ -97,13 +89,13 @@ To add new GCP resources managed by Terraform:
 
 ### Workflow
 
-1. Make changes to Terraform modules or CRs in `infrastructure/gcp/terraform/`
+1. Make changes to Terraform CRs in the cluster's flux-system directory
 2. Commit and push to feature branch
 3. Create PR to main
 4. After merge, tofu-controller will reconcile the Terraform resources
-5. Check status: `kubectl get terraform -n terraform`
-6. View logs: `kubectl logs -n infra deployment/tofu-controller`
-7. Check runner logs if Terraform apply fails: `kubectl logs -n terraform -l app=tofu-controller-runner`
+5. Check status: `kubectl get terraform -n flux-system`
+6. View logs: `kubectl logs -n flux-system deployment/tofu-controller`
+7. Check runner logs if Terraform apply fails: `kubectl logs -n flux-system -l app.kubernetes.io/name=tofu-controller`
 
 ### Manual Approval
 
@@ -111,7 +103,7 @@ For production resources, set `spec.approvePlan` explicitly instead of `auto`:
 
 ```yaml
 # First, let the controller generate a plan:
-kubectl get terraform <resource-name> -n terraform -o jsonpath='{.status.plan}'
+kubectl get terraform <resource-name> -n flux-system -o jsonpath='{.status.plan}'
 # Then set the plan name to apply (under spec.approvePlan):
 #   approvePlan: plan-main-<generated-id>
 ```
@@ -122,9 +114,9 @@ This ensures a human reviews the plan before Terraform applies changes.
 
 | Symptom                              | Likely Cause                                   | Check                                                           |
 | ------------------------------------ | ---------------------------------------------- | --------------------------------------------------------------- |
-| Controller pod not starting          | Missing HelmRepository or chart version        | `kubectl get helmrelease -n infra tofu-controller`              |
-| Terraform CR not reconciling         | Namespace mismatch or RBAC issue               | `kubectl describe terraform -n terraform <name>`                |
-| Runner pod fails with auth error     | Workload Identity not configured correctly     | `kubectl describe sa -n terraform tofu-controller-runner`       |
+| Controller pod not starting          | Missing HelmRepository or chart version        | `kubectl get helmrelease -n flux-system tofu-controller`       |
+| Terraform CR not reconciling         | Namespace mismatch or RBAC issue               | `kubectl describe terraform -n flux-system <name>`              |
+| Runner pod fails with auth error     | Workload Identity not configured correctly     | `kubectl describe sa -n flux-system tf-runner`                |
 | Terraform plan stuck in "pending"    | Concurrency limit reached or plan in progress  | Check `tofu-controller` logs and runner status                  |
 
 For further investigation, check:
