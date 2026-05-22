@@ -94,8 +94,8 @@ To add new GCP resources managed by Terraform:
 3. Create PR to main
 4. After merge, tofu-controller will reconcile the Terraform resources
 5. Check status: `kubectl get terraform -n flux-system`
-6. View logs: `kubectl logs -n flux-system deployment/tofu-controller`
-7. Check runner logs if Terraform apply fails: `kubectl logs -n flux-system -l app.kubernetes.io/name=tofu-controller`
+6. Check runner logs if Terraform apply fails: `kubectl logs -n flux-system -l app.kubernetes.io/name=tofu-runner`
+7. Check controller logs: `kubectl logs -n flux-system deployment/tofu-controller`
 
 ### Manual Approval
 
