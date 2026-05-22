@@ -68,7 +68,7 @@ gcloud iam service-accounts add-iam-policy-binding \
 
 ### Usage
 
-Terraform resources are defined as Kubernetes CRDs in the cluster's `flux-system` directory:
+Terraform resources are defined as Kubernetes CRDs in the infrastructure/gcp/terraform/ directory:
 
 ```
 infrastructure/gcp/terraform/
