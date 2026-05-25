@@ -38,14 +38,14 @@ spec:
                 - -ec
               args:
                 - |
-                  summary_json="$(cost-insight sync-gcp-billing-summary)"
-                  echo "${summary_json}"
-                  export COST_INSIGHT_SUMMARY_JSON="${summary_json}"
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-gcp-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
                   dates="$(python - <<'PY'
                   import json
-                  import os
 
-                  payload = json.loads(os.environ["COST_INSIGHT_SUMMARY_JSON"])
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
                   dates = payload.get("touched_usage_dates") or []
                   if dates:
                       print(min(dates), max(dates))
