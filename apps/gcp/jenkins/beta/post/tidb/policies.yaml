@@ -21,7 +21,7 @@ spec:
                   nodeSelectorTerms:
                     - matchExpressions:
                         - key: cloud.google.com/gke-provisioning
-                          operator: NotIn
+                          operator: In
                           values: ["spot"]
                         - key: cloud.google.com/machine-family
                           operator: In
