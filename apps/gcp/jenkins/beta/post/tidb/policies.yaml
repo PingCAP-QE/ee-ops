@@ -15,14 +15,5 @@ spec:
             annotations:
               cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
           spec:
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: cloud.google.com/gke-provisioning
-                          operator: In
-                          values: ["spot"]
-                        - key: cloud.google.com/machine-family
-                          operator: In
-                          values: [c4d, c4, c4a]
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker
