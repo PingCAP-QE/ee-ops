@@ -1,10 +1,10 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cost-insight-sync-gcp-billing-export
+  name: cost-insight-sync-gcp-billing-summary
   namespace: apps
   labels:
-    app.kubernetes.io/name: cost-insight-sync-gcp-billing-export
+    app.kubernetes.io/name: cost-insight-sync-gcp-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
   # Interpreted with timeZone below: 21:10 Asia/Shanghai, intentionally outside BJ work time.
@@ -22,7 +22,7 @@ spec:
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: cost-insight-sync-gcp-billing-export
+            app.kubernetes.io/name: cost-insight-sync-gcp-billing-summary
             app.kubernetes.io/part-of: cost-insight
         spec:
           # Reuse the existing Workload Identity path; the bound GSA must have
@@ -30,13 +30,36 @@ spec:
           serviceAccountName: ci-dashboard
           restartPolicy: Never
           containers:
-            - name: sync-gcp-billing-export
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.17-4-ge7e0ea6
+            - name: sync-gcp-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.24-2-g7f5f498
               imagePullPolicy: IfNotPresent
               command:
-                - cost-insight
+                - /bin/sh
+                - -ec
               args:
-                - sync-gcp-billing-export
+                - |
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-gcp-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  dates="$(python - <<'PY'
+                  import json
+
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
+                  dates = payload.get("touched_usage_dates") or []
+                  if dates:
+                      print(min(dates), max(dates))
+                  PY
+                  )"
+                  if [ -n "${dates}" ]; then
+                    set -- ${dates}
+                    cost-insight refresh-cost-attribution-from-summary \
+                      --start-date "$1" \
+                      --end-date "$2" \
+                      --split-by-day
+                  else
+                    echo "No touched usage dates returned; skip attribution refresh."
+                  fi
               envFrom:
                 - secretRef:
                     name: ci-dashboard-eq-prd-insight-db
@@ -51,8 +74,10 @@ spec:
                   value: pingcap-testing-account
                 - name: COST_INSIGHT_GCP_BILLING_TABLE
                   value: gcp-digital-bi.gcp_billing_detailed.gcp_billing_export_resource_v1_01D088_8F9CF2_8AF1C6
-                - name: COST_INSIGHT_SYNC_OVERLAP_DAYS
-                  value: "7"
+                - name: COST_INSIGHT_SYNC_LAG_DAYS
+                  value: "5"
+                - name: COST_INSIGHT_EXPORT_OVERLAP_DAYS
+                  value: "0"
                 - name: COST_INSIGHT_SYNC_PAGE_SIZE
                   value: "5000"
               resources:
@@ -66,14 +91,14 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cost-insight-refresh-attribution-daily
+  name: cost-insight-sync-gcp-unmatched-resources
   namespace: apps
   labels:
-    app.kubernetes.io/name: cost-insight-refresh-attribution-daily
+    app.kubernetes.io/name: cost-insight-sync-gcp-unmatched-resources
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 23:10 Asia/Shanghai, after the raw sync window.
-  schedule: "10 23 * * *"
+  # Interpreted with timeZone below: Monday 22:10 Asia/Shanghai.
+  schedule: "10 22 * * 1"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -83,20 +108,19 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 4
-      activeDeadlineSeconds: 3600
+      activeDeadlineSeconds: 7200
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: cost-insight-refresh-attribution-daily
+            app.kubernetes.io/name: cost-insight-sync-gcp-unmatched-resources
             app.kubernetes.io/part-of: cost-insight
         spec:
-          # This job only uses DB credentials from envFrom; keep it off Workload Identity.
-          serviceAccountName: default
-          automountServiceAccountToken: false
+          # Reuse Workload Identity because this job scans resource-level BigQuery data.
+          serviceAccountName: ci-dashboard
           restartPolicy: Never
           containers:
-            - name: refresh-attribution-daily
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.17-4-ge7e0ea6
+            - name: sync-gcp-unmatched-resources
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.24-2-g7f5f498
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -105,17 +129,19 @@ spec:
                 - |
                   dates="$(python - <<'PY'
                   from datetime import datetime, timedelta, timezone
+                  import os
 
-                  end_date = datetime.now(timezone.utc).date() - timedelta(days=1)
+                  lag_days = int(os.environ.get("COST_INSIGHT_UNMATCHED_RESOURCE_LAG_DAYS", "5"))
+                  stable_date = datetime.now(timezone.utc).date() - timedelta(days=lag_days)
+                  end_date = stable_date - timedelta(days=stable_date.weekday() + 1)
                   start_date = end_date - timedelta(days=6)
                   print(start_date.isoformat(), end_date.isoformat())
                   PY
                   )"
                   set -- ${dates}
-                  cost-insight refresh-cost-attribution-daily \
-                    --start-date "$1" \
-                    --end-date "$2" \
-                    --split-by-day
+                  cost-insight sync-gcp-unmatched-resources \
+                    --usage-start-date "$1" \
+                    --usage-end-date "$2"
               envFrom:
                 - secretRef:
                     name: ci-dashboard-eq-prd-insight-db
@@ -124,6 +150,16 @@ spec:
                   value: "1"
                 - name: COST_INSIGHT_LOG_LEVEL
                   value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_GCP_ACCOUNT_ID
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_GCP_BILLING_TABLE
+                  value: gcp-digital-bi.gcp_billing_detailed.gcp_billing_export_resource_v1_01D088_8F9CF2_8AF1C6
+                - name: COST_INSIGHT_UNMATCHED_RESOURCE_LAG_DAYS
+                  value: "5"
+                - name: COST_INSIGHT_SYNC_PAGE_SIZE
+                  value: "5000"
               resources:
                 requests:
                   cpu: "500m"
