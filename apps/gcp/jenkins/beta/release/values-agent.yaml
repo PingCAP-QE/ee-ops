@@ -16,5 +16,6 @@ agent:
     enabled: true
     timeout: 300
     namespaces: |-
+      jenkins-pd
       jenkins-tiflow
       jenkins-tidb
