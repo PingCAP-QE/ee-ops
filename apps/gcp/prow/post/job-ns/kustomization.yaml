@@ -4,3 +4,4 @@ namespace: ${TEST_PODS_NAMESPACE}
 resources:
   - rbac.yaml
   - secrets
+  - policies.yaml
