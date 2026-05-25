@@ -1,5 +1,5 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ticdc
-  - tidb
+  - ci-worker.yaml
+  - ci-worker-bigdisk.yaml
