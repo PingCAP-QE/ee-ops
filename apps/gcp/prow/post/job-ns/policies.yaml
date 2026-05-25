@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: set-ci-worker-pod-defaults
+spec:
+  rules:
+    - name: set-ci-worker-compute-class
+      match:
+        resources:
+          kinds:
+            - Pod
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker

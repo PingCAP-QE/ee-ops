@@ -10,3 +10,4 @@ resources:
   - operators
   - cleaners
   - terraform
+  - compute-classes

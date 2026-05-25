@@ -1,36 +1,52 @@
 apiVersion: cloud.google.com/v1
 kind: ComputeClass
 metadata:
-  name: jenkins-worker
+  name: ci-worker-bigdisk
 spec:
   nodePoolAutoCreation:
     enabled: true
   whenUnsatisfiable: ScaleUpAnyway
+  priorityDefaults:
+    location:
+      locationPolicy: ANY
+      zoneTypes: [STANDARD]
   priorities:
     # --------- spot types -----------
     - machineFamily: c4d
+      priorityScore: 100
       spot: true
       storage:
         bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
     - machineFamily: c4
+      priorityScore: 90
       spot: true
       storage:
         bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
     - machineFamily: c4a
+      priorityScore: 90
       spot: true
       storage:
         bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
 
     # --------- on-demand types -----------
     - machineFamily: c4d
+      priorityScore: 50
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
     - machineFamily: c4
+      priorityScore: 40
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
     - machineFamily: c4a
+      priorityScore: 40
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
