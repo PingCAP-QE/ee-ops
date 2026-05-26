@@ -4,3 +4,4 @@ resources:
   - pd
   - ticdc
   - tidb
+  - tiflash
