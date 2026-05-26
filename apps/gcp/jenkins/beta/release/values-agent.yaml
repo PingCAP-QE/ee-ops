@@ -19,3 +19,4 @@ agent:
       jenkins-pd
       jenkins-tiflow
       jenkins-tidb
+      jenkins-tiflash
