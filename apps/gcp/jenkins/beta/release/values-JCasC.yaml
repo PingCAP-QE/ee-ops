@@ -293,12 +293,6 @@ controller:
                 }
               }
 
-      github-plugin-config: |
-        unclassified:
-          gitHubConfiguration:
-            apiRateLimitChecker: ThrottleOnOver
-          gitHubPluginConfig:
-            hookUrl: "https://${INGRESS_HOST}${INGRESS_PATH}/github-webhook/"
       pipeline-cache: |
         unclassified:
           pipeline-cache:
