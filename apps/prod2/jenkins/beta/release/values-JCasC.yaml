@@ -262,17 +262,16 @@ controller:
           awsCredentials:
             region: ${jenkins-cache-region}
             credentialsId: jenkins-cache-s3
-          artifactManager:
-            artifactManagerFactories:
-              - jclouds:
-                  provider:
-                    s3: {}
           s3:
             container: ${jenkins-cache-bucket}
             customEndpoint: ${jenkins-cache-endpoint}
             customSigningRegion: ${jenkins-cache-region}
             usePathStyleUrl: true
             disableSessionToken: true
+        jenkins:
+          artifactManager:
+            artifactManagerFactories:
+              - s3: {}
 
       # for jobs.
       jobs-dsl: |
