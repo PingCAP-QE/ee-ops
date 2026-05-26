@@ -35,7 +35,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/ci-dashboard
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/ci-dashboard versioning=semver
-      tag: v2026.5.17-11-ga655183
+      tag: v2026.5.24-3-g4e98920
     resources:
       requests:
         cpu: "2"
@@ -49,7 +49,7 @@ spec:
       - name: CI_DASHBOARD_ENABLE_RUNTIME_INSIGHTS
         value: "true"
       - name: CI_DASHBOARD_ENABLE_COST_DASHBOARD
-        value: "false"
+        value: "true"
     serviceAccount:
       annotations:
         iam.gke.io/gcp-service-account: ci-dashboard@pingcap-testing-account.iam.gserviceaccount.com
