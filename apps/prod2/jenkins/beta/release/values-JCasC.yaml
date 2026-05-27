@@ -258,7 +258,7 @@ controller:
                       password: ${harbor-tiflow-engine-password}
 
       artifact-manager-s3: |
-        unclassified:
+        aws:
           awsCredentials:
             region: ${jenkins-cache-region}
             credentialsId: jenkins-cache-s3
@@ -268,10 +268,12 @@ controller:
             customSigningRegion: ${jenkins-cache-region}
             usePathStyleUrl: true
             disableSessionToken: true
-        jenkins:
+        unclassified:
           artifactManager:
             artifactManagerFactories:
-              - s3: {}
+              - s3:
+                  config:
+                    prefix: "jenkins-artifacts/"
 
       # for jobs.
       jobs-dsl: |
