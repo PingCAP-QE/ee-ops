@@ -266,7 +266,6 @@ controller:
                   provider: s3
         aws:
           awsCredentials:
-            region: ${jenkins-cache-region}
             credentialsId: jenkins-cache-s3
           s3:
             container: ${jenkins-cache-bucket}
