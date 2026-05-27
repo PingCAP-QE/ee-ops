@@ -30,6 +30,7 @@ controller:
     - { name: jenkins-cache, keyName: region }
     - { name: jenkins-cache, keyName: bucket }
     - { name: jenkins-cache, keyName: endpoint }
+    - { name: jenkins-cache, keyName: endpoint-host }
     - { name: jenkins-cache, keyName: access-key }
     - { name: jenkins-cache, keyName: access-secret }
 
@@ -270,7 +271,8 @@ controller:
           s3:
             container: ${jenkins-cache-bucket}
             prefix: "jenkins-artifacts/"
-            customEndpoint: ${jenkins-cache-endpoint}
+            # artifact-manager-s3 validates customEndpoint as host[:port].
+            customEndpoint: ${jenkins-cache-endpoint-host}
             customSigningRegion: ${jenkins-cache-region}
             usePathStyleUrl: true
             disableSessionToken: true
