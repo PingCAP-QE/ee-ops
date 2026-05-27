@@ -158,6 +158,12 @@ controller:
                       id: "ks3util-config"
                       fileName: "ks3util.conf"
                       secretBytes: "${base64:${ks3util-config}}"
+                  - aws:
+                      scope: GLOBAL
+                      id: jenkins-cache-s3
+                      description: S3 credentials for Jenkins artifact manager
+                      accessKey: ${jenkins-cache-access-key}
+                      secretKey: ${jenkins-cache-access-secret}
               - domain:
                   name: github.com
                   description: github ssh and open api
@@ -250,6 +256,24 @@ controller:
                       description: user/password for tiflow engine test in harbor
                       username: ${harbor-tiflow-engine-username}
                       password: ${harbor-tiflow-engine-password}
+
+      artifact-manager-s3: |
+        aws:
+          awsCredentials:
+            region: ${jenkins-cache-region}
+            credentialsId: jenkins-cache-s3
+          s3:
+            container: ${jenkins-cache-bucket}
+            customEndpoint: ${jenkins-cache-endpoint}
+            customSigningRegion: ${jenkins-cache-region}
+            usePathStyleUrl: true
+            disableSessionToken: true
+        unclassified:
+          artifactManager:
+            artifactManagerFactories:
+              - s3:
+                  config:
+                    prefix: "jenkins-artifacts/"
 
       # for jobs.
       jobs-dsl: |
