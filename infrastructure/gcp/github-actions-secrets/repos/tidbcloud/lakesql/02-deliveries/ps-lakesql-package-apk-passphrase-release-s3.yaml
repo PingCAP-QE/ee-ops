@@ -16,9 +16,9 @@ spec:
       kind: SecretStore
   selector:
     secret:
-      name: src-lakesql-package-apk-passphrase
+      name: src-lakesql-release-s3-bundle
   data:
     - match:
-        secretKey: value
+        secretKey: LAKESQL_PACKAGE_APK_PASSPHRASE
         remoteRef:
           remoteKey: LAKESQL_PACKAGE_APK_PASSPHRASE

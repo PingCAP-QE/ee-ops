@@ -6,13 +6,31 @@ This document defines the GitHub Actions secrets required by `tidbcloud/lakesql`
 
 These GitHub Actions environment secrets are delivered by External Secrets Operator to `tidbcloud/lakesql` environment `release-s3`.
 
-| GitHub secret name | GCP Secret Manager ID | Expected value |
+The source of truth in GCP Secret Manager is a single JSON secret:
+
+- `gha__env__tidbcloud__lakesql__release-s3__bundle`
+
+Expected JSON shape:
+
+```json
+{
+  "gpg_private_key_b64": "<base64 of ASCII-armored GPG private key>",
+  "gpg_passphrase": "<GPG key passphrase>",
+  "apk_private_key_b64": "<base64 of Alpine RSA private key>",
+  "apk_public_key_b64": "<base64 of Alpine RSA public key>",
+  "apk_passphrase": "<Alpine RSA private key passphrase>"
+}
+```
+
+That bundle is unpacked into the following GitHub Actions environment secrets:
+
+| GitHub secret name | JSON field | Expected value |
 | --- | --- | --- |
-| `LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64` | `gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_private_key_b64` | base64 of ASCII-armored GPG private key used for `deb`/`rpm` signing and apt metadata signing |
-| `LAKESQL_PACKAGE_GPG_PASSPHRASE` | `gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_passphrase` | passphrase for the GPG private key |
-| `LAKESQL_PACKAGE_APK_PRIVATE_KEY_B64` | `gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_private_key_b64` | base64 of Alpine RSA private key used by `abuild-sign` |
-| `LAKESQL_PACKAGE_APK_PUBLIC_KEY_B64` | `gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_public_key_b64` | base64 of Alpine RSA public key published to `/keys/lakesql-packages.rsa.pub` |
-| `LAKESQL_PACKAGE_APK_PASSPHRASE` | `gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_passphrase` | passphrase for the Alpine RSA private key; may be empty if the key is created without one |
+| `LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64` | `gpg_private_key_b64` | base64 of ASCII-armored GPG private key used for `deb`/`rpm` signing and apt metadata signing |
+| `LAKESQL_PACKAGE_GPG_PASSPHRASE` | `gpg_passphrase` | passphrase for the GPG private key |
+| `LAKESQL_PACKAGE_APK_PRIVATE_KEY_B64` | `apk_private_key_b64` | base64 of Alpine RSA private key used by `abuild-sign` |
+| `LAKESQL_PACKAGE_APK_PUBLIC_KEY_B64` | `apk_public_key_b64` | base64 of Alpine RSA public key published to `/keys/lakesql-packages.rsa.pub` |
+| `LAKESQL_PACKAGE_APK_PASSPHRASE` | `apk_passphrase` | passphrase for the Alpine RSA private key; may be empty if the key is created without one |
 
 ## Generate the GPG signing key
 
@@ -106,24 +124,30 @@ Set the project first:
 export PROJECT_ID=pingcap-testing-account
 ```
 
-Create each secret if it does not already exist:
+Create the bundle secret if it does not already exist:
 
 ```bash
-gcloud secrets create gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_private_key_b64 --project="${PROJECT_ID}" --replication-policy=automatic
-gcloud secrets create gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_passphrase --project="${PROJECT_ID}" --replication-policy=automatic
-gcloud secrets create gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_private_key_b64 --project="${PROJECT_ID}" --replication-policy=automatic
-gcloud secrets create gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_public_key_b64 --project="${PROJECT_ID}" --replication-policy=automatic
-gcloud secrets create gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_passphrase --project="${PROJECT_ID}" --replication-policy=automatic
+gcloud secrets create gha__env__tidbcloud__lakesql__release-s3__bundle --project="${PROJECT_ID}" --replication-policy=automatic
 ```
 
-Add or rotate secret versions:
+Render the JSON payload locally:
 
 ```bash
-gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_private_key_b64 --project="${PROJECT_ID}" --data-file=lakesql-package-signing.asc.b64
-printf '%s' '__REPLACE_WITH_GPG_PASSPHRASE__' | gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_passphrase --project="${PROJECT_ID}" --data-file=-
-gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_private_key_b64 --project="${PROJECT_ID}" --data-file=lakesql-packages.rsa.b64
-gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_public_key_b64 --project="${PROJECT_ID}" --data-file=lakesql-packages.rsa.pub.b64
-printf '%s' '__REPLACE_WITH_APK_PASSPHRASE__' | gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__lakesql_package_apk_passphrase --project="${PROJECT_ID}" --data-file=-
+cat > lakesql-release-s3-bundle.json <<'EOF'
+{
+  "gpg_private_key_b64": "__REPLACE_WITH_GPG_PRIVATE_KEY_B64__",
+  "gpg_passphrase": "__REPLACE_WITH_GPG_PASSPHRASE__",
+  "apk_private_key_b64": "__REPLACE_WITH_APK_PRIVATE_KEY_B64__",
+  "apk_public_key_b64": "__REPLACE_WITH_APK_PUBLIC_KEY_B64__",
+  "apk_passphrase": "__REPLACE_WITH_APK_PASSPHRASE__"
+}
+EOF
+```
+
+Add or rotate the secret version:
+
+```bash
+gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__bundle --project="${PROJECT_ID}" --data-file=lakesql-release-s3-bundle.json
 ```
 
 ## Delivery mapping in ee-ops
@@ -134,4 +158,7 @@ The GitOps objects for this environment live under:
 - `infrastructure/gcp/github-actions-secrets/repos/tidbcloud/lakesql/01-source-secrets`
 - `infrastructure/gcp/github-actions-secrets/repos/tidbcloud/lakesql/02-deliveries`
 
-After the secrets are present in Secret Manager and Flux reconciles the manifests, ESO will push them into GitHub environment `tidbcloud/lakesql:release-s3`.
+After the bundle secret is present in Secret Manager and Flux reconciles the manifests, ESO will:
+
+- extract the five JSON fields into one cluster-local source secret: `src-lakesql-release-s3-bundle`
+- push those five keys into GitHub environment `tidbcloud/lakesql:release-s3`
