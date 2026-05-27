@@ -1,0 +1,23 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: es-src-lakesql-package-gpg-passphrase
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/source-secret-id: gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_passphrase
+    ee.pingcap.com/github-secret-name: LAKESQL_PACKAGE_GPG_PASSPHRASE
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: gcp-sm-github-actions
+    kind: SecretStore
+  target:
+    name: src-lakesql-package-gpg-passphrase
+    creationPolicy: Owner
+  data:
+    - secretKey: value
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-s3__lakesql_package_gpg_passphrase

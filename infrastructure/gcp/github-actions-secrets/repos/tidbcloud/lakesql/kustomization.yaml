@@ -2,3 +2,13 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - 00-target-stores/gh-environments.yaml
+  - 01-source-secrets/es-src-lakesql-package-apk-passphrase.yaml
+  - 01-source-secrets/es-src-lakesql-package-apk-private-key-b64.yaml
+  - 01-source-secrets/es-src-lakesql-package-apk-public-key-b64.yaml
+  - 01-source-secrets/es-src-lakesql-package-gpg-passphrase.yaml
+  - 01-source-secrets/es-src-lakesql-package-gpg-private-key-b64.yaml
+  - 02-deliveries/ps-lakesql-package-apk-passphrase-release-s3.yaml
+  - 02-deliveries/ps-lakesql-package-apk-private-key-b64-release-s3.yaml
+  - 02-deliveries/ps-lakesql-package-apk-public-key-b64-release-s3.yaml
+  - 02-deliveries/ps-lakesql-package-gpg-passphrase-release-s3.yaml
+  - 02-deliveries/ps-lakesql-package-gpg-private-key-b64-release-s3.yaml
