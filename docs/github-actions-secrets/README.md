@@ -220,6 +220,10 @@ infrastructure/gcp/github-actions-secrets/
 - Use repository secrets for subset targeting because ESO does not model org `selected` repository visibility.
 - Use environment secrets only for deployment-scoped credentials.
 
+## Repo-specific runbooks
+
+- `tidbcloud/lakesql` `release-s3` package-signing secrets: `docs/github-actions-secrets/lakesql-release-s3-secrets.md`
+
 ## References
 
 - External Secrets Operator GitHub provider: https://external-secrets.io/latest/provider/github/

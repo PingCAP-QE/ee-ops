@@ -1,0 +1,24 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: ps-lakesql-package-gpg-private-key-b64-release-s3
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/github-secret-name: LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64
+spec:
+  deletionPolicy: Delete
+  refreshInterval: 1h
+  secretStoreRefs:
+    - name: gh-env-tidbcloud-lakesql-release-s3
+      kind: SecretStore
+  selector:
+    secret:
+      name: src-lakesql-release-s3-bundle
+  data:
+    - match:
+        secretKey: LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64
+        remoteRef:
+          remoteKey: LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64
