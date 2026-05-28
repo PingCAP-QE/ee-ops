@@ -1,0 +1,39 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: es-src-lakesql-release-s3-bundle
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/source-secret-id: gha__env__tidbcloud__lakesql__release-s3__bundle
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: gcp-sm-github-actions
+    kind: SecretStore
+  target:
+    name: src-lakesql-release-s3-bundle
+    creationPolicy: Owner
+  data:
+    - secretKey: LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-s3__bundle
+        property: gpg_private_key_b64
+    - secretKey: LAKESQL_PACKAGE_GPG_PASSPHRASE
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-s3__bundle
+        property: gpg_passphrase
+    - secretKey: LAKESQL_PACKAGE_APK_PRIVATE_KEY_B64
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-s3__bundle
+        property: apk_private_key_b64
+    - secretKey: LAKESQL_PACKAGE_APK_PUBLIC_KEY_B64
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-s3__bundle
+        property: apk_public_key_b64
+    - secretKey: LAKESQL_PACKAGE_APK_PASSPHRASE
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-s3__bundle
+        property: apk_passphrase
