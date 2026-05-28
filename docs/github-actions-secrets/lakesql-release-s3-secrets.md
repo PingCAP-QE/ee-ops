@@ -41,6 +41,8 @@ export GNUPGHOME="$(mktemp -d)"
 chmod 700 "${GNUPGHOME}"
 ```
 
+All `gpg` commands below use that temporary home explicitly via `--homedir "${GNUPGHOME}"`.
+
 Create a passphrase and keep it for `LAKESQL_PACKAGE_GPG_PASSPHRASE`:
 
 ```bash
@@ -62,14 +64,14 @@ Passphrase: __REPLACE_WITH_GPG_PASSPHRASE__
 %commit
 EOF
 
-gpg --batch --generate-key gpg-lakesql-batch.conf
+gpg --homedir "${GNUPGHOME}" --batch --generate-key gpg-lakesql-batch.conf
 ```
 
 Resolve the key id and export the private key in ASCII armor:
 
 ```bash
-GPG_KEY_ID="$(gpg --batch --list-secret-keys --with-colons | awk -F: '$1 == "sec" { print $5; exit }')"
-gpg --batch --pinentry-mode loopback --passphrase '__REPLACE_WITH_GPG_PASSPHRASE__' \
+GPG_KEY_ID="$(gpg --homedir "${GNUPGHOME}" --batch --list-secret-keys --with-colons | awk -F: '$1 == "sec" { print $5; exit }')"
+gpg --homedir "${GNUPGHOME}" --batch --pinentry-mode loopback --passphrase '__REPLACE_WITH_GPG_PASSPHRASE__' \
   --armor --export-secret-keys "${GPG_KEY_ID}" > lakesql-package-signing.asc
 base64 < lakesql-package-signing.asc | tr -d '\n' > lakesql-package-signing.asc.b64
 ```
@@ -82,8 +84,14 @@ Outputs:
 Optional sanity checks:
 
 ```bash
-base64 -d lakesql-package-signing.asc.b64 | gpg --batch --import
-gpg --batch --list-secret-keys "${GPG_KEY_ID}"
+base64 -d lakesql-package-signing.asc.b64 | gpg --homedir "${GNUPGHOME}" --batch --import
+gpg --homedir "${GNUPGHOME}" --batch --list-secret-keys "${GPG_KEY_ID}"
+```
+
+Clean up the temporary GnuPG home when you are done:
+
+```bash
+rm -rf "${GNUPGHOME}"
 ```
 
 ## Generate the Alpine APK signing key pair
