@@ -51,6 +51,10 @@ openssl rand -base64 32
 
 Generate the key in batch mode:
 
+Keep `%commit` below as a literal GnuPG batch directive. It tells `gpg --generate-key`
+to commit the parameters in this file and create the key; it is not a placeholder and
+does not need to be replaced.
+
 ```bash
 cat >gpg-lakesql-batch.conf <<'EOF'
 Key-Type: RSA
