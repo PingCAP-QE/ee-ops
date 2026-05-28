@@ -30,103 +30,70 @@ That bundle is unpacked into the following GitHub Actions environment secrets:
 | `LAKESQL_PACKAGE_GPG_PASSPHRASE` | `gpg_passphrase` | passphrase for the GPG private key |
 | `LAKESQL_PACKAGE_APK_PRIVATE_KEY_B64` | `apk_private_key_b64` | base64 of Alpine RSA private key used by `abuild-sign` |
 | `LAKESQL_PACKAGE_APK_PUBLIC_KEY_B64` | `apk_public_key_b64` | base64 of Alpine RSA public key published to `/keys/lakesql-packages.rsa.pub` |
-| `LAKESQL_PACKAGE_APK_PASSPHRASE` | `apk_passphrase` | passphrase for the Alpine RSA private key; may be empty if the key is created without one |
+| `LAKESQL_PACKAGE_APK_PASSPHRASE` | `apk_passphrase` | empty string for the current workflow, because `abuild-sign` signs `APKINDEX.tar.gz` with an unencrypted PEM key |
 
-## Generate the GPG signing key
+## Quick start
 
-Create an isolated GnuPG home first:
+Prerequisites on the machine that runs the helper script:
 
-```bash
-export GNUPGHOME="$(mktemp -d)"
-chmod 700 "${GNUPGHOME}"
-```
+- `openssl`
+- `gpg` or `gpg2`
 
-All `gpg` commands below use that temporary home explicitly via `--homedir "${GNUPGHOME}"`.
-
-Create a passphrase and keep it for `LAKESQL_PACKAGE_GPG_PASSPHRASE`:
+Run the helper script from the repo root:
 
 ```bash
-openssl rand -base64 32
+./scripts/generate_lakesql_release_s3_bundle.sh
 ```
 
-Generate the key in batch mode:
+By default it writes a timestamped directory like `./lakesql-release-s3-secrets-20260528094500`.
 
-Keep `%commit` below as a literal GnuPG batch directive. It tells `gpg --generate-key`
-to commit the parameters in this file and create the key; it is not a placeholder and
-does not need to be replaced.
+Optional flags:
 
 ```bash
-cat >gpg-lakesql-batch.conf <<'EOF'
-Key-Type: RSA
-Key-Length: 4096
-Subkey-Type: RSA
-Subkey-Length: 4096
-Name-Real: LakeSQL Package Signing
-Name-Email: lakesql-release@tidbcloud.com
-Expire-Date: 2y
-Passphrase: __REPLACE_WITH_GPG_PASSPHRASE__
-%commit
-EOF
-
-gpg --homedir "${GNUPGHOME}" --batch --generate-key gpg-lakesql-batch.conf
+./scripts/generate_lakesql_release_s3_bundle.sh \
+  --output-dir /secure/path/lakesql-release-s3-secrets \
+  --gpg-name-real "LakeSQL Package Signing" \
+  --gpg-name-email lakesql-release@tidbcloud.com \
+  --gpg-expire 2y
 ```
 
-Resolve the key id and export the private key in ASCII armor:
+Generated files:
 
-```bash
-GPG_KEY_ID="$(gpg --homedir "${GNUPGHOME}" --batch --list-secret-keys --with-colons | awk -F: '$1 == "sec" { print $5; exit }')"
-gpg --homedir "${GNUPGHOME}" --batch --pinentry-mode loopback --passphrase '__REPLACE_WITH_GPG_PASSPHRASE__' \
-  --armor --export-secret-keys "${GPG_KEY_ID}" > lakesql-package-signing.asc
-base64 < lakesql-package-signing.asc | tr -d '\n' > lakesql-package-signing.asc.b64
-```
+- `lakesql-package-signing.asc`: ASCII-armored GPG private key
+- `lakesql-package-signing.public.asc`: ASCII-armored GPG public key
+- `lakesql-package-signing.asc.b64`: base64 value for `LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64`
+- `lakesql-package-signing.fingerprint.txt`: GPG key fingerprint
+- `lakesql-packages.rsa`: Alpine APK RSA private key in PEM format
+- `lakesql-packages.rsa.pub`: Alpine APK RSA public key in PEM format
+- `lakesql-packages.rsa.b64`: base64 value for `LAKESQL_PACKAGE_APK_PRIVATE_KEY_B64`
+- `lakesql-packages.rsa.pub.b64`: base64 value for `LAKESQL_PACKAGE_APK_PUBLIC_KEY_B64`
+- `lakesql-release-s3-bundle.json`: JSON payload for GCP Secret Manager
 
-Outputs:
+## What the helper script does
 
-- `lakesql-package-signing.asc.b64` -> `LAKESQL_PACKAGE_GPG_PRIVATE_KEY_B64`
-- the passphrase string -> `LAKESQL_PACKAGE_GPG_PASSPHRASE`
+The helper script performs three actions in one run:
 
-Optional sanity checks:
+- generates a 4096-bit RSA GPG signing key with a generated passphrase, unless `--gpg-passphrase` is provided
+- generates an unencrypted 4096-bit RSA PEM key pair for Alpine APK signing
+- renders `lakesql-release-s3-bundle.json` with the exact field names expected by `ee-ops`
 
-```bash
-base64 -d lakesql-package-signing.asc.b64 | gpg --homedir "${GNUPGHOME}" --batch --import
-gpg --homedir "${GNUPGHOME}" --batch --list-secret-keys "${GPG_KEY_ID}"
-```
+It also runs local sanity checks before writing the bundle.
 
-Clean up the temporary GnuPG home when you are done:
+## Why `apk_passphrase` is empty
 
-```bash
-rm -rf "${GNUPGHOME}"
-```
+This is intentional for the current `tidbcloud/lakesql` release workflow.
 
-## Generate the Alpine APK signing key pair
+The workflow uses two different APK signing paths:
 
-Create a passphrase and keep it for `LAKESQL_PACKAGE_APK_PASSPHRASE`:
+- `nfpm package --packager apk` can consume `NFPM_APK_PASSPHRASE`
+- `abuild-sign` signs `APKINDEX.tar.gz` directly with the PEM private key and does not consume a separate passphrase input in our current implementation
 
-```bash
-openssl rand -base64 32
-```
+Because the release job must complete both steps, the safest compatible output today is:
 
-Generate a 4096-bit RSA key pair:
+- unencrypted `lakesql-packages.rsa`
+- empty-string `apk_passphrase` in the bundle JSON
 
-```bash
-openssl genrsa -aes256 -passout pass:'__REPLACE_WITH_APK_PASSPHRASE__' -out lakesql-packages.rsa 4096
-openssl rsa -in lakesql-packages.rsa -passin pass:'__REPLACE_WITH_APK_PASSPHRASE__' -pubout -out lakesql-packages.rsa.pub
-base64 < lakesql-packages.rsa | tr -d '\n' > lakesql-packages.rsa.b64
-base64 < lakesql-packages.rsa.pub | tr -d '\n' > lakesql-packages.rsa.pub.b64
-```
-
-Outputs:
-
-- `lakesql-packages.rsa.b64` -> `LAKESQL_PACKAGE_APK_PRIVATE_KEY_B64`
-- `lakesql-packages.rsa.pub.b64` -> `LAKESQL_PACKAGE_APK_PUBLIC_KEY_B64`
-- the passphrase string -> `LAKESQL_PACKAGE_APK_PASSPHRASE`
-
-Optional sanity checks:
-
-```bash
-base64 -d lakesql-packages.rsa.b64 | openssl rsa -passin pass:'__REPLACE_WITH_APK_PASSPHRASE__' -check -noout
-base64 -d lakesql-packages.rsa.pub.b64 | openssl rsa -pubin -inform PEM -text -noout
-```
+If LakeSQL later changes the workflow to decrypt the key before calling `abuild-sign`, this runbook and the helper script can be updated to support a non-empty APK passphrase.
 
 ## Create or update the source of truth in GCP Secret Manager
 
@@ -142,24 +109,12 @@ Create the bundle secret if it does not already exist:
 gcloud secrets create gha__env__tidbcloud__lakesql__release-s3__bundle --project="${PROJECT_ID}" --replication-policy=automatic
 ```
 
-Render the JSON payload locally:
-
-```bash
-cat > lakesql-release-s3-bundle.json <<'EOF'
-{
-  "gpg_private_key_b64": "__REPLACE_WITH_GPG_PRIVATE_KEY_B64__",
-  "gpg_passphrase": "__REPLACE_WITH_GPG_PASSPHRASE__",
-  "apk_private_key_b64": "__REPLACE_WITH_APK_PRIVATE_KEY_B64__",
-  "apk_public_key_b64": "__REPLACE_WITH_APK_PUBLIC_KEY_B64__",
-  "apk_passphrase": "__REPLACE_WITH_APK_PASSPHRASE__"
-}
-EOF
-```
-
 Add or rotate the secret version:
 
 ```bash
-gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__bundle --project="${PROJECT_ID}" --data-file=lakesql-release-s3-bundle.json
+gcloud secrets versions add gha__env__tidbcloud__lakesql__release-s3__bundle \
+  --project="${PROJECT_ID}" \
+  --data-file=/secure/path/lakesql-release-s3-secrets/lakesql-release-s3-bundle.json
 ```
 
 ## Delivery mapping in ee-ops
@@ -174,3 +129,17 @@ After the bundle secret is present in Secret Manager and Flux reconciles the man
 
 - extract the five JSON fields into one cluster-local source secret: `src-lakesql-release-s3-bundle`
 - push those five keys into GitHub environment `tidbcloud/lakesql:release-s3`
+
+## Why this is not generated by `ExternalSecret` or `secret-generator`
+
+This repo's current split of responsibility is deliberate:
+
+- `ExternalSecret` reads an existing value from GCP Secret Manager into the cluster
+- `PushSecret` pushes that existing value into GitHub Actions secrets
+- `secret-generator` is currently used in this repo for simple generated values such as random passwords, not long-lived signing identities
+
+For LakeSQL package signing, key generation should stay outside the cluster because:
+
+- the GPG and APK private keys are release identities that need backup and explicit operator custody
+- GCP Secret Manager is the source of truth for GitHub Actions secret delivery in this design
+- generating the keys in-cluster would require a separate export and backup path back into GCP, which would complicate rotation and recovery
