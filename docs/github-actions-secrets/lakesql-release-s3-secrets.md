@@ -38,11 +38,12 @@ Prerequisites on the machine that runs the helper script:
 
 - `openssl`
 - `gpg` or `gpg2`
+- `jq`
 
 Run the helper script from the repo root:
 
 ```bash
-./scripts/generate_lakesql_release_s3_bundle.sh
+./docs/github-actions-secrets/tools/helpers/generate_lakesql_release_s3_bundle.sh
 ```
 
 By default it writes a timestamped directory like `./lakesql-release-s3-secrets-20260528094500`.
@@ -50,7 +51,7 @@ By default it writes a timestamped directory like `./lakesql-release-s3-secrets-
 Optional flags:
 
 ```bash
-./scripts/generate_lakesql_release_s3_bundle.sh \
+./docs/github-actions-secrets/tools/helpers/generate_lakesql_release_s3_bundle.sh \
   --output-dir /secure/path/lakesql-release-s3-secrets \
   --gpg-name-real "LakeSQL Package Signing" \
   --gpg-name-email lakesql-release@tidbcloud.com \
@@ -78,6 +79,14 @@ The helper script performs three actions in one run:
 - renders `lakesql-release-s3-bundle.json` with the exact field names expected by `ee-ops`
 
 It also runs local sanity checks before writing the bundle.
+
+The script also validates the generated `lakesql-release-s3-bundle.json` before finishing. To validate an existing bundle file separately:
+
+```bash
+./docs/github-actions-secrets/tools/helpers/generate_lakesql_release_s3_bundle.sh \
+  validate-bundle \
+  --bundle-json /secure/path/lakesql-release-s3-secrets/lakesql-release-s3-bundle.json
+```
 
 ## Why `apk_passphrase` is empty
 
