@@ -1,41 +1,10 @@
 apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
-  name: restrict-to-node-instance-types
+  name: set-node-selector-tekton-taskrun-pods
 spec:
   rules:
-    - name: restrict-non-el-pods-to-c4-c4a
-      match:
-        resources:
-          kinds:
-            - Pod
-      exclude:
-        resources:
-          names:
-            - "el-*"
-      mutate:
-        patchStrategicMerge:
-          spec:
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: cloud.google.com/machine-family
-                          operator: In
-                          values: [c4, c4a]
-                        - key: cloud.google.com/gke-provisioning
-                          operator: In
-                          values: ["spot"]
-
----
-apiVersion: kyverno.io/v1
-kind: Policy
-metadata:
-  name: protect-tekton-taskruns
-spec:
-  rules:
-    - name: inject-annotation-for-tekton-taskrun-pod
+    - name: add-compute-class-and-annotations
       match:
         resources:
           kinds:
@@ -49,3 +18,18 @@ spec:
           metadata:
             annotations:
               cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker
+
+---
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: protect-tekton-taskruns
+spec:
+  rules:
+    - name: inject-annotation-for-tekton-taskrun-pod
+
+      mutate:
+        patchStrategicMerge:
