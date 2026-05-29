@@ -1,25 +1,16 @@
 apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
-  name: restrict-to-node-instance-types
+  name: run-with-autopilot-spot-pod
 spec:
   rules:
-    - name: restrict-pods-running-on-spot-nodes
+    - name: add-compute-class
       match:
         resources:
           kinds:
             - Pod
       mutate:
         patchStrategicMerge:
-          metadata:
-            annotations:
-              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
           spec:
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: cloud.google.com/gke-provisioning
-                          operator: In
-                          values: ["spot"]
+            nodeSelector:
+              cloud.google.com/compute-class: autopilot-spot
