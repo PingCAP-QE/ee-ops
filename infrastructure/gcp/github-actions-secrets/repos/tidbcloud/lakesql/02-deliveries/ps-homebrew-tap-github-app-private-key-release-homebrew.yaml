@@ -1,0 +1,24 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: PushSecret
+metadata:
+  name: ps-homebrew-tap-github-app-private-key-release-homebrew
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/github-secret-name: HOMEBREW_TAP_GITHUB_APP_PRIVATE_KEY
+spec:
+  deletionPolicy: Delete
+  refreshInterval: 1h
+  secretStoreRefs:
+    - name: gh-env-tidbcloud-lakesql-release-homebrew
+      kind: SecretStore
+  selector:
+    secret:
+      name: src-homebrew-tap-github-app-private-key
+  data:
+    - match:
+        secretKey: value
+        remoteRef:
+          remoteKey: HOMEBREW_TAP_GITHUB_APP_PRIVATE_KEY

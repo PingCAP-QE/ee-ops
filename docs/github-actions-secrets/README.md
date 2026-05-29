@@ -222,6 +222,7 @@ infrastructure/gcp/github-actions-secrets/
 
 ## Repo-specific runbooks
 
+- `tidbcloud/lakesql` `release-homebrew` cross-repo PR secrets: `docs/github-actions-secrets/lakesql-release-homebrew-secrets.md`
 - `tidbcloud/lakesql` `release-s3` package-signing secrets: `docs/github-actions-secrets/lakesql-release-s3-secrets.md`
 
 ## References
