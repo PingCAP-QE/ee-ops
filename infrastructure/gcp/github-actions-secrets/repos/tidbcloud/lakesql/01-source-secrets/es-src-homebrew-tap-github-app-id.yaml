@@ -1,0 +1,23 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: es-src-homebrew-tap-github-app-id
+  labels:
+    ee.pingcap.com/owner-team: platform
+    ee.pingcap.com/managed-by: fluxcd
+    ee.pingcap.com/github-org: tidbcloud
+  annotations:
+    ee.pingcap.com/source-secret-id: gha__env__tidbcloud__lakesql__release-homebrew__homebrew_tap_github_app_id
+    ee.pingcap.com/github-secret-name: HOMEBREW_TAP_GITHUB_APP_ID
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: gcp-sm-github-actions
+    kind: SecretStore
+  target:
+    name: src-homebrew-tap-github-app-id
+    creationPolicy: Owner
+  data:
+    - secretKey: value
+      remoteRef:
+        key: gha__env__tidbcloud__lakesql__release-homebrew__homebrew_tap_github_app_id
