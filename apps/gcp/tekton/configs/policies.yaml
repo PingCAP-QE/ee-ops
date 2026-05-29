@@ -21,15 +21,3 @@ spec:
           spec:
             nodeSelector:
               cloud.google.com/compute-class: ci-worker
-
----
-apiVersion: kyverno.io/v1
-kind: Policy
-metadata:
-  name: protect-tekton-taskruns
-spec:
-  rules:
-    - name: inject-annotation-for-tekton-taskrun-pod
-
-      mutate:
-        patchStrategicMerge:
