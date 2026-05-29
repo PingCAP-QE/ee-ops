@@ -1,10 +1,10 @@
 apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
-  name: restrict-to-node-instance-types
+  name: set-pod-node-selector
 spec:
   rules:
-    - name: set-ci-worker-pod-defaults
+    - name: add-compute-class-and-annotations
       match:
         resources:
           kinds:
