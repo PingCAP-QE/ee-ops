@@ -5,7 +5,7 @@ metadata:
 spec:
   nodePoolAutoCreation:
     enabled: true
-  whenUnsatisfiable: ScaleUpAnyway
+  whenUnsatisfiable: DoNotScaleUp
   priorityDefaults:
     location:
       locationPolicy: ANY
@@ -25,7 +25,19 @@ spec:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 500
     - machineFamily: c4a
-      priorityScore: 90
+      priorityScore: 85
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
+    - machineFamily: c3
+      priorityScore: 60
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
+    - machineFamily: c3d
+      priorityScore: 55
       spot: true
       storage:
         bootDiskType: hyperdisk-balanced
@@ -46,6 +58,18 @@ spec:
         bootDiskSize: 500
     - machineFamily: c4a
       priorityScore: 40
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
+    - machineFamily: c3
+      priorityScore: 25
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 500
+    - machineFamily: c3d
+      priorityScore: 20
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
