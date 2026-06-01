@@ -1,0 +1,44 @@
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: ci-worker-ondemand
+spec:
+  nodePoolAutoCreation:
+    enabled: true
+  whenUnsatisfiable: DoNotScaleUp
+  priorityDefaults:
+    location:
+      locationPolicy: ANY
+      zoneTypes: [STANDARD]
+  priorities:
+    # --------- on-demand types only -----------
+    - machineFamily: c4d
+      priorityScore: 100
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: c4
+      priorityScore: 90
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: c4a
+      priorityScore: 85
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: c3
+      priorityScore: 60
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: c3d
+      priorityScore: 55
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
