@@ -1,0 +1,32 @@
+name: Kyverno Test
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths-ignore:
+      - "**.md"
+
+jobs:
+  kyverno-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Setup Kyverno CLI
+        env:
+          KYVERNO_VERSION: v1.18.1
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.local/bin"
+          curl -sSL "https://github.com/kyverno/kyverno/releases/download/${KYVERNO_VERSION}/kyverno-cli_${KYVERNO_VERSION}_linux_x86_64.tar.gz" | tar -xz
+          install kyverno "$HOME/.local/bin/kyverno"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/kyverno" version
+
+      - name: Run Kyverno tests
+        run: kyverno test .
