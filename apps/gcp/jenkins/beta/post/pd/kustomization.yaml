@@ -4,4 +4,3 @@ namespace: jenkins-pd
 resources:
   - namespace.yaml
   - ../_base
-  - policies.yaml

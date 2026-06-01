@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-non-release
+  namespace: jenkins-pd
+  labels:
+    jenkins/jenkins-jenkins-agent: "true"
+  annotations:
+    ci_refs: '{"org":"pingcap","repo":"tidb","base_ref":"master"}'
+spec:
+  containers:
+    - name: main
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 3600"]

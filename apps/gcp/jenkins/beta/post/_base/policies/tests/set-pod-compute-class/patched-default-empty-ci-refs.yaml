@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-empty-ci-refs
+  namespace: jenkins-pd
+  annotations:
+    ci_refs: ""
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+spec:
+  containers:
+    - name: main
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 3600"]
+  nodeSelector:
+    cloud.google.com/compute-class: ci-worker

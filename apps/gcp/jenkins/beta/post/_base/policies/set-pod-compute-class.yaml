@@ -1,0 +1,62 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: set-pod-compute-class
+spec:
+  rules:
+    - name: add-compute-class-and-annotations
+      match:
+        resources:
+          kinds:
+            - Pod
+          selector:
+            matchExpressions:
+              - key: jenkins/jenkins-jenkins-agent
+                operator: In
+                values: ["true"]
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker
+
+    - name: override-compute-class-for-hotfix-branches
+      match:
+        resources:
+          kinds:
+            - Pod
+          selector:
+            matchExpressions:
+              - key: jenkins/jenkins-jenkins-agent
+                operator: In
+                values: ["true"]
+      context:
+        - name: ci_refs_raw
+          variable:
+            default: "{}"
+            jmesPath: "request.object.metadata.annotations.ci_refs || '{}'"
+        - name: parsed_refs
+          variable:
+            default: {}
+            jmesPath: "parse_json(ci_refs_raw)"
+        - name: is_hotfix_branch
+          variable:
+            default: false
+            jmesPath: >-
+              regex_match(
+              '^release-[0-9]+\\.[0-9]+-[0-9]{8}-v[0-9]+\\.[0-9]+\\.[0-9]+$',
+              not_null(parsed_refs.base_ref, '')
+              )
+      preconditions:
+        all:
+          - key: "{{ is_hotfix_branch }}"
+            operator: Equals
+            value: true
+      mutate:
+        patchStrategicMerge:
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker-ondemand

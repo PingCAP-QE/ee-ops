@@ -4,4 +4,3 @@ namespace: jenkins-tiflash
 resources:
   - namespace.yaml
   - ../_base
-  - policies.yaml
