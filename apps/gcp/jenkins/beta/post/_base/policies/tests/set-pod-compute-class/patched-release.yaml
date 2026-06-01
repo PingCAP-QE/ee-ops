@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-release
+  namespace: jenkins-pd
+  annotations:
+    ci_refs: '{"org":"pingcap","repo":"tidb","base_ref":"release-8.5-20260301-v8.5.6"}'
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+spec:
+  containers:
+    - name: main
+      image: busybox:1.36
+      command: ["sh", "-c", "sleep 3600"]
+  nodeSelector:
+    cloud.google.com/compute-class: ci-worker-ondemand
