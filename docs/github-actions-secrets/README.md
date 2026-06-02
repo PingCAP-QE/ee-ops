@@ -224,9 +224,9 @@ infrastructure/gcp/github-actions-secrets/
 
 Repo-specific runbooks are organized under `docs/github-actions-secrets/<org>/<repo>/`.
 
-- `tidbcloud/lakesql` runbooks index: `docs/github-actions-secrets/tidbcloud/lakesql/README.md`
-- `tidbcloud/lakesql` `release-homebrew` cross-repo PR secrets: `docs/github-actions-secrets/tidbcloud/lakesql/release-homebrew-secrets.md`
-- `tidbcloud/lakesql` `release-s3` package-signing secrets: `docs/github-actions-secrets/tidbcloud/lakesql/release-s3-secrets.md`
+- tidbcloud/lakesql runbooks index: [tidbcloud/lakesql/README.md](tidbcloud/lakesql/README.md)
+- tidbcloud/lakesql release-homebrew cross-repo PR secrets: [tidbcloud/lakesql/release-homebrew-secrets.md](tidbcloud/lakesql/release-homebrew-secrets.md)
+- tidbcloud/lakesql release-s3 package-signing secrets: [tidbcloud/lakesql/release-s3-secrets.md](tidbcloud/lakesql/release-s3-secrets.md)
 
 ## References
 

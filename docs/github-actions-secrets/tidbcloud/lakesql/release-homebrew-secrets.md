@@ -27,33 +27,11 @@ The GitHub App referenced by these secrets must be installed on `tidbcloud/homeb
 
 This workflow reuses the shared company GitHub App. Confirm that its `tidbcloud/homebrew-tap` installation has those permissions before publishing the secrets.
 
-## Create or update the source of truth in GCP Secret Manager
+## Source of truth in GCP Secret Manager
 
-Set the project first:
+These shared system secrets (gha__system__github_app_id and gha__system__github_app_private_key) are managed globally. They should not be created or rotated from this repository-specific runbook, as doing so may affect other repositories and workflows that rely on the same shared GitHub App.
 
-```bash
-export PROJECT_ID=pingcap-testing-account
-```
-
-Create `gha__system__github_app_id` if it does not already exist:
-
-```bash
-gcloud secrets create gha__system__github_app_id \
-  --project="${PROJECT_ID}" \
-  --replication-policy=automatic
-```
-
-Add or rotate the shared GitHub App ID:
-
-```bash
-printf '%s' '214286' | gcloud secrets versions add \
-  gha__system__github_app_id \
-  --project="${PROJECT_ID}" \
-  --data-file=-
-```
-
-`gha__system__github_app_private_key` is reused as-is. The private key payload should remain the original PEM issued by GitHub App settings.
-
+If you need to verify or update these shared secrets, please refer to the central platform administration runbook or contact the platform team.
 ## Delivery mapping in ee-ops
 
 The GitOps objects for this environment live under:
