@@ -27,7 +27,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-roster
-              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.5.24-2-g7f5f498
+              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.5.31-2-g3dd898b
               imagePullPolicy: IfNotPresent
               args:
                 - sync-roster
@@ -78,7 +78,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: weekly-summary
-              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.5.24-2-g7f5f498
+              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.5.31-2-g3dd898b
               imagePullPolicy: IfNotPresent
               args:
                 - weekly-summary
@@ -95,6 +95,8 @@ spec:
                   value: "INFO"
                 - name: ROSTER_LARK_NOTIFY_OPEN_ID
                   value: "ou_305fc38fd60e3f64a60296cf9afeb7f7"
+                - name: ROSTER_LARK_NOTIFY_OPEN_IDS
+                  value: "ou_56362e46e2f73a1045c98d1e4aa89109"
               resources:
                 requests:
                   cpu: "250m"
