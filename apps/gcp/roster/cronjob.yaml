@@ -95,6 +95,8 @@ spec:
                   value: "INFO"
                 - name: ROSTER_LARK_NOTIFY_OPEN_ID
                   value: "ou_305fc38fd60e3f64a60296cf9afeb7f7"
+                - name: ROSTER_LARK_NOTIFY_OPEN_IDS
+                  value: "ou_56362e46e2f73a1045c98d1e4aa89109"
               resources:
                 requests:
                   cpu: "250m"
