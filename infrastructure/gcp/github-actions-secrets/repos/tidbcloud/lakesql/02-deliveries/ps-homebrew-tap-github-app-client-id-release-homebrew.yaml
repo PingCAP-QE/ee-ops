@@ -1,13 +1,13 @@
 apiVersion: external-secrets.io/v1alpha1
 kind: PushSecret
 metadata:
-  name: ps-homebrew-tap-github-app-id-release-homebrew
+  name: ps-homebrew-tap-github-app-client-id-release-homebrew
   labels:
     ee.pingcap.com/owner-team: platform
     ee.pingcap.com/managed-by: fluxcd
     ee.pingcap.com/github-org: tidbcloud
   annotations:
-    ee.pingcap.com/github-secret-name: HOMEBREW_TAP_GITHUB_APP_ID
+    ee.pingcap.com/github-secret-name: HOMEBREW_TAP_GITHUB_APP_CLIENT_ID
 spec:
   deletionPolicy: Delete
   refreshInterval: 1h
@@ -16,9 +16,9 @@ spec:
       kind: SecretStore
   selector:
     secret:
-      name: src-homebrew-tap-github-app-id
+      name: src-homebrew-tap-github-app-client-id
   data:
     - match:
         secretKey: value
         remoteRef:
-          remoteKey: HOMEBREW_TAP_GITHUB_APP_ID
+          remoteKey: HOMEBREW_TAP_GITHUB_APP_CLIENT_ID

@@ -8,15 +8,17 @@ These GitHub Actions environment secrets are delivered by External Secrets Opera
 
 The source of truth in GCP Secret Manager is two shared system secrets:
 
-- `gha__system__github_app_id`
+- `gha__system__github_app_client_id`
 - `gha__system__github_app_private_key`
 
 They are pushed into the GitHub environment as:
 
 | GitHub secret name | GCP secret name | Expected value |
 | --- | --- | --- |
-| `HOMEBREW_TAP_GITHUB_APP_ID` | `gha__system__github_app_id` | decimal GitHub App ID for the shared GitHub App installed on `tidbcloud/homebrew-tap` |
+| `HOMEBREW_TAP_GITHUB_APP_CLIENT_ID` | `gha__system__github_app_client_id` | GitHub App client ID for the shared GitHub App installed on `tidbcloud/homebrew-tap` |
 | `HOMEBREW_TAP_GITHUB_APP_PRIVATE_KEY` | `gha__system__github_app_private_key` | PEM-encoded private key for the same shared GitHub App |
+
+Although the value is a client ID rather than a sensitive credential, this repo still delivers it through a GitHub Actions environment secret because the current centralized `ee-ops` delivery path manages GitHub Actions secrets, not variables.
 
 ## Required GitHub App permissions
 
@@ -29,7 +31,7 @@ This workflow reuses the shared company GitHub App. Confirm that its `tidbcloud/
 
 ## Source of truth in GCP Secret Manager
 
-These shared system secrets (gha__system__github_app_id and gha__system__github_app_private_key) are managed globally. They should not be created or rotated from this repository-specific runbook, as doing so may affect other repositories and workflows that rely on the same shared GitHub App.
+These shared system secrets (gha__system__github_app_client_id and gha__system__github_app_private_key) are managed globally. They should not be created or rotated from this repository-specific runbook, as doing so may affect other repositories and workflows that rely on the same shared GitHub App.
 
 If you need to verify or update these shared secrets, please refer to the central platform administration runbook or contact the platform team.
 ## Delivery mapping in ee-ops
@@ -42,7 +44,7 @@ The GitOps objects for this environment live under:
 
 After the two shared GCP secrets are present in Secret Manager and Flux reconciles the manifests, ESO will:
 
-- extract the two values into cluster-local source secrets: `src-homebrew-tap-github-app-id` and `src-homebrew-tap-github-app-private-key`
+- extract the two values into cluster-local source secrets: `src-homebrew-tap-github-app-client-id` and `src-homebrew-tap-github-app-private-key`
 - push them into GitHub environment `tidbcloud/lakesql:release-homebrew`
 
 This environment is intended for the release workflow step that opens or updates formula PRs in `tidbcloud/homebrew-tap`.
