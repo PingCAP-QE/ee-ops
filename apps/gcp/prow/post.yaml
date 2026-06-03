@@ -18,4 +18,4 @@ spec:
   postBuild:
     substitute:
       TEST_PODS_NAMESPACE: prow-test-pods
-      DOCS_CN_S3_JSON: prod2_jenkins_beta_docs_cn_s3_json
+      DOCS_CN_S3_JSON: gcp_prow_docs_cn_s3_json
