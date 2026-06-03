@@ -386,7 +386,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-issue-triage-plugin
-          tag: v2.4.6
+          tag: v2026.6.3
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
