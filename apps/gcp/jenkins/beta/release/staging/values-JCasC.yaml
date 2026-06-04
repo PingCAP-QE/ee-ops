@@ -336,12 +336,12 @@ controller:
                   provider: s3
         aws:
           awsCredentials:
-            credentialsId: jenkins-cache-s3
+            credentialsId: jenkins-artifact-s3
           s3:
             container: ${jenkins-cache-bucket}
             prefix: "jenkins-artifacts-staging/"
             # artifact-manager-s3 validates customEndpoint as host[:port].
             customEndpoint: ${jenkins-cache-endpoint-host}
             customSigningRegion: ${jenkins-cache-region}
-            usePathStyleUrl: true
+            usePathStyleUrl: false
             disableSessionToken: true
