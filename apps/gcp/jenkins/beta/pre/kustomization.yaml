@@ -9,3 +9,4 @@ resources:
   - secret-docs-cn.yaml
   - secret-ks3util.yaml
   - secret-tidbx-docker-config.yaml
+  - secret-jenkins-artifact-s3.yaml
