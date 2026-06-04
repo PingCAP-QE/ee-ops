@@ -13,12 +13,13 @@ controller:
     - http_request:1.25
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
     - job-dsl:3654.vdf58f53e2d15
-    - role-strategy:840.v206ff7f7312e
-    - pipeline-utility-steps:3.810.va_7672d206740
-    - prometheus:852.v317db_5d17a_b_0
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1469.v52dff5a_80e32
     - pipeline-graph-view:836.v68ef091500dd
+    - pipeline-utility-steps:3.810.va_7672d206740
+    - prometheus:852.v317db_5d17a_b_0
+    - role-strategy:840.v206ff7f7312e
+    - ssh-agent:396.vcc7d84e622ec
 
   initializeOnce: false
 
