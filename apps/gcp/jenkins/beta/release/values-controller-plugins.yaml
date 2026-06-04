@@ -6,7 +6,6 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - blueocean:1.27.25
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
     - generic-webhook-trigger:2.4.1
@@ -17,7 +16,6 @@ controller:
     - role-strategy:840.v206ff7f7312e
     - pipeline-utility-steps:3.810.va_7672d206740
     - prometheus:852.v317db_5d17a_b_0
-    - ssh-agent:396.vcc7d84e622ec
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1469.v52dff5a_80e32
     - pipeline-graph-view:836.v68ef091500dd
