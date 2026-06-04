@@ -4,6 +4,8 @@ resources:
   - namespace-agent.yaml
   - release.yaml
   - http-routes.yaml
+  - staging/release.yaml
+  - staging/http-routes.yaml
 secretGenerator:
   - name: jenkins-release-values
     files:
@@ -12,5 +14,10 @@ secretGenerator:
       - values3.yaml=values-JCasC.yaml
       - values4.yaml=values-rbac.yaml
       - values5.yaml=values-agent.yaml
+      - staging-values1.yaml=staging/values-controller.yaml
+      - staging-values2.yaml=staging/values-controller-plugins.yaml
+      - staging-values3.yaml=staging/values-JCasC.yaml
+      - staging-values4.yaml=staging/values-rbac.yaml
+      - staging-values5.yaml=staging/values-agent.yaml
 configurations:
   - kustomize-config.yaml
