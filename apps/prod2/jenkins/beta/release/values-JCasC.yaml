@@ -266,7 +266,7 @@ controller:
                   provider: s3
         aws:
           awsCredentials:
-            credentialsId: jenkins-cache-s3
+            credentialsId: jenkins-artifact-s3
           s3:
             container: ${jenkins-cache-bucket}
             prefix: "jenkins-artifacts/"
