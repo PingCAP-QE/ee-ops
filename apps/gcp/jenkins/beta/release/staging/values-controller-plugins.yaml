@@ -1,0 +1,59 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+controller:
+  overwritePlugins: true
+  installLatestPlugins: true
+  # List of plugins to install in addition to those listed in controller.installPlugins
+  additionalPlugins:
+    # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
+    # but without outer `plugin` key.
+    - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
+    - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
+    - generic-webhook-trigger:2.4.1
+    - google-login:109.v022b_cf87b_e5b_
+    - http_request:1.25
+    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
+    - job-dsl:3654.vdf58f53e2d15
+    - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
+    - lockable-resources:1469.v52dff5a_80e32
+    - pipeline-graph-view:836.v68ef091500dd
+    - pipeline-utility-steps:3.810.va_7672d206740
+    - prometheus:852.v317db_5d17a_b_0
+    - role-strategy:840.v206ff7f7312e
+    - ssh-agent:396.vcc7d84e622ec
+
+  initializeOnce: false
+
+  # for plugin build-failure-analyzer
+  #   Exporting to prometheus
+  #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
+  prometheus:
+    metricRelabelings:
+      # add label: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_category_(.*)
+        targetLabel: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:.*:_:(.*)
+        targetLabel: category
+
+      # add label: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_cause_(.*)
+        targetLabel: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:.*:_:(.*)
+        targetLabel: cause
+
+      # add label: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:(.*):_:.*
+        targetLabel: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:(.*):_:.*
+        targetLabel: jobname
+
+      # aggerate to uniq metric: jenkins_bfa
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_(.*)_(.*)
+        replacement: jenkins_bfa
+        targetLabel: __name__

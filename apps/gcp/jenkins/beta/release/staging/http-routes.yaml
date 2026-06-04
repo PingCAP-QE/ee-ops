@@ -1,0 +1,37 @@
+# HealthCheckPolicy to align GKE load balancer health probes with Jenkins' actual health endpoint
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: jenkins-health-check-policy
+spec:
+  targetRef:
+    group: ""
+    kind: Service
+    name: jenkins
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        requestPath: "${INGRESS_PATH}-staging/login"
+        port: 80
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: controller
+  namespace: jenkins
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: infra
+  hostnames:
+    - "${INGRESS_HOST}"
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 80
+      matches:
+        - path:
+            type: PathPrefix
+            value: "${INGRESS_PATH}-staging"
