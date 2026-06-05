@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: jenkins
-      version: 5.9.19
+      version: 5.9.22
       sourceRef:
         kind: HelmRepository
         name: jenkins
