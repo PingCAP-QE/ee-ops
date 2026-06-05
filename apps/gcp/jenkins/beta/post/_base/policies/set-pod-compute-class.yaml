@@ -11,9 +11,9 @@ spec:
             - Pod
           selector:
             matchExpressions:
-              - key: jenkins/jenkins-jenkins-agent
-                operator: In
-                values: ["true"]
+              - key: kubernetes.jenkins.io/controller
+                operator: Exists
+
       mutate:
         patchStrategicMerge:
           metadata:
@@ -30,9 +30,9 @@ spec:
             - Pod
           selector:
             matchExpressions:
-              - key: jenkins/jenkins-jenkins-agent
-                operator: In
-                values: ["true"]
+              - key: kubernetes.jenkins.io/controller
+                operator: Exists
+
       context:
         - name: ci_refs_raw
           variable:
@@ -55,6 +55,25 @@ spec:
           - key: "{{ is_hotfix_branch }}"
             operator: Equals
             value: true
+      mutate:
+        patchStrategicMerge:
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker-ondemand
+
+    - name: override-compute-class-for-retried-pods
+      match:
+        resources:
+          kinds:
+            - Pod
+          selector:
+            matchExpressions:
+              - key: kubernetes.jenkins.io/controller
+                operator: Exists
+              - key: kubernetes.jenkins.io/retry
+                operator: In
+                values: ["true"]
+
       mutate:
         patchStrategicMerge:
           spec:

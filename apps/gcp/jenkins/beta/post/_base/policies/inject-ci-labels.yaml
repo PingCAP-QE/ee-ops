@@ -12,9 +12,9 @@ spec:
             - Pod
           selector:
             matchExpressions:
-              - key: jenkins/jenkins-jenkins-agent
-                operator: In
-                values: ["true"]
+              - key: kubernetes.jenkins.io/controller
+                operator: Exists
+
       context:
         - name: parsed_refs
           variable:
@@ -25,7 +25,6 @@ spec:
           - key: "{{ request.object.metadata.annotations.ci_refs || '' }}"
             operator: NotEquals
             value: ""
-
       mutate:
         patchStrategicMerge:
           metadata:
