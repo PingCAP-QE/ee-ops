@@ -6,6 +6,7 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
+    - artifact-manager-s3:973.v6a_51253e896b_
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
     - generic-webhook-trigger:2.4.1
@@ -13,6 +14,7 @@ controller:
     - http_request:1.25
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
     - job-dsl:3654.vdf58f53e2d15
+    - kubernetes:4437.vd64141124d8f:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f/kubernetes-4437.vd64141124d8f.hpi
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1469.v52dff5a_80e32
     - pipeline-graph-view:836.v68ef091500dd
