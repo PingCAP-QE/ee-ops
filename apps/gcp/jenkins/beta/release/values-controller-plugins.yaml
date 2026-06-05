@@ -2,6 +2,15 @@
 controller:
   overwritePlugins: true
   installLatestPlugins: true
+
+  # Override the default list to use our own custom plugin
+  # Ref: https://artifacthub.io/packages/helm/jenkinsci/jenkins?modal=values&path=controller.installPlugins
+  installPlugins:
+    - kubernetes:4437.vd64141124d8f:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f/kubernetes-4437.vd64141124d8f.hpi
+    - workflow-aggregator:608.v67378e9d3db_1
+    - git:5.10.1
+    - configuration-as-code:2077.v41f1011a_5110
+
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
@@ -14,7 +23,6 @@ controller:
     - http_request:1.25
     - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
     - job-dsl:3654.vdf58f53e2d15
-    - kubernetes:4437.vd64141124d8f:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f/kubernetes-4437.vd64141124d8f.hpi
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1469.v52dff5a_80e32
     - pipeline-graph-view:836.v68ef091500dd
