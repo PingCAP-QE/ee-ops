@@ -4,7 +4,7 @@ metadata:
   name: pod-release
   namespace: jenkins-pd
   labels:
-    jenkins/jenkins-jenkins-agent: "true"
+    kubernetes.jenkins.io/controller: ""
   annotations:
     ci_refs: '{"org":"pingcap","repo":"tidb","base_ref":"release-8.5-20260301-v8.5.6"}'
 spec:
