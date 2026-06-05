@@ -13,7 +13,6 @@ spec:
             matchExpressions:
               - key: kubernetes.jenkins.io/controller
                 operator: Exists
-
       mutate:
         patchStrategicMerge:
           metadata:
@@ -32,7 +31,6 @@ spec:
             matchExpressions:
               - key: kubernetes.jenkins.io/controller
                 operator: Exists
-
       context:
         - name: ci_refs_raw
           variable:
@@ -61,6 +59,8 @@ spec:
             nodeSelector:
               cloud.google.com/compute-class: ci-worker-ondemand
 
+    # Override compute class for retried Jenkins pods to ensure they
+    # run on on-demand CI workers.
     - name: override-compute-class-for-retried-pods
       match:
         resources:
@@ -73,7 +73,6 @@ spec:
               - key: kubernetes.jenkins.io/retry
                 operator: In
                 values: ["true"]
-
       mutate:
         patchStrategicMerge:
           spec:

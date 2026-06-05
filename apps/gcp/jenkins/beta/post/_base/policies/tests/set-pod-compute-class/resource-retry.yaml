@@ -1,12 +1,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-non-release
+  name: pod-retry
   namespace: jenkins-pd
   labels:
     kubernetes.jenkins.io/controller: ""
-  annotations:
-    ci_refs: '{"org":"pingcap","repo":"tidb","base_ref":"master"}'
+    kubernetes.jenkins.io/retry: "true"
 spec:
   containers:
     - name: main
