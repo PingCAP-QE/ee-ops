@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.24-3-g4e98920
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.31-3-gf1df263
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -46,7 +46,13 @@ spec:
 
                   with open("/tmp/summary.json", encoding="utf-8") as f:
                       payload = json.load(f)
-                  dates = payload.get("touched_usage_dates") or []
+                  if isinstance(payload, dict):
+                      payloads = [payload]
+                  else:
+                      payloads = payload or []
+                  dates = []
+                  for item in payloads:
+                      dates.extend(item.get("touched_usage_dates") or [])
                   if dates:
                       print(min(dates), max(dates))
                   PY
@@ -120,7 +126,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.24-3-g4e98920
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.31-3-gf1df263
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -159,6 +165,173 @@ spec:
                 - name: COST_INSIGHT_UNMATCHED_RESOURCE_LAG_DAYS
                   value: "5"
                 - name: COST_INSIGHT_SYNC_PAGE_SIZE
+                  value: "5000"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-insight-sync-aws-billing-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-aws-billing-summary
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Interpreted with timeZone below: 21:40 Asia/Shanghai, after the GCP summary job.
+  schedule: "40 21 * * *"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-aws-billing-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-aws-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.31-3-gf1df263
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-aws-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  dates="$(python - <<'PY'
+                  import json
+
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
+                  if isinstance(payload, dict):
+                      payloads = [payload]
+                  else:
+                      payloads = payload or []
+                  dates = []
+                  for item in payloads:
+                      dates.extend(item.get("touched_usage_dates") or [])
+                  if dates:
+                      print(min(dates), max(dates))
+                  PY
+                  )"
+                  if [ -n "${dates}" ]; then
+                    set -- ${dates}
+                    cost-insight refresh-cost-attribution-from-summary \
+                      --start-date "$1" \
+                      --end-date "$2" \
+                      --split-by-day
+                  else
+                    echo "No touched usage dates returned; skip attribution refresh."
+                  fi
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_AWS_BILLING_TABLE
+                  value: gcp-digital-bi.stg_cloud_billing.stg_aws_billing
+                - name: COST_INSIGHT_AWS_EXPORT_OVERLAP_MONTHS
+                  value: "1"
+                - name: COST_INSIGHT_AWS_SYNC_PAGE_SIZE
+                  value: "5000"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-insight-sync-aws-unmatched-resources
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-aws-unmatched-resources
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Interpreted with timeZone below: Monday 23:10 Asia/Shanghai, after the GCP unmatched job.
+  schedule: "10 23 * * 1"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-aws-unmatched-resources
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-aws-unmatched-resources
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.5.31-3-gf1df263
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  dates="$(python - <<'PY'
+                  from datetime import datetime, timedelta, timezone
+                  import os
+
+                  lag_days = int(os.environ.get("COST_INSIGHT_UNMATCHED_RESOURCE_LAG_DAYS", "5"))
+                  stable_date = datetime.now(timezone.utc).date() - timedelta(days=lag_days)
+                  end_date = stable_date - timedelta(days=stable_date.weekday() + 1)
+                  start_date = end_date - timedelta(days=6)
+                  print(start_date.isoformat(), end_date.isoformat())
+                  PY
+                  )"
+                  set -- ${dates}
+                  cost-insight sync-aws-unmatched-resources \
+                    --usage-start-date "$1" \
+                    --usage-end-date "$2"
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_AWS_BILLING_TABLE
+                  value: gcp-digital-bi.stg_cloud_billing.stg_aws_billing
+                - name: COST_INSIGHT_UNMATCHED_RESOURCE_LAG_DAYS
+                  value: "5"
+                - name: COST_INSIGHT_AWS_SYNC_PAGE_SIZE
                   value: "5000"
               resources:
                 requests:
