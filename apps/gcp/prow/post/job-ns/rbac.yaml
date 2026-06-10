@@ -31,3 +31,10 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: k8s-pod-full
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: tidbx-puller
+  annotations:
+    iam.gke.io/gcp-service-account: tidbx-gar-reader@pingcap-testing-account.iam.gserviceaccount.com
