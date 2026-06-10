@@ -106,9 +106,7 @@ spec:
   # Interpreted with timeZone below: 22:20 Asia/Shanghai, after the other daily cost jobs.
   schedule: "20 22 * * *"
   timeZone: Asia/Shanghai
-  # Keep suspended until the ee-apps image tag is updated to a release that includes
-  # the new GCS cache cleanup commands.
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
