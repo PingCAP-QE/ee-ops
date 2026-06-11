@@ -93,6 +93,26 @@ spec:
                   cluster_type: TICDC_NG
                   base_image: us.gcr.io/pingcap-public/tidbx/ticdc
                   github_repo: pingcap/ticdc
+                tibr_autobackup:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
+                  github_repo: tidbcloud/cloud-storage-engine
+                tibr_restore:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
+                  github_repo: tidbcloud/cloud-storage-engine
+                tibrgc_t2_dfsgc:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
+                  github_repo: tidbcloud/cloud-storage-engine
+                tibrgc_t3_archive:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/tikv
+                  github_repo: tidbcloud/cloud-storage-engine
+                classic_restore:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/br
+                  github_repo: pingcap/tidb
             dev:
               api_base_url: "{{ .ops_dev_api_base_url }}"
               api_key: "{{ .ops_dev_api_key }}"
