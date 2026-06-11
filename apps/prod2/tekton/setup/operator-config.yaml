@@ -39,8 +39,8 @@ spec:
     resources:
       - taskrun
       - pipelinerun
-    keep-since: 600 # unit: minute
-    schedule: "0 * * * *" # hourly
+    keep-since: 300 # unit: minute
+    schedule: "*/30 * * * *" # every half hour
   hub:
     params:
       - name: enable-devconsole-integration
