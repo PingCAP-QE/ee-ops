@@ -11,6 +11,7 @@ resources:
   - ci-dashboard
   - cost-insight
   - roster
+  - publisher
   # workloads
   - acr-runners
   - jenkins/beta

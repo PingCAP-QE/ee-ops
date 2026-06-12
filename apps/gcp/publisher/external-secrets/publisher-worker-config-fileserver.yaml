@@ -1,0 +1,46 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: publisher-worker-config-fileserver
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: publisher-worker-config-fileserver
+    creationPolicy: Owner
+    template:
+      type: Opaque
+      data:
+        config.yaml: |
+          file_server:
+            kafka:
+              brokers:
+                - cluster-cd-kafka-bootstrap:9092
+              topic: cd-publishing-requests
+              consumer_group: publisher-worker-fileserver
+
+            redis:
+              addr: "redis-master:6379"
+              db: 0
+              password: {{ .redis_password }}
+
+            options:
+              lark_webhook_url: {{ .lark_webhook_url }}
+              s3.endpoint: {{ .S3_REGION_ENDPOINT }}
+              s3.region: {{ .S3_REGION }}
+              s3.bucket_name: {{ .S3_BUCKET }}
+              s3.access_key: {{ .S3_ACCESS_KEY }}
+              s3.secret_key: {{ .S3_SECRET_KEY }}
+
+  data:
+    - secretKey: redis_password
+      remoteRef:
+        key: prod2_publisher_redis_password
+    - secretKey: lark_webhook_url
+      remoteRef:
+        key: prod2_publisher_failure_lark_webhook_url
+  dataFrom:
+    - extract:
+        # json object contains keys: S3_*
+        key: prod2_publisher_fileserver_s3_json

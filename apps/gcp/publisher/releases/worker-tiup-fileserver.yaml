@@ -1,0 +1,49 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: publisher-worker-fileserver
+spec:
+  chart:
+    spec:
+      chart: publisher-worker
+      version: 0.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  dependsOn:
+    - name: redis
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+  test:
+    enable: false
+  values:
+    # Additional volumes on the output Deployment definition.
+    image:
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher-worker versioning=semver
+      tag: v2026.3.15-3-g628a93d
+    resources:
+      limits:
+        cpu: "1"
+        memory: 4Gi
+      requests:
+        cpu: 500m
+        memory: 1Gi
+    worker:
+      config:
+        secretName: publisher-worker-config-fileserver
+        secretKey: config.yaml
+        debug: true
+
+    volumes:
+      - name: worker-oci-cred
+        secret:
+          secretName: registry-reader-cred
+    volumeMounts:
+      - name: worker-oci-cred
+        mountPath: /root/.docker
+        readOnly: true
