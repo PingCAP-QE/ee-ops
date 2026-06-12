@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - ../_base
   - cluster-policies
-  - brc
   - tekton
   - publisher
   - zot
