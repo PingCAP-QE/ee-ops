@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - httproute-auth-secret.yaml
   - publisher-server-config.yaml
-  - publisher-worker-config-fileserver.yaml
   - publisher-worker-config-tiup-prod.yaml
   - publisher-worker-config-tiup-staging.yaml
   - tiup-credentials-prod.yaml
