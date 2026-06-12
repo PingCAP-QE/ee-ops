@@ -1,0 +1,23 @@
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: ee-application
+spec:
+  nodePoolAutoCreation:
+    enabled: true
+  whenUnsatisfiable: DoNotScaleUp
+  priorityDefaults:
+    location:
+      locationPolicy: ANY
+      zoneTypes: [STANDARD]
+  priorities:
+    # --------- spot types -----------
+    - machineFamily: t2d
+      priorityScore: 100
+      spot: false
+    - machineFamily: n2d
+      priorityScore: 90
+      spot: false
+    - machineFamily: e2
+      priorityScore: 60
+      spot: false

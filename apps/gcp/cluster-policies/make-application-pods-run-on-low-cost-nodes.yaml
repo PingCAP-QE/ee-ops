@@ -1,0 +1,25 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: make-application-pods-run-on-low-cost-nodes
+spec:
+  rules:
+    - name: set-compute-class
+      match:
+        resources:
+          kinds:
+            - Pod
+          namespaces:
+            - apps
+            - arc-systems
+            - jenkins
+            - kafka
+            - kafka-operator
+            - publisher
+            - tekton-operator
+            - tekton-pipelines
+      mutate:
+        patchStrategicMerge:
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ee-application
