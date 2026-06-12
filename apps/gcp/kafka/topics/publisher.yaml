@@ -4,4 +4,8 @@ metadata:
   name: cd-publishing-requests
   labels:
     strimzi.io/cluster: cluster-cd
-spec: {}
+spec:
+  partitions: 3
+  replicationFactor: 2
+  retention.ms: 604800000 # 7 days
+  segment.bytes: 1073741824 # 1 GB
