@@ -17,3 +17,4 @@ agent:
       jenkins-tiflow
       jenkins-tidb
       jenkins-tiflash
+      jenkins-tikv
