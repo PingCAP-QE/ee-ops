@@ -4,3 +4,4 @@ resources:
   - ci-worker.yaml
   - ci-worker-bigdisk.yaml
   - ci-worker-ondemand.yaml
+  - ee-application.yaml

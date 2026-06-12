@@ -1,4 +1,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - avoid-application-pods-run-on-spot-nodes.yaml
+  - make-application-pods-run-on-low-cost-nodes.yaml
