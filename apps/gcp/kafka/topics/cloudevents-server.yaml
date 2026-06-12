@@ -1,4 +1,4 @@
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
 metadata:
   name: cloudevents-default-channel
@@ -6,7 +6,7 @@ metadata:
     strimzi.io/cluster: cluster-cd
 spec: {}
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
 metadata:
   name: cloudevents-dead-letter
@@ -14,7 +14,7 @@ metadata:
     strimzi.io/cluster: cluster-cd
 spec: {}
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
 metadata:
   name: jenkins-event
