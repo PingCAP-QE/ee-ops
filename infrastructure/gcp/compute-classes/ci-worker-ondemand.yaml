@@ -24,8 +24,14 @@ spec:
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
-    - machineFamily: c4a
+    - machineFamily: c4a # Arm64
       priorityScore: 85
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4a # Arm64
+      priorityScore: 75
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
