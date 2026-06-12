@@ -12,14 +12,5 @@ spec:
       mutate:
         patchStrategicMerge:
           spec:
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: cloud.google.com/machine-family
-                          operator: In
-                          values: [t2d]
-                        - key: cloud.google.com/gke-provisioning
-                          operator: NotIn
-                          values: ["spot"]
+            nodeSelector:
+              cloud.google.com/compute-class: ee-application
