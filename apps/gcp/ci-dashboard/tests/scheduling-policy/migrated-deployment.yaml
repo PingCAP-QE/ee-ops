@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ci-dashboard
+  namespace: apps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ci-dashboard
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ci-dashboard
+    spec:
+      containers:
+        - name: ci-dashboard
+          image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard:test
+      nodeSelector:
+        cloud.google.com/compute-class: ee-application
+        kubernetes.io/arch: amd64

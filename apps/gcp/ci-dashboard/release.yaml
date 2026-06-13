@@ -28,21 +28,6 @@ spec:
   test:
     enable: true
     ignoreFailures: false
-  postRenderers:
-    - kustomize:
-        patches:
-          - target:
-              kind: Deployment
-              name: ci-dashboard
-            patch: |
-              apiVersion: apps/v1
-              kind: Deployment
-              metadata:
-                name: ci-dashboard
-              spec:
-                template:
-                  spec:
-                    affinity: null
   values:
     replicaCount: 1
     nodeSelector:

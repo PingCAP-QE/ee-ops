@@ -1,0 +1,23 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: ci-dashboard-scheduling
+policies:
+  - ../../scheduling-policy.yaml
+resources:
+  - legacy-deployment.yaml
+  - unrelated-deployment.yaml
+results:
+  - policy: ci-dashboard-scheduling
+    rule: migrate-app-to-compute-class
+    resources:
+      - ci-dashboard
+    kind: Deployment
+    result: pass
+    patchedResources: migrated-deployment.yaml
+  - policy: ci-dashboard-scheduling
+    rule: migrate-app-to-compute-class
+    resources:
+      - unrelated-app
+    kind: Deployment
+    result: skip
