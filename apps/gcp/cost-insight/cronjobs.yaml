@@ -81,9 +81,9 @@ spec:
                 - name: COST_INSIGHT_GCP_BILLING_TABLE
                   value: gcp-digital-bi.gcp_billing_detailed.gcp_billing_export_resource_v1_01D088_8F9CF2_8AF1C6
                 - name: COST_INSIGHT_SYNC_LAG_DAYS
-                  value: "5"
+                  value: "3"
                 - name: COST_INSIGHT_EXPORT_OVERLAP_DAYS
-                  value: "0"
+                  value: "3"
                 - name: COST_INSIGHT_SYNC_PAGE_SIZE
                   value: "5000"
               resources:
