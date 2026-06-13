@@ -1,0 +1,22 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: ci-dashboard-scheduling
+  namespace: apps
+spec:
+  rules:
+    - name: migrate-app-to-compute-class
+      match:
+        resources:
+          kinds:
+            - Deployment
+          names:
+            - ci-dashboard
+      mutate:
+        patchStrategicMerge:
+          spec:
+            template:
+              spec:
+                affinity: null
+                nodeSelector:
+                  cloud.google.com/compute-class: ee-application
