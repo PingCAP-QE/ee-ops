@@ -3,6 +3,9 @@ agent:
   maxRequestsPerHostStr: "10" # need to restart controller after updated it.
   containerCap: 10
   resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
     limits:
       cpu: 200m
       memory: 512Mi
