@@ -5,4 +5,3 @@ resources:
   - publisher.yaml
   - worker-tiup-prod.yaml
   - worker-tiup-staging.yaml
-  - publisher-ext-http-routes.yaml
