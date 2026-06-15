@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.7-3-gb764b8f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.14-4-gb4b9a0d
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -127,7 +127,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.7-3-gb764b8f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.14-4-gb4b9a0d
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -167,13 +167,11 @@ metadata:
     app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-dry-run
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: Monday 22:50 Asia/Shanghai, after the daily
+  # Interpreted with timeZone below: daily 22:40 Asia/Shanghai, after the daily
   # last-seen sync has refreshed the previous UTC day.
-  schedule: "50 22 * * 1"
+  schedule: "40 22 * * *"
   timeZone: Asia/Shanghai
-  # Keep suspended until the ee-apps image tag is updated to a release that includes
-  # the new GCS cache cleanup commands.
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -188,12 +186,11 @@ spec:
             app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-dry-run
             app.kubernetes.io/part-of: cost-insight
         spec:
-          # This first slice is BigQuery-only and does not perform deletes.
           serviceAccountName: ci-dashboard
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-dry-run
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.7-3-gb764b8f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.14-4-gb4b9a0d
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -202,8 +199,7 @@ spec:
                 - |
                   cost-insight cleanup-gcs-cache \
                     --mode dry-run \
-                    --ac-retention-days 28 \
-                    --cas-retention-days 42
+                    --execute-kind all
               env:
                 - name: PYTHONUNBUFFERED
                   value: "1"
@@ -220,9 +216,90 @@ spec:
                 - name: COST_INSIGHT_GCS_CACHE_AUDIT_LOG_TABLE
                   value: cloudaudit_googleapis_com_data_access
                 - name: COST_INSIGHT_GCS_CACHE_AC_RETENTION_DAYS
-                  value: "28"
+                  value: "14"
                 - name: COST_INSIGHT_GCS_CACHE_CAS_RETENTION_DAYS
-                  value: "42"
+                  value: "21"
+                - name: COST_INSIGHT_GCS_CACHE_SAFETY_BUFFER_DAYS
+                  value: "1"
+                - name: COST_INSIGHT_GCS_CACHE_CLEANUP_SAMPLE_LIMIT
+                  value: "10"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-insight-cleanup-gcs-cache-delete-ac
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-delete-ac
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Interpreted with timeZone below: daily 23:00 Asia/Shanghai. Keep suspended
+  # until the manual first wave has been reviewed.
+  schedule: "0 23 * * *"
+  timeZone: Asia/Shanghai
+  suspend: true
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-delete-ac
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: cleanup-gcs-cache-delete-ac
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.14-4-gb4b9a0d
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  cost-insight cleanup-gcs-cache \
+                    --mode delete \
+                    --execute-kind ac
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_GCS_CACHE_PROJECT_ID
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_GCS_CACHE_BUCKET_NAME
+                  value: pingcap-ci-bazel-remote-cache-us-central1
+                - name: COST_INSIGHT_GCS_CACHE_DATASET
+                  value: ci_bazel_cache_logs
+                - name: COST_INSIGHT_GCS_CACHE_AUDIT_LOG_TABLE
+                  value: cloudaudit_googleapis_com_data_access
+                - name: COST_INSIGHT_GCS_CACHE_AC_RETENTION_DAYS
+                  value: "14"
+                - name: COST_INSIGHT_GCS_CACHE_CAS_RETENTION_DAYS
+                  value: "21"
+                - name: COST_INSIGHT_GCS_CACHE_SAFETY_BUFFER_DAYS
+                  value: "1"
+                - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_OBJECTS
+                  value: "10000000"
+                - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MANIFEST_BUCKET
+                  value: pingcap-ci-console-logs-us-central1
+                - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MANIFEST_PREFIX
+                  value: gcs-cache-steady-state-delete
               resources:
                 requests:
                   cpu: "500m"
@@ -263,7 +340,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.7-3-gb764b8f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.14-4-gb4b9a0d
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -342,7 +419,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.7-3-gb764b8f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.14-4-gb4b9a0d
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -432,7 +509,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.7-3-gb764b8f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.14-4-gb4b9a0d
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
