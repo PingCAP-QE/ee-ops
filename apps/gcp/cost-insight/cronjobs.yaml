@@ -103,8 +103,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcs-cache-last-seen
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 22:20 Asia/Shanghai, after the other daily cost jobs.
-  schedule: "20 22 * * *"
+  # Interpreted with timeZone below: 21:20 Asia/Shanghai, after the other daily cost jobs.
+  schedule: "20 21 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -167,9 +167,9 @@ metadata:
     app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-dry-run
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: daily 22:40 Asia/Shanghai, after the daily
+  # Interpreted with timeZone below: daily 21:40 Asia/Shanghai, after the daily
   # last-seen sync has refreshed the previous UTC day.
-  schedule: "40 22 * * *"
+  schedule: "40 21 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
