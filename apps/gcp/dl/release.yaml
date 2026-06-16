@@ -1,0 +1,51 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: dl
+spec:
+  chart:
+    spec:
+      chart: dl
+      version: 0.2.1
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/dl
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
+      tag: v2026.6.14-8-g988cf92
+    server:
+      args: [--ks3-config=/config/ks3.yaml, --oci-config=/config/oci.yaml]
+      volumes:
+        - name: config
+          secret:
+            secretName: dl-config
+      volumeMounts:
+        - name: config
+          mountPath: /config
+    serviceAccount:
+      create: false
+    httpRoute:
+      enabled: false
