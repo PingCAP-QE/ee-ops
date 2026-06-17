@@ -3,7 +3,6 @@ kind: Policy
 metadata:
   name: set-application-node-selectors
 spec:
-  mutateExistingOnPolicyUpdate: true
   rules:
     - name: set-compute-class
       match:
