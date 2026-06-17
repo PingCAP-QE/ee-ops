@@ -4,5 +4,6 @@ namespace: dl
 resources:
   - namespace.yaml
   - external-secrets
+  - health-check-policy.yaml
   - http-route.yaml
   - release.yaml
