@@ -1,0 +1,55 @@
+apiVersion: kyverno.io/v1
+kind: Policy
+metadata:
+  name: set-application-node-selectors
+spec:
+  mutateExistingOnPolicyUpdate: true
+  rules:
+    - name: set-compute-class
+      match:
+        resources:
+          kinds:
+            - Deployment
+            - StatefulSet
+      exclude:
+        resources:
+          kinds:
+            - Deployment
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: publisher
+      mutate:
+        targets:
+          - apiVersion: apps/v1
+            kind: Deployment
+          - apiVersion: apps/v1
+            kind: StatefulSet
+        patchStrategicMerge:
+          spec:
+            template:
+              spec:
+                nodeSelector:
+                  cloud.google.com/compute-class: ee-application
+
+    - name: set-publisher-node-selector
+      match:
+        resources:
+          kinds:
+            - Deployment
+          selector:
+            matchLabels:
+              app.kubernetes.io/name: publisher
+      mutate:
+        targets:
+          - apiVersion: apps/v1
+            kind: Deployment
+        patchStrategicMerge:
+          spec:
+            template:
+              spec:
+                nodeSelector:
+                  cloud.google.com/gke-nodepool: whitelist-nat
+                tolerations:
+                  - effect: NoSchedule
+                    key: network
+                    value: whitelist
