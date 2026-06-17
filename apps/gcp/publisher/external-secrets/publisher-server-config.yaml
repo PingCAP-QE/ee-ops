@@ -150,7 +150,7 @@ spec:
             target: "ops_dev_$1"
     - extract:
         # json object contains keys: api_base_url, api_key
-        key: tcms_api_json
+        key: tcms_public_api_json
       rewrite:
         - regexp:
             source: "(.*)"
