@@ -20,10 +20,12 @@ spec:
             path:
               type: ReplacePrefixMatch
               replacePrefixMatch: /
-      # Large artifact downloads are streamed for minutes, so the default
-      # Gateway/Envoy request timeout must be disabled on this route.
-      timeouts:
-        request: 0s
+      # Large artifact downloads are streamed for minutes. The GCP external
+      # HTTP(S) load balancer (GKE Gateway) has a 30s backend timeout, which
+      # applies to data-packet intervals, not total download duration. As long
+      # as the dl service streams data continuously, downloads won't be cut off.
+      # If long pauses between chunks cause timeouts, configure timeout via
+      # a GCPBackendPolicy on the dl Service instead.
       backendRefs:
         - name: dl
           port: 80
