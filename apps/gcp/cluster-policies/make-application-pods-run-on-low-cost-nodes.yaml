@@ -15,7 +15,6 @@ spec:
             - jenkins
             - kafka
             - kafka-operator
-            - publisher
             - tekton-operator
             - tekton-pipelines
       mutate:
