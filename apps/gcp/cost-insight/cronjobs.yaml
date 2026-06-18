@@ -320,7 +320,7 @@ spec:
   # Interpreted with timeZone below: daily 21:20 Asia/Shanghai, after delete-ac.
   schedule: "20 21 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
