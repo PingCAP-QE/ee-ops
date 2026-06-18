@@ -220,7 +220,7 @@ spec:
                 - name: COST_INSIGHT_GCS_CACHE_AC_RETENTION_DAYS
                   value: "14"
                 - name: COST_INSIGHT_GCS_CACHE_CAS_RETENTION_DAYS
-                  value: "21"
+                  value: "14"
                 - name: COST_INSIGHT_GCS_CACHE_SAFETY_BUFFER_DAYS
                   value: "1"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_SAMPLE_LIMIT
@@ -293,7 +293,7 @@ spec:
                 - name: COST_INSIGHT_GCS_CACHE_AC_RETENTION_DAYS
                   value: "14"
                 - name: COST_INSIGHT_GCS_CACHE_CAS_RETENTION_DAYS
-                  value: "21"
+                  value: "14"
                 - name: COST_INSIGHT_GCS_CACHE_SAFETY_BUFFER_DAYS
                   value: "1"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_OBJECTS
