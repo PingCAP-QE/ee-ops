@@ -55,6 +55,9 @@ spec:
             value: true
       mutate:
         patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
           spec:
             nodeSelector:
               cloud.google.com/compute-class: ci-worker-ondemand
@@ -75,6 +78,9 @@ spec:
                 values: ["true"]
       mutate:
         patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
           spec:
             nodeSelector:
               cloud.google.com/compute-class: ci-worker-ondemand
