@@ -5,3 +5,4 @@ resources:
   - el-github.yaml
   - el-harbor.yaml
   - el-notify.yaml
+  - el-tibuild.yaml
