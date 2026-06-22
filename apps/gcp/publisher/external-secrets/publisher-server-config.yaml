@@ -16,7 +16,7 @@ spec:
           event_source: "http://publisher.publisher.svc"
           kafka:
             brokers:
-              - cluster-cd-kafka-bootstrap:9092
+              - cluster-cd-kafka-bootstrap.kafka.svc:9092
             topic: cd-publishing-requests
             client_id: publisher-server
           redis:
