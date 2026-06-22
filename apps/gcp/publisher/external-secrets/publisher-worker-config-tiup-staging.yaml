@@ -35,7 +35,7 @@ spec:
         key: prod2_publisher_redis_password
     - secretKey: tiup_mirror_url
       remoteRef:
-        key: tiup-staging-mirror-url
+        key: tiup-staging-mirror-external-url
     - secretKey: lark_webhook_url
       remoteRef:
         key: prod2_publisher_failure_lark_webhook_url
