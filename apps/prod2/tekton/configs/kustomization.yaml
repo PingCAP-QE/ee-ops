@@ -4,6 +4,7 @@ resources:
   - 0-namespace.yaml
   - secrets
   - rbac
+  - configmaps
   - tasks/config.yaml
   - pipelines/config.yaml
   - triggers
