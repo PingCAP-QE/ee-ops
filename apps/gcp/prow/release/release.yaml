@@ -31,6 +31,21 @@ spec:
   test:
     enable: true
     ignoreFailures: false
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              labelSelector: app.kubernetes.io/part-of=prow
+            patch: |
+              apiVersion: apps/v1
+              kind: Deployment
+              metadata:
+                name: ignored
+              spec:
+                template:
+                  spec:
+                    affinity: null
   values:
     podLabels:
       env: cicd
