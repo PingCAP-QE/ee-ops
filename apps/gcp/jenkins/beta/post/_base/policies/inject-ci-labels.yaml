@@ -53,6 +53,14 @@ spec:
                   regex_replace_all('^[-_]+|[-_]+$', @, '') |
                   regex_replace_all('^(.{0,63}).*$', @, '$1')
                 }}
+              prow.k8s.io/refs.target_branch: >-
+                {{
+                  not_null(parsed_refs.base_ref, '') |
+                  to_lower(@) |
+                  regex_replace_all('[^a-z0-9_-]', @, '_') |
+                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
+                  regex_replace_all('^(.{0,63}).*$', @, '$1')
+                }}
 
               author: >-
                 {{
@@ -77,6 +85,14 @@ spec:
               repo: >-
                 {{
                   not_null(parsed_refs.repo, '') |
+                  to_lower(@) |
+                  regex_replace_all('[^a-z0-9_-]', @, '_') |
+                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
+                  regex_replace_all('^(.{0,63}).*$', @, '$1')
+                }}
+              target_branch: >-
+                {{
+                  not_null(parsed_refs.base_ref, '') |
                   to_lower(@) |
                   regex_replace_all('[^a-z0-9_-]', @, '_') |
                   regex_replace_all('^[-_]+|[-_]+$', @, '') |
