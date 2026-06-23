@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -127,7 +127,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -194,7 +194,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-ac-references
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -258,7 +258,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-dry-run
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -331,7 +331,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -363,7 +363,7 @@ spec:
                 - name: COST_INSIGHT_GCS_CACHE_SAFETY_BUFFER_DAYS
                   value: "1"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_OBJECTS
-                  value: "10000000"
+                  value: "500"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_CAS_OBJECTS
                   value: "500"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MANIFEST_BUCKET
@@ -410,7 +410,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -489,7 +489,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -579,7 +579,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-6-g30392c1
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.21-8-g7708e63
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
