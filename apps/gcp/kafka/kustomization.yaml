@@ -5,3 +5,4 @@ resources:
   - cluster.yaml
   - topics/cloudevents-server.yaml
   - topics/publisher.yaml
+  - topics/publisher-dlq.yaml
