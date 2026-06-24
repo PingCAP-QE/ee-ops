@@ -32,6 +32,12 @@ spec:
               s3.bucket_name: {{ .S3_BUCKET }}
               s3.access_key: {{ .S3_ACCESS_KEY }}
               s3.secret_key: {{ .S3_SECRET_KEY }}
+            dlq:
+              enabled: true
+              topic: cd-publishing-requests-dlq
+              max_retries: 3
+              backoff_base: 10s
+              max_backoff: 5m
 
   data:
     - secretKey: redis_password

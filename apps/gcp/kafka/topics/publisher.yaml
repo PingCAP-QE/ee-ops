@@ -5,3 +5,11 @@ metadata:
   labels:
     strimzi.io/cluster: cluster-cd
 spec: {}
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: cd-publishing-requests-dlq
+  labels:
+    strimzi.io/cluster: cluster-cd
+spec: {}
