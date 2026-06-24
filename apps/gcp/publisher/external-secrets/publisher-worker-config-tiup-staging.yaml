@@ -29,6 +29,12 @@ spec:
               addr: "redis-master:6379"
               db: 0
               password: {{ .redis_password }}
+            dlq:
+              enabled: true
+              topic: cd-publishing-requests-dlq
+              max_retries: 3
+              backoff_base: 10s
+              max_backoff: 5m
   data:
     - secretKey: redis_password
       remoteRef:
