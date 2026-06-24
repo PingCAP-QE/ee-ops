@@ -71,7 +71,7 @@ spec:
         enabled: false
       image:
         repository: ghcr.io/ti-community-infra/prow/deck
-        tag: v20260624-854ffdb7f
+        tag: v20260624-51a7f0e61
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
