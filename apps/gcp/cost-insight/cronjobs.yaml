@@ -311,10 +311,9 @@ metadata:
     app.kubernetes.io/part-of: cost-insight
 spec:
   # Interpreted with timeZone below: daily 22:20 Asia/Shanghai, after dry-run.
-  # Keep suspended until manual v3 canary validation is complete.
   schedule: "20 22 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -322,7 +321,7 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 4
-      activeDeadlineSeconds: 7200
+      activeDeadlineSeconds: 43200
       template:
         metadata:
           labels:
@@ -367,20 +366,20 @@ spec:
                 - name: COST_INSIGHT_GCS_CACHE_SAFETY_BUFFER_DAYS
                   value: "1"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_OBJECTS
-                  value: "500"
+                  value: "5000000"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_CAS_OBJECTS
-                  value: "500"
+                  value: "1000000"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MANIFEST_BUCKET
                   value: pingcap-ci-console-logs-us-central1
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MANIFEST_PREFIX
                   value: gcs-cache-steady-state-delete
               resources:
                 requests:
-                  cpu: "500m"
-                  memory: 1Gi
+                  cpu: "4"
+                  memory: 8Gi
                 limits:
-                  cpu: "2"
-                  memory: 4Gi
+                  cpu: "8"
+                  memory: 16Gi
 ---
 apiVersion: batch/v1
 kind: CronJob
