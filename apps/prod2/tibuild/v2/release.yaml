@@ -37,7 +37,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2 versioning=semver
-      tag: v2026.6.21-16-gd6cdfe2
+      tag: v2026.6.21-29-g7948db8
     server:
       debug: false
       config:
