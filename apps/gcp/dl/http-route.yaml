@@ -20,12 +20,8 @@ spec:
             path:
               type: ReplacePrefixMatch
               replacePrefixMatch: /
-      # Large artifact downloads are streamed for minutes. The GCP external
-      # HTTP(S) load balancer (GKE Gateway) has a 30s backend timeout, which
-      # applies to data-packet intervals, not total download duration. As long
-      # as the dl service streams data continuously, downloads won't be cut off.
-      # If long pauses between chunks cause timeouts, configure timeout via
-      # a GCPBackendPolicy on the dl Service instead.
+      # Large artifact downloads are streamed for minutes. The GCPBackendPolicy
+      # (backend-policy.yaml) overrides the default 30s backend timeout to 1h.
       backendRefs:
         - name: dl
           port: 80
