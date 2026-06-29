@@ -4,3 +4,4 @@ namespace: prow-test-pods
 resources:
   - namespace.yaml
   - rbac.yaml
+  - secrets
