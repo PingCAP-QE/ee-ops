@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - ../_base
   - cluster-policies
+  - harbor
   - tekton
   - publisher
   - zot
@@ -11,6 +12,5 @@ resources:
   - cache
   - dl
   - tibuild # experiment for v2
-  - buildbarn # experiment
   - jenkins/beta # experiment
   - prow-worker
