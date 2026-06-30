@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: goproxy
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: infra
+  hostnames:
+    - goproxy.pingcap.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: goproxy
+          port: 80
