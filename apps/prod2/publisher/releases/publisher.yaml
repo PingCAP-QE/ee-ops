@@ -45,12 +45,18 @@ spec:
           name: internal-gateway
           namespace: infra
       hostnames:
-        - publisher.pingcap.net
+        - internal2-do.pingcap.net
       rules:
         - matches:
             - path:
                 type: PathPrefix
-                value: /
+                value: /publisher
+          filters:
+            - type: URLRewrite
+              urlRewrite:
+                path:
+                  type: ReplacePrefixMatch
+                  replacePrefixMatch: /
     volumes:
       - name: packages-config
         configMap:
