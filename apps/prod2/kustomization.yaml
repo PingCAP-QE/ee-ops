@@ -14,4 +14,3 @@ resources:
   - buildbarn # experiment
   - jenkins/beta # experiment
   - prow-worker
-  - goproxy

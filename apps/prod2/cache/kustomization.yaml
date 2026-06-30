@@ -4,3 +4,4 @@ namespace: cache
 resources:
   - namespace.yaml
   - git-cdn
+  - goproxy
