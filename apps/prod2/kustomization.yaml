@@ -11,6 +11,5 @@ resources:
   - cache
   - dl
   - tibuild # experiment for v2
-  - buildbarn # experiment
   - jenkins/beta # experiment
   - prow-worker
