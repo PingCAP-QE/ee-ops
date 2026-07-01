@@ -7,4 +7,3 @@ resources:
   - jenkins-pingkai.yaml
   - greenhouse
   - ats
-  - goproxy
