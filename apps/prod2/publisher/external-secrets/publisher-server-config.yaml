@@ -81,6 +81,10 @@ spec:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
                   github_repo: tidbcloud/cloud-storage-engine
+                data_migration:
+                  cluster_type: SHARED_POOL
+                  base_image: us.gcr.io/pingcap-public/tidbx/dm
+                  github_repo: pingcap/tiflow
                 tidb:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tidb
