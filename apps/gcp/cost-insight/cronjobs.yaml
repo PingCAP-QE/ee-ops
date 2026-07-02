@@ -313,7 +313,7 @@ spec:
   # Interpreted with timeZone below: daily 22:20 Asia/Shanghai, after dry-run.
   schedule: "20 22 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
