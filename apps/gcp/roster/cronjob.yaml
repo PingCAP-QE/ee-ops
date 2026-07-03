@@ -9,7 +9,7 @@ metadata:
 spec:
   schedule: "0 3 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 3
@@ -60,7 +60,7 @@ metadata:
 spec:
   schedule: "10 10 * * 1"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 3

@@ -27,7 +27,7 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 0
+    replicaCount: 1
     resources:
       requests:
         cpu: "100m"
