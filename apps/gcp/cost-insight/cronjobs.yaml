@@ -10,7 +10,7 @@ spec:
   # Interpreted with timeZone below: 21:10 Asia/Shanghai, intentionally outside BJ work time.
   schedule: "10 21 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -106,7 +106,7 @@ spec:
   # Interpreted with timeZone below: 21:20 Asia/Shanghai, after the other daily cost jobs.
   schedule: "20 21 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -393,7 +393,7 @@ spec:
   # Interpreted with timeZone below: Monday 22:10 Asia/Shanghai.
   schedule: "10 22 * * 1"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -473,7 +473,7 @@ spec:
   # Interpreted with timeZone below: 21:40 Asia/Shanghai, after the GCP summary job.
   schedule: "40 21 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -563,7 +563,7 @@ spec:
   # Interpreted with timeZone below: Monday 23:10 Asia/Shanghai, after the GCP unmatched job.
   schedule: "10 23 * * 1"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
