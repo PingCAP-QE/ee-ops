@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: ci-dashboard-pod-watcher
     app.kubernetes.io/part-of: ci-dashboard
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app.kubernetes.io/name: ci-dashboard-pod-watcher
