@@ -29,13 +29,13 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 0
+    replicaCount: 1
     nodeSelector:
       kubernetes.io/arch: amd64
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/ci-dashboard
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/ci-dashboard versioning=semver
-      tag: v2026.6.21-22-g7e11485
+      tag: v2026.6.28-17-g6b4417e
     resources:
       requests:
         cpu: "2"
