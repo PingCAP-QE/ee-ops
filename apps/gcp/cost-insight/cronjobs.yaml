@@ -310,10 +310,10 @@ metadata:
     app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-delete-cas
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: daily 22:20 Asia/Shanghai, after dry-run.
+  # Interpreted with timeZone below: daily 22:20 Asia/Shanghai.
   schedule: "20 22 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -332,7 +332,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.28-10-g946744d
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.28-22-g0e99626
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -341,7 +341,7 @@ spec:
                 - |
                   cost-insight cleanup-gcs-cache \
                     --mode delete \
-                    --execute-kind cas
+                    --execute-kind cas-from-index
               env:
                 - name: PYTHONUNBUFFERED
                   value: "1"
