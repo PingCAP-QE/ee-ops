@@ -341,7 +341,8 @@ spec:
                 - |
                   cost-insight cleanup-gcs-cache \
                     --mode delete \
-                    --execute-kind cas-from-index
+                    --execute-kind cas-from-index \
+                    --max-delete-objects 5000000
               env:
                 - name: PYTHONUNBUFFERED
                   value: "1"
@@ -367,6 +368,8 @@ spec:
                   value: "1"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_OBJECTS
                   value: "5000000"
+                - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_CAS_BYTES
+                  value: "54975581388800"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_AC_DELETE_BATCH_SIZE
                   value: "500000"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MANIFEST_BUCKET
