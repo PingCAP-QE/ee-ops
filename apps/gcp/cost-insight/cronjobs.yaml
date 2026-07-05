@@ -332,7 +332,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.28-22-g0e99626
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.6.28-23-g579b709
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
