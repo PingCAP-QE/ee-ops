@@ -35,7 +35,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/dl
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
-      tag: v2026.6.28-14-g16bd374
+      tag: v2026.6.28-20-g343ff73
     server:
       args:
         - --domain=0.0.0.0:80
