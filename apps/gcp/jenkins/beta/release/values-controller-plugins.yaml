@@ -18,6 +18,10 @@ controller:
     - artifact-manager-s3:973.v6a_51253e896b_
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
+    # PingCAP fork: skip withCredentials cleanup when the agent is offline, so a lost agent
+    # (e.g. preempted Kubernetes pod) under `retry` no longer fails the build on cleanup.
+    # Ref: jenkinsci/credentials-binding-plugin#530 (fixes #531)
+    - credentials-binding:725.ve52b_2328a_fde-fork.2:https://github.com/wuhuizuo/credentials-binding-plugin/releases/download/725.ve52b_2328a_fde-fork.2/credentials-binding-725.ve52b_2328a_fde-fork.2.hpi
     - generic-webhook-trigger:2.4.1
     - google-login:109.v022b_cf87b_e5b_
     - http_request:1.25
