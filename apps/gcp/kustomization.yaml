@@ -13,6 +13,7 @@ resources:
   - dl
   - roster
   - publisher
+  - tibuild
   # workloads
   - acr-runners
   - jenkins/beta

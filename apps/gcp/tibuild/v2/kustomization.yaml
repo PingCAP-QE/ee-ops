@@ -1,0 +1,8 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - external-secret-config.yaml
+  - external-secret-httproute-auth.yaml
+  - release.yaml
+  - http-route-v2-auth.yaml
+  - envoy-security-policy-v2-auth.yaml
