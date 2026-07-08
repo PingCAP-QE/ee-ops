@@ -235,9 +235,16 @@ controller:
                 scm {
                   git {
                     remote {
-                      github('PingCAP-QE/ci', 'https')
+                      url('https://github.com/PingCAP-QE/ci.git')
                     }
                     branch('main')
+                    extensions {
+                      cloneOptions {
+                        depth(1)
+                        shallow(true)
+                        timeout(5)
+                      }
+                    }
                   }
                 }
                 triggers {
