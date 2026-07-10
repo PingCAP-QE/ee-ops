@@ -6,7 +6,7 @@ controller:
   # Override the default list to use our own custom plugin
   # Ref: https://artifacthub.io/packages/helm/jenkinsci/jenkins?modal=values&path=controller.installPlugins
   installPlugins:
-    - kubernetes:4437.vd64141124d8f:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f/kubernetes-4437.vd64141124d8f.hpi
+    - kubernetes:4437.vd64141124d8f-fork.2:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f-fork.2/kubernetes.hpi
     - workflow-aggregator:608.v67378e9d3db_1
     - git:5.10.1
     - configuration-as-code:2077.v41f1011a_5110
