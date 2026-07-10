@@ -62,6 +62,39 @@ spec:
             nodeSelector:
               cloud.google.com/compute-class: ci-worker-ondemand
 
+    - name: override-compute-class-for-special-jenkins-jobs
+      match:
+        resources:
+          kinds:
+            - Pod
+          selector:
+            matchExpressions:
+              - key: kubernetes.jenkins.io/controller
+                operator: Exists
+      context:
+        - name: ci_job
+          variable:
+            default: "{}"
+            jmesPath: "request.object.metadata.annotations.ci_job || ''"
+        - name: is_special_job
+          variable:
+            default: false
+            jmesPath: >-
+              regex_match('^pingcap/tidb/pull_unit_test',ci_job)
+      preconditions:
+        all:
+          - key: "{{ is_special_job }}"
+            operator: Equals
+            value: true
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker-ondemand
+
     # Override compute class for retried Jenkins pods to ensure they
     # run on on-demand CI workers.
     - name: override-compute-class-retried
