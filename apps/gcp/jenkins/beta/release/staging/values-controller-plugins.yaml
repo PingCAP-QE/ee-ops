@@ -22,6 +22,10 @@ controller:
     # (e.g. preempted Kubernetes pod) under `retry` no longer fails the build on cleanup.
     # Ref: jenkinsci/credentials-binding-plugin#530 (fixes #531)
     - credentials-binding:725.ve52b_2328a_fde-fork.2:https://github.com/wuhuizuo/credentials-binding-plugin/releases/download/725.ve52b_2328a_fde-fork.2/credentials-binding-725.ve52b_2328a_fde-fork.2.hpi
+    # PingCAP fork: when a lost agent times out (RemovedNodeTimeoutCause), do not flag the
+    # interruption as an actual (user-initiated) abort. This allows declarative agent retries
+    # to re-run stages cleanly on the re-provisioned agent instead of aborting after SCM checkout.
+    - workflow-durable-task-step:1479.v56e587f413a_7-fork.1:https://github.com/wuhuizuo/workflow-durable-task-step-plugin/releases/download/1479.v56e587f413a_7-fork.1/workflow-durable-task-step.hpi
     - generic-webhook-trigger:2.4.1
     - google-login:109.v022b_cf87b_e5b_
     - http_request:1.25
