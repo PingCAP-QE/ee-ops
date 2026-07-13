@@ -27,7 +27,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-roster
-              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.5.31-2-g3dd898b
+              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.7.12-2-ged3a74e
               imagePullPolicy: IfNotPresent
               args:
                 - sync-roster
@@ -78,7 +78,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: weekly-summary
-              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.5.31-2-g3dd898b
+              image: ghcr.io/pingcap-qe/ee-apps/roster-jobs:v2026.7.12-2-ged3a74e
               imagePullPolicy: IfNotPresent
               args:
                 - weekly-summary
