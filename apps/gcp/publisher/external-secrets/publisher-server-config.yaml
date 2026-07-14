@@ -118,7 +118,7 @@ spec:
                   base_image: us.gcr.io/pingcap-public/tidbx/dm
                   github_repo: pingcap/tiflow
                 dumpling:
-                  cluster_type: SHARED_POOL
+                  cluster_type: LOGICAL_CLUSTER
                   base_image: us.gcr.io/pingcap-public/tidbx/dumpling
                   github_repo: pingcap/tidb
 
