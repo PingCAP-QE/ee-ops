@@ -17,14 +17,16 @@ spec:
     name: ee-infra
     namespace: flux-system
   path: ./terraform/tencentcloud/tidb-cicd
-  env:
-    - name: TENCENTCLOUD_SECRET_ID
-      valueFrom:
-        secretKeyRef:
-          name: tencentcloud-terraform-creds
-          key: TENCENTCLOUD_SECRET_ID
-    - name: TENCENTCLOUD_SECRET_KEY
-      valueFrom:
-        secretKeyRef:
-          name: tencentcloud-terraform-creds
-          key: TENCENTCLOUD_SECRET_KEY
+  runnerPodTemplate:
+    spec:
+      env:
+        - name: TENCENTCLOUD_SECRET_ID
+          valueFrom:
+            secretKeyRef:
+              name: tencentcloud-terraform-creds
+              key: TENCENTCLOUD_SECRET_ID
+        - name: TENCENTCLOUD_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: tencentcloud-terraform-creds
+              key: TENCENTCLOUD_SECRET_KEY
