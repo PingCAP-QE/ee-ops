@@ -1,0 +1,21 @@
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: tencentcloud-terraform-creds
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: tencentcloud-terraform-creds
+  data:
+    - remoteRef:
+        key: tencentcloud_ci_terraform_creds
+        property: TENCENTCLOUD_SECRET_ID
+      secretKey: TENCENTCLOUD_SECRET_ID
+    - remoteRef:
+        key: tencentcloud_ci_terraform_creds
+        property: TENCENTCLOUD_SECRET_KEY
+      secretKey: TENCENTCLOUD_SECRET_KEY
