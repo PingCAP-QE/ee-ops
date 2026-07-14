@@ -3,5 +3,3 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - gcp-pingcap-testing-account.yaml
-  - tencentcloud-tidb-cicd.yaml
-  - tencentcloud-tidb-cicd-creds.yaml
