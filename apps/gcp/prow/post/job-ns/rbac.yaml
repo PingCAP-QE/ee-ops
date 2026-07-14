@@ -38,3 +38,10 @@ metadata:
   name: tidbx-puller
   annotations:
     iam.gke.io/gcp-service-account: tidbx-gar-reader@pingcap-testing-account.iam.gserviceaccount.com
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: terraform-plan-reader
+  annotations:
+    iam.gke.io/gcp-service-account: terraform-plan-reader@pingcap-testing-account.iam.gserviceaccount.com
