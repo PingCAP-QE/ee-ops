@@ -1,0 +1,27 @@
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: tencentcloud-tidb-cicd
+spec:
+  approvePlan: auto
+  interval: 1h
+  retryInterval: 5m
+  destroyResourcesOnDeletion: true
+  sourceRef:
+    kind: GitRepository
+    name: ee-infra
+    namespace: flux-system
+  path: ./terraform/tencentcloud/tidb-cicd
+  runnerPodTemplate:
+    spec:
+      env:
+        - name: TENCENTCLOUD_SECRET_ID
+          valueFrom:
+            secretKeyRef:
+              name: tencentcloud-terraform-creds
+              key: TENCENTCLOUD_SECRET_ID
+        - name: TENCENTCLOUD_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: tencentcloud-terraform-creds
+              key: TENCENTCLOUD_SECRET_KEY
