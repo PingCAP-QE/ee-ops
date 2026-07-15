@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-2-ged3a74e
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-3-g7acb7f9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -127,7 +127,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-2-ged3a74e
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-3-g7acb7f9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -193,7 +193,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-2-ged3a74e
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-3-g7acb7f9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -280,7 +280,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-2-ged3a74e
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-3-g7acb7f9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -359,7 +359,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-2-ged3a74e
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-3-g7acb7f9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -449,7 +449,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-2-ged3a74e
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.12-3-g7acb7f9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
