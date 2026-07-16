@@ -12,6 +12,9 @@ spec:
     name: ee-infra
     namespace: flux-system
   path: ./terraform/tencentcloud/tidb-cicd
+  vars:
+    - name: manage_karpenter_cr
+      value: "true"
   runnerPodTemplate:
     spec:
       env:
