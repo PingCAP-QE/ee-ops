@@ -231,7 +231,7 @@ spec:
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_OBJECTS
                   value: "10000000"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_AC_OBJECTS
-                  value: "100000"
+                  value: "3000000"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_MAX_DELETE_CAS_BYTES
                   value: "54975581388800"
                 - name: COST_INSIGHT_GCS_CACHE_CLEANUP_AC_DELETE_BATCH_SIZE
