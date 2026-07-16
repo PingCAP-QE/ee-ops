@@ -6,14 +6,12 @@ metadata:
   name: flux-system
   namespace: flux-system
 spec:
-  interval: 5m0s
-  provider: github
+  interval: 1m0s
   ref:
     branch: main
   secretRef:
     name: flux-system
-  timeout: 60s
-  url: https://github.com/PingCAP-QE/ee-ops
+  url: ssh://git@github.com/PingCAP-QE/ee-ops
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
