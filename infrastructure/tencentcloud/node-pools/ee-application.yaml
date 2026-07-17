@@ -8,6 +8,7 @@ spec:
       labels:
         compute-class: ee-application
     spec:
+      expireAfter: 168h
       nodeClassRef:
         group: karpenter.k8s.tke
         kind: TKEMachineNodeClass
@@ -28,5 +29,5 @@ spec:
             - S5
             - SA3
   disruption:
-    consolidationPolicy: WhenUnderutilized
-    expireAfter: 720h
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 5m
