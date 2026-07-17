@@ -1,13 +1,13 @@
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: infrastructure
+  name: sources
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 24h
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./infrastructure/tencentcloud
+  path: ./clusters/tencentcloud/sources
   prune: true
