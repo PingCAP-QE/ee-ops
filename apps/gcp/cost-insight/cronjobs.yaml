@@ -203,8 +203,7 @@ spec:
                   cost-insight cleanup-gcs-cache \
                     --mode delete \
                     --execute-kind cas-from-index \
-                    --max-delete-objects 10000000 \
-                    --max-delete-ac-objects 100000
+                    --max-delete-objects 10000000
               env:
                 - name: PYTHONUNBUFFERED
                   value: "1"
