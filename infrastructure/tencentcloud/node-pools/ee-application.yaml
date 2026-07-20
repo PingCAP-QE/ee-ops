@@ -25,9 +25,13 @@ spec:
         - key: node.kubernetes.io/instance-type
           operator: In
           values:
-            - S6
-            - S5
             - SA3
+            - S5
+            - S6
+        - key: karpenter.k8s.tke/instance-cpu
+          operator: Gt
+          values:
+            - "3"
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
-    consolidateAfter: 5m
+    consolidateAfter: 1m
