@@ -18,6 +18,7 @@ spec:
           operator: In
           values:
             - amd64
+            - arm64
         - key: karpenter.sh/capacity-type
           operator: In
           values:
@@ -32,4 +33,4 @@ spec:
             - S5
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
-    consolidateAfter: 5m
+    consolidateAfter: 2m
