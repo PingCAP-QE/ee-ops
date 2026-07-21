@@ -8,6 +8,7 @@ spec:
   chart:
     spec:
       chart: kyverno
+      # renovate: datasource=helm depName=kyverno registryUrl=https://kyverno.github.io/kyverno/
       version: 3.4.4
       sourceRef:
         kind: HelmRepository
