@@ -1,0 +1,16 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: external-secrets-post # setup after deployment
+spec:
+  targetNamespace: infra
+  dependsOn:
+    - name: external-secrets-release
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./infrastructure/tencentcloud/external-secrets/post
+  prune: true
