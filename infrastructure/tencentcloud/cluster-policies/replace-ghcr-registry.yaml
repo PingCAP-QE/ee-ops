@@ -1,0 +1,45 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_mutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: replace-ghcr-registry
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: no-image-pull-secrets
+      expression: "!has(object.spec.imagePullSecrets) || size(object.spec.imagePullSecrets) == 0"
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.containers.map(c,
+            c.image.startsWith("ghcr.io/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/image",
+              value: c.image.replace("ghcr.io/", "ghcr.nju.edu.cn/")
+            } : null
+          ).filter(p, p != null)
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.spec.initContainers) ?
+          object.spec.initContainers.map(c,
+            c.image.startsWith("ghcr.io/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/image",
+              value: c.image.replace("ghcr.io/", "ghcr.nju.edu.cn/")
+            } : null
+          ).filter(p, p != null) :
+          []
