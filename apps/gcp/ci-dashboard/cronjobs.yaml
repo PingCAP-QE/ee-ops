@@ -372,3 +372,68 @@ spec:
                 limits:
                   cpu: "500m"
                   memory: 512Mi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ci-dashboard-sync-unattached-block-volumes
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: ci-dashboard-sync-unattached-block-volumes
+    app.kubernetes.io/part-of: ci-dashboard
+spec:
+  schedule: "20 3 * * *"
+  timeZone: Asia/Shanghai
+  suspend: true
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ci-dashboard-sync-unattached-block-volumes
+            app.kubernetes.io/part-of: ci-dashboard
+        spec:
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-unattached-block-volumes
+              image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
+              imagePullPolicy: IfNotPresent
+              args: ["sync-unattached-block-volumes"]
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: CI_DASHBOARD_LOG_LEVEL
+                  value: INFO
+                - name: CI_DASHBOARD_AWS_EBS_REGIONS
+                  value: us-west-2
+                - name: CI_DASHBOARD_AWS_EBS_ACCOUNT_ID
+                  value: "946646677266"
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: ci-dashboard-aws-readonly
+                      key: aws-access-key-id
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: ci-dashboard-aws-readonly
+                      key: aws-secret-access-key
+                - name: CI_DASHBOARD_GCP_BLOCK_VOLUME_PROJECTS
+                  value: pingcap-testing-account
+              resources:
+                requests:
+                  cpu: "250m"
+                  memory: 512Mi
+                limits:
+                  cpu: "1"
+                  memory: 1Gi
