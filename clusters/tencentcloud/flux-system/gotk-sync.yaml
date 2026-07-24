@@ -7,11 +7,12 @@ metadata:
   namespace: flux-system
 spec:
   interval: 1m0s
-  ref:
-    branch: main
   secretRef:
     name: flux-system
-  url: ssh://git@github.com/PingCAP-QE/ee-ops
+  provider: github
+  url: https://github.com/PingCAP-QE/ee-ops
+  ref:
+    branch: main
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
