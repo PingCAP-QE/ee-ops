@@ -1,0 +1,39 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/policies.kyverno.io/policies.kyverno.io_mutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: make-application-pods-run-on-low-cost-nodes
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: is-application-namespace
+      expression: "object.metadata.namespace in ['apps', 'arc-systems', 'jenkins', 'kafka', 'kafka-operator', 'tekton-operator', 'tekton-pipelines']"
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.spec.nodeSelector) ?
+          [
+            JSONPatch{
+              op: "add",
+              path: "/spec/nodeSelector/compute-class",
+              value: "ee-application"
+            }
+          ] :
+          [
+            JSONPatch{
+              op: "add",
+              path: "/spec/nodeSelector",
+              value: {"compute-class": "ee-application"}
+            }
+          ]
