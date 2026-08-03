@@ -4,3 +4,5 @@ resources:
   - cluster-policies
   - kafka
   - cloudevents-server
+  - jenkins
+  - tibuild
