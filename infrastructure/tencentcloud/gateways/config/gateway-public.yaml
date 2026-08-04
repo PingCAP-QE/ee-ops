@@ -3,6 +3,11 @@ kind: Gateway
 metadata:
   name: external-https
 spec:
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: external-https-proxy
   gatewayClassName: envoy-gateway
   listeners:
     - name: wildcard-pingcap-net-https
