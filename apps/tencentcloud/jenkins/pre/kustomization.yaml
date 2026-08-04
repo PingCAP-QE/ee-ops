@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - secret-google-oauth.yaml
+  - secret-jenkins-cache.yaml
+  - secret-github.yaml
+  - secret-codecov.yaml
+  - secret-docs-cn.yaml
+  - secret-tidbx-docker-config.yaml
+  - secret-jenkins-artifact-s3.yaml
