@@ -24,7 +24,7 @@ spec:
     - patchType: JSONPatch
       jsonPatch:
         expression: |
-          object.kind == 'Pod' ?
+          has(object.spec.containers) ?
           object.spec.containers.map(c,
             c.image.startsWith("ghcr.io/") ?
             JSONPatch{
@@ -37,7 +37,7 @@ spec:
     - patchType: JSONPatch
       jsonPatch:
         expression: |
-          object.kind == 'Pod' && has(object.spec.initContainers) ?
+          has(object.spec.initContainers) ?
           object.spec.initContainers.map(c,
             c.image.startsWith("ghcr.io/") ?
             JSONPatch{
