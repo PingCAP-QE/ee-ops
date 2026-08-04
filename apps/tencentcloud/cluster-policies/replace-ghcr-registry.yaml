@@ -24,6 +24,7 @@ spec:
     - patchType: JSONPatch
       jsonPatch:
         expression: |
+          has(object.spec.containers) ?
           object.spec.containers.map(c,
             c.image.startsWith("ghcr.io/") ?
             JSONPatch{
@@ -31,7 +32,8 @@ spec:
               path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/image",
               value: c.image.replace("ghcr.io/", "ghcr.nju.edu.cn/")
             } : null
-          ).filter(p, p != null)
+          ).filter(p, p != null) :
+          []
     - patchType: JSONPatch
       jsonPatch:
         expression: |
