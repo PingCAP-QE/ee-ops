@@ -22,16 +22,12 @@ spec:
           operator: In
           values:
             - on-demand
-        - key: node.kubernetes.io/instance-type
+        - key: karpenter.k8s.tke/instance-family
           operator: In
           values:
             - SA3
             - S5
             - S6
-        - key: karpenter.k8s.tke/instance-cpu
-          operator: Gt
-          values:
-            - "3"
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
     consolidateAfter: 1m
