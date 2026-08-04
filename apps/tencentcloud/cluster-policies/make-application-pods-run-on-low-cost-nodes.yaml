@@ -17,7 +17,7 @@ spec:
         resources: ["pods"]
   matchConditions:
     - name: is-application-namespace
-      expression: "object.metadata.namespace in ['cs', 'jenkins', 'kafka', 'kafka-operator', 'tekton-operator', 'tekton-pipelines']"
+      expression: "object.metadata.namespace in ['cs', 'jenkins', 'kafka', 'kafka-operator', 'tekton-operator', 'tekton-pipelines', 'tibuild', 'ee-cd', 'publisher', 'jenkins-agents']"
   mutations:
     - patchType: JSONPatch
       jsonPatch:
