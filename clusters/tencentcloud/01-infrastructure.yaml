@@ -13,6 +13,3 @@ spec:
     name: flux-system
   path: ./infrastructure/tencentcloud
   prune: true
-  postBuild:
-    substitute:
-      security_group_id: sg-ijmyqquv
