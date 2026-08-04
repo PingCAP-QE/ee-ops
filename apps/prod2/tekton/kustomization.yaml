@@ -3,5 +3,6 @@ kind: Kustomization
 namespace: flux-system
 resources:
   - setup.yaml
+  - dashboard-ext.yaml
   - configs.yaml
   - boskos.yaml
