@@ -1,0 +1,49 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_mutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: replace-quay-registry
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: is-pod
+      expression: "object.kind == 'Pod'"
+    - name: no-image-pull-secrets
+      expression: "!has(object.spec.imagePullSecrets) || size(object.spec.imagePullSecrets) == 0"
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.spec.containers) ?
+          object.spec.containers.map(c,
+            c.image.startsWith("quay.io/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/image",
+              value: c.image.replace("quay.io/", "quay.tencentcloudcr.com/")
+            } : null
+          ).filter(p, p != null) :
+          []
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.spec.initContainers) ?
+          object.spec.initContainers.map(c,
+            c.image.startsWith("quay.io/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/image",
+              value: c.image.replace("quay.io/", "quay.tencentcloudcr.com/")
+            } : null
+          ).filter(p, p != null) :
+          []
