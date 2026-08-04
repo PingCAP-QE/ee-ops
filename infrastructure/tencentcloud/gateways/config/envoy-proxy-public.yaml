@@ -9,6 +9,7 @@ spec:
     kubernetes:
       envoyService:
         annotations:
+          # ref: https://cloud.tencent.com/document/product/457/51258
           service.cloud.tencent.com/security-groups: "${security_group_id}"
           service.cloud.tencent.com/pass-to-target: "true"
           service.cloud.tencent.com/direct-access: 'true'
