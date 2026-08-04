@@ -37,3 +37,15 @@ spec:
               value: {"compute-class": "ee-application"}
             }
           ]
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.containers.map(c, i,
+            has(c.resources) ?
+            null :
+            JSONPatch{
+              op: "add",
+              path: sprintf("/spec/containers/%d/resources", [i]),
+              value: {"requests": {"cpu": "100m", "memory": "200Mi"}}
+            }
+          ).filter(p, p != null)
