@@ -6,3 +6,4 @@ resources:
   - cloudevents-server
   - jenkins
   - tibuild
+  - tekton
