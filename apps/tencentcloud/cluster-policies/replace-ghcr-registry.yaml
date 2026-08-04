@@ -17,7 +17,7 @@ spec:
         resources: ["pods"]
   matchConditions:
     - name: is-pod
-      expression: "has(object.spec.containers)"
+      expression: "has(object.spec.containers) && !has(object.spec.template)"
     - name: no-image-pull-secrets
       expression: "!has(object.spec.imagePullSecrets) || size(object.spec.imagePullSecrets) == 0"
   mutations:
