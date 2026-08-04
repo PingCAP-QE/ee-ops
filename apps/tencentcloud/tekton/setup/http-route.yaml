@@ -10,7 +10,7 @@ spec:
       name: external-https
       namespace: infra
   hostnames:
-    - prow.tidb.net
+    - do.pingcap.net
   rules:
     - matches:
         - path:
