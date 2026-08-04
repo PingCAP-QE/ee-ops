@@ -9,4 +9,4 @@ spec:
     kubernetes:
       envoyService:
         annotations:
-          service.cloud.tencent.com/security-group-id: "${security_group_id}"
+          tke.endpoint.security-group: "${security_group_id}"
