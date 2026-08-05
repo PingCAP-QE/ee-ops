@@ -13,7 +13,6 @@ spec:
             - brc
             - buildbarn
             - cs
-            - jenkins-beta
             - kafka
             - publisher
             - tekton-operator
