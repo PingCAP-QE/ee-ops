@@ -49,6 +49,6 @@ spec:
         release: kps
     metricsService:
       enabled: true
-    # deploy on dedicated node.
+    # deploy on amd64 nodes.
     nodeSelector:
-      dedicated: greenhouse
+      kubernetes.io/arch: amd64
