@@ -137,7 +137,11 @@ controller:
                     // Ref: https://docs.prow.k8s.io/docs/jobs/#job-environment-variables
                     stringParam("BUILD_ID", "", "Build ID")
                     stringParam("PROW_JOB_ID", "", "Prow job ID")
-                    stringParam("JOB_SPEC", "", "Prow job spec struct data")
+                    stringParam(
+                      "JOB_SPEC",
+                      '{"type":"postsubmit","refs":{"org":"PingCAP-QE","repo":"ci","repo_link":"https://github.com/PingCAP-QE/ci","base_ref":"main","base_sha":"main"}}',
+                      "Prow job spec struct data"
+                    )
                 }
                 scm {
                   git {
