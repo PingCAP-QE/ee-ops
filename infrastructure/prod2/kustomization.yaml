@@ -5,8 +5,7 @@ resources:
   - namespace.yaml
   - openebs
   - nfs-pvc-provisioner
-  - nginx
-  - gateways # will replace nginx ingress controller
+  - gateways # replaced nginx ingress controller
   - secret-generator
   - external-secrets
   - kyverno
