@@ -1,0 +1,43 @@
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: set-node-selector-tekton-taskrun-pods
+  namespace: ee-cd
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+    objectSelector:
+      matchExpressions:
+        - key: tekton.dev/taskRun
+          operator: Exists
+  matchConditions:
+    - name: is-pod
+      expression: "object.kind == 'Pod'"
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.spec.nodeSelector) ?
+          [
+            JSONPatch{
+              op: "add",
+              path: "/spec/nodeSelector/compute-class",
+              value: "ci-worker"
+            }
+          ] :
+          [
+            JSONPatch{
+              op: "add",
+              path: "/spec/nodeSelector",
+              value: {"compute-class": "ci-worker"}
+            }
+          ]

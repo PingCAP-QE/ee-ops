@@ -4,4 +4,4 @@ namespace: flux-system
 resources:
   - setup.yaml
   - dashboard-ext.yaml
-  # - configs.yaml
+  - configs.yaml

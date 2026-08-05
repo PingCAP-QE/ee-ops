@@ -1,0 +1,19 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: tekton-config-trigger-templates
+spec:
+  interval: 1m0s
+  sourceRef:
+    kind: GitRepository
+    name: ci
+    namespace: flux-system
+  path: ./tekton/v1/triggers/templates
+  prune: true
+  force: true
+  postBuild:
+    substitute:
+      STORAGE_CLASSNAME_RWO: cbs
+      STORAGE_CLASSNAME_RWO_AMD64: cbs
+      STORAGE_CLASSNAME_RWO_ARM64: cbs
+      # STORAGE_CLASSNAME_RWM: not-used-yet
