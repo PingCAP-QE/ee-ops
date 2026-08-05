@@ -4,7 +4,6 @@ resources:
   - secret-google-oauth.yaml
   - secret-jenkins-cache.yaml
   - credential-codecov.yaml
-  - credential-docs-cn.yaml
   - credential-github.yaml
   - credential-jenkins-artifact-s3.yaml
   - credential-tidbx-docker-config.yaml
