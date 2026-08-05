@@ -16,6 +16,3 @@ spec:
     substitute:
       GOOGLE_OAUTH_JSON: tencentcloud_jenkins_google_oauth_json
       JENKINS_CACHE_S3_JSON: tencentcloud_jenkins_cache_s3_json
-      CODECOV_TOKENS_JSON: tencentcloud_jenkins_codecov_tokens_json
-      HARBOR_CREDENTIALS_JSON: tencentcloud_jenkins_beta_harbor_credentials_json
-      DOCS_CN_S3_JSON: prod2_jenkins_beta_docs_cn_s3_json
