@@ -1,0 +1,54 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: greenhouse
+  namespace: flux-system
+spec:
+  releaseName: greenhouse
+  targetNamespace: apps
+  chart:
+    spec:
+      chart: ./charts/greenhouse
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    replicaCount: 1
+    run:
+      minPercentBlocksFree: 5 # %5
+      evictUntilPercentBlocksFree: 7 # %7
+      diskCheckInterval: 60s
+    resources:
+      limits:
+        cpu: "2"
+        memory: 4Gi
+    persistence:
+      enabled: true
+      storageClass: openebs-single-replica
+      accessMode: ReadWriteOnce
+      size: 3840Gi
+    serviceMonitor:
+      enabled: true
+      additionalLabels:
+        release: kps
+    metricsService:
+      enabled: true
+    # deploy on dedicated node.
+    nodeSelector:
+      dedicated: greenhouse
