@@ -8,3 +8,6 @@ resources:
   - secret-docs-cn.yaml
   - secret-tidbx-docker-config.yaml
   - secret-jenkins-artifact-s3.yaml
+  - credential-github.yaml
+  - credential-codecov.yaml
+  - credential-docs-cn.yaml
