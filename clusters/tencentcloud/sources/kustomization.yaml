@@ -9,3 +9,4 @@ resources:
   - helm-repo-external-secrets.yaml
   - helm-repo-kyverno.yaml
   - helm-repo-others.yaml
+  - git-repo-ci.yaml
