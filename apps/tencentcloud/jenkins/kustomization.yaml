@@ -4,5 +4,5 @@ namespace: jenkins
 resources:
   - namespace.yaml
   - pre.yaml
-  # - release.yaml
+  - release.yaml
   # - post.yaml
