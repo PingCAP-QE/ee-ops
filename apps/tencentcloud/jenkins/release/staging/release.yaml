@@ -56,8 +56,8 @@ spec:
       namespace: "${AGENT_NAMESPACE}"
 
     controller:
-      servicePort: 80
-      targetPort: 80
+      servicePort: 8080
+      targetPort: 8080
       jenkinsUriPrefix: "${INGRESS_PATH}-staging"
       jenkinsUrl: "https://${INGRESS_HOST}${INGRESS_PATH}-staging"
       jenkinsAdminEmail: "${ADMIN_EMAIL}"

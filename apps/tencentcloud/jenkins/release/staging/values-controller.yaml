@@ -5,6 +5,8 @@ controller:
     team: eq
     author: wuhuizuo
 
+  containerPort: 8080
+
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
