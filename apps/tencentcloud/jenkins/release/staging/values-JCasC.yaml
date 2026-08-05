@@ -14,9 +14,12 @@ controller:
     - { name: jenkins-cache, keyName: region }
     - { name: jenkins-cache, keyName: bucket }
     - { name: jenkins-cache, keyName: endpoint }
-    - { name: jenkins-cache, keyName: endpoint-host }
     - { name: jenkins-cache, keyName: access-key }
     - { name: jenkins-cache, keyName: access-secret }
+
+    - { name: jenkins-artifact-s3, keyName: region }
+    - { name: jenkins-artifact-s3, keyName: bucket }
+    - { name: jenkins-artifact-s3, keyName: endpoint-host }
 
   additionalSecrets: []
   #  - name: nameOfSecret
@@ -216,12 +219,12 @@ controller:
                   provider: s3
         aws:
           awsCredentials:
-            credentialsId: jenkins-artifact-s3
+            credentialsId: jenkins-artifact-s3-auth
           s3:
-            container: ${jenkins-cache-bucket}
+            container: ${jenkins-artifact-s3-bucket}
             prefix: "jenkins-artifacts-staging/"
             # artifact-manager-s3 validates customEndpoint as host[:port].
-            customEndpoint: ${jenkins-cache-endpoint-host}
-            customSigningRegion: ${jenkins-cache-region}
-            usePathStyleUrl: true
+            customEndpoint: ${jenkins-artifact-s3-endpoint-host}
+            customSigningRegion: ${jenkins-artifact-s3-region}
+            usePathStyleUrl: false
             disableSessionToken: true
