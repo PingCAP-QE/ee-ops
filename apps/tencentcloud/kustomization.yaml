@@ -5,5 +5,6 @@ resources:
   - kafka
   - cloudevents-server
   - jenkins
+  - jenkins-agents
   - tibuild
   - tekton
