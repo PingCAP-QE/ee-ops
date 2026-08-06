@@ -1,85 +1,96 @@
-apiVersion: kyverno.io/v2beta1
-kind: MutationPolicy
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
 metadata:
   name: inject-ci-labels
 spec:
-  failurePolicy: Ignore
-  rules:
-    - name: inject-labels-from-annotations
-      match:
-        resources:
-          kinds:
-            - Pod
-          selector:
-            matchExpressions:
-              - key: kubernetes.jenkins.io/controller
-                operator: Exists
-      context:
-        - name: parsed_refs
-          variable:
-            default: {}
-            jmesPath: "request.object.metadata.annotations.ci_refs | parse_json(@)"
-      preconditions:
-        all:
-          - key: "{{ request.object.metadata.annotations.ci_refs || '' }}"
-            operator: NotEquals
-            value: ""
-      mutate:
-        patchStrategicMerge:
-          metadata:
-            labels:
-              # compatible with prow style refs labels:
-              prow.k8s.io/refs.org: >-
-                {{
-                  not_null(parsed_refs.org, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1')
-                }}
-              prow.k8s.io/refs.repo: >-
-                {{
-                  not_null(parsed_refs.repo, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1')
-                }}
-              prow.k8s.io/refs.base_ref: >-
-                {{
-                  not_null(parsed_refs.base_ref, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1')
-                }}
-
-              author: >-
-                {{
-                  not_null(
-                    parsed_refs.pulls[0].author,
-                    request.object.metadata.annotations."ci_trigger_user",
-                    ''
-                  ) |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1')
-                }}
-              org: >-
-                {{
-                  not_null(parsed_refs.org, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1')
-                }}
-              repo: >-
-                {{
-                  not_null(parsed_refs.repo, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1')
-                }}
-              env: cicd
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
+    - name: has-ci-refs
+      expression: >-
+        has(object.metadata.annotations) &&
+        'ci_refs' in object.metadata.annotations &&
+        object.metadata.annotations['ci_refs'] != ''
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  variables:
+    - name: refs
+      expression: json.unmarshal(object.metadata.annotations['ci_refs'])
+    - name: author
+      expression: >-
+        variables.refs.?pulls.orValue([]).size() > 0 ?
+        string(variables.refs.pulls[0].?author.orValue('')) :
+        string(object.metadata.?annotations.orValue({})[?'ci_trigger_user'].orValue(''))
+    # compatible with prow style refs labels: lowercase, only [a-z0-9_-],
+    # truncated to 63 chars at patch time.
+    - name: sanitizedOrg
+      expression: >-
+        string(variables.refs.?org.orValue('')).lowerAscii()
+        .split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+    - name: sanitizedRepo
+      expression: >-
+        string(variables.refs.?repo.orValue('')).lowerAscii()
+        .split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+    - name: sanitizedBaseRef
+      expression: >-
+        string(variables.refs.?base_ref.orValue('')).lowerAscii()
+        .split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+    - name: sanitizedAuthor
+      expression: >-
+        variables.author.lowerAscii()
+        .split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          [
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/prow.k8s.io~1refs.org",
+              value: size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg
+            },
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/prow.k8s.io~1refs.repo",
+              value: size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo
+            },
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/prow.k8s.io~1refs.base_ref",
+              value: size(variables.sanitizedBaseRef) > 63 ? variables.sanitizedBaseRef.substring(0, 63) : variables.sanitizedBaseRef
+            },
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/author",
+              value: size(variables.sanitizedAuthor) > 63 ? variables.sanitizedAuthor.substring(0, 63) : variables.sanitizedAuthor
+            },
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/org",
+              value: size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg
+            },
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/repo",
+              value: size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo
+            },
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/env",
+              value: "cicd"
+            }
+          ]
