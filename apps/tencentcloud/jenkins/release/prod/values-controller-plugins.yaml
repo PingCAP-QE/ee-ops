@@ -1,0 +1,69 @@
+# please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+controller:
+  overwritePlugins: true
+  installLatestPlugins: true
+
+  # Override the default list to use our own custom plugin
+  # Ref: https://artifacthub.io/packages/helm/jenkinsci/jenkins?modal=values&path=controller.installPlugins
+  installPlugins:
+    - kubernetes:4437.vd64141124d8f-fork.3:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f-fork.3/kubernetes.hpi
+    - workflow-aggregator:608.v67378e9d3db_1
+    - git:5.10.1
+    - configuration-as-code:2114.v67a_a_18696b_8f
+
+  # List of plugins to install in addition to those listed in controller.installPlugins
+  additionalPlugins:
+    # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
+    # but without outer `plugin` key.
+    - artifact-manager-s3:986.v7c9a_d15576b_b_
+    - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
+    - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-1/cdevents-1-40-pingcap-1.hpi
+    - generic-webhook-trigger:2.4.2
+    - google-login:109.v022b_cf87b_e5b_
+    - http_request:1.25
+    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
+    - job-dsl:3654.vdf58f53e2d15
+    - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
+    - lockable-resources:1539.v4db_b_fc1cc115
+    - pipeline-graph-view:980.vb_db_0b_e5f683c
+    - pipeline-utility-steps:3.810.va_7672d206740
+    - prometheus:856.vc9e3d6e4b_b_9e
+    - role-strategy:898.vc050ed2424ca_
+    - ssh-agent:413.v1fd573533a_ec
+
+  initializeOnce: false
+
+  # for plugin build-failure-analyzer
+  #   Exporting to prometheus
+  #   Ref: https://github.com/jenkinsci/build-failure-analyzer-plugin/blob/master/docs/metrics.md
+  prometheus:
+    metricRelabelings:
+      # add label: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_category_(.*)
+        targetLabel: category
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:.*:_:(.*)
+        targetLabel: category
+
+      # add label: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_cause_(.*)
+        targetLabel: cause
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:.*:_:(.*)
+        targetLabel: cause
+
+      # add label: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_category:_:(.*):_:.*
+        targetLabel: jobname
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_job_cause:_:(.*):_:.*
+        targetLabel: jobname
+
+      # aggerate to uniq metric: jenkins_bfa
+      - sourceLabels: [__name__]
+        regex: jenkins_bfa_(.*)_(.*)
+        replacement: jenkins_bfa
+        targetLabel: __name__
