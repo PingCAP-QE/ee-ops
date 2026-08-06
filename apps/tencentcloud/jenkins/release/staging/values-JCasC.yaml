@@ -183,7 +183,7 @@ controller:
             - envVars:
                 env:
                   - key: "GOPROXY"
-                    value: "http://goproxy.cache.svc"
+                    value: "http://goproxy.cache.svc,direct"
 
       pipeline-cache: |
         unclassified:
