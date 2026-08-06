@@ -1,0 +1,52 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: set-pod-compute-class
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          [
+            has(object.metadata.annotations) ?
+            JSONPatch{
+              op: "add",
+              path: "/metadata/annotations/cluster-autoscaler.kubernetes.io~1safe-to-evict",
+              value: "false"
+            } :
+            JSONPatch{
+              op: "add",
+              path: "/metadata/annotations",
+              value: {"cluster-autoscaler.kubernetes.io/safe-to-evict": "false"}
+            },
+            has(object.spec.nodeSelector) ?
+            JSONPatch{
+              op: "add",
+              path: "/spec/nodeSelector/compute-class",
+              value: "ci-worker"
+            } :
+            JSONPatch{
+              op: "add",
+              path: "/spec/nodeSelector",
+              value: {"compute-class": "ci-worker"}
+            }
+          ]
