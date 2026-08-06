@@ -4,3 +4,4 @@ resources:
   - gatewayclass.yaml
   - gateway-internal.yaml
   - gateway-public.yaml
+  - es-gateway-tls-certs.yaml
