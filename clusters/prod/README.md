@@ -12,4 +12,3 @@
 | apps        | coveralls-token            | `kubectl -n apps create secret generic ...`                            | for coveralls uploading, keys: `tiflow`                                                                                                                                                         |
 | apps        | tekton-ingress             | `kubectl -n apps create secret generic tekton-ingress ...`             | tekton component, keys: `domain`, `path_for_dashboard`                                                                                                                                          |
 | flux-system | prow                       | `kubectl -n flux-system create secret generic ...`                     | secret configurations to deploy prow github app                                                                                                                                                 |
-
