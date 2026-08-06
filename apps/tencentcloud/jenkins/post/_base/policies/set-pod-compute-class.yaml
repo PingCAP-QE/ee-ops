@@ -1,5 +1,5 @@
-apiVersion: kyverno.io/v1
-kind: Policy
+apiVersion: kyverno.io/v2beta1
+kind: MutationPolicy
 metadata:
   name: set-pod-compute-class
 spec:
