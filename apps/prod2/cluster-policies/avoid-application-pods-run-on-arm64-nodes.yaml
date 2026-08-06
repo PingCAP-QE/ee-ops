@@ -10,17 +10,18 @@ spec:
           kinds:
             - Pod
           namespaces:
+            - apps
             - brc
             - buildbarn
+            - cache
             - cs
+            - dl
             - kafka
             - publisher
             - tekton-operator
             - tekton-pipelines
             - tibuild
             - zot
-            - cache
-            - dl
       mutate:
         patchStrategicMerge:
           spec:

@@ -2,12 +2,8 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: ats
-  namespace: flux-system
 spec:
   releaseName: ats
-  targetNamespace: apps
-  dependsOn:
-    - name: greenhouse
   chart:
     spec:
       chart: ./charts/ats
