@@ -46,7 +46,7 @@ if [ -d /etc/containerinfo ]; then
     mem_limit=$(cat /etc/containerinfo/mem_limit 2>/dev/null)
     if [ -n "$cpu_limit" ] && [ -n "$mem_limit" ]; then
         mem_limit=$(((mem_limit / 1048576) * 9 / 10 ))
-        # Use $var (not ${var}) to avoid Flux postBuild substitution stripping values.
+        # Use the bare $var form (no curly braces) to avoid Flux postBuild substitution stripping values.
         echo "build --local_ram_resources=$mem_limit --local_cpu_resources=$cpu_limit --jobs=$cpu_limit" >> ~/.bazelrc
     fi
 fi
