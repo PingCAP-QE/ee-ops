@@ -6,6 +6,8 @@ metadata:
 spec:
   dependsOn:
     - name: jenkins-release
+    - name: bazel-remote
+      namespace: cache
   interval: 5m0s
   sourceRef:
     kind: GitRepository
