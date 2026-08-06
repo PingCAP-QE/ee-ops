@@ -45,3 +45,17 @@ spec:
             kind: HTTPRoute
         namespaces:
           from: All
+    - name: wildcard-pingcap-cn-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.pingcap.cn"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-pingcap-cn-cert
+      allowedRoutes:
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+        namespaces:
+          from: All
