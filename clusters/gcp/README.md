@@ -6,12 +6,19 @@
 
 ### Secrets
 
-| namespace   | secret name                | prepare commands                                   | keys                                                                                                                                                                                            | description |
-| ----------- | -------------------------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| flux-system | prow                       | `kubectl -n flux-system create secret generic ...` | `DOMAIN_NAME`, `GITHUB_APP_ID`, `GITHUB_APP_CERT`, `GITHUB_APP_WEBHOOK_HMAC`, `GITHUB_TOKEN`,`GITHUB_APP_CLIENT_ID`,`GITHUB_APP_CLIENT_SECRET`, `OAUTH_COOKIE_SECRET`, `GCS_CREDENTIALS_BASE64` |             |
-| flux-system | gcs-credentials            | `service-account.json`                             | GCS credentials for prow                                                                                                                                                                        |             |
-| apps        | prow-jenkins-operator-auth | `user`, `token`                                    | auth to external jenkins controller                                                                                                                                                             |             |
-| apps        | prow-tls                   |                                                    | prow site ingress cert secret                                                                                                                                                                   |             |
+Most application secrets are synced automatically by `external-secrets` from GCP
+Secret Manager (ClusterSecretStore `ee-gcp-sm`) and do not need manual
+preparation, e.g. prow related (`prow-github`, `prow-webhook`,
+`prow-oauth-cookie`, `prow-kubeconfig`, `prow-gcs-credentials`,
+`prow-jenkins-operator-auth`, etc.).
+
+Secrets that require manual preparation:
+
+| namespace   | secret name       | prepare commands                                                                                          | description                                  |
+| ----------- | ----------------- | --------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| flux-system | lark-token        | `kubectl -n flux-system create secret generic lark-token --from-literal=address=<lark-webhook-url>`       | GitOps notification webhook (info events)    |
+| flux-system | lark-token-error  | `kubectl -n flux-system create secret generic lark-token-error --from-literal=address=<lark-webhook-url>` | GitOps alert webhook (error events)          |
+| apps        | prow-tls          | Create ingress TLS cert secret manually                                                                    | prow site ingress cert secret                |
 
 ## Terraform GitOps (tofu-controller)
 
