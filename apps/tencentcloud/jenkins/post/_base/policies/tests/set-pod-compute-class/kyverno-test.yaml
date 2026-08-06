@@ -18,27 +18,11 @@ results:
     result: pass
 
   - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
-    resources:
-      - pod-no-ci-refs
-    kind: Pod
-    result: skip
-    patchedResources: patched-default.yaml
-
-  - policy: set-pod-compute-class
     rule: add-compute-class-and-annotations
     resources:
       - pod-empty-ci-refs
     kind: Pod
     result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
-    resources:
-      - pod-empty-ci-refs
-    kind: Pod
-    result: skip
-    patchedResources: patched-default-empty-ci-refs.yaml
 
   - policy: set-pod-compute-class
     rule: add-compute-class-and-annotations
@@ -48,24 +32,8 @@ results:
     result: pass
 
   - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
-    resources:
-      - pod-non-release
-    kind: Pod
-    result: skip
-    patchedResources: patched-default-non-release.yaml
-
-  - policy: set-pod-compute-class
     rule: add-compute-class-and-annotations
     resources:
       - pod-release
     kind: Pod
     result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
-    resources:
-      - pod-release
-    kind: Pod
-    result: pass
-    patchedResources: patched-release.yaml
