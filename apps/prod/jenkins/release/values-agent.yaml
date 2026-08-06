@@ -1,4 +1,0 @@
-agent:
-  maxRequestsPerHostStr: "200" # need to restart controller after updated it.
-  namespace: jenkins-ci-default
-  containerCap: 200
