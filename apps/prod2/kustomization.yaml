@@ -12,5 +12,3 @@ resources:
   - dl
   - tibuild # experiment for v2
   - prow-worker
-  - greenhouse
-  - ats
