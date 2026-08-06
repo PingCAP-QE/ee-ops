@@ -1,4 +1,4 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
+apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: brc
@@ -28,26 +28,39 @@ spec:
       fsGroup: 1000
     nodeSelector:
       kubernetes.io/arch: amd64
+      compute-class: ee-application
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /data
-      max_size: 1000 # The maximum size of bazel-remote's disk cache in GiB.
+      max_size: 100 # The maximum size of bazel-remote's local disk cache in GiB.
       experimental_remote_asset_api: true
       access_log_level: all
       http_address: ":8080"
       grpc_address: ":9092"
       log_timezone: UTC
-      #s3_proxy:
-      #  endpoint: ks3-endpoint:9000
-      #  bucket: test-bucket
-      #  prefix: test-prefix
-      #  disable_ssl: true
-      #  bucket_lookup_type: auto
+      s3_proxy:
+        # Tencent COS only supports virtual-hosted-style addressing:
+        # https://<bucket>.cos.<region>.myqcloud.com
+        endpoint: cos.${COS_REGION}.myqcloud.com
+        bucket: ${COS_BUCKET}
+        prefix: ${COS_PREFIX}
+        region: ${COS_REGION}
+        auth_method: credentials_file
+        aws_shared_credentials_file: /etc/bazel-remote/credentials
+        aws_profile: brc
+        bucket_lookup_type: dns
+        max_idle_conns: 1024
     replicaCount: 1
     volumeMounts:
       - mountPath: /data
         name: brc-cache
+      - mountPath: /etc/bazel-remote/credentials
+        name: brc-cos-credentials
+        subPath: credentials
     volumes:
       - name: brc-cache
         persistentVolumeClaim:
           claimName: brc-cache
+      - name: brc-cos-credentials
+        secret:
+          secretName: brc-cos-credentials
