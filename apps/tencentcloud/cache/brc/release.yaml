@@ -45,7 +45,7 @@ spec:
         bucket: ${COS_BUCKET}
         prefix: ${COS_PREFIX}
         region: ${COS_REGION}
-        auth_method: credentials_file
+        auth_method: aws_credentials_file
         aws_shared_credentials_file: /etc/bazel-remote/credentials
         aws_profile: brc
         bucket_lookup_type: dns
