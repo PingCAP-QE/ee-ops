@@ -7,6 +7,6 @@ spec:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 1.1Ti
-  storageClassName: openebs-single-replica
+      storage: 100Gi
+  storageClassName: cbs
   volumeMode: Filesystem
