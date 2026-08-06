@@ -176,6 +176,15 @@ controller:
                 }
               }
 
+      # global environment variables for all agents.
+      global-env: |
+        jenkins:
+          globalNodeProperties:
+            - envVars:
+                env:
+                  - key: "GOPROXY"
+                    value: "http://goproxy.cache.svc,direct"
+
       pipeline-cache: |
         unclassified:
           pipeline-cache:
