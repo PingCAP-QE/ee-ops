@@ -4,12 +4,21 @@ aliases:
     - wuhuizuo
     - dillon-zheng
   sig-root-reviewers:
-    - purelind
-    - lybcodes
+    - timzxz
+
+  sig-apps-gcp-approvers:
+    - wuhuizuo
+    - dillon-zheng
+  sig-apps-gcp-tencentcloud:
+    - wuhuizuo
+    - dillon-zheng
 
   sig-apps-prod-approvers:
-    - purelind
-    - wuhuizuo
+    - kumailf # pingkai
+  sig-apps-prod2-approvers:
+    - kumailf # pingkai
 
   # emeritus_reviewers:
   #   - lijie0123
+  #   - purelind
+  #   - lybcodes
