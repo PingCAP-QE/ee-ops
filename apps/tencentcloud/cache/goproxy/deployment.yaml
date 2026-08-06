@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: goproxy
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -45,4 +45,5 @@ spec:
           mountPath: /opt/cache
       volumes:
       - name: data
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: goproxy-cache
