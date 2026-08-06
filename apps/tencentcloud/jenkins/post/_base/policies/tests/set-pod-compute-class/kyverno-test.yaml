@@ -9,7 +9,6 @@ resources:
   - resource-empty-ci-refs.yaml
   - resource-non-release.yaml
   - resource-release.yaml
-  - resource-retry.yaml
 results:
   - policy: set-pod-compute-class
     rule: add-compute-class-and-annotations
@@ -70,18 +69,3 @@ results:
     kind: Pod
     result: pass
     patchedResources: patched-release.yaml
-
-  - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
-    resources:
-      - pod-retry
-    kind: Pod
-    result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-retried
-    resources:
-      - pod-retry
-    kind: Pod
-    result: pass
-    patchedResources: patched-retry.yaml
