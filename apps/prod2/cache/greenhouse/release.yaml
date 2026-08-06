@@ -40,7 +40,7 @@ spec:
       enabled: true
       storageClass: openebs-single-replica
       accessMode: ReadWriteOnce
-      size: 3840Gi
+      size: 1Ti
     serviceMonitor:
       enabled: true
       additionalLabels:

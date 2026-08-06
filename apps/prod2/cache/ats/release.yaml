@@ -35,9 +35,9 @@ spec:
         cpu: "1"
         # ats ram-cache size + 8GiB
         memory: 34Gi
-    # deploy on dedicated node.
+    # deploy on amd64 nodes.
     nodeSelector:
-      dedicated: greenhouse
+      kubernetes.io/arch: amd64
     volumes:
       - name: data
         persistentVolumeClaim:
