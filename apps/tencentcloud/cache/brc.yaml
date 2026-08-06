@@ -14,7 +14,7 @@ spec:
   prune: true
   postBuild:
     substitute:
-      COS_BUCKET: <bucket-name-appid>
+      COS_BUCKET: ee-brc-1453452848
       COS_REGION: ap-beijing
       COS_PREFIX: brc
       COS_CREDENTIALS_JSON: tencentcloud_common_creds_json

@@ -16,4 +16,5 @@ spec:
     substitute:
       GOOGLE_OAUTH_JSON: tencentcloud_jenkins_google_oauth_json
       JENKINS_CACHE_S3_JSON: tencentcloud_jenkins_cache_s3_json
-      JENKINS_ARTIFACT_S3_S3_JSON: tencentcloud_jenkins_artifact_s3_json
+      JENKINS_ARTIFACT_S3_JSON: tencentcloud_jenkins_artifact_s3_json
+      S3_CREDENTIALS_JSON: tencentcloud_common_creds_json
