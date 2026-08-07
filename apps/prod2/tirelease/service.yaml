@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tirelease
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: tirelease
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tirelease-webhook
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+  selector:
+    app: tirelease-webhook
