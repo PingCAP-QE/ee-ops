@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ci-rwo
+  labels:
+    app.kubernetes.io/managed-by: fluxcd
+allowVolumeExpansion: true
+parameters:
+  type: CLOUD_HSSD
+provisioner: com.tencent.cloud.csi.cbs
+reclaimPolicy: Delete
+volumeBindingMode: WaitForFirstConsumer
