@@ -1,0 +1,64 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: jenkins
+spec:
+  chart:
+    spec:
+      chart: jenkins
+      version: 5.9.49
+      sourceRef:
+        kind: HelmRepository
+        name: jenkins
+        namespace: flux-system
+  dependsOn:
+    - name: cloudevents-server
+      namespace: cs
+  interval: 1h0m0s
+  timeout: 15m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+  test:
+    enable: true
+    ignoreFailures: false
+  valuesFrom:
+    - { kind: Secret, name: jenkins-release-values, valuesKey: prod-values1.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: prod-values2.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: prod-values3.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: prod-values4.yaml }
+    - { kind: Secret, name: jenkins-release-values, valuesKey: prod-values5.yaml }
+  values:
+    agent:
+      namespace: "${AGENT_NAMESPACE}"
+
+    controller:
+      servicePort: 8080
+      targetPort: 8080
+      jenkinsUriPrefix: "${INGRESS_PATH}"
+      jenkinsUrl: "https://${INGRESS_HOST}${INGRESS_PATH}"
+      jenkinsAdminEmail: "${ADMIN_EMAIL}"
+
+    persistence:
+      enabled: true
+
+      # A manually managed Persistent Volume and Claim
+      # Requires persistence.enabled: true
+      # If defined, PVC must be created manually before volume will be bound
+      # existingClaim: jenkins
+
+      # jenkins data Persistent Volume Storage Class
+      # If defined, storageClassName: <storageClass>
+      # If set to "-", storageClassName: "", which disables dynamic provisioning
+      # If undefined (the default) or set to null, no storageClassName spec is
+      #   set, choosing the default provisioner.  (gp2 on AWS, standard on
+      #   GKE, AWS & OpenStack)
+      #
+      storageClass: "${PERSISTENCE_STORAGE_CLASS}"
+      size: "700Gi"
+
+    serviceAccount:
+      create: true

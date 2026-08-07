@@ -1,0 +1,236 @@
+controller:
+  # 'name' is a name of an existing secret in same namespace as jenkins,
+  # 'keyName' is the name of one of the keys inside current secret.
+  # the 'name' and 'keyName' are concatenated with a '-' in between, so for example:
+  # an existing secret "secret-credentials" and a key inside it named "github-password" should be used in Jcasc as ${secret-credentials-github-password}
+  # 'name' and 'keyName' must be lowercase RFC 1123 label must consist of lower case alphanumeric characters or '-',
+  # and must start and end with an alphanumeric character (e.g. 'my-name',  or '123-abc')
+  additionalExistingSecrets:
+    # for login with google
+    - { name: google-oauth, keyName: client-id }
+    - { name: google-oauth, keyName: client-secret }
+
+    # for ci cache, no need create manually.
+    - { name: jenkins-cache, keyName: region }
+    - { name: jenkins-cache, keyName: bucket }
+    - { name: jenkins-cache, keyName: endpoint }
+    - { name: jenkins-cache, keyName: endpoint-host }
+    - { name: jenkins-cache, keyName: access-key }
+    - { name: jenkins-cache, keyName: access-secret }
+
+  additionalSecrets: []
+  #  - name: nameOfSecret
+  #    value: secretText
+
+  JCasC:
+    defaultConfig: true
+    # Ignored if authorizationStrategy is defined in controller.JCasC.configScripts
+    authorizationStrategy: |-
+      # loggedInUsersCanDoAnything:
+      #   allowAnonymousRead: true # allow users to read builds logs without logging in.
+      #
+      roleBased:
+        permissionTemplates:
+          - name: "read-build-template"
+            permissions:
+              - "Job/Cancel"
+              - "Job/Build"
+              - "Job/Read"
+          - name: "configure-template"
+            permissions:
+              - "Job/Cancel"
+              - "Job/Build"
+              - "Job/Read"
+              - "Job/Configure"
+        roles:
+          global:
+            # Full administrator
+            - name: "admin"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "Overall/Administer"
+              entries:
+                - user: "wuhui.zuo@pingcap.com"
+                - user: "wei.zheng@pingcap.com"
+
+            # Reader
+            - name: "builder"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "Job/Read"
+                - "Job/Build"
+                - "Job/Cancel"
+                - "Run/Read"
+                - "Run/Replay"
+                - "View/Read"
+                - "Metrics/Read"
+              entries:
+                - user: "lifu.wu@pingcap.com"
+                - user: "yebin.li@pingcap.com"
+
+            # Readonly
+            - name: "readonly"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "Job/Read"
+                - "Run/Read"
+                - "View/Read"
+              entries:
+                - user: anonymous
+                - group: authenticated
+
+    # for security.
+    security:
+      globalJobDslSecurityConfiguration:
+        useScriptSecurity: false
+      gitHostKeyVerificationConfiguration:
+        sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
+
+    securityRealm: |-
+      # local:
+      #   allowsSignup: false
+      #   enableCaptcha: false
+      #   users:
+      #   - id: "${chart-admin-username}"
+      #     name: "Jenkins Admin"
+      #     password: "${chart-admin-password}"
+      googleOAuth2:
+        clientId: "${google-oauth-client-id}"
+        clientSecret: "${google-oauth-client-secret}"
+        domain: "pingcap.com"
+
+    # REF Doc: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/README.md
+    #
+    # Notable: if you want delete some key, first please delete the conetnt but keep the key.
+    #   after deployed, then create other commit and push to delete the key.
+    configScripts:
+      #  welcome-message: |
+      #    jenkins:
+      #      systemMessage: Welcome to our CI\CD server.  This Jenkins is configured and managed 'as code'.
+      # Ignored if securityRealm is defined in controller.JCasC.configScripts and
+      # ignored if controller.enableXmlConfig=true as controller.securityRealm takes precedence
+      # securityRealm: |
+      #   jenkins:
+      #     securityRealm:
+      #       googleOAuth2:
+      #         # will read from key `client-id` from secret `google-oauth2`
+      #         clientId: "${google-oauth2-client-id}"
+      #         # will read from key `client-secret` from secret `google-oauth2`
+      #         clientSecret: "${google-oauth2-client-secret}"
+
+      # for jobs.
+      jobs-dsl: |
+        jobs:
+          - script: |
+              job('seed') {
+                description('''
+                    Jenkins jobs As Code
+                    No need to configure job on Jenkins Web UI anymore.
+                ''')
+                logRotator {
+                    daysToKeep(7)
+                }
+                parameters {
+                    // Ref: https://docs.prow.k8s.io/docs/jobs/#job-environment-variables
+                    stringParam("BUILD_ID", "", "Build ID")
+                    stringParam("PROW_JOB_ID", "", "Prow job ID")
+                    stringParam(
+                      "JOB_SPEC",
+                      '{"type":"postsubmit","refs":{"org":"PingCAP-QE","repo":"ci","repo_link":"https://github.com/PingCAP-QE/ci","base_ref":"main","base_sha":"main"}}',
+                      "Prow job spec struct data"
+                    )
+                }
+                scm {
+                  git {
+                    remote {
+                      url('https://github.com/PingCAP-QE/ci.git')
+                    }
+                    branch('main')
+                    extensions {
+                      cloneOptions {
+                        depth(1)
+                        shallow(true)
+                        timeout(5)
+                      }
+                    }
+                  }
+                }
+                steps {
+                  jobDsl {
+                    targets('jobs/**/*.groovy')
+                    failOnMissingPlugin(false)
+                    ignoreMissingFiles(true)
+                    ignoreExisting(false)
+                    removedJobAction('DELETE')
+                    removedConfigFilesAction('DELETE')
+                    removedViewAction('DELETE')
+                    lookupStrategy('SEED_JOB')
+                    sandbox(false)
+                  }
+                }
+              }
+
+      # global environment variables for all agents.
+      global-env: |
+        jenkins:
+          globalNodeProperties:
+            - envVars:
+                env:
+                  - key: "GOPROXY"
+                    value: "http://goproxy.cache.svc,direct"
+
+      pipeline-cache: |
+        unclassified:
+          pipeline-cache:
+            region: ${jenkins-cache-region}
+            bucket: ${jenkins-cache-bucket}
+            endpoint: ${jenkins-cache-endpoint}
+            username: ${jenkins-cache-access-key}
+            password: ${jenkins-cache-access-secret}
+            threshold: 400000 # limit to 400GiB
+      cdevents: |
+        unclassified:
+          cDEventsGlobalConfig:
+            httpSinkUrl: "http://cloudevents-server.cs.svc/events"
+            sinkType: "http"
+      # for global shared libraries
+      global-library: |
+        unclassified:
+          globalLibraries:
+            libraries:
+              - name: "tisys"
+                retriever:
+                  modernSCM:
+                    scm:
+                      gitSource:
+                        remote: "https://github.com/pingcap-qe/ci.git"
+                    libraryPath: "libraries/tisys"
+                defaultVersion: "main"
+                implicit: true
+                allowVersionOverride: true
+                includeInChangesets: false
+                cachingConfiguration:
+                  refreshTimeMinutes: 60
+                  includedVersionsStr: "main"
+                  excludedVersionsStr: "feature/ fix/ bugfix/"
+
+      artifact-manager-s3: |
+        unclassified:
+          artifactManager:
+            artifactManagerFactories:
+              - jclouds:
+                  provider: s3
+        aws:
+          awsCredentials:
+            credentialsId: jenkins-artifact-s3-auth
+          s3:
+            container: ${jenkins-cache-bucket}
+            prefix: "jenkins-artifacts/"
+            # artifact-manager-s3 validates customEndpoint as host[:port].
+            customEndpoint: ${jenkins-cache-endpoint-host}
+            customSigningRegion: ${jenkins-cache-region}
+            usePathStyleUrl: false
+            disableSessionToken: true
