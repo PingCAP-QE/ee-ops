@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tirelease
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: tirelease
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: tirelease
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: main
+          image: hub.pingcap.net/ee/tirelease:94d9a4c-dirty-amd64
+          command: ["/apps/tirelease"]
+          args:
+            - --config=/etc/config/config.yaml
+            - --secret=/etc/secret-config
+          env:
+            - name: GOGC
+              value: "150"
+            - name: GOMEMLIMIT
+              value: "1200MiB"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 1500m
+              memory: 1536Mi
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: secret-config
+              mountPath: /etc/secret-config
+              readOnly: true
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: config
+          configMap:
+            name: tirelease-config
+        - name: secret-config
+          secret:
+            secretName: tirelease-secret-config
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
