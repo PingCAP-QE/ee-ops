@@ -23,7 +23,7 @@ spec:
         kubernetes.io/arch: amd64
       containers:
         - name: main
-          image: hub.pingcap.net/ee/tirelease:94d9a4c-dirty-amd64
+          image: hub.pingcap.net/ee/tirelease
           command: ["/apps/jobs"]
           args:
             - --config=/etc/config/config.yaml
