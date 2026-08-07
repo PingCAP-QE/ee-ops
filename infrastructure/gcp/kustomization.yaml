@@ -11,3 +11,4 @@ resources:
   - cleaners
   - terraform
   - compute-classes
+  - storage-classes
