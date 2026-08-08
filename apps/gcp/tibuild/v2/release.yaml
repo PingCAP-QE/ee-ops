@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: tibuild-v2
-      version: 2.0.0-alpha.1
+      version: 2.0.0-alpha.2
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -43,6 +43,18 @@ spec:
       config:
         secretName: v2-config
         secretKey: config.yaml
+      # Registry credentials for image sync (crane), mounted as Docker config.
+      volumes:
+        - name: docker-cred
+          secret:
+            secretName: image-release-cred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+      volumeMounts:
+        - name: docker-cred
+          mountPath: /root/.docker
+          readOnly: true
     serviceAccount:
       create: false
     httpRoute:
