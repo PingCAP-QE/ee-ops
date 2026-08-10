@@ -31,6 +31,8 @@ spec:
             - SK1
             - S6
             - S5
+            - SA9
+            - SA5
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
     consolidateAfter: 2m
