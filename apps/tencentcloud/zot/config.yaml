@@ -1,0 +1,43 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: zot-config
+spec:
+  dependsOn:
+    - name: zot-pre
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/tencentcloud/zot/config
+  prune: true
+  postBuild:
+    substitute:
+      # Not exposed via ingress/httproute yet, use the in-cluster service URL.
+      EXTERNAL_URL: http://zot.zot.svc.cluster.local:5000
+      # TODO: we should put it in secret that managed by external-secret
+      ZOT_EVENT_SINKER_URL: https://webhook-test.com/5e5b8e3cc0cbd10543adabee7c1a2a39 # free public mock test endpoint
+      # the json file should have content with this format:
+      #   {
+      #     "127.0.0.1:8080": {
+      #       "username": "user",
+      #       "password": "pass"
+      #     },
+      #     "registry2:5000": {
+      #       "username": "user2",
+      #       "password": "pass2"
+      #     }
+      #   }
+      ZOT_SYNC_AUTH_JSON_FILEPATH: /secret/sync_auth.json
+    substituteFrom:
+      # from redis external secret, contains keys:
+      # - REDIS_PASSWORD
+      - kind: Secret
+        name: redis
+      # from external-secret in zot-pre, contains keys:
+      # - GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+      # - S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET, S3_REGION_ENDPOINT, S3_REGION
+      - kind: Secret
+        name: zot-config-secrets

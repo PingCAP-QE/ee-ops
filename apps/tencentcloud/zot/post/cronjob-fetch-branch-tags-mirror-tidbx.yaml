@@ -1,0 +1,78 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-fetch-branch-tags-mirror-tidbx
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: fetch-tags
+              image: ghcr.io/pingcap-qe/cd/utils/release:v2026.3.29-14-g90ae7ef
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+              env:
+                - name: DST_REPO_PREFIX
+                  value: "zot.zot.svc.cluster.local:5000/mirrors/tidbx"
+              command:
+                - /bin/bash
+                - -c
+              args:
+                - |
+                  #!/usr/bin/env bash
+                  set -euo pipefail
+
+                  ocis=(
+                    pingcap/ticdc/image:master-next-gen
+                    pingcap/tidb/images/br:master-next-gen
+                    pingcap/tidb/images/dumpling:master-next-gen
+                    pingcap/tidb/images/tidb-lightning:master-next-gen
+                    pingcap/tidb/images/tidb-server:master-next-gen
+                    pingcap/tiflash/image:master-next-gen
+                    pingcap/tiflow/images/dm:master-next-gen
+                    tikv/pd/image:master-next-gen
+                    tikv/tikv/image:cloud-engine-next-gen
+
+                    pingcap/ticdc/image:release-nextgen-202603
+                    pingcap/tidb/images/br:release-nextgen-202603
+                    pingcap/tidb/images/dumpling:release-nextgen-202603
+                    pingcap/tidb/images/tidb-lightning:release-nextgen-202603
+                    pingcap/tidb/images/tidb-server:release-nextgen-202603
+                    pingcap/tiflash/image:release-nextgen-202603
+                    pingcap/tiflow/images/dm:release-nextgen-202603
+                    tikv/pd/image:release-nextgen-202603
+                    tikv/tikv/image:release-nextgen-202603
+
+                    pingcap/tidb/images/br:feature-fts-next-gen
+                    pingcap/tidb/images/dumpling:feature-fts-next-gen
+                    pingcap/tidb/images/tidb-lightning:feature-fts-next-gen
+                    pingcap/tidb/images/tidb-server:feature-fts-next-gen
+                    pingcap/tiflash/image:feature-fts-next-gen
+                  )
+
+                  any_failed=false
+                  for oci in "${ocis[@]}"; do
+                    DEST="$DST_REPO_PREFIX/$oci"
+                    echo "Updating $DEST"
+                    # Try to get the digest. Redirect stdout to /dev/null as we only care about success/failure.
+                    if crane digest "$DEST" >/dev/null; then
+                      echo "Successfully processed $DEST"
+                    else
+                      # This will catch 'not found' as well as other errors.
+                      echo "Could not process $DEST"
+                      any_failed=true
+                    fi
+                  done
+
+                  if [ "$any_failed" = "true" ]; then
+                    echo "Error: Failed to process some image tags. Please check logs for details." >&2
+                    exit 1
+                  fi
