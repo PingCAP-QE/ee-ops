@@ -26,13 +26,11 @@ spec:
         - key: karpenter.k8s.tke/instance-family
           operator: In
           values:
-            - C6
-            - C5
-            - SK1
-            - S6
-            - S5
-            - SA9
-            - SA5
+            - SA9e # AMD Turin C, comparable to GCP C4D
+            - SA9 # AMD Turin D, comparable to GCP N4D
+            - S9pro # Intel latest gen high-performance
+            - S9e # Intel latest gen standard
+            - SK1 # ARM
   disruption:
     consolidationPolicy: WhenEmptyOrUnderutilized
     consolidateAfter: 2m
