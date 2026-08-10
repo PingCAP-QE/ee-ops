@@ -21,7 +21,7 @@ controller:
     - generic-webhook-trigger:2.4.2
     - google-login:109.v022b_cf87b_e5b_
     - http_request:1.25
-    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
+    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.1/jenkins-pipeline-cache-0.2.1.hpi
     - job-dsl:3654.vdf58f53e2d15
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1539.v4db_b_fc1cc115
