@@ -38,17 +38,7 @@
         "path": "/secret/htpasswd"
       },
       "sessionKeysFile": "/secret/sessionKeys.json",
-      "apikey": true,
-      "openid": {
-        "providers": {
-          "google": {
-            "issuer": "https://accounts.google.com",
-            "clientid": "${GOOGLE_CLIENT_ID}",
-            "clientsecret": "${GOOGLE_CLIENT_SECRET}",
-            "scopes": ["openid", "email"]
-          }
-        }
-      }
+      "apikey": true
     },
     "accessControl": {
       "groups": {
