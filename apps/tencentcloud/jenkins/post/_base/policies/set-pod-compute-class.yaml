@@ -41,12 +41,23 @@ spec:
             has(object.spec.nodeSelector) ?
             JSONPatch{
               op: "add",
-              path: "/spec/nodeSelector/compute-class",
-              value: "ci-worker"
+              path: "/spec/nodeSelector/node.kubernetes.io~1instance-type",
+              value: "eklet"
             } :
             JSONPatch{
               op: "add",
               path: "/spec/nodeSelector",
-              value: {"compute-class": "ci-worker"}
+              value: {"node.kubernetes.io/instance-type": "eklet"}
+            },
+            has(object.spec.tolerations) ?
+            JSONPatch{
+              op: "add",
+              path: "/spec/tolerations/-",
+              value: {"key": "eks.tke.cloud.tencent.com/eklet", "operator": "Exists", "effect": "NoSchedule"}
+            } :
+            JSONPatch{
+              op: "add",
+              path: "/spec/tolerations",
+              value: [{"key": "eks.tke.cloud.tencent.com/eklet", "operator": "Exists", "effect": "NoSchedule"}]
             }
           ]
