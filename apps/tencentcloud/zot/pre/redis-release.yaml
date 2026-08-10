@@ -16,6 +16,8 @@ spec:
   values:
     global:
       storageClass: cbs
+    image:
+      registry: mirror.ccs.tencentyun.com # docker.io is unreachable from this cluster
     master:
       resourcesPreset: nano #  nano < micro < small < medium < large < xlarge < 2xlarge
       persistence:
