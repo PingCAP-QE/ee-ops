@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  name: bazel-remote
+  name: brc
 spec:
   chart:
     spec:
@@ -21,6 +21,7 @@ spec:
     enable: true
     ignoreFailures: false
   values:
+    fullnameOverride: brc
     image:
       repository: quay.io/bazel-remote/bazel-remote
       tag: v2.6.1
