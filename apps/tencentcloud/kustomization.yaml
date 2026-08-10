@@ -9,3 +9,4 @@ resources:
   - jenkins-agents
   - tibuild
   - tekton
+  - zot

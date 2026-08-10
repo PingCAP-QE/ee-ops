@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: zot
+configMapGenerator:
+  - name: zot-config
+    options:
+      disableNameSuffixHash: true
+    files:
+      - config.json # Ref: https://zotregistry.dev/v2.1.11/admin-guide/admin-configuration/
