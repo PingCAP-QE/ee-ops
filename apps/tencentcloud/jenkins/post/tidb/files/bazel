@@ -1,2 +1,2 @@
-build --remote_cache=grpc://bazel-remote.cache:9092
+build --remote_cache=grpc://brc.cache:9092
 build --remote_timeout="30s"

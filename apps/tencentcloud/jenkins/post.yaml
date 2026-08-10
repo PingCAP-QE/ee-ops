@@ -6,7 +6,7 @@ metadata:
 spec:
   dependsOn:
     - name: jenkins-release
-    - name: bazel-remote
+    - name: brc
       namespace: cache
   interval: 5m0s
   sourceRef:
