@@ -16,6 +16,8 @@ spec:
   values:
     global:
       storageClass: cbs
+      security:
+        allowInsecureImages: true # needed for mirror.ccs.tencentyun.com registry
     image:
       registry: mirror.ccs.tencentyun.com # docker.io is unreachable from this cluster
     master:
