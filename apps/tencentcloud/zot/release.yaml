@@ -32,7 +32,7 @@ spec:
     pvc:
       accessMode: ReadWriteOnce
       create: true
-      storage: 8Gi
+      storage: 10Gi # CBS minimum is 10Gi
       storageClassName: cbs
     replicaCount: 2
     service:
