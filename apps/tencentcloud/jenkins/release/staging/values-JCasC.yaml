@@ -184,6 +184,8 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "http://goproxy.cache.svc,direct"
+                  - key: "BAZELISK_BASE_URL"
+                    value: "https://repo.huaweicloud.com/bazel"
 
       pipeline-cache: |
         unclassified:
