@@ -1,0 +1,28 @@
+# The first reconciliation creates an import-aware plan only. Set approvePlan
+# to the generated plan ID in a reviewed follow-up change before any apply.
+apiVersion: infra.contrib.fluxcd.io/v1alpha2
+kind: Terraform
+metadata:
+  name: tencentcloud-ci-hongkong-egress
+spec:
+  interval: 1h
+  retryInterval: 5m
+  destroyResourcesOnDeletion: false
+  sourceRef:
+    kind: GitRepository
+    name: ee-infra
+    namespace: flux-system
+  path: ./terraform/tencentcloud/ci-hongkong-egress
+  runnerPodTemplate:
+    spec:
+      env:
+        - name: TENCENTCLOUD_SECRET_ID
+          valueFrom:
+            secretKeyRef:
+              name: tencentcloud-terraform-creds
+              key: TENCENTCLOUD_SECRET_ID
+        - name: TENCENTCLOUD_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: tencentcloud-terraform-creds
+              key: TENCENTCLOUD_SECRET_KEY
