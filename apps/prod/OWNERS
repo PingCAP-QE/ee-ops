@@ -1,5 +1,4 @@
 approvers:
-  - wuhuizuo
-  - purelind
+  - sig-apps-prod-approvers
 labels:
   - env/prod
