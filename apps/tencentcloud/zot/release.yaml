@@ -25,9 +25,22 @@ spec:
     secretFiles: false # We are in charge of managing it(the secret `zot-secret`)
     mountConfig: true
     configFiles: false # We are in charge of managing it(the config map `zot-config`)
-    # Not exposed via ingress/httproute for now.
     httproute:
-      enabled: false
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: external-https
+          namespace: infra
+      hostnames:
+        - cr.pingcap.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          # Registry pulls and pushes can stream large layers for a long time.
+          timeouts:
+            request: 0s
     persistence: true
     pvc:
       accessMode: ReadWriteOnce
