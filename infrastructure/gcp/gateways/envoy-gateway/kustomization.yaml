@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - source-envoyproxy.yaml
   - release-envoy-gateway.yaml
+  - envoyproxy-crd.yaml
