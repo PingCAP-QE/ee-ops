@@ -27,6 +27,12 @@ spec:
         - path:
             type: PathPrefix
             value: /debug
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
       backendRefs:
         # The Envoy data plane Service managed by Envoy Gateway, named via the
         # `internal` EnvoyProxy (envoyService.name).
