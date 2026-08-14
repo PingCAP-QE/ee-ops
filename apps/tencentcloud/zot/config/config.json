@@ -64,7 +64,7 @@
               "actions": ["read", "create", "update"]
             }
           ],
-          "anonymousPolicy": ["read"],
+          "anonymousPolicy": [],
           "defaultPolicy": ["read"]
         }
       },
@@ -131,18 +131,6 @@
     },
     "mgmt": {
       "enable": true
-    },
-    "events": {
-      "enable": true,
-      "sinks": [
-        {
-          "type": "http",
-          "address": "${ZOT_EVENT_SINKER_URL}",
-          "timeout": "5s",
-          "credentials": {},
-          "headers": {}
-        }
-      ]
     }
   }
 }
