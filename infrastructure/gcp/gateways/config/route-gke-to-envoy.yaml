@@ -26,19 +26,6 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /healthz
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /eg-healthz
-      backendRefs:
-        - name: eg-internal
-          port: 80
-    - matches:
-        - path:
-            type: PathPrefix
             value: /debug
       backendRefs:
         # The Envoy data plane Service managed by Envoy Gateway, named via the
