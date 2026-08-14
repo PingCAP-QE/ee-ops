@@ -4,6 +4,9 @@ metadata:
   name: envoy-gateway
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  # Shared EnvoyProxy for all Gateways of this class. New Gateways on this
+  # class MUST override it with their own Gateway-level EnvoyProxy
+  # (Gateway.spec.infrastructure.parametersRef) - see envoy-proxy.yaml.
   parametersRef:
     group: gateway.envoyproxy.io
     kind: EnvoyProxy

@@ -1,3 +1,19 @@
+# This EnvoyProxy is referenced by the envoy-gateway GatewayClass
+# (spec.parametersRef), so it applies to ALL Gateways of that class, including
+# envoyService.name. DO NOT create a second Gateway on the envoy-gateway class
+# without giving it its own Gateway-level EnvoyProxy:
+#
+#   apiVersion: gateway.networking.k8s.io/v1
+#   kind: Gateway
+#   spec:
+#     infrastructure:
+#       parametersRef:
+#         group: gateway.envoyproxy.io
+#         kind: EnvoyProxy
+#         name: <envoy-proxy-name>   # per-Gateway EnvoyProxy with a unique
+#                                    # envoyService.name, or the fixed service
+#                                    # name below will collide
+#
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: EnvoyProxy
 metadata:
