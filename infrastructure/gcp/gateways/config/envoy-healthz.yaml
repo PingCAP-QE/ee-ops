@@ -13,7 +13,9 @@ metadata:
 spec:
   directResponse:
     statusCode: 200
-    body: ok
+    body:
+      type: Inline
+      inline: ok
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
