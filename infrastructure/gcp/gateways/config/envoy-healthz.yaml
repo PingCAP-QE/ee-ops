@@ -1,0 +1,53 @@
+# Static 200 health endpoint for the Envoy data plane, and the GKE-side
+# health check that uses it.
+#
+# GKE probes the backend Service (eg-internal) on "/" by default, which the
+# Envoy data plane answers with 404 (no route matches "/"), marking the backend
+# unhealthy. HealthCheckPolicy points the probe at /healthz, and this
+# HTTPRouteFilter answers it with a static 200, independent of any backend app.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: HTTPRouteFilter
+metadata:
+  name: healthz-direct-response
+  namespace: infra
+spec:
+  directResponse:
+    statusCode: 200
+    body: ok
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: envoy-healthz
+  namespace: infra
+spec:
+  parentRefs:
+    - name: eg-internal
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /healthz
+      filters:
+        - type: ExtensionRef
+          extensionRef:
+            group: gateway.envoyproxy.io
+            kind: HTTPRouteFilter
+            name: healthz-direct-response
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: eg-internal-health-check
+  namespace: infra
+spec:
+  default:
+    config:
+      httpHealthCheck:
+        port: 80
+        requestPath: /healthz
+      type: HTTP
+  targetRef:
+    group: ""
+    kind: Service
+    name: eg-internal
