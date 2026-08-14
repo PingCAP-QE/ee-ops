@@ -46,7 +46,7 @@ spec:
   default:
     config:
       httpHealthCheck:
-        port: 80
+        portSpecification: USE_SERVING_PORT
         requestPath: /healthz
       type: HTTP
   targetRef:
