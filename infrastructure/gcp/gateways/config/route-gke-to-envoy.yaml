@@ -1,3 +1,20 @@
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: eg-internal-health-check
+  namespace: infra
+spec:
+  default:
+    config:
+      httpHealthCheck:
+        portSpecification: USE_SERVING_PORT
+        requestPath: /eg-healthz
+      type: HTTP
+  targetRef:
+    group: ""
+    kind: Service
+    name: eg-internal
+---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -10,6 +27,12 @@ spec:
         - path:
             type: PathPrefix
             value: /debug
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
       backendRefs:
         # The Envoy data plane Service managed by Envoy Gateway, named via the
         # `internal` EnvoyProxy (envoyService.name).
