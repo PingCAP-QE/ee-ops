@@ -8,7 +8,6 @@ spec:
   targetNamespace: infra
   dependsOn:
     - name: envoy-gateway-release
-    - name: envoy-gateway-crds
   interval: 10m0s
   sourceRef:
     kind: GitRepository
