@@ -3,5 +3,7 @@ kind: Kustomization
 resources:
   - source-envoyproxy.yaml
   - release-envoy-gateway.yaml
-  - envoyproxy-crd.yaml
-  - httproutefilter-crd.yaml
+  # Envoy Gateway CRDs, applied directly from the upstream release asset (pure
+  # YAML, no Helm involved - the gateway-crds-helm chart exceeds Helm's 1MB
+  # release secret limit, see envoyproxy/gateway#6105). Bump the tag to upgrade.
+  - https://github.com/envoyproxy/gateway/releases/download/v1.9.0-rc.1/envoy-gateway-crds.yaml
