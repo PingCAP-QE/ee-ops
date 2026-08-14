@@ -15,3 +15,9 @@ spec:
         namespace: infra
   install:
     crds: Skip
+  values:
+    crds:
+      # Gateway API CRDs are managed by the GKE addon (standard channel).
+      # The chart's crds subchart ships experimental-channel CRDs, which are
+      # rejected by the gateway-api safe-upgrades ValidatingAdmissionPolicy.
+      enabled: false
