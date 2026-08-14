@@ -1,0 +1,9 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-gateway
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  # No class-level EnvoyProxy: every Gateway of this class MUST reference its
+  # own Gateway-level EnvoyProxy (Gateway.spec.infrastructure.parametersRef) to
+  # control its data plane Service - see envoy-gateway-internal.yaml.
