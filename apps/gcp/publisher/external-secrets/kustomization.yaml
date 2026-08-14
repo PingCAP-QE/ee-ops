@@ -8,3 +8,4 @@ resources:
   - tiup-credentials-prod.yaml
   - tiup-credentials-staging.yaml
   - registry-reader-cred.yaml
+  - oidc-secret.yaml
