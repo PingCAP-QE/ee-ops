@@ -8,3 +8,4 @@ resources:
   - publisher-packages-config.yaml
   - redis
   - releases.yaml
+  - security-policy.yaml
