@@ -13,6 +13,12 @@ curl -sL https://github.com/fluxcd/flux2/releases/latest/download/crd-schemas.ta
 
 find . -type f -name '*.yaml' -print0 | while IFS= read -r -d $'\0' file;
   do
+    # Skip Helm chart templates: they contain Go template directives and are
+    # not valid standalone YAML.
+    if [[ "$file" == ./charts/*/templates/* ]]; then
+      echo "INFO - Skipping Helm template $file"
+      continue
+    fi
     echo "INFO - Validating $file"
     yq e 'true' "$file" > /dev/null
 done
