@@ -4,3 +4,4 @@ resources:
   - source-envoyproxy.yaml
   - release-envoy-gateway.yaml
   - envoyproxy-crd.yaml
+  - httproutefilter-crd.yaml
