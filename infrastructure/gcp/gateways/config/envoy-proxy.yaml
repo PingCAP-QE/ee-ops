@@ -1,0 +1,14 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: envoy-internal
+  namespace: infra
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        # Use a ClusterIP service instead of the default LoadBalancer:
+        # traffic is routed to this Envoy data plane via the GKE gateway
+        # (external-https) HTTPRoute, so no external LB is needed.
+        type: ClusterIP
