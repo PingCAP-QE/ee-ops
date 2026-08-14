@@ -4,11 +4,6 @@ metadata:
   name: envoy-gateway
 spec:
   controllerName: gateway.envoyproxy.io/gatewayclass-controller
-  # Shared EnvoyProxy for all Gateways of this class. New Gateways on this
-  # class MUST override it with their own Gateway-level EnvoyProxy
-  # (Gateway.spec.infrastructure.parametersRef) - see envoy-proxy.yaml.
-  parametersRef:
-    group: gateway.envoyproxy.io
-    kind: EnvoyProxy
-    name: envoy-internal
-    namespace: infra
+  # No class-level EnvoyProxy: every Gateway of this class MUST reference its
+  # own Gateway-level EnvoyProxy (Gateway.spec.infrastructure.parametersRef) to
+  # control its data plane Service - see envoy-proxy.yaml.
