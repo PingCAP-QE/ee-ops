@@ -34,6 +34,9 @@ spec:
       - email
       - profile
   jwt:
+    # optional: browser users authenticated via OIDC have no JWT and must pass;
+    # invalid JWTs are still rejected regardless of this setting.
+    optional: true
     providers:
       - name: google
         issuer: https://accounts.google.com
