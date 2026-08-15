@@ -61,7 +61,7 @@ spec:
       enabled: true
       parentRefs:
         - kind: Gateway
-          name: external-https
+          name: eg-internal
           namespace: infra
       hostnames:
         - prow.tidb.net

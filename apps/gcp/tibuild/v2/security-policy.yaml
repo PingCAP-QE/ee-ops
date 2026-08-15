@@ -10,6 +10,9 @@
 #     --audiences=prow.tidb.net
 # or via Workload Identity Federation in CI (google-github-actions/auth,
 # token_format: id_token, target_audience: prow.tidb.net).
+#
+# The redirectURL must be prefixed with the protected route's path (/tibuild),
+# otherwise the OAuth2 callback never matches the route and the flow fails.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
@@ -19,7 +22,7 @@ spec:
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
-      name: v2
+      name: v2-tibuild-v2
   oidc:
     provider:
       issuer: https://accounts.google.com
@@ -27,7 +30,7 @@ spec:
       name: tibuild-v2-oidc
     clientSecret:
       name: tibuild-v2-oidc
-    redirectURL: https://prow.tidb.net/oauth2/callback
+    redirectURL: https://prow.tidb.net/tibuild/oauth2/callback
     passThroughAuthHeader: true
     scopes:
       - openid
