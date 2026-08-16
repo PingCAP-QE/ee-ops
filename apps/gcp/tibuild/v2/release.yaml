@@ -58,4 +58,21 @@ spec:
     serviceAccount:
       create: false
     httpRoute:
-      enabled: false
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: eg-internal
+          namespace: infra
+      hostnames:
+        - prow.tidb.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /tibuild
+          filters:
+            - type: URLRewrite
+              urlRewrite:
+                path:
+                  type: ReplacePrefixMatch
+                  replacePrefixMatch: /

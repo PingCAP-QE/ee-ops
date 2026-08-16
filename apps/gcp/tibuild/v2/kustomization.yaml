@@ -3,4 +3,6 @@ kind: Kustomization
 resources:
   - external-secret-config.yaml
   - external-secrets/image-release-cred.yaml
+  - external-secrets/oidc-secret.yaml
   - release.yaml
+  - security-policy.yaml
