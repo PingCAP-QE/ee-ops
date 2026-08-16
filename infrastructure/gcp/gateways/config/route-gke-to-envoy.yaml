@@ -15,6 +15,16 @@ spec:
     kind: Service
     name: eg-internal
 ---
+# Routes the hosts served only via the Envoy Gateway (eg-internal) from the
+# GKE gateway (external-https). TLS is terminated at GKE; Envoy handles
+# hostname + path routing and SecurityPolicy (OIDC/JWT).
+#
+# prow.tidb.net: still has other hostname-specific GKE routes (jenkins /jenkins,
+# dl /dl, tekton /tekton, ci-dashboard /dashboard/), so GKE keeps a host rule
+# for it; this / catch-all forwards everything else (/, /hook, /tibuild, ...)
+# to Envoy — requests hitting the host rule without a matching path rule would
+# otherwise get a GKE 404 ("fault filter abort") instead of falling through.
+# publisher.pingcap.net: no GKE routes; forwarded entirely to Envoy.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -22,6 +32,9 @@ metadata:
 spec:
   parentRefs:
     - name: external-https
+  hostnames:
+    - prow.tidb.net
+    - publisher.pingcap.net
   rules:
     - matches:
         - path:
