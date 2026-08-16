@@ -6,3 +6,4 @@ resources:
   - envoy-gateway-internal.yaml
   - envoy-healthz.yaml
   - route-gke-to-envoy.yaml
+  - route-prow-tidb-net-to-envoy.yaml

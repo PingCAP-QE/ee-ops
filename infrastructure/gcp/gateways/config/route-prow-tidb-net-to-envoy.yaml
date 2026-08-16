@@ -1,0 +1,26 @@
+# prow.tidb.net still has hostname-specific routes on the GKE gateway
+# (jenkins /jenkins, dl /dl, tekton /tekton, ci-dashboard /dashboard/), so GKE
+# builds a host rule for it. Requests hitting that host rule without a matching
+# path rule get a GKE 404 ("fault filter abort") and do NOT fall through to the
+# hostless default matcher (gke-to-envoy-route). This catch-all / rule forwards
+# everything else (/, /hook, /tibuild, ...) to the Envoy Gateway (eg-internal),
+# where prow and tibuild HTTPRoutes match by path specificity.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: prow-tidb-net-to-envoy
+spec:
+  parentRefs:
+    - name: external-https
+  hostnames:
+    - prow.tidb.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        # The Envoy data plane Service managed by Envoy Gateway, named via the
+        # `internal` EnvoyProxy (envoyService.name).
+        - name: eg-internal
+          port: 80
