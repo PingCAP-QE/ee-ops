@@ -1,0 +1,25 @@
+# Lengthen downstream timeouts on internal-gateway for large registry uploads
+# (e.g. hub.pingcap.net oras/docker blob PUTs). Do not shorten these values.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: internal-gateway-long-timeout
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: internal-gateway
+  timeout:
+    tcp:
+      # Default 1h; set explicitly for large L4/TLS edge cases.
+      idleTimeout: 3600s
+    http:
+      # Cover slow/large request body reception (registry blob upload).
+      requestReceivedTimeout: 600s
+      # Default 1h; keep generous for connection reuse under concurrent pushes.
+      idleTimeout: 3600s
+      # Default 5m; raise so long single-stream uploads are not cut early.
+      streamIdleTimeout: 600s
+  connection:
+    # Default 32Ki; raise soft buffer for concurrent large uploads.
+    bufferLimit: 32Mi
