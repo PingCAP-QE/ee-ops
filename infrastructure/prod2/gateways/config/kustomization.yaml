@@ -5,5 +5,4 @@ resources:
   - gateway-internal.yaml
   - gateway-public.yaml
   - client-traffic-policy-internal.yaml
-  - backend-traffic-policy-internal.yaml
   - es-gateway-tls-certs.yaml
