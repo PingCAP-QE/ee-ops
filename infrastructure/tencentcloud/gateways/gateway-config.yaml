@@ -18,3 +18,4 @@ spec:
   postBuild:
     substitute:
       security_group_id: sg-ijmyqquv
+      internal_lb_subnet_id: subnet-xxxxxxxx # should update to your own subnet id
