@@ -1,0 +1,20 @@
+# Lengthen upstream timeouts on internal-gateway for large registry uploads
+# (Envoy → Harbor/backends). Complements ClientTrafficPolicy downstream timeouts.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: internal-gateway-long-upstream-timeout
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: internal-gateway
+  timeout:
+    http:
+      connectionIdleTimeout: 3600s
+      # Cover long blob PUT to upstream registry; 0s disables max stream duration.
+      requestTimeout: 600s
+      maxStreamDuration: 0s
+  connection:
+    # Soft buffer toward backends during concurrent large uploads.
+    bufferLimit: 32Mi
