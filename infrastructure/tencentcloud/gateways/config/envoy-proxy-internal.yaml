@@ -1,0 +1,16 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: internal-https-proxy
+  namespace: infra
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        annotations:
+          # ref: https://cloud.tencent.com/document/product/457/51258
+          service.kubernetes.io/qcloud-loadbalancer-internal-subnetid: "${internal_lb_subnet_id}" # should update to your own subnet id
+          service.cloud.tencent.com/security-groups: "${security_group_id}"
+          service.cloud.tencent.com/pass-to-target: "true"
+          service.cloud.tencent.com/direct-access: 'true'

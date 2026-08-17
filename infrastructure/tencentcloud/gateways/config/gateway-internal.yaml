@@ -1,0 +1,25 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal-https
+spec:
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: internal-https-proxy
+  gatewayClassName: envoy-gateway
+  listeners:
+    - name: wildcard-pingcap-net-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.pingcap.net"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-pingcap-net-cert
+      allowedRoutes:
+        kinds:
+          - kind: HTTPRoute
+        namespaces:
+          from: All

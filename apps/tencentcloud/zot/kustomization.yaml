@@ -7,4 +7,5 @@ resources:
   - pre.yaml
   - config.yaml
   - release.yaml
+  - httproute-internal.yaml
   - post.yaml
