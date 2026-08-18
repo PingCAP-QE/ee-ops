@@ -70,7 +70,10 @@
     },
     "accessControl": {
       "groups": {
-        "releasors": {
+        "pullers": {
+          "users": ["ci-bot"]
+        },
+        "pushers": {
           "users": ["cd-bot"]
         },
         "personal": {
@@ -109,7 +112,11 @@
         "**": {
           "policies": [
             {
-              "groups": ["releasors"],
+              "groups": ["pullers"],
+              "actions": ["read"]
+            },
+            {
+              "groups": ["pushers"],
               "actions": ["read", "create", "update"]
             }
           ],
