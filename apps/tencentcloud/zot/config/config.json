@@ -7,7 +7,7 @@
     "dedupe": true,
     "gc": true,
     "gcDelay": "1h",
-    "gcInterval": "24h",
+    "gcInterval": "1h",
     "storageDriver": {
       "name": "s3",
       "rootdirectory": "/",
@@ -24,6 +24,22 @@
       "name": "redis",
       "url": "redis://:${REDIS_PASSWORD}@redis-master:6379/0?dial_timeout=3&read_timeout=6s",
       "keyprefix": "zot"
+    },
+    "retention": {
+      "policies": [
+        {
+          "repositories": ["ttl-1h/**"],
+          "keepTags": [{ "patterns": [".*"], "pushedWithin": "1h" }]
+        },
+        {
+          "repositories": ["ttl-1d/**"],
+          "keepTags": [{ "patterns": [".*"], "pushedWithin": "24h" }]
+        },
+        {
+          "repositories": ["ttl-1w/**"],
+          "keepTags": [{ "patterns": [".*"], "pushedWithin": "168h" }]
+        }
+      ]
     }
   },
   "http": {
@@ -54,9 +70,40 @@
       "groups": {
         "releasors": {
           "users": ["cd-bot"]
+        },
+        "personal": {
+          "users": ${PERSONAL_USERS}
         }
       },
       "repositories": {
+        "personal/**": {
+          "policies": [
+            {
+              "groups": ["personal"],
+              "actions": ["read", "create", "update", "delete"],
+              "conditions": [
+                {
+                  "expression": "req.repository.startsWith('personal/' + req.user.username.split('@')[0] + '/')",
+                  "message": "only your personal namespace"
+                }
+              ]
+            }
+          ],
+          "anonymousPolicy": [],
+          "defaultPolicy": ["read"]
+        },
+        "ttl-1h/**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read", "create", "update"]
+        },
+        "ttl-1d/**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read", "create", "update"]
+        },
+        "ttl-1w/**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read", "create", "update"]
+        },
         "**": {
           "policies": [
             {
@@ -118,6 +165,18 @@
               "prefix": "/pingcap-testing-account/internal/**",
               "destination": "/mirrors/internal",
               "stripPrefix": true
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true
+        },
+        {
+          "urls": ["https://ghcr.io"],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "**",
+              "destination": "/mirrors/ghcr"
             }
           ],
           "onDemand": true,
