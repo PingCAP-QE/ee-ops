@@ -54,11 +54,6 @@ controller:
   # jenkinsUrl: ""
   # If you set this prefix and use ingress controller then you might want to set the ingress path below
 
-  hostAliases:
-    - ip: "193.112.193.79"
-      hostnames:
-        - "accounts.google.com"
-
   ingress:
     enabled: false
 
