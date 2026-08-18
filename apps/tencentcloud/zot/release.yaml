@@ -47,7 +47,7 @@ spec:
       create: true
       storage: 10Gi # CBS minimum is 10Gi
       storageClassName: cbs
-    replicaCount: 2
+    replicaCount: 1
     service:
       type: ClusterIP
     nodeSelector:
