@@ -52,7 +52,7 @@
     },
     "accessControl": {
       "groups": {
-        "releasors": {
+        "pushers": {
           "users": ["cd-bot"]
         }
       },
@@ -60,7 +60,7 @@
         "**": {
           "policies": [
             {
-              "groups": ["releasors"],
+              "groups": ["pushers"],
               "actions": ["read", "create", "update"]
             }
           ],
