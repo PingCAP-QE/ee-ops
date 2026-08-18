@@ -358,7 +358,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.26-1-geabc587
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-5-gef84914
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -429,7 +429,7 @@ spec:
   # Interpreted with timeZone below: Monday 23:10 Asia/Shanghai, after the GCP unmatched job.
   schedule: "10 23 * * 1"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
