@@ -301,6 +301,19 @@ controller:
                 }
               }
 
+      # global environment variables for all agents.
+      global-env: |
+        jenkins:
+          globalNodeProperties:
+            - envVars:
+                env:
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
+                    value: "us-docker.pkg.dev/pingcap-testing-account/hub"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_TIDBX"
+                    value: "us-docker.pkg.dev/pingcap-testing-account/tidbx"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_INTERNAL"
+                    value: "us-docker.pkg.dev/pingcap-testing-account/internal"
+
       pipeline-cache: |
         unclassified:
           pipeline-cache:
