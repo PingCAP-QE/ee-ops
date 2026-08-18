@@ -48,6 +48,8 @@
     "compat": ["docker2s2"],
     "externalUrl": "${EXTERNAL_URL}",
     "realm": "zot",
+    "readTimeout": "600s",
+    "writeTimeout": "600s",
     "auth": {
       "failDelay": 5,
       "htpasswd": {
