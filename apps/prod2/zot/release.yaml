@@ -47,7 +47,7 @@ spec:
       create: true
       storage: 8Gi
       storageClassName: openebs-3-replicas
-    replicaCount: 2
+    replicaCount: 1
     service:
       type: ClusterIP
 
