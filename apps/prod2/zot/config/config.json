@@ -57,7 +57,7 @@
         }
       },
       "repositories": {
-        "**": {
+        "/mirrors/**": {
           "policies": [
             {
               "groups": ["pushers"],
@@ -65,6 +65,16 @@
             }
           ],
           "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read"]
+        },
+        "**": {
+          "policies": [
+            {
+              "groups": ["pushers"],
+              "actions": ["read", "create", "update"]
+            }
+          ],
+          "anonymousPolicy": [],
           "defaultPolicy": ["read"]
         }
       },
