@@ -1,0 +1,82 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zot
+spec:
+  chart:
+    spec:
+      chart: zot
+      # renovate: datasource=helm depName=zot registryUrl=https://zotregistry.dev/helm-charts
+      version: 0.1.122
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: project-zot
+  dependsOn:
+    - name: redis
+  interval: 1h
+  upgrade:
+    remediation:
+      strategy: uninstall
+      retries: 1
+      remediateLastFailure: true
+  values:
+    mountSecret: true
+    secretFiles: false # We are in charge of managing it(the secret `zot-secret`)
+    mountConfig: true
+    configFiles: false # We are in charge of managing it(the config map `zot-config`)
+    httproute:
+      enabled: true
+      parentRefs:
+        - kind: Gateway
+          name: external-https
+          namespace: infra
+      hostnames:
+        - cr.pingcap.net
+      rules:
+        - matches:
+            - path:
+                type: PathPrefix
+                value: /
+          # Registry pulls and pushes can stream large layers for a long time.
+          timeouts:
+            request: 0s
+    persistence: true
+    pvc:
+      accessMode: ReadWriteOnce
+      create: true
+      storage: 10Gi # CBS minimum is 10Gi
+      storageClassName: cbs
+    replicaCount: 1
+    service:
+      type: ClusterIP
+    nodeSelector:
+      compute-class: ee-application
+
+    # Relax probes to avoid restart loops during zot cold start
+    startupProbe:
+      httpGet:
+        path: /startupz
+        port: 5000
+      initialDelaySeconds: 20
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 30
+
+    readinessProbe:
+      httpGet:
+        path: /readyz
+        port: 5000
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 6
+
+    livenessProbe:
+      httpGet:
+        path: /livez
+        port: 5000
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 3
+      failureThreshold: 6

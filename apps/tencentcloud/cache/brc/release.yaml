@@ -21,6 +21,7 @@ spec:
     enable: true
     ignoreFailures: false
   values:
+    fullnameOverride: brc
     image:
       repository: quay.io/bazel-remote/bazel-remote
       tag: v2.6.1
@@ -53,14 +54,14 @@ spec:
     replicaCount: 1
     volumeMounts:
       - mountPath: /data
-        name: brc-cache
+        name: bazel-remote-cache
       - mountPath: /etc/bazel-remote/credentials
-        name: brc-cos-credentials
+        name: bazel-remote-cos-credentials
         subPath: credentials
     volumes:
-      - name: brc-cache
+      - name: bazel-remote-cache
         persistentVolumeClaim:
-          claimName: brc-cache
-      - name: brc-cos-credentials
+          claimName: bazel-remote-cache
+      - name: bazel-remote-cos-credentials
         secret:
-          secretName: brc-cos-credentials
+          secretName: bazel-remote-cos-credentials

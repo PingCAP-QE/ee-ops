@@ -9,3 +9,5 @@ resources:
   - jenkins-agents
   - tibuild
   - tekton
+  - zot
+  - prow-worker

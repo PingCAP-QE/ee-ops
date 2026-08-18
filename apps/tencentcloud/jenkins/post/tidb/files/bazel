@@ -1,0 +1,4 @@
+build --remote_cache=grpc://brc.cache:9092
+build --experimental_remote_downloader=grpc://brc.cache:9092
+build --experimental_remote_downloader_local_fallback=true
+build --remote_timeout="600s"

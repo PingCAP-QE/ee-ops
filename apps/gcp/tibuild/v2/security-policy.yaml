@@ -1,0 +1,49 @@
+# Authentication for prow.tidb.net/tibuild:
+# - OIDC (Google): browser users via redirect-based login (session cookies)
+# - JWT: machine clients presenting a Google-issued ID token in the
+#   Authorization: Bearer header skip the OIDC redirect (passThroughAuthHeader)
+#   and are validated against Google's JWKS.
+#
+# Machine clients obtain an ID token, e.g.:
+#   gcloud auth print-identity-token \
+#     --impersonate-service-account=tibuild-v2-api-client@<project>.iam.gserviceaccount.com \
+#     --audiences=prow.tidb.net
+# or via Workload Identity Federation in CI (google-github-actions/auth,
+# token_format: id_token, target_audience: prow.tidb.net).
+#
+# The redirectURL must be prefixed with the protected route's path (/tibuild),
+# otherwise the OAuth2 callback never matches the route and the flow fails.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: tibuild-v2-oidc-jwt
+  namespace: tibuild
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: v2-tibuild-v2
+  oidc:
+    provider:
+      issuer: https://accounts.google.com
+    clientIDRef:
+      name: tibuild-v2-oidc
+    clientSecret:
+      name: tibuild-v2-oidc
+    redirectURL: https://prow.tidb.net/tibuild/oauth2/callback
+    passThroughAuthHeader: true
+    scopes:
+      - openid
+      - email
+      - profile
+  jwt:
+    # optional: browser users authenticated via OIDC have no JWT and must pass;
+    # invalid JWTs are still rejected regardless of this setting.
+    optional: true
+    providers:
+      - name: google
+        issuer: https://accounts.google.com
+        remoteJWKS:
+          uri: https://www.googleapis.com/oauth2/v3/certs
+        audiences:
+          - prow.tidb.net

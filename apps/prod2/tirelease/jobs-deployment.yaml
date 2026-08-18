@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jobs
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: jobs
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: jobs
+    spec:
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      containers:
+        - name: main
+          image: hub.pingcap.net/ee/tirelease
+          command: ["/apps/jobs"]
+          args:
+            - --config=/etc/config/config.yaml
+            - --secret=/etc/secret-config
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+            - name: config
+              mountPath: /etc/config
+              readOnly: true
+            - name: secret-config
+              mountPath: /etc/secret-config
+              readOnly: true
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: config
+          configMap:
+            name: tirelease-config
+        - name: secret-config
+          secret:
+            secretName: tirelease-secret-config
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

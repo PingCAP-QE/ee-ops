@@ -1,0 +1,33 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: redis
+spec:
+  chart:
+    spec:
+      chart: redis
+      version: 27.0.8
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  interval: 1h
+  values:
+    global:
+      storageClass: cbs
+      security:
+        allowInsecureImages: true # needed for mirror.ccs.tencentyun.com registry
+    image:
+      registry: mirror.ccs.tencentyun.com # docker.io is unreachable from this cluster
+    master:
+      resourcesPreset: nano #  nano < micro < small < medium < large < xlarge < 2xlarge
+      persistence:
+        size: 10Gi # CBS minimum is 10Gi
+    replica:
+      resourcesPreset: nano
+      persistence:
+        size: 10Gi # CBS minimum is 10Gi
+    auth:
+      existingSecret: redis
+      existingSecretPasswordKey: REDIS_PASSWORD

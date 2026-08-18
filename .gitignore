@@ -20,3 +20,4 @@ Chart.lock
 
 # IDEs
 .vscode
+.idea/

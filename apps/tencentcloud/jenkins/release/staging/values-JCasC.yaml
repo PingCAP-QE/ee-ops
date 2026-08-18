@@ -184,6 +184,14 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "http://goproxy.cache.svc,direct"
+                  - key: "BAZELISK_BASE_URL"
+                    value: "https://repo.huaweicloud.com/bazel"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
+                    value: "cr-qcloud.pingcap.net/mirrors/hub"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_TIDBX"
+                    value: "cr-qcloud.pingcap.net/mirrors/tidbx"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_INTERNAL"
+                    value: "cr-qcloud.pingcap.net/mirrors/internal"
 
       pipeline-cache: |
         unclassified:

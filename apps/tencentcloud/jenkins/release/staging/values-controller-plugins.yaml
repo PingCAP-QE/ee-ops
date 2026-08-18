@@ -5,11 +5,11 @@ controller:
 
   # Override the default list to use our own custom plugin
   # Ref: https://artifacthub.io/packages/helm/jenkinsci/jenkins?modal=values&path=controller.installPlugins
-  installPlugins:
-    - kubernetes:4437.vd64141124d8f-fork.3:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f-fork.3/kubernetes.hpi
-    - workflow-aggregator:608.v67378e9d3db_1
-    - git:5.10.1
-    - configuration-as-code:2114.v67a_a_18696b_8f
+  # installPlugins:
+  #   - kubernetes:4437.vd64141124d8f-fork.3:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f-fork.3/kubernetes.hpi
+  #   - workflow-aggregator:608.v67378e9d3db_1
+  #   - git:5.10.1
+  #   - configuration-as-code:2114.v67a_a_18696b_8f
 
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
@@ -21,15 +21,15 @@ controller:
     - generic-webhook-trigger:2.4.2
     - google-login:109.v022b_cf87b_e5b_
     - http_request:1.25
-    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
+    - jenkins-pipeline-cache::https://github.com/wuhuizuo/jenkins-pipeline-cache-plugin/releases/download/v0.2.3/jenkins-pipeline-cache.hpi
     - job-dsl:3654.vdf58f53e2d15
     - kubernetes-credentials-provider:1.303.vdfcf47fb_b_fef
     - lockable-resources:1539.v4db_b_fc1cc115
-    - pipeline-graph-view:980.vb_db_0b_e5f683c
+    - pipeline-graph-view:998.vc30deece0e36
     - pipeline-utility-steps:3.810.va_7672d206740
     - prometheus:856.vc9e3d6e4b_b_9e
     - role-strategy:898.vc050ed2424ca_
-    - ssh-agent:413.v1fd573533a_ec
+    - ssh-agent:418.v59904cc02b_71
 
   initializeOnce: false
 
