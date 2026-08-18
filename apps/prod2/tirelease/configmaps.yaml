@@ -12,6 +12,12 @@ data:
     authingOidcIssuer: https://tirelease.authing.pingcap.net/oidc
     testInfraAuthority: tcms.pingcap.net
     disableNotify: false
+    tibuild:
+      baseURL: https://prow.tidb.net/tibuild
+      audience: prow.tidb.net
+      ociFileserverURL: https://prow.tidb.net/dl/oci-file
+      createdBy: xiaozhou.zhu@pingcap.com
+      saKey: tibuild_sa_key
     jiraMetas:
       - base: https://tidb.atlassian.net/
         projects: [APID, TCID, JPID, NAID, EMID, TCOC, GTOC, ST, FD, FRM, CB]
@@ -39,6 +45,12 @@ data:
     authingOidcIssuer: https://tirelease.authing.pingcap.net/oidc
     testInfraAuthority: tcms.pingcap.net
     disableNotify: false
+    tibuild:
+      baseURL: https://prow.tidb.net/tibuild
+      audience: prow.tidb.net
+      ociFileserverURL: https://prow.tidb.net/dl/oci-file
+      createdBy: xiaozhou.zhu@pingcap.com
+      saKey: tibuild_sa_key
     jiraMetas:
       - base: https://tidb.atlassian.net/
         projects: [APID, TCID, JPID, NAID, EMID, TCOC, GTOC, ST, FD, FRM, CB]
