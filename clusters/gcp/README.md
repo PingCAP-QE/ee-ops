@@ -10,7 +10,7 @@ Most application secrets are synced automatically by `external-secrets` from GCP
 Secret Manager (ClusterSecretStore `ee-gcp-sm`) and do not need manual
 preparation, e.g. prow related (`prow-github`, `prow-webhook`,
 `prow-oauth-cookie`, `prow-kubeconfig`, `prow-gcs-credentials`,
-`prow-jenkins-operator-auth`, etc.).
+`prow-jenkins-operator-0-auth`, `prow-jenkins-operator-1-auth`, etc.).
 
 Secrets that require manual preparation:
 
