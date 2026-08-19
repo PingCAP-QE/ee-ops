@@ -23,18 +23,18 @@ spec:
       TEST_PODS_NAMESPACE: prow-test-pods
       DOMAIN_NAME: prow.tidb.net
 
-      ### need secret `prow-jenkins-operator-auth` with keys:
+      ### need secret `prow-jenkins-operator-0-auth` with keys:
       # - user
       # - token
-      JENKINS_OPERATOR_AUTH_SEC_NAME: prow-jenkins-operator-auth
-      JENKINS_OPERATOR_AUTH_SEC_KEY_USER: user
-      JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN: token
-      JENKINS_BASE_URL: https://do.pingcap.net/jenkins
+      JENKINS_OPERATOR_0_AUTH_SEC_NAME: prow-jenkins-operator-0-auth
+      JENKINS_OPERATOR_0_AUTH_SEC_KEY_USER: user
+      JENKINS_OPERATOR_0_AUTH_SEC_KEY_TOKEN: token
+      JENKINS_OPERATOR_0_BASE_URL: https://do.pingcap.net/jenkins
 
-      ### need secret `prow-jenkins-operator-auth-ticdc` with keys:
+      ### need secret `prow-jenkins-operator-1-auth` with keys:
       # - user
       # - token
-      JENKINS_OPERATOR_AUTH_SEC_NAME_TICDC: prow-jenkins-operator-ticdc-auth
-      JENKINS_OPERATOR_AUTH_SEC_KEY_USER_TICDC: user
-      JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN_TICDC: token
-      JENKINS_BASE_URL_TICDC: https://prow.tidb.net/jenkins
+      JENKINS_OPERATOR_1_AUTH_SEC_NAME: prow-jenkins-operator-1-auth
+      JENKINS_OPERATOR_1_AUTH_SEC_KEY_USER: user
+      JENKINS_OPERATOR_1_AUTH_SEC_KEY_TOKEN: token
+      JENKINS_OPERATOR_1_BASE_URL: https://prow.tidb.net/jenkins

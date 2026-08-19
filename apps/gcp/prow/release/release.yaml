@@ -151,32 +151,32 @@ spec:
         repository: ghcr.io/ti-community-infra/prow/jenkins-operator
         tag: v20250105-d73428bb3
       instances:
-        - name: default
+        - name: jenkins-0
           replicaCount: 1
           autoscaling:
             enabled: false
           skipReport: true
           dryRun: false
           csrfProtect: false
-          jenkinsUrl: ${JENKINS_BASE_URL}
+          jenkinsUrl: ${JENKINS_OPERATOR_0_BASE_URL}
           labelSelector: master=0 # the first Jenkins operator
           auth:
-            secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME}
-            secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER}
-            secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN}
-        - name: dedicated-for-ticdc
+            secretName: ${JENKINS_OPERATOR_0_AUTH_SEC_NAME}
+            secretKeyJenkinsUser: ${JENKINS_OPERATOR_0_AUTH_SEC_KEY_USER}
+            secretKeyJenkinsToken: ${JENKINS_OPERATOR_0_AUTH_SEC_KEY_TOKEN}
+        - name: jenkins-1
           replicaCount: 1
           autoscaling:
             enabled: false
           skipReport: true
           dryRun: false
           csrfProtect: false
-          jenkinsUrl: ${JENKINS_BASE_URL_TICDC}
+          jenkinsUrl: ${JENKINS_OPERATOR_1_BASE_URL}
           labelSelector: master=1 # the second Jenkins operator
           auth:
-            secretName: ${JENKINS_OPERATOR_AUTH_SEC_NAME_TICDC}
-            secretKeyJenkinsUser: ${JENKINS_OPERATOR_AUTH_SEC_KEY_USER_TICDC}
-            secretKeyJenkinsToken: ${JENKINS_OPERATOR_AUTH_SEC_KEY_TOKEN_TICDC}
+            secretName: ${JENKINS_OPERATOR_1_AUTH_SEC_NAME}
+            secretKeyJenkinsUser: ${JENKINS_OPERATOR_1_AUTH_SEC_KEY_USER}
+            secretKeyJenkinsToken: ${JENKINS_OPERATOR_1_AUTH_SEC_KEY_TOKEN}
     thirdPlugins:
       chatgpt:
         service:
