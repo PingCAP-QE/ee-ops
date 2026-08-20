@@ -6,7 +6,7 @@ data:
   config.yaml: |
     enableApiGzip: true
     runAutoMigrate: true
-    enableCron: false
+    enableCron: true
     bigQueryProject: pingcap-dbaas-build
     bigQuerySaKey: /bigQuerySaKey
     authingOidcIssuer: https://tirelease.authing.pingcap.net/oidc
