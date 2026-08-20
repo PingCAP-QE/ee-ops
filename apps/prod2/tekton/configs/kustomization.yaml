@@ -6,5 +6,6 @@ resources:
   - rbac
   - configmaps
   - tasks/config.yaml
+  - step-actions/config.yaml
   - pipelines/config.yaml
   - triggers
