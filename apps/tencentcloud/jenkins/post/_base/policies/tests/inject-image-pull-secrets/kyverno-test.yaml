@@ -1,0 +1,40 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-image-pull-secrets
+policies:
+  - ../../inject-image-pull-secrets.yaml
+resources:
+  - resource-cr.yaml
+  - resource-cr-existing.yaml
+  - resource-init.yaml
+  - resource-plain.yaml
+results:
+  - policy: inject-image-pull-secrets
+    rule: inject-image-pull-secrets
+    resources:
+      - pod-cr
+    kind: Pod
+    result: pass
+    patchedResources: patched-cr.yaml
+
+  - policy: inject-image-pull-secrets
+    rule: inject-image-pull-secrets
+    resources:
+      - pod-cr-existing
+    kind: Pod
+    result: pass
+
+  - policy: inject-image-pull-secrets
+    rule: inject-image-pull-secrets
+    resources:
+      - pod-init
+    kind: Pod
+    result: pass
+
+  - policy: inject-image-pull-secrets
+    rule: inject-image-pull-secrets
+    resources:
+      - pod-plain
+    kind: Pod
+    result: skip

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-cr-existing
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+spec:
+  imagePullSecrets:
+    - name: other-secret
+    - name: ci-registry-auth
+  containers:
+    - name: utils
+      image: cr-qcloud.pingcap.net/pingcap-qe/ci-jenkins:latest
