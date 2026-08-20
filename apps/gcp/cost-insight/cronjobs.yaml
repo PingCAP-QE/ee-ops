@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.26-1-geabc587
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-19-gfb7cb3e
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -41,7 +41,7 @@ spec:
                   summary_json_path=/tmp/summary.json
                   cost-insight sync-gcp-billing-summary > "${summary_json_path}"
                   cat "${summary_json_path}"
-                  dates="$(python - <<'PY'
+                  allocation_args="$(python - <<'PY'
                   import json
 
                   with open("/tmp/summary.json", encoding="utf-8") as f:
@@ -51,20 +51,38 @@ spec:
                   else:
                       payloads = payload or []
                   dates = []
+                  export_partition_starts = []
+                  export_partition_ends = []
                   for item in payloads:
+                      if not isinstance(item, dict):
+                          continue
                       dates.extend(item.get("touched_usage_dates") or [])
-                  if dates:
-                      print(min(dates), max(dates))
+                      export_partition_starts.append(item.get("export_partition_start"))
+                      export_partition_ends.append(item.get("export_partition_end"))
+                  if dates and all(export_partition_starts) and all(export_partition_ends):
+                      print(
+                          min(dates),
+                          max(dates),
+                          min(export_partition_starts),
+                          max(export_partition_ends),
+                      )
                   PY
                   )"
-                  if [ -n "${dates}" ]; then
-                    set -- ${dates}
+                  if [ -n "${allocation_args}" ]; then
+                    # The command resolves every active GCP source, so use the
+                    # union of the summary source windows for matching lineage.
+                    set -- ${allocation_args}
+                    cost-insight sync-gcp-kubernetes-workload-allocations \
+                      --usage-start-date "$1" \
+                      --usage-end-date "$2" \
+                      --export-partition-start "$3" \
+                      --export-partition-end "$4"
                     cost-insight refresh-cost-attribution-from-summary \
                       --start-date "$1" \
                       --end-date "$2" \
                       --split-by-day
                   else
-                    echo "No touched usage dates returned; skip attribution refresh."
+                    echo "No touched usage dates returned; skip GKE allocation and attribution refresh."
                   fi
               envFrom:
                 - secretRef:
@@ -213,7 +231,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.26-1-geabc587
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-19-gfb7cb3e
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -279,7 +297,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.26-1-geabc587
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-19-gfb7cb3e
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -365,7 +383,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.26-1-geabc587
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-19-gfb7cb3e
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -444,7 +462,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-7-ga861e54
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-19-gfb7cb3e
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -534,7 +552,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.7.26-1-geabc587
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.16-19-gfb7cb3e
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
