@@ -10,3 +10,5 @@ spec:
     namespace: flux-system
   path: ./tekton/v1/tasks
   prune: true
+  dependsOn:
+    - name: tekton-config-step-actions
