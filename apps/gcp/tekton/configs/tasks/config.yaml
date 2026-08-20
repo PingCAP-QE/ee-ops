@@ -11,3 +11,5 @@ spec:
   path: ./tekton/v1/tasks
   prune: true
   force: true
+  dependsOn:
+    - name: tekton-config-step-actions
