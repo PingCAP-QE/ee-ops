@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/part-of: ci-dashboard
 rules:
   - apiGroups: [""]
-    resources: ["pods", "events"]
+    resources: ["pods", "persistentvolumeclaims", "events"]
     verbs: ["get", "list", "watch"]
 ---
 # Bind the shared ClusterRole separately in each watched namespace so the
