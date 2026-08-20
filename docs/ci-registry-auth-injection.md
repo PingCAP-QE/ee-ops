@@ -1,42 +1,42 @@
-# CI 容器注册表认证自动注入方案（Kyverno）
+# CI Container Registry Auth Injection (Kyverno)
 
-## 1. 背景与目标
+## 1. Background & Goals
 
-PingCAP-QE/ci 的 Jenkins 构建/测试 pod 需要在容器内访问多个 OCI 注册表：
+PingCAP-QE/ci Jenkins build/test pods need to access multiple OCI registries from inside containers:
 
-- **OCI 产物下载**（`scripts/artifacts/download_pingcap_oci_artifact.sh`，经 oras 拉取）：`us-docker.pkg.dev/pingcap-testing-account/{hub,internal,dev}`（hub/dev 为脚本默认源，internal 用于内部组件，均可通过 env 切换）。
-- **容器内 docker pull**（tiflash IT 镜像等）。
-- **Pod 镜像拉取**（kubelet）：`ghcr.io/pingcap-qe/*`、`us-docker.pkg.dev/pingcap-testing-account/{internal/test,ghcr-remote,dockerhub-remote}` 等。
+- **OCI artifact downloads** (`scripts/artifacts/download_pingcap_oci_artifact.sh`, pulled via oras): `us-docker.pkg.dev/pingcap-testing-account/{hub,internal,dev}` (hub/dev are the script's default sources, internal is for internal components; all switchable via env).
+- **In-container `docker pull`** (tiflash IT images, etc.).
+- **Pod image pulls** (kubelet): `ghcr.io/pingcap-qe/*`, `us-docker.pkg.dev/pingcap-testing-account/{internal-test,ghcr-remote,dockerhub-remote}`, etc.
 
-现状：hub/internal/dev 目前匿名可拉；**计划对 hub/internal/dev 开启认证**，且 CI pod 会被**随机调度到跨云集群**（GCP→AWS/Azure 等）。届时匿名拉取将失败，需在 pod 内与 kubelet 两侧同时具备认证。
+Current state: hub/internal/dev are anonymously pullable; **auth is planned for hub/internal/dev**, and CI pods will be **scheduled randomly across clouds** (GCP→AWS/Azure, etc.). Once that happens, anonymous pulls will fail, so auth is needed on both the in-pod side and the kubelet side.
 
-**适用集群范围**：仅 **gcp** 与 **tencentcloud** 两个集群的 Jenkins 命名空间。**prod2 不参与 Jenkins 任务调度**（其 `jenkins-cbg` 不承载 CI pod），本次不覆盖 prod2。
+**Cluster scope**: only the Jenkins namespaces of the **gcp** and **tencentcloud** clusters. **prod2 does not participate in Jenkins job scheduling** (its `jenkins-cbg` does not host CI pods) and is out of scope.
 
-**目标**：在 pod 创建时（admission 阶段）由 Kyverno 自动注入注册表认证，**PingCAP-QE/ci 仓库零改动**，现有与未来所有 job 自动覆盖。
+**Goal**: Kyverno injects registry auth automatically at pod creation (admission phase), with **zero changes to PingCAP-QE/ci** — all existing and future jobs are covered automatically.
 
-## 2. 方案设计
+## 2. Design
 
-两条 Kyverno 策略（可合并为一条多规则），作用于 Jenkins 命名空间内的 Pod。策略为 namespaced（`Policy`/`NamespacedMutatingPolicy`）还是 cluster 级别（`ClusterPolicy`/`MutatingPolicy`）不影响本方案，落地时按现有仓库惯例选择即可。
+Two Kyverno policies (can be merged into a single multi-rule policy) targeting Pods in Jenkins namespaces. Whether the policies are namespaced (`Policy`/`NamespacedMutatingPolicy`) or cluster-level (`ClusterPolicy`/`MutatingPolicy`) does not affect the design; pick per the repo's existing conventions at rollout time.
 
-### Policy A：in-pod 注册表凭据注入（oras / docker CLI）
+### Policy A: in-pod registry credential injection (oras / docker CLI)
 
-在 Pod 创建时**仅向名为 `utils` 的容器**注入：
+At pod creation, inject **only into the container named `utils`**:
 
-1. `volume`：`ci-registry-auth`（引用 Secret，`items` 投影 `.dockerconfigjson` → `config.json`，只读）
-2. `volumeMount`：`/var/run/ci/registry`
-3. `env`：`DOCKER_CONFIG=/var/run/ci/registry`（兼容 `ORAS_DOCKER_CONFIG`）
+1. `volume`: `ci-registry-auth` (references the Secret, `items` projects `.dockerconfigjson` → `config.json`, read-only)
+2. `volumeMount`: `/var/run/ci/registry`
+3. `env`: `DOCKER_CONFIG=/var/run/ci/registry` (also compatible with `ORAS_DOCKER_CONFIG`)
 
-覆盖范围：现 314 处 `download_pingcap_oci_artifact.sh` 调用 + tiflash IT 的 docker pull + 委托脚本均在 `utils` 容器内执行，因此只注入 `utils` 容器即可全覆盖；default/jnlp/golang 等其他容器不注入，减少注入面与误伤。
+Coverage: all 314 current `download_pingcap_oci_artifact.sh` call sites, tiflash IT's docker pulls, and the delegated scripts run inside the `utils` container, so injecting only `utils` covers everything; other containers (default/jnlp/golang) are left untouched to minimize the injection surface and avoid collateral impact.
 
-### Policy B：imagePullSecrets 注入（kubelet 拉 pod 镜像）
+### Policy B: imagePullSecrets injection (kubelet pulling pod images)
 
-**仅当 Pod 内镜像命中目标仓库前缀时**才向该 Pod 注入 `spec.imagePullSecrets`（引用 `ci-registry-auth`，Secret 类型 `kubernetes.io/dockerconfigjson`），解决跨云拉取 GCP Artifact Registry / ghcr 镜像的认证。匹配清单即需认证的镜像前缀（如 `us-docker.pkg.dev/pingcap-testing-account/internal-test/`、`ghcr.io/pingcap-qe/` 等，见待确认 #6），未命中则不注入，避免对不使用这些镜像的 pod 无谓注入。
+**Only when a pod image matches the target registry prefixes** inject `spec.imagePullSecrets` (referencing `ci-registry-auth`, a `kubernetes.io/dockerconfigjson` Secret), solving auth for cross-cloud pulls of GCP Artifact Registry / ghcr images. The match list is the set of image prefixes that require auth (see #6 in §6); non-matching pods are untouched to avoid needless injection.
 
-> 本轮范围：Policy B **暂仅在 tencentcloud 集群部署**（该集群已开启跨云 pod 调度），gcp 集群暂不注入，待 tencentcloud 验证稳定后再扩展到 gcp。
+> This round's scope: Policy B is **deployed on the tencentcloud cluster only** (which already has cross-cloud pod scheduling); gcp is excluded until tencentcloud validates stably, then extended.
 
-> 关键点：kubelet 拉镜像用的是 Pod 上的 `imagePullSecrets`，与 pod 内挂载的 config 无关，两者缺一不可，故需两条规则。
+> Key point: the kubelet pulls images using the Pod's `imagePullSecrets`, which is unrelated to the config mounted inside the pod — both are required, hence two rules.
 
-### Secret 设计（ExternalSecret 同步，单 Secret 双用）
+### Secret design (ExternalSecret sync, single Secret dual-use)
 
 ```yaml
 apiVersion: v1
@@ -44,21 +44,21 @@ kind: Secret
 metadata:
   name: ci-registry-auth
   namespace: <jenkins-*>
-type: kubernetes.io/dockerconfigjson   # 天然可被 imagePullSecrets 引用
+type: kubernetes.io/dockerconfigjson   # natively referenceable by imagePullSecrets
 data:
   .dockerconfigjson: '<config.json base64>'
 ```
 
-- 由 **ExternalSecret** 从单一源同步：**新建独立 GCP Secret Manager secret `ci_registry_auth_dockerconfig_json`**（内容含全部目标 registry 的 auths，需覆盖 in-pod 与 imagePullSecrets 两侧，见下一条），每个 Jenkins 命名空间一份，跨集群不手工维护。
-- in-pod 挂载用 `items: [{key: .dockerconfigjson, path: config.json}]` 投影即可（无需 Opaque 双份）。
-- config.json 的 `auths` 需覆盖：Policy A 侧 `us-docker.pkg.dev`（hub/internal/dev）、`ghcr.io`（utils/builders/ci-jenkins）；Policy B 侧 `cr-qcloud.pingcap.net`、`cr.pingcap.net`。按 ee-ops 确认的实际清单。
-- **每个 Jenkins 命名空间一份**；跨云时每个目标集群的对应命名空间也需同步（由 ExternalSecret 自动完成）。
+- Synced by **ExternalSecret** from a single source: **a new dedicated GCP Secret Manager secret `ci_registry_auth_dockerconfig_json`** (its contents include auths for all target registries, covering both the in-pod and imagePullSecrets sides, see next item). One per Jenkins namespace; no manual cross-cluster maintenance.
+- For in-pod mounts use the `items: [{key: .dockerconfigjson, path: config.json}]` projection (no need for a duplicate Opaque secret).
+- `config.json`'s `auths` must cover: Policy A side `us-docker.pkg.dev` (hub/internal/dev), `ghcr.io` (utils/builders/ci-jenkins); Policy B side `cr-qcloud.pingcap.net`, `cr.pingcap.net`. Per the actual list confirmed by ee-ops.
+- **One per Jenkins namespace**; each target cluster's corresponding namespace must also be synced (done automatically by ExternalSecret).
 
-### Kyverno 策略骨架（示意，ee-ops 定稿）
+### Kyverno policy skeleton (illustrative, finalized by ee-ops)
 
 ```yaml
-apiVersion: policies.kyverno.io/v1   # gcp 升级后与 tencentcloud 统一；Kyverno 1.12 用 kyverno.io/v1
-kind: ClusterPolicy                  # 或 NamespacedMutatingPolicy / Policy，均不影响
+apiVersion: policies.kyverno.io/v1   # unified with tencentcloud after gcp upgrade; Kyverno 1.12 used kyverno.io/v1
+kind: ClusterPolicy                  # or NamespacedMutatingPolicy / Policy — equivalent
 metadata:
   name: inject-ci-registry-auth
 spec:
@@ -73,7 +73,7 @@ spec:
               namespaces:
                 - jenkins-tidb
                 - jenkins-tikv
-                # ... 完整命名空间清单
+                # ... full namespace list
       mutate:
         patchStrategicMerge:
           spec:
@@ -98,8 +98,8 @@ spec:
         any:
           - resources:
               kinds: [Pod]
-              namespaces: [ ...同 A... ]
-              images:                # 仅命中目标镜像前缀的 pod 才注入
+              namespaces: [ ...same as A... ]
+              images:                # only inject when a pod image matches a target prefix
                 - "cr-qcloud.pingcap.net/*"
                 - "cr.pingcap.net/*"
       mutate:
@@ -109,39 +109,39 @@ spec:
               - name: ci-registry-auth
 ```
 
-## 3. 兼容性与技术要点
+## 3. Compatibility & Technical Notes
 
-- `oras`（1.x，经 go-containerregistry）与 `docker` CLI 均遵循 `DOCKER_CONFIG` 环境变量，回退 `~/.docker`。仓库内 Tekton/kaniko 已用同模式。
-- 只注入 `utils` 容器，其余容器不受影响；下载/拉镜像逻辑均在 `utils` 内执行，覆盖完整。
-- 与现有 30 处 `withCredentials('tidbx-docker-config')` 的 `~/.docker/config.json` 拷贝模式**无冲突**，可保留（后续清理）。
-- Secret 挂载只读、`defaultMode` 建议 `0444`，非 root 容器可读；不依赖 fsGroup。
-- 若 `utils` 容器已定义 `DOCKER_CONFIG`，Kyverno 需避免重复注入（patch 策略注意幂等）；Policy B 对已有 `imagePullSecrets` 的 pod 同样需幂等。
+- Both `oras` (1.x, via go-containerregistry) and the `docker` CLI honor the `DOCKER_CONFIG` env var, falling back to `~/.docker`. Tekton/kaniko in this repo already use the same pattern.
+- Only the `utils` container is injected; other containers are unaffected. All download/pull logic runs in `utils`, so coverage is complete.
+- No conflict with the existing 30 `withCredentials('tidbx-docker-config')` `~/.docker/config.json` copy sites; they can remain (cleanup later).
+- Secret mounts are read-only; `defaultMode` is recommended as `0444` so non-root containers can read; no fsGroup dependency.
+- If the `utils` container already defines `DOCKER_CONFIG`, Kyverno must avoid duplicate injection (mind idempotency in the patch); Policy B must likewise be idempotent for pods that already have `imagePullSecrets`.
 
-## 4. 交付物清单（ee-ops 仓库）
+## 4. Deliverables (ee-ops repo)
 
-1. 策略两条（或一条双规则）：inject-registry-config-utils（仅 utils 容器）+ inject-image-pull-secrets（镜像匹配才注入；**本轮仅 tencentcloud**）
-2. `ExternalSecret` 定义（每命名空间，单一源）+ `Secret` 落地形态确认
-3. 各命名空间 Secret 同步机制（ExternalSecret + 单一源，跨集群自动同步）
-4. 迁移说明：现 `tidbx-docker-config` 凭据内容 → Secret；灰度验证记录
-5. gcp 集群 Kyverno 版本升级（chart 3.4.4 → 与 tencentcloud 3.8.2 对齐，统一使用 `policies.kyverno.io/v1`）
+1. Two policies (or one dual-rule policy): inject-registry-config-utils (utils container only) + inject-image-pull-secrets (image-match only; **tencentcloud only this round**)
+2. `ExternalSecret` definition (per namespace, single source) + final `Secret` shape confirmation
+3. Per-namespace Secret sync mechanism (ExternalSecret + single source, automatic cross-cluster)
+4. Migration notes: current `tidbx-docker-config` credential contents → Secret; grayscale validation record
+5. gcp cluster Kyverno upgrade (chart 3.4.4 → aligned with tencentcloud 3.8.2, unified on `policies.kyverno.io/v1`)
 
-## 5. 灰度与回滚
+## 5. Grayscale & Rollback
 
-1. 先在 **staging/测试命名空间**（如 jenkins-tidb 的少量 job）验证：手动建 pod → 检查 utils 容器 volume/env、imagePullSecrets 注入 → 跑一个真实下载 job（如 tidb `pull_integration_realcluster_test_next_gen`）。gcp 与 tencentcloud 本轮均生效 Policy A（gcp 已完成 Kyverno 升级）；Policy B 本轮仅在 tencentcloud 集群生效。
-2. 确认 hub/internal/dev 认证后匿名失败、注入后成功；再逐步扩大到各命名空间，并将 Policy B 扩展到 gcp。
-3. 回滚：删除策略与 Secret 即可，pod 创建即时恢复原状，不影响历史 pod。
+1. First validate in a **staging/test namespace** (e.g. a small set of jenkins-tidb jobs): manually create a pod → check the utils container volume/env and imagePullSecrets injection → run a real download job (e.g. tidb `pull_integration_realcluster_test_next_gen`). Policy A is active on both gcp and tencentcloud this round (gcp Kyverno upgrade done); Policy B is active on tencentcloud only this round.
+2. Confirm that after hub/internal/dev require auth, anonymous pulls fail while injected pulls succeed; then expand namespace by namespace and extend Policy B to gcp.
+3. Rollback: just delete the policies and the Secret; pod creation returns to the previous state immediately, and existing pods are unaffected.
 
-## 6. 待 ee-ops 确认点
+## 6. Open Items for ee-ops
 
-| # | 确认点 | 说明 |
+| # | Item | Notes |
 |---|---|---|
-| 1 | 各 CI 集群 Kyverno 版本/管理方式 | 已部署于 gcp（chart 3.4.4）、tencentcloud（3.8.2）、prod2（3.4.4），均 Flux HelmRelease 管理；prod2 不参与 Jenkins 调度，排除。**已升级 gcp 至 3.8.2 与 tencentcloud 对齐**，统一 `policies.kyverno.io/v1` |
-| 2 | 需要注入的**命名空间完整清单** | 已确认：`jenkins-tidb`、`jenkins-tikv`、`jenkins-tiflow`、`jenkins-tiflash`、`jenkins-pd`（注：`post/ticdc` 目录实际创建 `jenkins-tiflow`）；staging/test 命名空间待定 |
-| 3 | **匹配方式** | 已定：沿用现有 `kubernetes.jenkins.io/controller` label 惯例（namespaced MutatingPolicy 挂在各 jenkins-* 命名空间，天然按命名空间隔离）；Policy B 额外做镜像前缀匹配（见 #6）。策略 namespaced/cluster 级别均可 |
-| 4 | **Secret 供应方式** | 已定 ExternalSecret 同步，**新建独立 GCP SM secret `ci_registry_auth_dockerconfig_json`**；确认其内容含全部目标 registry，以及 GAR 凭据形态（长期 `_json_key` vs 短期 token + 自动轮换） |
-| 5 | **config.json 需覆盖的 registry host 清单** | Policy A 侧：`us-docker.pkg.dev`（hub/internal/dev）、`ghcr.io`；Policy B 侧：`cr-qcloud.pingcap.net`、`cr.pingcap.net`；nextgen 用到的 `gcr.io/us.gcr.io` 是否纳入 |
-| 6 | **Policy B 镜像匹配清单** | **已确认**：`cr-qcloud.pingcap.net/`、`cr.pingcap.net/` 前缀命中即注入 `imagePullSecrets`。Policy B **本轮仅部署 tencentcloud**，gcp 待验证稳定后扩展 |
-| 7 | hub/internal/dev 在目标云（AWS/Azure）的访问方式 | 公网可达 GCP AR，还是需在各云镜像副本？影响 config.json 内容与镜像地址 |
-| 8 | 策略 Owner / 审批流程 | 谁 review 谁 approve |
-| 9 | utils 镜像内 **oras 版本**确认（是否 ≥1.x 支持 DOCKER_CONFIG） | 若过旧需升级 utils 镜像（另行处理） |
-| 10 | 是否清理现有 30 处 `withCredentials('tidbx-docker-config')` | 建议本轮保留，验证稳定后再清理 |
+| 1 | Kyverno version / management per CI cluster | Deployed on gcp (chart 3.4.4), tencentcloud (3.8.2), prod2 (3.4.4), all managed via Flux HelmRelease; prod2 excluded (no Jenkins scheduling). **gcp upgraded to 3.8.2 to align with tencentcloud**, unified on `policies.kyverno.io/v1` |
+| 2 | Full list of namespaces to inject | Confirmed: `jenkins-tidb`, `jenkins-tikv`, `jenkins-tiflow`, `jenkins-tiflash`, `jenkins-pd` (note: the `post/ticdc` directory actually creates `jenkins-tiflow`); staging/test namespaces TBD |
+| 3 | **Matching strategy** | Decided: reuse the existing `kubernetes.jenkins.io/controller` label convention (namespaced MutatingPolicy mounted per jenkins-* namespace, naturally isolated by namespace); Policy B additionally matches image prefixes (see #6). Namespaced vs cluster-level both acceptable |
+| 4 | **Secret provisioning** | Decided: ExternalSecret sync from a **new dedicated GCP SM secret `ci_registry_auth_dockerconfig_json`**; confirm its contents cover all target registries and the GAR credential shape (long-lived `_json_key` vs short-lived token with auto-rotation) |
+| 5 | **Registry host list covered by config.json** | Policy A side: `us-docker.pkg.dev` (hub/internal/dev), `ghcr.io`; Policy B side: `cr-qcloud.pingcap.net`, `cr.pingcap.net`; whether nextgen's `gcr.io/us.gcr.io` should be included |
+| 6 | **Policy B image match list** | **Confirmed**: pods whose images start with `cr-qcloud.pingcap.net/` or `cr.pingcap.net/` get `imagePullSecrets` injected. Policy B is **deployed on tencentcloud only this round**; extend to gcp after validation |
+| 7 | How hub/internal/dev are reached from target clouds (AWS/Azure) | Public access to GCP AR, or registry mirrors per cloud? Affects config.json contents and image addresses |
+| 8 | Policy owner / approval flow | Who reviews and who approves |
+| 9 | Confirm **oras version** in the utils image (≥1.x supporting DOCKER_CONFIG) | If too old, upgrade the utils image (separate change) |
+| 10 | Whether to clean up the existing 30 `withCredentials('tidbx-docker-config')` sites | Keep this round; clean up after stability is proven |
