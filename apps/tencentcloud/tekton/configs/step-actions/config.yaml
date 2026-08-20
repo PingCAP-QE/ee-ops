@@ -1,15 +1,13 @@
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: tekton-config-tasks
+  name: tekton-config-step-actions
 spec:
   interval: 1m0s
   sourceRef:
     kind: GitRepository
     name: ci
     namespace: flux-system
-  path: ./tekton/v1/tasks
+  path: ./tekton/v1/step-actions
   prune: true
   force: true
-  dependsOn:
-    - name: tekton-config-step-actions
