@@ -1,0 +1,24 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins-cbg
+  labels:
+    app.kubernetes.io/name: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+spec:
+  hostnames:
+    - do.pingcap.cn
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: internal-gateway
+      namespace: infra
+      sectionName: do-pingcap-cn-https
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /jenkins-pingkai
+      backendRefs:
+        - name: jenkins-cbg
+          port: 8080
