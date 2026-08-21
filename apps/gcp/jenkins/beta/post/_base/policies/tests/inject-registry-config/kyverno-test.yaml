@@ -1,0 +1,40 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-registry-config
+policies:
+  - ../../inject-registry-config.yaml
+resources:
+  - resource-utils.yaml
+  - resource-utils-mutated.yaml
+  - resource-no-utils.yaml
+  - resource-no-label.yaml
+results:
+  - policy: inject-registry-config
+    rule: inject-registry-config
+    resources:
+      - pod-utils
+    kind: Pod
+    result: pass
+    patchedResources: patched-utils.yaml
+
+  - policy: inject-registry-config
+    rule: inject-registry-config
+    resources:
+      - pod-utils-mutated
+    kind: Pod
+    result: pass
+
+  - policy: inject-registry-config
+    rule: inject-registry-config
+    resources:
+      - pod-no-utils
+    kind: Pod
+    result: skip
+
+  - policy: inject-registry-config
+    rule: inject-registry-config
+    resources:
+      - pod-no-label
+    kind: Pod
+    result: skip
