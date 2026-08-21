@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-docker
+  namespace: jenkins-tiflash
+  labels:
+    kubernetes.jenkins.io/controller: ""
+spec:
+  containers:
+    - name: dockerd
+      image: docker:24.0.9-dind
+    - name: docker
+      image: ghcr.io/pingcap-qe/ci/base:v2026
+      env:
+        - name: DOCKER_HOST
+          value: tcp://localhost:2375
+    - name: jnlp
+      image: busybox:1.36

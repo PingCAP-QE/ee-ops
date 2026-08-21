@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    kubernetes.jenkins.io/controller: ""
+  name: pod-both
+  namespace: jenkins-tiflash
+spec:
+  containers:
+  - env:
+    - name: DOCKER_CONFIG
+      value: /var/run/ci/registry
+    image: busybox:1.36
+    name: utils
+    volumeMounts:
+    - mountPath: /var/run/ci/registry
+      name: ci-registry-auth
+      readOnly: true
+  - env:
+    - name: DOCKER_CONFIG
+      value: /var/run/ci/registry
+    image: ghcr.io/pingcap-qe/ci/base:v2026
+    name: docker
+    volumeMounts:
+    - mountPath: /var/run/ci/registry
+      name: ci-registry-auth
+      readOnly: true
+  - image: busybox:1.36
+    name: jnlp
+  volumes:
+  - name: ci-registry-auth
+    secret:
+      defaultMode: 292
+      items:
+      - key: .dockerconfigjson
+        path: config.json
+      secretName: ci-registry-auth
+
+---

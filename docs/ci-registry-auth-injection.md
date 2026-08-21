@@ -20,13 +20,13 @@ Two Kyverno policies (can be merged into a single multi-rule policy) targeting P
 
 ### Policy A: in-pod registry credential injection (oras / docker CLI)
 
-At pod creation, inject **only into the container named `utils`**:
+At pod creation, inject **only into containers named `utils` or `docker`**:
 
 1. `volume`: `ci-registry-auth` (references the Secret, `items` projects `.dockerconfigjson` → `config.json`, read-only)
 2. `volumeMount`: `/var/run/ci/registry`
 3. `env`: `DOCKER_CONFIG=/var/run/ci/registry` (also compatible with `ORAS_DOCKER_CONFIG`)
 
-Coverage: all 314 current `download_pingcap_oci_artifact.sh` call sites, tiflash IT's docker pulls, and the delegated scripts run inside the `utils` container, so injecting only `utils` covers everything; other containers (default/jnlp/golang) are left untouched to minimize the injection surface and avoid collateral impact.
+Coverage: all 314 current `download_pingcap_oci_artifact.sh` call sites run in the `utils` container (oras honors `DOCKER_CONFIG`); tiflash IT's `docker pull` steps run in the pod's `docker` container (Jenkins `defaultContainer 'docker'`, pod has no `utils`). Injecting into `utils` and `docker` covers both paths; other containers (default/jnlp/golang/dockerd) are left untouched to minimize the injection surface and avoid collateral impact.
 
 ### Policy B: imagePullSecrets injection (kubelet pulling pod images)
 
@@ -65,7 +65,7 @@ spec:
   validationFailureAction: Audit
   background: false
   rules:
-    - name: inject-registry-config-utils
+    - name: inject-registry-config-utils-docker
       match:
         any:
           - resources:
@@ -85,7 +85,15 @@ spec:
                     - key: .dockerconfigjson
                       path: config.json
             containers:
-              - name: utils
+              - name: utils      # also inject into the 'docker' container (tiflash IT docker pull)
+                volumeMounts:
+                  - name: ci-registry-auth
+                    mountPath: /var/run/ci/registry
+                    readOnly: true
+                env:
+                  - name: DOCKER_CONFIG
+                    value: /var/run/ci/registry
+              - name: docker
                 volumeMounts:
                   - name: ci-registry-auth
                     mountPath: /var/run/ci/registry
@@ -112,14 +120,15 @@ spec:
 ## 3. Compatibility & Technical Notes
 
 - Both `oras` (1.x, via go-containerregistry) and the `docker` CLI honor the `DOCKER_CONFIG` env var, falling back to `~/.docker`. Tekton/kaniko in this repo already use the same pattern.
-- Only the `utils` container is injected; other containers are unaffected. All download/pull logic runs in `utils`, so coverage is complete.
+- Only the `utils` and `docker` containers are injected; other containers (default/jnlp/golang/dockerd) are unaffected. All oras downloads run in `utils`, all in-pod docker pulls run in `docker`, so coverage is complete.
+- The `docker` container (tiflash IT pod) mounts the same `ci-registry-auth` volume; `DOCKER_CONFIG` there only redirects docker CLI auth lookup to `/var/run/ci/registry` (the container's `DOCKER_HOST` points at the sibling dind), no side effects.
 - No conflict with the existing 30 `withCredentials('tidbx-docker-config')` `~/.docker/config.json` copy sites; they can remain (cleanup later).
 - Secret mounts are read-only; `defaultMode` is recommended as `0444` so non-root containers can read; no fsGroup dependency.
-- If the `utils` container already defines `DOCKER_CONFIG`, Kyverno must avoid duplicate injection (mind idempotency in the patch); Policy B must likewise be idempotent for pods that already have `imagePullSecrets`.
+- If a target container already defines `DOCKER_CONFIG`, Kyverno must avoid duplicate injection (mind idempotency in the patch); Policy B must likewise be idempotent for pods that already have `imagePullSecrets`.
 
 ## 4. Deliverables (ee-ops repo)
 
-1. Two policies (or one dual-rule policy): inject-registry-config-utils (utils container only) + inject-image-pull-secrets (image-match only; **tencentcloud only this round**)
+1. Two policies (or one dual-rule policy): inject-registry-config (utils + docker containers) + inject-image-pull-secrets (image-match only; **tencentcloud only this round**)
 2. `ExternalSecret` definition (per namespace, single source) + final `Secret` shape confirmation
 3. Per-namespace Secret sync mechanism (ExternalSecret + single source, automatic cross-cluster)
 4. Migration notes: current `tidbx-docker-config` credential contents → Secret; grayscale validation record
