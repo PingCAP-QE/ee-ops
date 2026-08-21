@@ -13,11 +13,11 @@ controller:
     tag: "2.568.2-jdk21"
   resources:
     requests:
-      cpu: "6"
-      memory: 24Gi
+      cpu: "2"
+      memory: 4Gi
     limits:
-      cpu: "6"
-      memory: 24Gi
+      cpu: "4"
+      memory: 8Gi
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # Set min/max heap here if needed with:
