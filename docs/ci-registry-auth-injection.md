@@ -51,7 +51,7 @@ data:
 
 - Synced by **ExternalSecret** from a single source: **a new dedicated GCP Secret Manager secret `ci_registry_auth_dockerconfig_json`** (its contents include auths for all target registries, covering both the in-pod and imagePullSecrets sides, see next item). One per Jenkins namespace; no manual cross-cluster maintenance.
 - For in-pod mounts use the `items: [{key: .dockerconfigjson, path: config.json}]` projection (no need for a duplicate Opaque secret).
-- `config.json`'s `auths` must cover: Policy A side `us-docker.pkg.dev` (hub/internal/dev), `ghcr.io` (utils/builders/ci-jenkins); Policy B side `cr-qcloud.pingcap.net`, `cr.pingcap.net`. Per the actual list confirmed by ee-ops.
+- `config.json`'s `auths` covers (confirmed): `us-docker.pkg.dev` via a dedicated GCP SA key (`gar-reader`, `_json_key` auth) for hub/internal/dev; `cr-qcloud.pingcap.net` and `cr.pingcap.net` via `ci-bot` credentials for Policy B. `ghcr.io` is **not included** — the repos used there are public.
 - **One per Jenkins namespace**; each target cluster's corresponding namespace must also be synced (done automatically by ExternalSecret).
 
 ### Kyverno policy skeleton (illustrative, finalized by ee-ops)
@@ -138,8 +138,8 @@ spec:
 | 1 | Kyverno version / management per CI cluster | Deployed on gcp (chart 3.4.4), tencentcloud (3.8.2), prod2 (3.4.4), all managed via Flux HelmRelease; prod2 excluded (no Jenkins scheduling). **gcp upgraded to 3.8.2 to align with tencentcloud**, unified on `policies.kyverno.io/v1` |
 | 2 | Full list of namespaces to inject | Confirmed: `jenkins-tidb`, `jenkins-tikv`, `jenkins-tiflow`, `jenkins-tiflash`, `jenkins-pd` (note: the `post/ticdc` directory actually creates `jenkins-tiflow`); staging/test namespaces TBD |
 | 3 | **Matching strategy** | Decided: reuse the existing `kubernetes.jenkins.io/controller` label convention (namespaced MutatingPolicy mounted per jenkins-* namespace, naturally isolated by namespace); Policy B additionally matches image prefixes (see #6). Namespaced vs cluster-level both acceptable |
-| 4 | **Secret provisioning** | Decided: ExternalSecret sync from a **new dedicated GCP SM secret `ci_registry_auth_dockerconfig_json`**; confirm its contents cover all target registries and the GAR credential shape (long-lived `_json_key` vs short-lived token with auto-rotation) |
-| 5 | **Registry host list covered by config.json** | Policy A side: `us-docker.pkg.dev` (hub/internal/dev), `ghcr.io`; Policy B side: `cr-qcloud.pingcap.net`, `cr.pingcap.net`; whether nextgen's `gcr.io/us.gcr.io` should be included |
+| 4 | **Secret provisioning** | Decided: ExternalSecret sync from a **new dedicated GCP SM secret `ci_registry_auth_dockerconfig_json`** (created, version 2); GAR credential uses a dedicated SA key (`gar-reader`, `_json_key`) |
+| 5 | **Registry host list covered by config.json** | **Confirmed**: `us-docker.pkg.dev` (hub/internal/dev, `gar-reader` `_json_key`), `cr-qcloud.pingcap.net` + `cr.pingcap.net` (`ci-bot`); `ghcr.io` **not included** (public repos); nextgen's `gcr.io/us.gcr.io` not needed |
 | 6 | **Policy B image match list** | **Confirmed**: pods whose images start with `cr-qcloud.pingcap.net/` or `cr.pingcap.net/` get `imagePullSecrets` injected. Policy B is **deployed on tencentcloud only this round**; extend to gcp after validation |
 | 7 | How hub/internal/dev are reached from target clouds (AWS/Azure) | Public access to GCP AR, or registry mirrors per cloud? Affects config.json contents and image addresses |
 | 8 | Policy owner / approval flow | Who reviews and who approves |
