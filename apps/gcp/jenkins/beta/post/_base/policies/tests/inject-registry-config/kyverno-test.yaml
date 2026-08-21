@@ -6,6 +6,8 @@ policies:
   - ../../inject-registry-config.yaml
 resources:
   - resource-utils.yaml
+  - resource-docker.yaml
+  - resource-both.yaml
   - resource-utils-mutated.yaml
   - resource-no-utils.yaml
   - resource-no-label.yaml
@@ -17,6 +19,22 @@ results:
     kind: Pod
     result: pass
     patchedResources: patched-utils.yaml
+
+  - policy: inject-registry-config
+    rule: inject-registry-config
+    resources:
+      - pod-docker
+    kind: Pod
+    result: pass
+    patchedResources: patched-docker.yaml
+
+  - policy: inject-registry-config
+    rule: inject-registry-config
+    resources:
+      - pod-both
+    kind: Pod
+    result: pass
+    patchedResources: patched-both.yaml
 
   - policy: inject-registry-config
     rule: inject-registry-config
