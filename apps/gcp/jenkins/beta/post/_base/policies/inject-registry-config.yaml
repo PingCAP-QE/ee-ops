@@ -12,8 +12,9 @@ spec:
   matchConditions:
     - name: is-pod
       expression: object.kind == 'Pod'
-    - name: has-utils-container
-      expression: object.spec.containers.exists(c, c.name == 'utils')
+    - name: has-target-container
+      expression: >-
+        object.spec.containers.exists(c, c.name == 'utils' || c.name == 'docker')
   matchConstraints:
     objectSelector:
       matchExpressions:
@@ -31,7 +32,14 @@ spec:
           Object{
             spec: Object.spec{
               volumes: [Object.spec.volumes{name: "ci-registry-auth", secret: Object.spec.volumes.secret{secretName: "ci-registry-auth", defaultMode: 292}}],
-              containers: [Object.spec.containers{name: "utils", volumeMounts: [Object.spec.containers.volumeMounts{mountPath: "/var/run/ci/registry", name: "ci-registry-auth", readOnly: true}], env: [Object.spec.containers.env{name: "DOCKER_CONFIG", value: "/var/run/ci/registry"}]}]
+              containers: (object.spec.containers.exists(c, c.name == 'utils') && object.spec.containers.exists(c, c.name == 'docker'))
+                ? [
+                    Object.spec.containers{name: "utils", volumeMounts: [Object.spec.containers.volumeMounts{mountPath: "/var/run/ci/registry", name: "ci-registry-auth", readOnly: true}], env: [Object.spec.containers.env{name: "DOCKER_CONFIG", value: "/var/run/ci/registry"}]},
+                    Object.spec.containers{name: "docker", volumeMounts: [Object.spec.containers.volumeMounts{mountPath: "/var/run/ci/registry", name: "ci-registry-auth", readOnly: true}], env: [Object.spec.containers.env{name: "DOCKER_CONFIG", value: "/var/run/ci/registry"}]}
+                  ]
+                : (object.spec.containers.exists(c, c.name == 'utils')
+                  ? [Object.spec.containers{name: "utils", volumeMounts: [Object.spec.containers.volumeMounts{mountPath: "/var/run/ci/registry", name: "ci-registry-auth", readOnly: true}], env: [Object.spec.containers.env{name: "DOCKER_CONFIG", value: "/var/run/ci/registry"}]}]
+                  : [Object.spec.containers{name: "docker", volumeMounts: [Object.spec.containers.volumeMounts{mountPath: "/var/run/ci/registry", name: "ci-registry-auth", readOnly: true}], env: [Object.spec.containers.env{name: "DOCKER_CONFIG", value: "/var/run/ci/registry"}]}])
             }
           }
     - patchType: JSONPatch
