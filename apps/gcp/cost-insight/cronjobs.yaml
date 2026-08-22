@@ -358,8 +358,7 @@ spec:
   # Interpreted with timeZone below: 21:40 Asia/Shanghai, after the GCP summary job.
   schedule: "40 21 * * *"
   timeZone: Asia/Shanghai
-  # Keep source facts frozen while migration 016 and the initial allocation backfill run.
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
