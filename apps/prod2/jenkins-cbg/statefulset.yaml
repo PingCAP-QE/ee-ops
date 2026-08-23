@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: jenkins-cbg
+  labels:
+    app.kubernetes.io/name: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+spec:
+  serviceName: jenkins-cbg
+  replicas: 1
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Retain
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jenkins-cbg
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: jenkins-cbg
+        app.kubernetes.io/part-of: jenkins-cbg-migrate
+    spec:
+      serviceAccountName: jenkins-cbg
+      nodeSelector:
+        kubernetes.io/arch: amd64
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
+      containers:
+        - name: jenkins
+          image: docker.io/jenkins/jenkins:2.504.1-lts-jdk21
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+            - name: agent-listener
+              containerPort: 50000
+              protocol: TCP
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms2048m -Xmx2048m -XX:+UseG1GC -Dhudson.model.DirectoryBrowserSupport.CSP="
+            - name: JENKINS_OPTS
+              value: "--prefix=/jenkins-pingkai --webroot=/tmp/war"
+            - name: JENKINS_SLAVE_AGENT_PORT
+              value: "50000"
+          resources:
+            requests:
+              cpu: 500m
+              memory: 3Gi
+            limits:
+              cpu: "4"
+              memory: 6Gi
+          livenessProbe:
+            httpGet:
+              path: /jenkins-pingkai/login
+              port: 8080
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /jenkins-pingkai/login
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 30
+          volumeMounts:
+            - name: jenkins-home
+              mountPath: /var/jenkins_home
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: jenkins-home
+          persistentVolumeClaim:
+            claimName: jenkins-cbg
+        - name: tmp
+          emptyDir: {}

@@ -3,4 +3,10 @@ kind: Kustomization
 namespace: jenkins-cbg
 resources:
   - namespace.yaml
+  - serviceaccount.yaml
+  - rbac.yaml
+  - pvc.yaml
+  - service.yaml
+  - statefulset.yaml
   - httproute.yaml
+  - post
