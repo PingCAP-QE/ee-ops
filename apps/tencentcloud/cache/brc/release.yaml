@@ -53,8 +53,6 @@ spec:
         bucket_lookup_type: dns
         max_idle_conns: 1024
     replicaCount: 2
-    podAnnotations:
-      karpenter.sh/do-not-evict: "true"
     resources:
       requests:
         cpu: "1"
