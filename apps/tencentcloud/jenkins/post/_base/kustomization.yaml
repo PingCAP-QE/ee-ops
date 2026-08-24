@@ -7,3 +7,4 @@ resources:
   - policies/set-pod-compute-class.yaml
   - policies/inject-registry-config.yaml
   - policies/inject-image-pull-secrets.yaml
+  - policies/inject-do-not-evict.yaml

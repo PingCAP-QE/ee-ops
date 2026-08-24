@@ -1,23 +1,27 @@
-#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/policies.kyverno.io/policies.kyverno.io_mutatingpolicies.yaml
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
 apiVersion: policies.kyverno.io/v1
-kind: MutatingPolicy
+kind: NamespacedMutatingPolicy
 metadata:
-  name: annotate-jenkins-agent-pods-do-not-evict
+  name: inject-do-not-evict
 spec:
   evaluation:
     admission:
       enabled: true
     mutateExisting:
       enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
   matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
     resourceRules:
       - apiGroups: [""]
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["pods"]
-  matchConditions:
-    - name: is-jenkins-agent-namespace
-      expression: "object.metadata.namespace in ['jenkins-pd', 'jenkins-tidb', 'jenkins-tiflash', 'jenkins-tiflow', 'jenkins-tikv']"
   mutations:
     - patchType: JSONPatch
       jsonPatch:
