@@ -1,0 +1,55 @@
+# Ref: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
+controller:
+  # Keep resource names aligned with the manually bootstrapped migration stack.
+  fullnameOverride: jenkins-cbg
+
+  podLabels:
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+
+  nodeSelector:
+    kubernetes.io/arch: amd64
+
+  image:
+    registry: docker.io
+    repository: jenkins/jenkins
+    tag: 2.504.1-lts-jdk21
+
+  containerPort: 8080
+  jenkinsOpts: "--webroot=/tmp/war"
+  jenkinsUriPrefix: /jenkins-pingkai
+  jenkinsUrl: https://do.pingcap.cn/jenkins-pingkai
+  jenkinsAdminEmail: wuhui.zuo@pingcap.cn
+
+  numExecutors: 0
+
+  resources:
+    requests:
+      cpu: 500m
+      memory: 3Gi
+    limits:
+      cpu: "4"
+      memory: 6Gi
+
+  javaOpts: >-
+    -Xms2048m -Xmx2048m -XX:+UseG1GC
+    -Dhudson.model.DirectoryBrowserSupport.CSP=
+
+  customInitContainers:
+    - name: init-create-logs-dir
+      image: alpine:3.21.3
+      imagePullPolicy: Always
+      command: ["mkdir", "-p", "/var/jenkins_home/logs"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsGroup: 1000
+        runAsUser: 1000
+      volumeMounts:
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
+
+  ingress:
+    enabled: false
+
+  prometheus:
+    enabled: false

@@ -1,0 +1,5 @@
+agent:
+  namespace: jenkins-cbg
+  podRetention: Never
+  containerCap: 200
+  maxRequestsPerHostStr: "200"
