@@ -45,29 +45,52 @@ HTTPRoute already points at Service `jenkins-cbg:8080` (HTTP only) — matches c
 
 After adopt, agent tunnel is `jenkins-cbg-agent.jenkins-cbg.svc:50000` (set in JCasC).
 
-## K8s agent connectivity (hot-copy)
+## K8s cloud (architecture)
 
-Hot-copied `config.xml` still stores the **manual migration** Kubernetes cloud URLs:
+Hot-copied `JENKINS_HOME` carries **three** stale layers that GitOps cannot override
+while the controller keeps running:
 
-| Field | stale hot-copy | required |
-|-------|----------------|----------|
-| `jenkinsUrl` | `.../jenkins-cbg/` | `.../jenkins-pingkai/` |
-| `jenkinsTunnel` | `jenkins-cbg:50000` | `jenkins-cbg-agent:50000` |
+| Stale layer | Symptom |
+|-------------|---------|
+| `config.xml` `<clouds>` | Wrong `jenkinsUrl` (`/jenkins-cbg/`) and `jenkinsTunnel` (pre-Helm Service) |
+| `init.groovy.d/00-cbg-manual-verify.groovy` | **Every startup** removes all clouds and recreates `jenkins-cbg-k8s` with manual-migration URLs |
+| `casc_configs/` on PVC | jenkins-gitee-era CasC (hidden at runtime by chart emptyDir, but confusing on disk) |
 
-`JCasC.configScripts` alone does not overwrite these `config.xml` fields, so agents
-spawn but stay **offline** (`tcpSlaveAgentListener` 404).
+With `JCasC.defaultConfig: false`, CasC `configScripts` declare the desired cloud in
+`values-JCasC.yaml`, but they **lose** if init.groovy or stale XML rewrites the cloud
+on every boot. Per-pod shell sed on `config.xml` only masked this race.
 
-`values-controller.yaml` runs init container `init-fix-k8s-cloud` on every pod start
-(script: `files/fix-hotcopy-k8s-cloud.sh`) to patch `config.xml` idempotently before
-the controller starts. The script ConfigMap is mounted via **`persistence.volumes`**
-(Jenkins chart 5.8.x — `controller.extraVolumes` is not rendered into the StatefulSet).
+**Correct model after migration:**
 
-Manual one-off (if needed before Flux reconcile):
+| Concern | Owner |
+|---------|--------|
+| Kubernetes cloud `jenkins-cbg-k8s` | **`values-JCasC.yaml` only** |
+| Admin / security realm | Hot-copied PVC (`defaultConfig: false`) |
+| Jobs / credentials / plugins | Hot-copied PVC |
+
+Do **not** reintroduce init shell patches or init.groovy that manage clouds.
+
+### One-time PVC finalize (required once per hot-copy)
+
+Removes stale `<clouds>`, legacy init.groovy, and PVC `casc_configs/`. Then JCasC
+creates the cloud on next controller start.
 
 ```bash
-kubectl -n jenkins-cbg exec jenkins-cbg-0 -c jenkins -- sed -n '116,117p' /var/jenkins_home/config.xml
-# expect jenkins-pingkai + jenkins-cbg-agent tunnel; then POST /jenkins-pingkai/reload
+bash apps/prod2/jenkins-cbg/release/files/run-finalize-hotcopy-jenkins-home.sh
 ```
+
+Verify after controller is up:
+
+```bash
+kubectl -n jenkins-cbg exec jenkins-cbg-0 -c jenkins -- sh -c '
+  test ! -f init.groovy.d/00-cbg-manual-verify.groovy
+  grep -E "jenkinsUrl|jenkinsTunnel" config.xml
+'
+# expect .../jenkins-pingkai/ and jenkins-cbg-agent...:50000
+```
+
+Restarting the pod must **not** revert URLs. If it does, check that the legacy groovy
+file is gone and only one cloud `jenkins-cbg-k8s` exists.
 
 ## Namespace secrets (manual migration)
 
@@ -93,9 +116,9 @@ done
 |---------|-------|-----|
 | HelmRelease API | `v2beta1` | prod2 cluster APIs |
 | Chart version | `5.8.43` | matches prod2 Flux / jenkins repo pin |
-| Init script volume | `persistence.volumes` | chart 5.8.x renders extra pod volumes here |
 | `fullnameOverride` | chart **root** value in `release.yaml` | not `controller.fullnameOverride` |
 | `JCasC.defaultConfig` | `false` | keep hot-copied admin/security |
+| K8s cloud | `values-JCasC.yaml` only | after one-time `<clouds>` strip on PVC |
 | `admin.createSecret` | `false` | do not invent chart admin password |
 | `overwritePlugins` / `installLatestPlugins` | `false` | do not wipe plugins on start |
 | `test.enable` | `false` | avoid false-negative Ready on adopt |

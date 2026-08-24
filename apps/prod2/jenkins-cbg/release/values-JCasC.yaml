@@ -7,8 +7,9 @@ controller:
     - { name: jenkins-cbg-ks3-cache, keyName: access-secret }
 
   JCasC:
-    # false: do not apply chart default securityRealm/admin password over hot-copied JENKINS_HOME.
-    # Our configScripts below are still rendered into casc_configs.
+    # false: keep hot-copied admin/security in config.xml.
+    # Kubernetes cloud is declared below; run one-time PVC migration (README) so CasC
+    # creates cloud jenkins-cbg-k8s instead of inheriting stale <clouds> from hot-copy.
     defaultConfig: false
     configScripts:
       kubernetes-cloud: |

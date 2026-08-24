@@ -5,8 +5,3 @@ persistence:
   storageClass: openebs-3-replicas
   accessMode: ReadWriteOnce
   size: 400Gi
-  volumes:
-    - name: jenkins-cbg-init-scripts
-      configMap:
-        name: jenkins-cbg-init-scripts
-        defaultMode: 0555
