@@ -47,22 +47,6 @@ controller:
       volumeMounts:
         - mountPath: /var/jenkins_home
           name: jenkins-home
-    - name: init-fix-k8s-cloud
-      # Hot-copy config.xml keeps /jenkins-cbg + jenkins-cbg:50000; patch before controller starts.
-      image: alpine:3.24
-      imagePullPolicy: IfNotPresent
-      command: ["/bin/sh", "/scripts/fix-hotcopy-k8s-cloud.sh"]
-      securityContext:
-        allowPrivilegeEscalation: false
-        readOnlyRootFilesystem: true
-        runAsGroup: 1000
-        runAsUser: 1000
-      volumeMounts:
-        - mountPath: /var/jenkins_home
-          name: jenkins-home
-        - mountPath: /scripts
-          name: jenkins-cbg-init-scripts
-          readOnly: true
 
   ingress:
     enabled: false

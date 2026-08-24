@@ -12,11 +12,5 @@ secretGenerator:
       - values5.yaml=values-rbac.yaml
       - values6.yaml=values-service-account.yaml
       - values7.yaml=values-JCasC.yaml
-configMapGenerator:
-  - name: jenkins-cbg-init-scripts
-    options:
-      disableNameSuffixHash: true
-    files:
-      - fix-hotcopy-k8s-cloud.sh=files/fix-hotcopy-k8s-cloud.sh
 configurations:
   - kustomize-config.yaml
