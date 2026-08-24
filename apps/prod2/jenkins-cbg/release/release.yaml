@@ -33,6 +33,8 @@ spec:
     - { kind: Secret, name: jenkins-cbg-values, valuesKey: values6.yaml }
     - { kind: Secret, name: jenkins-cbg-values, valuesKey: values7.yaml }
   values:
+    # Chart root value (not under controller). Matches releaseName / migration stack names.
+    fullnameOverride: jenkins-cbg
     agent:
       namespace: jenkins-cbg
     controller:
