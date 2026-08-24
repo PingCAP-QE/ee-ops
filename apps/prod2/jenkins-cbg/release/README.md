@@ -45,6 +45,47 @@ HTTPRoute already points at Service `jenkins-cbg:8080` (HTTP only) — matches c
 
 After adopt, agent tunnel is `jenkins-cbg-agent.jenkins-cbg.svc:50000` (set in JCasC).
 
+## K8s agent connectivity (hot-copy)
+
+Hot-copied `config.xml` still stores the **manual migration** Kubernetes cloud URLs:
+
+| Field | stale hot-copy | required |
+|-------|----------------|----------|
+| `jenkinsUrl` | `.../jenkins-cbg/` | `.../jenkins-pingkai/` |
+| `jenkinsTunnel` | `jenkins-cbg:50000` | `jenkins-cbg-agent:50000` |
+
+`JCasC.configScripts` alone does not overwrite these `config.xml` fields, so agents
+spawn but stay **offline** (`tcpSlaveAgentListener` 404).
+
+`values-controller.yaml` runs init container `init-fix-k8s-cloud` on every pod start
+(script: `files/fix-hotcopy-k8s-cloud.sh`) to patch `config.xml` idempotently before
+the controller starts.
+
+Manual one-off (if needed before Flux reconcile):
+
+```bash
+kubectl -n jenkins-cbg exec jenkins-cbg-0 -c jenkins -- sed -n '116,117p' /var/jenkins_home/config.xml
+# expect jenkins-pingkai + jenkins-cbg-agent tunnel; then POST /jenkins-pingkai/reload
+```
+
+## Namespace secrets (manual migration)
+
+These are **not** in GitOps; copy once from old `jenkins-gitee` namespace:
+
+| Secret | Used by |
+|--------|---------|
+| `hub-pingcap-net` | release/kaniko pod templates |
+| `loop-acr-dockerconfig` | loop release |
+| `ks3utilconfig` | offline-packages release |
+
+```bash
+for s in hub-pingcap-net loop-acr-dockerconfig ks3utilconfig; do
+  kubectl --context old -n jenkins-gitee get secret "$s" -o yaml \
+    | sed 's/namespace: jenkins-gitee/namespace: jenkins-cbg/' \
+    | kubectl --context new apply -f -
+done
+```
+
 ## Safety choices vs tencentcloud staging
 
 | Setting | Value | Why |
