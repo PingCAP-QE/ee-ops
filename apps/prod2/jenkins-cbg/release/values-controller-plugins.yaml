@@ -1,0 +1,30 @@
+# Plugin set inherited from pingkai/jenkins-gitee (ci-ops/apps/prod/jenkins).
+# Manage upgrades here instead of mutating JENKINS_HOME manually.
+controller:
+  initContainerEnv:
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+  containerEnv:
+    - name: JENKINS_UC_DOWNLOAD
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
+
+  installLatestPlugins: true
+  overwritePlugins: true
+  # Existing JENKINS_HOME already contains plugins from hot-copy migration.
+  initializeOnce: true
+
+  additionalPlugins:
+    - allure-jenkins-plugin:2.32.0
+    - blueocean:1.27.16
+    - cdevents:1-40.vb_3d2c94f2379
+    - code-coverage-api:4.99.0
+    - kubernetes-credentials-provider:1.281.v331e3f5a_05a_9
+    - generic-webhook-trigger:2.3.1
+    - http_request:1.20
+    - jenkins-pipeline-cache:0.2.0:https://github.com/j3t/jenkins-pipeline-cache-plugin/releases/download/0.2.0/jenkins-pipeline-cache-0.2.0.hpi
+    - job-dsl:1.93
+    - lockable-resources:1349.v8b_ccb_c5487f7
+    - pipeline-utility-steps:2.19.0
+    - prometheus:819.v50953a_c560dd
+    - role-strategy:777.v4fe2599cb_f48
+    - ssh-agent:386.v36cc0c7582f0

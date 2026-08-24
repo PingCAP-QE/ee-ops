@@ -1,0 +1,126 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-cbg
+  labels:
+    app.kubernetes.io/name: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: openebs-3-replicas
+  resources:
+    requests:
+      storage: 400Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: go-cache
+  labels:
+    app: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+    purpose: agent-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 200Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gomod-cache
+  labels:
+    app: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+    purpose: agent-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: loop-ci-assets
+  labels:
+    app: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+    purpose: agent-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tiflash-cache
+  labels:
+    app: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+    purpose: agent-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tikv-cache
+  labels:
+    app: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+    purpose: agent-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tiup-mirror-basic
+  labels:
+    app: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+    purpose: agent-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 50Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tools
+  labels:
+    app: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+    purpose: agent-cache
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 10Gi

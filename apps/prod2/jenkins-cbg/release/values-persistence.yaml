@@ -1,0 +1,7 @@
+persistence:
+  enabled: true
+  # Reuse the PVC created during jenkins-gitee hot-copy migration.
+  existingClaim: jenkins-cbg
+  storageClass: openebs-3-replicas
+  accessMode: ReadWriteOnce
+  size: 400Gi

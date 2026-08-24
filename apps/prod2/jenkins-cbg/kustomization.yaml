@@ -3,4 +3,7 @@ kind: Kustomization
 namespace: jenkins-cbg
 resources:
   - namespace.yaml
+  - pre
+  - release
+  - post
   - httproute.yaml
