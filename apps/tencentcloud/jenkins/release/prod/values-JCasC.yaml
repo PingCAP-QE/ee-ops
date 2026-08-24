@@ -184,10 +184,6 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "http://goproxy.cache.svc,direct"
-                  - key: "GOMODCACHE"
-                    value: "/home/jenkins/agent/gomodcache"
-                  - key: "GOCACHE"
-                    value: "/home/jenkins/agent/gocache"
                   - key: "BAZELISK_BASE_URL"
                     value: "https://repo.huaweicloud.com/bazel"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
