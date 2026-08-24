@@ -1,0 +1,59 @@
+controller:
+  additionalExistingSecrets:
+    - { name: jenkins-cbg-ks3-cache, keyName: region }
+    - { name: jenkins-cbg-ks3-cache, keyName: bucket }
+    - { name: jenkins-cbg-ks3-cache, keyName: endpoint }
+    - { name: jenkins-cbg-ks3-cache, keyName: access-key }
+    - { name: jenkins-cbg-ks3-cache, keyName: access-secret }
+
+  JCasC:
+    defaultConfig: true
+    configScripts:
+      kubernetes-cloud: |
+        jenkins:
+          clouds:
+            - kubernetes:
+                name: "jenkins-cbg-k8s"
+                serverUrl: "https://kubernetes.default"
+                namespace: "jenkins-cbg"
+                jenkinsUrl: "http://jenkins-cbg.jenkins-cbg.svc.cluster.local:8080/jenkins-pingkai/"
+                jenkinsTunnel: "jenkins-cbg.jenkins-cbg.svc.cluster.local:50000"
+                containerCap: 200
+                maxRequestsPerHost: 200
+                retentionTimeout: 5
+                connectTimeout: 5
+                readTimeout: 15
+                webSocket: false
+                templates:
+                  - name: "cbg-default"
+                    label: "jenkins-gitee-jenkins-agent jenkins-cbg"
+                    nodeUsageMode: NORMAL
+                    serviceAccount: "jenkins-cbg"
+                    nodeSelector: "jenkins-cbg-agent=true,kubernetes.io/arch=amd64"
+                    idleMinutes: 0
+                    instanceCap: 2147483647
+                    containers:
+                      - name: "jnlp"
+                        image: "jenkins/inbound-agent:3299.v0d0d06908537-1"
+                        workingDir: "/home/jenkins/agent"
+                        resourceRequestCpu: "100m"
+                        resourceRequestMemory: "256Mi"
+                        ttyEnabled: false
+
+      pipeline-cache: |
+        unclassified:
+          pipeline-cache:
+            region: ${jenkins-cbg-ks3-cache-region}
+            bucket: ${jenkins-cbg-ks3-cache-bucket}
+            endpoint: ${jenkins-cbg-ks3-cache-endpoint}
+            username: ${jenkins-cbg-ks3-cache-access-key}
+            password: ${jenkins-cbg-ks3-cache-access-secret}
+            threshold: 100000
+
+      env-vars: |
+        jenkins:
+          globalNodeProperties:
+            - envVars:
+                env:
+                  - key: "GOPROXY"
+                    value: "https://proxy.golang.org,direct"
