@@ -38,8 +38,9 @@ controller:
 
   customInitContainers:
     - name: init-create-logs-dir
-      image: alpine:3.21.3
-      imagePullPolicy: Always
+      # alpine:3.21.3 often fails via ksyun docker.io mirror; 3.24 is widely cached on prod2.
+      image: alpine:3.24
+      imagePullPolicy: IfNotPresent
       command: ["mkdir", "-p", "/var/jenkins_home/logs"]
       securityContext:
         allowPrivilegeEscalation: false
