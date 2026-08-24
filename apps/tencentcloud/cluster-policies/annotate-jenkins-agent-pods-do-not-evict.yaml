@@ -1,0 +1,39 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/policies.kyverno.io/policies.kyverno.io_mutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: annotate-jenkins-agent-pods-do-not-evict
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: is-jenkins-agent-namespace
+      expression: "object.metadata.namespace in ['jenkins-pd', 'jenkins-tidb', 'jenkins-tiflash', 'jenkins-tiflow', 'jenkins-tikv']"
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.metadata.annotations) ?
+          [
+            JSONPatch{
+              op: "add",
+              path: "/metadata/annotations/karpenter.sh~1do-not-evict",
+              value: "true"
+            }
+          ] :
+          [
+            JSONPatch{
+              op: "add",
+              path: "/metadata/annotations",
+              value: {"karpenter.sh/do-not-evict": "true"}
+            }
+          ]
