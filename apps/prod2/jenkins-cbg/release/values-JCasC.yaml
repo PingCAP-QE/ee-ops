@@ -7,7 +7,9 @@ controller:
     - { name: jenkins-cbg-ks3-cache, keyName: access-secret }
 
   JCasC:
-    defaultConfig: true
+    # false: do not apply chart default securityRealm/admin password over hot-copied JENKINS_HOME.
+    # Our configScripts below are still rendered into casc_configs.
+    defaultConfig: false
     configScripts:
       kubernetes-cloud: |
         jenkins:
@@ -17,7 +19,8 @@ controller:
                 serverUrl: "https://kubernetes.default"
                 namespace: "jenkins-cbg"
                 jenkinsUrl: "http://jenkins-cbg.jenkins-cbg.svc.cluster.local:8080/jenkins-pingkai/"
-                jenkinsTunnel: "jenkins-cbg.jenkins-cbg.svc.cluster.local:50000"
+                # Chart exposes JNLP on a separate Service (<fullname>-agent).
+                jenkinsTunnel: "jenkins-cbg-agent.jenkins-cbg.svc.cluster.local:50000"
                 containerCap: 200
                 maxRequestsPerHost: 200
                 retentionTimeout: 5
