@@ -1,0 +1,43 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: inject-do-not-evict
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.metadata.annotations) ?
+          [
+            JSONPatch{
+              op: "add",
+              path: "/metadata/annotations/karpenter.sh~1do-not-evict",
+              value: "true"
+            }
+          ] :
+          [
+            JSONPatch{
+              op: "add",
+              path: "/metadata/annotations",
+              value: {"karpenter.sh/do-not-evict": "true"}
+            }
+          ]

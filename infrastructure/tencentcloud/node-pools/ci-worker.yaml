@@ -32,5 +32,5 @@ spec:
             - S9e # Intel latest gen standard
             - SK1 # ARM
   disruption:
-    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidationPolicy: WhenEmpty
     consolidateAfter: 2m

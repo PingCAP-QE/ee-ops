@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-agent
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+spec:
+  containers:
+    - name: jnlp
+      image: busybox:1.36
