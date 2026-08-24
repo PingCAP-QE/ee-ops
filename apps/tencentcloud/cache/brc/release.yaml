@@ -52,6 +52,15 @@ spec:
         bucket_lookup_type: dns
         max_idle_conns: 1024
     replicaCount: 1
+    podAnnotations:
+      karpenter.sh/do-not-evict: "true"
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        cpu: "4"
+        memory: 8Gi
     volumeMounts:
       - mountPath: /data
         name: bazel-remote-cache
