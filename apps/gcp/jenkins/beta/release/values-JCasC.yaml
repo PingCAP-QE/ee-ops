@@ -307,6 +307,10 @@ controller:
           globalNodeProperties:
             - envVars:
                 env:
+                  - key: "GOMODCACHE"
+                    value: "/home/jenkins/agent/gomodcache"
+                  - key: "GOCACHE"
+                    value: "/home/jenkins/agent/gocache"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
                     value: "us-docker.pkg.dev/pingcap-testing-account/hub"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_TIDBX"
