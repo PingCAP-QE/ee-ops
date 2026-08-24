@@ -8,9 +8,10 @@ controller:
     - name: JENKINS_UC_DOWNLOAD
       value: https://mirrors.tuna.tsinghua.edu.cn/jenkins
 
-  installLatestPlugins: true
-  overwritePlugins: true
+  installLatestPlugins: false
+  overwritePlugins: false
   # Existing JENKINS_HOME already contains plugins from hot-copy migration.
+  # Only install missing plugins listed below; do not wipe/overwrite on every start.
   initializeOnce: true
 
   additionalPlugins:
