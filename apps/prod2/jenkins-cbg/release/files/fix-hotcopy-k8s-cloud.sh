@@ -10,16 +10,24 @@ if [ ! -f "$cfg" ]; then
   exit 0
 fi
 
+tunnel='jenkins-cbg-agent.jenkins-cbg.svc.cluster.local:50000'
+
 tmp=$(mktemp)
 cp "$cfg" "$tmp"
 
-# URI prefix: manual STS used /jenkins-cbg; HTTPRoute + chart use /jenkins-pingkai.
-sed 's#http://jenkins-cbg.jenkins-cbg.svc.cluster.local:8080/jenkins-cbg/#http://jenkins-cbg.jenkins-cbg.svc.cluster.local:8080/jenkins-pingkai/#g' "$tmp" > "${tmp}.1"
+# URI prefix: manual migration used /jenkins-cbg; HTTPRoute + chart use /jenkins-pingkai.
+sed 's#/jenkins-cbg/#/jenkins-pingkai/#g' "$tmp" > "${tmp}.1"
 mv "${tmp}.1" "$tmp"
 
 # JNLP tunnel: Helm chart exposes agent listener on jenkins-cbg-agent Service.
-sed 's#<jenkinsTunnel>jenkins-cbg.jenkins-cbg.svc.cluster.local:50000</jenkinsTunnel>#<jenkinsTunnel>jenkins-cbg-agent.jenkins-cbg.svc.cluster.local:50000</jenkinsTunnel>#g' "$tmp" > "${tmp}.1"
-mv "${tmp}.1" "$tmp"
+for old in \
+  'jenkins-cbg:50000' \
+  'jenkins-cbg.jenkins-cbg.svc.cluster.local:50000' \
+  'jenkins-cbg.jenkins-cbg.svc:50000'
+do
+  sed "s#<jenkinsTunnel>${old}</jenkinsTunnel>#<jenkinsTunnel>${tunnel}</jenkinsTunnel>#g" "$tmp" > "${tmp}.1"
+  mv "${tmp}.1" "$tmp"
+done
 
 if cmp -s "$cfg" "$tmp"; then
   echo "kubernetes cloud URLs already correct"

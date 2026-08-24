@@ -1,9 +1,6 @@
 # Ref: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 # Align with prod2 Flux (v2beta1 HelmRelease) and live jenkins-cbg migration stack.
 controller:
-  # Keep resource names aligned with the manually bootstrapped migration stack.
-  fullnameOverride: jenkins-cbg
-
   podLabels:
     app.kubernetes.io/part-of: jenkins-cbg-migrate
 
@@ -15,10 +12,10 @@ controller:
     repository: jenkins/jenkins
     tag: 2.504.1-lts-jdk21
 
-  containerPort: 8080
-  # Chart already injects --prefix from jenkinsUriPrefix and --webroot=/var/jenkins_cache/war.
-  # Do not set jenkinsOpts --webroot here (would duplicate / conflict with chart).
+  # targetPort/servicePort set in release.yaml HelmRelease values.
   jenkinsUriPrefix: /jenkins-pingkai
+  # Chart injects --prefix from jenkinsUriPrefix and --webroot=/var/jenkins_cache/war.
+  # Do not set jenkinsOpts --webroot here (would duplicate / conflict with chart).
   jenkinsUrl: https://do.pingcap.cn/jenkins-pingkai
   jenkinsAdminEmail: wuhui.zuo@pingcap.cn
 
@@ -77,9 +74,3 @@ controller:
   # Do not let chart default admin secret become the securityRealm.
   admin:
     createSecret: false
-
-  extraVolumes:
-    - name: jenkins-cbg-init-scripts
-      configMap:
-        name: jenkins-cbg-init-scripts
-        defaultMode: 0555

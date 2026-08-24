@@ -59,7 +59,8 @@ spawn but stay **offline** (`tcpSlaveAgentListener` 404).
 
 `values-controller.yaml` runs init container `init-fix-k8s-cloud` on every pod start
 (script: `files/fix-hotcopy-k8s-cloud.sh`) to patch `config.xml` idempotently before
-the controller starts.
+the controller starts. The script ConfigMap is mounted via **`persistence.volumes`**
+(Jenkins chart 5.8.x — `controller.extraVolumes` is not rendered into the StatefulSet).
 
 Manual one-off (if needed before Flux reconcile):
 
@@ -91,6 +92,9 @@ done
 | Setting | Value | Why |
 |---------|-------|-----|
 | HelmRelease API | `v2beta1` | prod2 cluster APIs |
+| Chart version | `5.8.43` | matches prod2 Flux / jenkins repo pin |
+| Init script volume | `persistence.volumes` | chart 5.8.x renders extra pod volumes here |
+| `fullnameOverride` | chart **root** value in `release.yaml` | not `controller.fullnameOverride` |
 | `JCasC.defaultConfig` | `false` | keep hot-copied admin/security |
 | `admin.createSecret` | `false` | do not invent chart admin password |
 | `overwritePlugins` / `installLatestPlugins` | `false` | do not wipe plugins on start |
