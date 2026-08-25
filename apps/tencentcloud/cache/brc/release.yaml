@@ -34,12 +34,12 @@ spec:
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /data
-      # Keep these two limits below the volumeClaimTemplates storage size (100Gi) below,
+      # Keep these two limits below the volumeClaimTemplates storage size (200Gi) below,
       # leaving headroom for filesystem overhead and eviction lag so the PVC never fills
       # up. If you change the PVC size or the storageClass (see volumeClaimTemplates
       # below), update max_size/max_size_hard_limit accordingly.
-      max_size: 85 # The maximum size of bazel-remote's local disk cache in GiB.
-      max_size_hard_limit: 90 # Reject writes once this GiB limit is reached to avoid ENOSPC.
+      max_size: 170 # The maximum size of bazel-remote's local disk cache in GiB (85% of PVC).
+      max_size_hard_limit: 180 # Reject writes once this GiB limit is reached to avoid ENOSPC (~90% of PVC).
       experimental_remote_asset_api: true
       access_log_level: all
       http_address: ":8080"
@@ -82,11 +82,11 @@ spec:
             - ReadWriteOnce
           # ci-rwo maps to Tencent CBS CLOUD_HSSD (enhanced SSD); the built-in default
           # "cbs" class uses CLOUD_PREMIUM (HDD tier). Keep this an SSD class and keep
-          # the size above conf's max_size_hard_limit (90 GiB); see conf above.
+          # the size above conf's max_size_hard_limit (180 GiB); see conf above.
           storageClassName: ci-rwo
           resources:
             requests:
-              storage: 100Gi # Must stay larger than conf's max_size_hard_limit (90 GiB); see conf above.
+              storage: 200Gi # Must stay larger than conf's max_size_hard_limit (180 GiB); see conf above.
     volumeMounts:
       - mountPath: /data
         name: bazel-remote-cache
