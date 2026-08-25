@@ -10,8 +10,8 @@ spec:
   # Interpreted with timeZone below: 21:10 Asia/Shanghai, intentionally outside BJ work time.
   schedule: "10 21 * * *"
   timeZone: Asia/Shanghai
-  # Keep source facts frozen while migration 016 and the initial allocation backfill run.
-  suspend: true
+  # Initial allocation backfill is complete; keep source facts current with daily syncs.
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -427,7 +427,7 @@ spec:
                 - name: COST_INSIGHT_AWS_EXPORT_OVERLAP_MONTHS
                   value: "1"
                 - name: COST_INSIGHT_AWS_SYNC_PAGE_SIZE
-                  value: "5000"
+                  value: "1000"
               resources:
                 requests:
                   cpu: "500m"
