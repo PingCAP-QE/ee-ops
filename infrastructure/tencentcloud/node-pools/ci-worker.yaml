@@ -31,6 +31,18 @@ spec:
             - S9pro # Intel latest gen high-performance
             - S9e # Intel latest gen standard
             - SK1 # ARM
+        - key: karpenter.k8s.tke/instance-cpu
+          operator: Lte
+          values:
+            - "64" # cap single node at 64 vCPU to avoid oversized instances
+        - key: karpenter.k8s.tke/instance-memory-gb
+          operator: Lte
+          values:
+            - "256" # cap single node at 256Gi
+  limits:
+    resources:
+      cpu: "2048" # cap total pool capacity
+      memory: 8192Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 2m
