@@ -18,3 +18,10 @@ spec:
         - path:
             type: PathPrefix
             value: "${INGRESS_PATH}"
+      filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            remove:
+              - X-Frame-Options
+              - Cross-Origin-Opener-Policy
+              - Content-Security-Policy
