@@ -7,13 +7,13 @@ metadata:
     app.kubernetes.io/part-of: jenkins-cbg-migrate
 spec:
   hostnames:
-    - do.pingcap.cn
+    - cicd.pingcap.cn
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: internal-gateway
       namespace: infra
-      sectionName: do-pingcap-cn-https
+      sectionName: cicd-pingcap-cn-https
   rules:
     - matches:
         - path:

@@ -1,6 +1,6 @@
 # Keep encoded path slashes (%2F) for Jenkins Blue Ocean folder URLs.
-# Scoped ONLY to listener do-pingcap-cn-https (hostname do.pingcap.cn).
-# HTTPRoute jenkins-cbg must parentRef sectionName: do-pingcap-cn-https.
+# Scoped ONLY to Jenkins-dedicated listener (not wildcard-pingcap-cn-https).
+# HTTPRoute jenkins-cbg must parentRef sectionName: cicd-pingcap-cn-https.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: ClientTrafficPolicy
 metadata:
@@ -13,6 +13,6 @@ spec:
     - group: gateway.networking.k8s.io
       kind: Gateway
       name: internal-gateway
-      sectionName: do-pingcap-cn-https
+      sectionName: cicd-pingcap-cn-https
   path:
     escapedSlashesAction: KeepUnchanged
