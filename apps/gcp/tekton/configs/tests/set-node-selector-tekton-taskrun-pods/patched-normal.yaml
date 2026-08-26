@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bp-tikv-nextgen-linux-amd64-6b8b2-deliver-images-pod
+  namespace: default
+  annotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  labels:
+    tekton.dev/taskRun: bp-tikv-nextgen-linux-amd64-6b8b2-deliver-images
+spec:
+  containers:
+    - name: step-run
+      image: gcr.io/go-containerregistry/crane/debug:latest
+  nodeSelector:
+    cloud.google.com/compute-class: ci-worker
