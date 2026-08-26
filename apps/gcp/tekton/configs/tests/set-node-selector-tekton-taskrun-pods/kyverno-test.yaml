@@ -1,0 +1,40 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: set-node-selector-tekton-taskrun-pods
+policies:
+  - ../../policies.yaml
+resources:
+  - resource-normal.yaml
+  - resource-retry.yaml
+results:
+  - policy: set-node-selector-tekton-taskrun-pods
+    rule: add-compute-class-and-annotations
+    resources:
+      - bp-tikv-nextgen-linux-amd64-6b8b2-deliver-images-pod
+    kind: Pod
+    result: pass
+    patchedResources: patched-normal.yaml
+
+  - policy: set-node-selector-tekton-taskrun-pods
+    rule: override-compute-class-for-retried-pods
+    resources:
+      - bp-tikv-nextgen-linux-amd64-6b8b2-deliver-images-pod
+    kind: Pod
+    result: skip
+
+  - policy: set-node-selector-tekton-taskrun-pods
+    rule: add-compute-class-and-annotations
+    resources:
+      - bp-tikv-nextgen-linux-amd64-6b8b2-deliver-images-pod-retry2
+    kind: Pod
+    result: pass
+    patchedResources: patched-retry.yaml
+
+  - policy: set-node-selector-tekton-taskrun-pods
+    rule: override-compute-class-for-retried-pods
+    resources:
+      - bp-tikv-nextgen-linux-amd64-6b8b2-deliver-images-pod-retry2
+    kind: Pod
+    result: pass
+    patchedResources: patched-retry.yaml
