@@ -66,13 +66,13 @@ spec:
             kind: HTTPRoute
         namespaces:
           from: All
-    # Jenkins Blue Ocean: keep encoded slashes (%2F) for folder job URLs.
+    # Jenkins cbg (prod2): cicd.pingcap.cn — dedicated listener for Blue Ocean %2F.
     # ClientTrafficPolicy jenkins-keep-escaped-slashes binds only to this section.
     # Do NOT set KeepUnchanged on wildcard-pingcap-cn-https (would affect hub-cbg etc.).
-    - name: do-pingcap-cn-https
+    - name: cicd-pingcap-cn-https
       protocol: HTTPS
       port: 443
-      hostname: do.pingcap.cn
+      hostname: cicd.pingcap.cn
       tls:
         mode: Terminate
         certificateRefs:
