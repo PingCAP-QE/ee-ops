@@ -16,7 +16,7 @@ controller:
   jenkinsUriPrefix: /jenkins-pingkai
   # Chart injects --prefix from jenkinsUriPrefix and --webroot=/var/jenkins_cache/war.
   # Do not set jenkinsOpts --webroot here (would duplicate / conflict with chart).
-  jenkinsUrl: https://do.pingcap.cn/jenkins-pingkai
+  jenkinsUrl: https://cicd.pingcap.cn/jenkins-pingkai
   jenkinsAdminEmail: wuhui.zuo@pingcap.cn
 
   numExecutors: 0
