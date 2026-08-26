@@ -61,3 +61,10 @@ controller:
                 env:
                   - key: "GOPROXY"
                     value: "https://proxy.golang.org,direct"
+
+      # Public Jenkins URL (links, notifications). Must match values-controller.yaml jenkinsUrl.
+      location-url: |
+        jenkins:
+          location:
+            url: "https://cicd.pingcap.cn/jenkins-pingkai/"
+            adminAddress: "wuhui.zuo@pingcap.cn"
