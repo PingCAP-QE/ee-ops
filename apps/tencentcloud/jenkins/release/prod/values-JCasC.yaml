@@ -196,6 +196,10 @@ controller:
                     value: "cr-qcloud.pingcap.net/mirrors/tidbx"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_INTERNAL"
                     value: "cr-qcloud.pingcap.net/mirrors/internal"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_COMMUNITY"
+                    value: "cr-qcloud.pingcap.net/mirrors/hub"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_DEV"
+                    value: "cr-qcloud.pingcap.net/mirrors/dev"
 
       pipeline-cache: |
         unclassified:
