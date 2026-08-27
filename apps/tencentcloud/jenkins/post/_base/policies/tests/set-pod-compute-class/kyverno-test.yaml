@@ -9,30 +9,66 @@ resources:
   - resource-empty-ci-refs.yaml
   - resource-non-release.yaml
   - resource-release.yaml
+  - resource-non-tidb.yaml
+  - resource-tidb-hostpath.yaml
+  - resource-tidb-privileged.yaml
+  - resource-tidb-super-node.yaml
 results:
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
+    rule: set-pod-compute-class
     resources:
       - pod-no-ci-refs
     kind: Pod
     result: pass
 
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
+    rule: set-pod-compute-class
     resources:
       - pod-empty-ci-refs
     kind: Pod
     result: pass
 
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
+    rule: set-pod-compute-class
+    resources:
+      - pod-non-tidb
+    kind: Pod
+    result: pass
+    patchedResources: patched-ci-worker.yaml
+
+  - policy: set-pod-compute-class
+    rule: set-pod-compute-class
+    resources:
+      - pod-tidb-hostpath
+    kind: Pod
+    result: pass
+    patchedResources: patched-ci-worker-hostpath.yaml
+
+  - policy: set-pod-compute-class
+    rule: set-pod-compute-class
+    resources:
+      - pod-tidb-privileged
+    kind: Pod
+    result: pass
+    patchedResources: patched-ci-worker-privileged.yaml
+
+  - policy: set-pod-compute-class
+    rule: set-pod-compute-class
+    resources:
+      - pod-tidb-super-node
+    kind: Pod
+    result: pass
+    patchedResources: patched-super-node.yaml
+
+  - policy: set-pod-compute-class
+    rule: set-pod-compute-class
     resources:
       - pod-non-release
     kind: Pod
     result: pass
 
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
+    rule: set-pod-compute-class
     resources:
       - pod-release
     kind: Pod
