@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: bazel-remote
-      version: 0.0.3
+      version: 0.0.4
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -23,6 +23,9 @@ spec:
   values:
     fullnameOverride: brc
     kind: StatefulSet
+    # bazel-remote drains in-flight HTTP/gRPC requests on SIGTERM; give it a long
+    # enough window so large blob transfers complete before SIGKILL.
+    terminationGracePeriodSeconds: 300
     image:
       repository: quay.io/bazel-remote/bazel-remote
       tag: v2.6.1
@@ -58,6 +61,14 @@ spec:
         bucket_lookup_type: dns
         max_idle_conns: 1024
     replicaCount: 2
+    service:
+      # A CI build runs many bazel steps; pin a client to a single replica so the
+      # per-pod local disk cache (170Gi) keeps hitting instead of bouncing between
+      # the two pods. timeoutSeconds covers the longest expected CI job.
+      sessionAffinity: ClientIP
+      sessionAffinityConfig:
+        clientIP:
+          timeoutSeconds: 10800
     resources:
       requests:
         cpu: "1"
