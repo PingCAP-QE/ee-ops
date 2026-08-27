@@ -17,6 +17,21 @@ entries:
   bazel-remote:
   - apiVersion: v2
     appVersion: v2.3.8
+    created: "2026-08-27T10:31:22.49894281Z"
+    description: Helm chart to deploy [bazel-remote](https://github.com/buchgr/bazel-remote).
+    digest: 61cdcbd7f3e3bc43d517dcbed12570c23c976a7e8059eb33b5b8d686ebbfff76
+    home: https://github.com/slamdev/helm-charts/tree/master/charts/bazel-remote
+    icon: https://bazel.build/images/bazel-icon.svg
+    maintainers:
+    - email: valentin.fedoskin@gmail.com
+      name: slamdev
+    name: bazel-remote
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/bazel-remote-0.0.4/bazel-remote-0.0.4.tgz
+    version: 0.0.4
+  - apiVersion: v2
+    appVersion: v2.3.8
     created: "2022-09-19T10:17:09.81421822Z"
     description: Helm chart to deploy [bazel-remote](https://github.com/buchgr/bazel-remote).
     digest: 10ee215476615d7245754f195ade3b8e8b554b94c06d350f1e122765754743cf
@@ -985,4 +1000,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-20T23:57:51.455910611Z"
+generated: "2026-08-27T10:31:22.499053196Z"
