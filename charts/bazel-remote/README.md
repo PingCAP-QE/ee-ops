@@ -1,6 +1,6 @@
 # bazel-remote
 
-![Version: 0.0.3](https://img.shields.io/badge/Version-0.0.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.2.0](https://img.shields.io/badge/AppVersion-v2.2.0-informational?style=flat-square)
+![Version: 0.0.4](https://img.shields.io/badge/Version-0.0.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: v2.2.0](https://img.shields.io/badge/AppVersion-v2.2.0-informational?style=flat-square)
 
 Helm chart to deploy [bazel-remote](https://github.com/buchgr/bazel-remote).
 
@@ -39,6 +39,8 @@ Helm chart to deploy [bazel-remote](https://github.com/buchgr/bazel-remote).
 | resources | object | `{}` | custom resource configuration |
 | securityContext | object | `{}` | specifies security settings for a container |
 | service.ports | list | `[{"name":"http","port":80,"targetPort":"http"},{"name":"grpc","port":9092,"targetPort":"grpc"}]` | service ports |
+| service.sessionAffinity | string | `"None"` | stick connections from the same client IP to the same backend pod; use "ClientIP" to avoid flapping between replicas |
+| service.sessionAffinityConfig | object | `{}` | configuration for session affinity (e.g. clientIP.timeoutSeconds) |
 | service.type | string | `"ClusterIP"` | service type |
 | serviceAccount.annotations | object | `{}` | annotations to add to the service account |
 | serviceAccount.create | bool | `false` | specifies whether a service account should be created |
@@ -47,6 +49,7 @@ Helm chart to deploy [bazel-remote](https://github.com/buchgr/bazel-remote).
 | serviceMonitor.enabled | bool | `false` | ServiceMonitor CRD is created for a prometheus operator |
 | startupProbe.httpGet.path | string | `"/status"` |  |
 | startupProbe.httpGet.port | string | `"http"` |  |
+| terminationGracePeriodSeconds | int | `30` | grace period for the pod to terminate gracefully, draining in-flight requests before SIGKILL |
 | tolerations | list | `[]` | tolerations for scheduler pod assignment |
 | volumeClaimTemplates | list | `[]` | volume claim templates; used only when 'kind: StatefulSet' |
 | volumeMounts | list | `[]` | additional volume mounts |

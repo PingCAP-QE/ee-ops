@@ -15,6 +15,7 @@ spec:
   serviceAccountName: {{ include "bazel-remote.serviceAccountName" . }}
   securityContext:
     {{- toYaml .Values.podSecurityContext | nindent 4 }}
+  terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
   containers:
     - name: {{ .Chart.Name }}
       securityContext:

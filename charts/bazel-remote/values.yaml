@@ -4,6 +4,11 @@ kind: Deployment
 # replicaCount -- number of replicas for bazel-remote deployment.
 replicaCount: 1
 
+# terminationGracePeriodSeconds -- grace period for the pod to terminate gracefully,
+# draining in-flight requests before SIGKILL. bazel-remote drains active HTTP/gRPC
+# connections on SIGTERM, so keep this above the longest expected blob transfer.
+terminationGracePeriodSeconds: 30
+
 image:
   # image.repository -- image repository
   repository: buchgr/bazel-remote-cache
@@ -55,6 +60,12 @@ podAnnotations: {}
 service:
   # service.type -- service type
   type: ClusterIP
+  # service.sessionAffinity -- stick connections from the same client IP to the
+  # same backend pod; use "ClientIP" to avoid flapping between replicas.
+  sessionAffinity: None
+  # service.sessionAffinityConfig -- configuration for session affinity
+  # (e.g. clientIP.timeoutSeconds)
+  sessionAffinityConfig: {}
   # service.ports -- service ports
   ports:
     - name: http
