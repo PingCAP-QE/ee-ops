@@ -61,10 +61,10 @@ spec:
     resources:
       requests:
         cpu: "1"
-        memory: 2Gi
+        memory: 6Gi
       limits:
-        cpu: "4"
-        memory: 8Gi
+        cpu: "3"
+        memory: 6Gi
     affinity:
       podAntiAffinity:
         preferredDuringSchedulingIgnoredDuringExecution:
