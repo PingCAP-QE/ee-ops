@@ -41,7 +41,7 @@ spec:
             - "256" # cap single node at 256Gi
   limits:
     cpu: "4096" # cap total pool capacity
-    memory: 1Ti
+    memory: 8192Gi
   disruption:
     consolidationPolicy: WhenEmpty
     consolidateAfter: 2m
