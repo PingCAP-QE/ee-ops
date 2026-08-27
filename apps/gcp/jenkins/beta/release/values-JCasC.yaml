@@ -317,6 +317,10 @@ controller:
                     value: "us-docker.pkg.dev/pingcap-testing-account/tidbx"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_INTERNAL"
                     value: "us-docker.pkg.dev/pingcap-testing-account/internal"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_COMMUNITY"
+                    value: "us-docker.pkg.dev/pingcap-testing-account/hub"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_DEV"
+                    value: "us-docker.pkg.dev/pingcap-testing-account/dev"
 
       pipeline-cache: |
         unclassified:
