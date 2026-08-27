@@ -35,7 +35,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/ci-dashboard
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/ci-dashboard versioning=semver
-      tag: v2026.8.23-10-g8a09ad1
+      tag: v2026.8.23-13-g6426db9
     resources:
       requests:
         cpu: "2"
