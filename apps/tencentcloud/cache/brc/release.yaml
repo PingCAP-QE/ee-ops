@@ -78,13 +78,11 @@ spec:
         memory: 6Gi
     affinity:
       podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchLabels:
-                  app.kubernetes.io/name: bazel-remote
-              topologyKey: kubernetes.io/hostname
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: bazel-remote
+            topologyKey: kubernetes.io/hostname
     volumeClaimTemplates:
       - metadata:
           name: bazel-remote-cache
