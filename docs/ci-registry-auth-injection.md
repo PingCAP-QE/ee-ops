@@ -36,6 +36,15 @@ Coverage: all 314 current `download_pingcap_oci_artifact.sh` call sites run in t
 
 > Key point: the kubelet pulls images using the Pod's `imagePullSecrets`, which is unrelated to the config mounted inside the pod — both are required, hence two rules.
 
+### Policy C: replace `ghcr.io/*` pod images with the local zot mirror (tencentcloud, pull acceleration)
+
+To speed up and stabilize kubelet pulls of `ghcr.io/*` pod images in the tencentcloud cluster, a `NamespacedMutatingPolicy` (`replace-ghcr-registry`, under `apps/tencentcloud/jenkins/post/_base/policies/`) rewrites **pods created by the Jenkins controller** (label `kubernetes.jenkins.io/controller`) that use `ghcr.io/*` images (containers or initContainers) **and have no `imagePullSecrets`**:
+
+- image rewrite: `ghcr.io/<path>` → `cr-qcloud.pingcap.net/mirrors/ghcr/<path>` (the local zot on-demand mirror, `preserveDigest`)
+- `spec.imagePullSecrets` gets `ci-registry-auth` injected so the kubelet can authenticate against the mirror — zot's `/mirrors/ghcr` is **not anonymously pullable**, and `config.json` already carries `cr-qcloud.pingcap.net` / `cr.pingcap.net` `ci-bot` credentials
+
+Pods that already set their own `imagePullSecrets` keep pulling `ghcr.io` directly (mirror replacement is skipped). This policy replaces the previously disabled cluster-wide `replace-ghcr-registry` policy (which targeted the external `ghcr.nju.edu.cn` mirror); it lives in jenkins post and applies only to the `jenkins-*` namespaces.
+
 ### Secret design (ExternalSecret sync, single Secret dual-use)
 
 ```yaml
