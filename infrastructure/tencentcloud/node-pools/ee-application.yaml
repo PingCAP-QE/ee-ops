@@ -29,5 +29,5 @@ spec:
             - S5
             - S6
   disruption:
-    consolidationPolicy: Balanced
+    consolidationPolicy: WhenEmptyOrUnderutilized
     consolidateAfter: 1h
