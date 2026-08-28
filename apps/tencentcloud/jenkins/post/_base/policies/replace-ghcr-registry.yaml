@@ -1,0 +1,57 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: replace-ghcr-registry
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
+    - name: no-image-pull-secrets
+      expression: "!has(object.spec.imagePullSecrets) || size(object.spec.imagePullSecrets) == 0"
+    - name: has-ghcr-image
+      expression: >-
+        object.spec.containers.exists(c, c.image.startsWith('ghcr.io/')) ||
+        object.spec.?initContainers.orValue([]).exists(c, c.image.startsWith('ghcr.io/'))
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.containers.map(c,
+            c.image.startsWith("ghcr.io/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/image",
+              value: c.image.replace("ghcr.io/", "cr-qcloud.pingcap.net/mirrors/ghcr/")
+            } : null
+          ).filter(p, p != null)
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.?initContainers.orValue([]).map(c,
+            c.image.startsWith("ghcr.io/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/image",
+              value: c.image.replace("ghcr.io/", "cr-qcloud.pingcap.net/mirrors/ghcr/")
+            } : null
+          ).filter(p, p != null)
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          [JSONPatch{op: "add", path: "/spec/imagePullSecrets", value: [{"name": "ci-registry-auth"}]}]

@@ -8,3 +8,4 @@ resources:
   - policies/inject-registry-config.yaml
   - policies/inject-image-pull-secrets.yaml
   - policies/inject-do-not-evict.yaml
+  - policies/replace-ghcr-registry.yaml
