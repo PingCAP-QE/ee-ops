@@ -307,6 +307,8 @@ controller:
           globalNodeProperties:
             - envVars:
                 env:
+                  - key: "GOPROXY"
+                    value: "https://us-go.pkg.dev/pingcap-testing-account/go-proxy-remote|https://proxy.golang.org,direct"
                   - key: "GOMODCACHE"
                     value: "/home/jenkins/agent/gomodcache"
                   - key: "GOCACHE"
