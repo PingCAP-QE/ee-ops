@@ -76,6 +76,17 @@ spec:
                 op: "add",
                 path: "/spec/nodeSelector",
                 value: {"node.kubernetes.io/instance-type": "eklet"}
+              },
+              has(object.spec.tolerations) ?
+              JSONPatch{
+                op: "add",
+                path: "/spec/tolerations/-",
+                value: {"key": "eks.tke.cloud.tencent.com/eklet", "operator": "Exists", "effect": "NoSchedule"}
+              } :
+              JSONPatch{
+                op: "add",
+                path: "/spec/tolerations",
+                value: [{"key": "eks.tke.cloud.tencent.com/eklet", "operator": "Exists", "effect": "NoSchedule"}]
               }
             ] :
             []) +
