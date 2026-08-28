@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-init
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+spec:
+  initContainers:
+    - name: init
+      image: ghcr.io/pingcap/tidb-operator:latest
+  containers:
+    - name: utils
+      image: busybox:1.36

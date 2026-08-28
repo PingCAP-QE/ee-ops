@@ -1,0 +1,33 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: replace-ghcr-registry
+policies:
+  - ../../replace-ghcr-registry.yaml
+resources:
+  - resource-plain.yaml
+  - resource-existing.yaml
+  - resource-init.yaml
+results:
+  - policy: replace-ghcr-registry
+    rule: replace-ghcr-registry
+    resources:
+      - pod-plain
+    kind: Pod
+    result: pass
+    patchedResources: patched-plain.yaml
+
+  - policy: replace-ghcr-registry
+    rule: replace-ghcr-registry
+    resources:
+      - pod-existing
+    kind: Pod
+    result: skip
+
+  - policy: replace-ghcr-registry
+    rule: replace-ghcr-registry
+    resources:
+      - pod-init
+    kind: Pod
+    result: pass
+    patchedResources: patched-init.yaml
