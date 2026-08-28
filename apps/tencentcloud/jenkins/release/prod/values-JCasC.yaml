@@ -200,6 +200,16 @@ controller:
                     value: "cr-qcloud.pingcap.net/mirrors/hub"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_DEV"
                     value: "cr-qcloud.pingcap.net/mirrors/dev"
+                  - key: "RUSTUP_DIST_SERVER"
+                    value: "https://rsproxy.cn"
+                  - key: "RUSTUP_UPDATE_ROOT"
+                    value: "https://rsproxy.cn/rustup"
+                  - key: "CARGO_SOURCE_CRATES_IO_REPLACE_WITH"
+                    value: "rsproxy-sparse"
+                  - key: "CARGO_SOURCE_RSPROXY_SPARSE_REGISTRY"
+                    value: "sparse+https://rsproxy.cn/index/"
+                  - key: "CARGO_NET_GIT_FETCH_WITH_CLI"
+                    value: "true"
 
       pipeline-cache: |
         unclassified:
