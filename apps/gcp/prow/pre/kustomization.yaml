@@ -4,3 +4,4 @@ resources:
   - secrets
   - prow-configs.yaml
   - prow-jobs.yaml
+  - rbac.yaml
