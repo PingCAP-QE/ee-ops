@@ -3,26 +3,29 @@
 # on the prow cluster to validate that changed kubernetes-agent prow jobs start
 # (image pulls + command boots), then deletes it.
 #
-# The presubmit runs with the dedicated ServiceAccount `prow-job-validation`
-# (set via spec.serviceAccountName), so we grant only that SA the needed
-# cluster-scoped permissions (least privilege).
+# Namespace split on the prow cluster:
+#   - ProwJob CRs live in the prowjob namespace `apps` (plank watches it there)
+#   - the job pods plank spawns run in the pod namespace `prow-test-pods`
+# The presubmit pod itself runs in `prow-test-pods` with the dedicated
+# ServiceAccount `prow-job-validation` (set via spec.serviceAccountName), so we
+# grant only that SA the needed cluster-scoped permissions (least privilege).
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: prow-job-validation
-  namespace: apps
+  namespace: prow-test-pods
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: prow-job-validation
 rules:
-  # create/watch/delete the validation ProwJob
+  # create/watch/delete the validation ProwJob (in the prowjob namespace)
   - apiGroups: ["prow.k8s.io"]
     resources: ["prowjobs"]
     verbs: ["create", "get", "list", "watch", "delete"]
-  # observe the pod plank spawns for the ProwJob
+  # observe the pod plank spawns for the ProwJob (in the pod namespace)
   - apiGroups: [""]
     resources: ["pods"]
     verbs: ["get", "list", "watch"]
@@ -37,7 +40,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: prow-job-validation
-    namespace: apps
+    namespace: prow-test-pods
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
