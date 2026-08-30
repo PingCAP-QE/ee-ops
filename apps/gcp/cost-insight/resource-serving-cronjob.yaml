@@ -1,0 +1,79 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ci-rs-resource-serving-native-refresh
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-resource-serving-materialization
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  schedule: "50 22 * * *"
+  timeZone: Asia/Shanghai
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 7
+  failedJobsHistoryLimit: 7
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 43200
+      ttlSecondsAfterFinished: 604800
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-resource-serving-materialization
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 60
+          containers:
+            - name: materialize-resource-serving
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-1-g775b5bb
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  dates="$(python - <<'PY'
+                  from datetime import date, timedelta
+
+                  from sqlalchemy import text
+
+                  from cost_insight.common.config import get_settings
+                  from cost_insight.common.db import build_engine
+
+                  engine = build_engine(get_settings())
+                  try:
+                      with engine.connect() as connection:
+                          end_date = connection.execute(
+                              text("SELECT MAX(usage_date) FROM cost_attribution_daily")
+                          ).scalar_one()
+                  finally:
+                      engine.dispose()
+                  if end_date is None:
+                      raise RuntimeError("no attribution date is available")
+                  if not hasattr(end_date, "isoformat"):
+                      end_date = date.fromisoformat(str(end_date)[:10])
+                  print((end_date - timedelta(days=30)).isoformat(), end_date.isoformat())
+                  PY
+                  )"
+                  set -- ${dates}
+                  exec cost-insight materialize-resource-serving \
+                    --start-date "$1" --end-date "$2" --basis native
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+              resources:
+                requests:
+                  cpu: "2"
+                  memory: 4Gi
+                limits:
+                  cpu: "4"
+                  memory: 8Gi
