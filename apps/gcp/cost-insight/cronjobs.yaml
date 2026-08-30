@@ -445,11 +445,10 @@ metadata:
     app.kubernetes.io/name: cost-insight-materialize-cost-allocations
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Enable only after the initial backfill is validated. It runs after both
-  # billing-summary jobs and always republishes the complete configured history.
+  # Runs after both billing-summary jobs and republishes the complete configured history.
   schedule: "10 22 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 3
@@ -457,7 +456,7 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 1
-      activeDeadlineSeconds: 14400
+      activeDeadlineSeconds: 43200
       template:
         metadata:
           labels:
@@ -468,7 +467,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: materialize-cost-allocations
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-1-g775b5bb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
