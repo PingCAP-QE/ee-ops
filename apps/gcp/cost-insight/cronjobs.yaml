@@ -366,7 +366,8 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 4
-      activeDeadlineSeconds: 7200
+      # The full AWS overlap-month sync plus per-day attribution took about two hours.
+      activeDeadlineSeconds: 14400
       template:
         metadata:
           labels:
@@ -445,8 +446,9 @@ metadata:
     app.kubernetes.io/name: cost-insight-materialize-cost-allocations
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Runs after both billing-summary jobs and republishes the complete configured history.
-  schedule: "10 22 * * *"
+  # Starts after the AWS summary job's four-hour deadline and republishes the
+  # complete configured history.
+  schedule: "10 2 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
