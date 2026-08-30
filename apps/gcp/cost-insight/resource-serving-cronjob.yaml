@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-resource-serving-materialization
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Starts after the complete-history allocation materialization window.
-  schedule: "30 8 * * *"
+  # Starts after the complete-history allocation job's 12-hour deadline.
+  schedule: "30 14 * * *"
   timeZone: Asia/Shanghai
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
@@ -17,7 +17,8 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 0
-      activeDeadlineSeconds: 43200
+      # Finish before the next billing-summary window starts at 21:10.
+      activeDeadlineSeconds: 21600
       ttlSecondsAfterFinished: 604800
       template:
         metadata:
