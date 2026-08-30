@@ -32,7 +32,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-2-gd48f2f4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -146,7 +146,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-2-gd48f2f4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -212,7 +212,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-2-gd48f2f4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -298,7 +298,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-2-gd48f2f4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -377,7 +377,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-2-gd48f2f4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -445,11 +445,10 @@ metadata:
     app.kubernetes.io/name: cost-insight-materialize-cost-allocations
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Enable only after the initial backfill is validated. It runs after both
-  # billing-summary jobs and always republishes the complete configured history.
+  # Runs after both billing-summary jobs and republishes the complete configured history.
   schedule: "10 22 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 3
@@ -457,7 +456,7 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 1
-      activeDeadlineSeconds: 14400
+      activeDeadlineSeconds: 43200
       template:
         metadata:
           labels:
@@ -468,7 +467,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: materialize-cost-allocations
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-2-gd48f2f4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -548,7 +547,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-2-gd48f2f4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
