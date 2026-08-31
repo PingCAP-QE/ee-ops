@@ -29,7 +29,6 @@ docs/             # TEKTON_MIGRATION.md, kyverno-policy-testing.md, gar-controll
 
 ## Clusters
 
-- **prod** — legacy, being deprecated (migration to prod2); only `ats` and `greenhouse` remain.
 - **prod2** — main production target (tekton, tibuild, zot, publisher, cache, tirelease...).
 - **gcp** — GCP cluster: jenkins (beta), jenkins-agents, tekton, prow, tibuild, publisher, kafka...
 - **tencentcloud** — Tencent Cloud cluster (newer): jenkins, jenkins-agents, tekton, tibuild, zot, kafka, cache...
@@ -48,7 +47,7 @@ Each cluster has a `README.md` under `clusters/<cluster>/` listing required secr
 
 - Per cluster: `apps/<cluster>/tekton/{configs,setup,configs.yaml,setup.yaml}`; configs include `rbac/` (ServiceAccounts), `secrets/`, `pipelines/`, `tasks/`, `triggers/` policies.
 - `setup/` installs the Tekton operator (operator-config, manual-approval gate).
-- See `docs/TEKTON_MIGRATION.md` for migration notes (prod Tekton deleted; workloads consolidated in prod2/gcp).
+- See `docs/TEKTON_MIGRATION.md` for migration notes (prod workloads consolidated in prod2/gcp).
 
 ## Validation & CI
 
