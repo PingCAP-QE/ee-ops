@@ -1,0 +1,58 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: git-cdn
+spec:
+  releaseName: git-cdn
+  chart:
+    spec:
+      chart: git-cdn
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-ops
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    image:
+      tag: 1.13.0-oss
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: "4"
+        memory: 4Gi
+    nodeSelector:
+      kubernetes.io/arch: amd64
+    service:
+      type: ClusterIP
+    ingress:
+      enabled: false
+    volumeMounts:
+      - name: data
+        mountPath: /data
+    volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: git-cdn-data
+    configuration:
+      GITSERVER_UPSTREAM: https://github.com/
+      # Keep the cache below the 100Gi PVC capacity for filesystem overhead and temporary writes.
+      PACK_CACHE_SIZE_GB: 90
+      # directory where to put cache files
+      WORKING_DIRECTORY: /data
+      PACK_CACHE_MULTI: true
+      PACK_CACHE_DEPTH: true
