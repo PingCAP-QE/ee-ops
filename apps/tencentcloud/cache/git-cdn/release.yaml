@@ -37,6 +37,7 @@ spec:
         memory: 4Gi
     nodeSelector:
       kubernetes.io/arch: amd64
+      compute-class: ee-application
     service:
       type: ClusterIP
     ingress:
