@@ -32,9 +32,12 @@ spec:
       tag: 1.13.0-oss
     replicaCount: 1
     resources:
+      requests:
+        cpu: "1"
+        memory: 1Gi
       limits:
-        cpu: "4"
-        memory: 4Gi
+        cpu: "3"
+        memory: 3Gi
     nodeSelector:
       kubernetes.io/arch: amd64
       compute-class: ee-application
