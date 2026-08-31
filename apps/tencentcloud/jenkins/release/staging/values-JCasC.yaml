@@ -188,6 +188,18 @@ controller:
                     value: "/home/jenkins/agent/gomodcache"
                   - key: "GOCACHE"
                     value: "/home/jenkins/agent/gocache"
+                  # Route public GitHub repositories through the in-cluster Git CDN.
+                  # SSH and other organizations remain direct for private repository credentials.
+                  - key: "GIT_CONFIG_COUNT"
+                    value: "2"
+                  - key: "GIT_CONFIG_KEY_0"
+                    value: "url.http://git-cdn.cache.svc:8000/pingcap/.insteadOf"
+                  - key: "GIT_CONFIG_VALUE_0"
+                    value: "https://github.com/pingcap/"
+                  - key: "GIT_CONFIG_KEY_1"
+                    value: "url.http://git-cdn.cache.svc:8000/tikv/.insteadOf"
+                  - key: "GIT_CONFIG_VALUE_1"
+                    value: "https://github.com/tikv/"
                   - key: "BAZELISK_BASE_URL"
                     value: "https://repo.huaweicloud.com/bazel"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
