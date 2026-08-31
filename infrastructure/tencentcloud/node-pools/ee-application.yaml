@@ -25,7 +25,12 @@ spec:
         - key: karpenter.k8s.tke/instance-family
           operator: In
           values:
+            - BF1
+            - SK2 # ARM
+            - SA2
             - SA3
+            - SA9
+            - SK1 # ARM
             - S5
             - S6
   disruption:

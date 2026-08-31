@@ -51,6 +51,7 @@ spec:
     service:
       type: ClusterIP
     nodeSelector:
+      kubernetes.io/arch: amd64
       compute-class: ee-application
 
     # Relax probes to avoid restart loops during zot cold start
