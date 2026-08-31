@@ -20,6 +20,16 @@ Secrets that require manual preparation:
 | flux-system | lark-token-error  | `kubectl -n flux-system create secret generic lark-token-error --from-literal=address=<lark-webhook-url>` | GitOps alert webhook (error events)          |
 | apps        | prow-tls          | Create ingress TLS cert secret manually                                                                    | prow site ingress cert secret                |
 
+The gcp `chatops-lark` deployment reads its dedicated application configuration
+from the `gcp_chatops_lark_json` key in GCP Secret Manager. The JSON object must
+contain `app-id`, `app-secret`, and `config.yaml`. Its `devbuild.api_url` and
+`hotfix.api_url` should use the in-cluster `tibuild-v2` service endpoints:
+
+```text
+http://v2-tibuild-v2.tibuild.svc/api/v2/devbuilds
+http://v2-tibuild-v2.tibuild.svc/api/v2/hotfix
+```
+
 ## Terraform GitOps (tofu-controller)
 
 This cluster uses [tofu-controller](https://flux-iac.github.io/tofu-controller/) to manage GCP resources via GitOps.

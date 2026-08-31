@@ -1,0 +1,52 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: chatops-lark-mcp-tool-github
+spec:
+  chart:
+    spec:
+      chart: mcp-tool
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-ops
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: false
+    ignoreFailures: true
+  values:
+    replicaCount: 1
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+    nodeSelector:
+      kubernetes.io/arch: amd64
+    image:
+      repository: golang
+      tag: "1.23"
+    livenessProbe: false
+    readinessProbe: false
+    command:
+      - go
+      - run
+      - github.com/github/github-mcp-server/cmd/github-mcp-server@http-sse
+    args: [http, --port=80, --read-only, --enable-command-logging]
+    env:
+      - name: GITHUB_PERSONAL_ACCESS_TOKEN
+        valueFrom:
+          secretKeyRef:
+            name: github
+            key: bot-token
