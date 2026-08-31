@@ -57,7 +57,8 @@ Local validation (mirrors CI "CD Test" workflow):
 ```bash
 # yq + kustomize + kubeconform must be installed (see script header for versions)
 pushd infrastructure && $PWD/../scripts/validate_k8s_yaml.sh && popd
-# repeat for clusters/ and apps/ (clusters also runs scripts/check_gcp_flux_api_versions.sh)
+# repeat for clusters/ and apps/ (clusters also runs scripts/check_gcp_flux_api_versions.sh,
+# which checks Flux API versions for prod2, gcp, and tencentcloud)
 ```
 
 - `validate_k8s_yaml.sh` skips `charts/*/templates/` (Go templating), validates yq syntax everywhere, kubeconform for clusters (maxdepth 2) and every `kustomize build` overlay.
