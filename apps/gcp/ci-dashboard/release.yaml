@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: ci-dashboard
-      version: 0.3.2
+      version: 0.3.3
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -29,13 +29,38 @@ spec:
     enable: true
     ignoreFailures: false
   values:
-    replicaCount: 1
+    replicaCount: 2
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxSurge: 1
+        maxUnavailable: 0
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
+    topologySpreadConstraints:
+      - maxSkew: 1
+        minDomains: 2
+        topologyKey: kubernetes.io/hostname
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: ci-dashboard
+            app.kubernetes.io/name: ci-dashboard
+      - maxSkew: 1
+        minDomains: 2
+        topologyKey: topology.kubernetes.io/zone
+        whenUnsatisfiable: DoNotSchedule
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: ci-dashboard
+            app.kubernetes.io/name: ci-dashboard
     nodeSelector:
       kubernetes.io/arch: amd64
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/ci-dashboard
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/ci-dashboard versioning=semver
-      tag: v2026.8.23-13-g6426db9
+      tag: v2026.8.30-4-g9e7639d
     resources:
       requests:
         cpu: "2"
