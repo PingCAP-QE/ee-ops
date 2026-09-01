@@ -188,11 +188,17 @@ controller:
                     value: "/home/jenkins/agent/gomodcache"
                   - key: "GOCACHE"
                     value: "/home/jenkins/agent/gocache"
-                  # Route all GitHub HTTPS repositories through the in-cluster Git CDN,
-                  # including third-party submodules used by TiFlash.
-                  # SSH URLs remain direct and are not rewritten.
+                  # Resolve transport credentials from the shared Jenkins credential IDs.
+                  - key: "GIT_SSH_CREDENTIALS_ID"
+                    value: "github-sre-bot-ssh"
+                  - key: "GIT_HTTP_CREDENTIALS_ID"
+                    value: "github-bot-https"
+                  - key: "GIT_CDN_ENABLED"
+                    value: "true"
+                  # Route GitHub HTTPS and SSH-style URLs through the in-cluster Git CDN.
+                  # Git uses the HTTP credential only when the CDN returns 401.
                   - key: "GIT_CONFIG_COUNT"
-                    value: "1"
+                    value: "3"
                   - key: "GIT_CONFIG_KEY_0"
                     value: "url.http://git-cdn.cache.svc:8000/.insteadOf"
                   - key: "GIT_CONFIG_VALUE_0"
