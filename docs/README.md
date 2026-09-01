@@ -8,6 +8,7 @@ This directory contains repository design notes, migration guides, and operation
 - `TEKTON_MIGRATION.md`: notes related to Tekton migration work
 - `gar-controlled-delivery/README.md`: controlled private-delivery design and related implementation documents
 - `github-actions-secrets/README.md`: GitHub Actions secrets central management design
+- `git-cdn-jenkins-auth.md`: Jenkins Git CDN URL rewriting and public/private repository authentication
 
 ## Notes
 
