@@ -37,9 +37,6 @@ controller:
     - { name: docs-cn, keyName: qiniu-sk }
     - { name: docs-cn, keyName: qiniu-bn }
 
-    # for ks3util
-    - { name: ks3util, keyName: config }
-
   additionalSecrets: []
   #  - name: nameOfSecret
   #    value: secretText
@@ -148,12 +145,6 @@ controller:
         credentials:
           system:
             domainCredentials:
-              - credentials:
-                  - file:
-                      scope: GLOBAL
-                      id: "ks3util-config"
-                      fileName: "ks3util.conf"
-                      secretBytes: "${base64:${ks3util-config}}"
               - domain:
                   name: ci.service
                 credentials:

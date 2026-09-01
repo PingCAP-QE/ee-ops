@@ -5,6 +5,7 @@ resources:
   - secret-jenkins-cache.yaml
   - secret-harbor.yaml
   - secret-docs-cn.yaml
+  # Retained until GCP main finishes the ks3util credential migration.
   - secret-ks3util.yaml
   - secret-tidbx-docker-config.yaml
   - secret-jenkins-artifact-s3.yaml
@@ -12,3 +13,4 @@ resources:
   # Provider credentials are consumed by GCP staging in this phase.
   - credential-github.yaml
   - credential-codecov.yaml
+  - credential-ks3util.yaml
