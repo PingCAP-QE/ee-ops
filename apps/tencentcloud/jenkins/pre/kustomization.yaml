@@ -7,4 +7,3 @@ resources:
   - credential-codecov.yaml
   - credential-github.yaml
   - credential-jenkins-artifact-s3-auth.yaml
-  - credential-tidbx-docker-config.yaml
