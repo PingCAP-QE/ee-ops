@@ -10,12 +10,6 @@ controller:
     - { name: google-oauth, keyName: client-id }
     - { name: google-oauth, keyName: client-secret }
 
-    # for git clone for private repo.
-    - { name: github, keyName: git-private-key }
-    - { name: github, keyName: git-username }
-    - { name: github, keyName: bot-token }
-    - { name: github, keyName: pr-diff-token }
-
     # for codecov.io uploading
     - { name: codecov-token, keyName: tidb }
     - { name: codecov-token, keyName: tikv-migration }
@@ -166,28 +160,6 @@ controller:
                       id: "ks3util-config"
                       fileName: "ks3util.conf"
                       secretBytes: "${base64:${ks3util-config}}"
-              - domain:
-                  name: github.com
-                  description: github ssh and open api
-                credentials:
-                  - basicSSHUserPrivateKey:
-                      id: github-sre-bot-ssh # TODO: change the id.
-                      privateKeySource:
-                        directEntry:
-                          privateKey: ${github-git-private-key}
-                      scope: GLOBAL
-                      username: ${github-git-username}
-                      usernameSecret: true
-                  - string:
-                      id: github-bot-token
-                      description: github private token to call api.
-                      scope: GLOBAL
-                      secret: ${github-bot-token}
-                  - string:
-                      id: github-pr-diff-token
-                      description: github token to list pr diff files.
-                      scope: GLOBAL
-                      secret: ${github-pr-diff-token}
               - domain:
                   name: codecov.io
                 credentials:
