@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - secret-google-oauth.yaml
   - secret-jenkins-cache.yaml
+  # Retained until GCP main finishes the Codecov credential migration.
   - secret-codecov.yaml
   - secret-harbor.yaml
   - secret-docs-cn.yaml
@@ -12,3 +13,4 @@ resources:
   - credential-jenkins-artifact-s3-auth.yaml
   # Provider credentials are consumed by GCP staging in this phase.
   - credential-github.yaml
+  - credential-codecov.yaml
