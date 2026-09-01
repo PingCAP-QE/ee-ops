@@ -10,12 +10,6 @@ controller:
     - { name: google-oauth, keyName: client-id }
     - { name: google-oauth, keyName: client-secret }
 
-    # for codecov.io uploading
-    - { name: codecov-token, keyName: tidb }
-    - { name: codecov-token, keyName: tikv-migration }
-    - { name: codecov-token, keyName: tiflow }
-    - { name: codecov-token, keyName: tiproxy }
-
     # for harbor
     - { name: harbor, keyName: tiflow-engine-username }
     - { name: harbor, keyName: tiflow-engine-password }
@@ -160,29 +154,6 @@ controller:
                       id: "ks3util-config"
                       fileName: "ks3util.conf"
                       secretBytes: "${base64:${ks3util-config}}"
-              - domain:
-                  name: codecov.io
-                credentials:
-                  - string:
-                      id: codecov-token-tidb
-                      description: codecov token for tidb
-                      scope: GLOBAL
-                      secret: ${codecov-token-tidb}
-                  - string:
-                      id: codecov-token-tikv-migration
-                      description: codecov token for tikv/migration
-                      scope: GLOBAL
-                      secret: ${codecov-token-tikv-migration}
-                  - string:
-                      id: codecov-token-tiflow
-                      description: codecov token for tiflow
-                      scope: GLOBAL
-                      secret: ${codecov-token-tiflow}
-                  - string:
-                      id: codecov-token-tiproxy
-                      description: codecov token for tiproxy
-                      scope: GLOBAL
-                      secret: ${codecov-token-tiproxy}
               - domain:
                   name: ci.service
                 credentials:
