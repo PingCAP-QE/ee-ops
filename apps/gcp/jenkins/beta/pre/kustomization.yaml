@@ -3,8 +3,6 @@ kind: Kustomization
 resources:
   - secret-google-oauth.yaml
   - secret-jenkins-cache.yaml
-  # Retained until GCP main finishes the GitHub credential migration.
-  - secret-github.yaml
   - secret-codecov.yaml
   - secret-harbor.yaml
   - secret-docs-cn.yaml
