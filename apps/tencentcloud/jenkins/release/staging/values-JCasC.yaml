@@ -197,12 +197,21 @@ controller:
                     value: "true"
                   # Route GitHub HTTPS and SSH-style URLs through the in-cluster Git CDN.
                   # Git uses the HTTP credential only when the CDN returns 401.
+                  # Keep the count synchronized with every KEY_n/VALUE_n pair below.
                   - key: "GIT_CONFIG_COUNT"
                     value: "3"
                   - key: "GIT_CONFIG_KEY_0"
                     value: "url.http://git-cdn.cache.svc:8000/.insteadOf"
                   - key: "GIT_CONFIG_VALUE_0"
                     value: "https://github.com/"
+                  - key: "GIT_CONFIG_KEY_1"
+                    value: "url.http://git-cdn.cache.svc:8000/.insteadOf"
+                  - key: "GIT_CONFIG_VALUE_1"
+                    value: "git@github.com:"
+                  - key: "GIT_CONFIG_KEY_2"
+                    value: "url.http://git-cdn.cache.svc:8000/.insteadOf"
+                  - key: "GIT_CONFIG_VALUE_2"
+                    value: "ssh://git@github.com/"
                   - key: "BAZELISK_BASE_URL"
                     value: "https://repo.huaweicloud.com/bazel"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
