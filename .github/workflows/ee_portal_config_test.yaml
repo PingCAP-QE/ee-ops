@@ -28,7 +28,7 @@ jobs:
           ref: main
           path: _ci/ee-apps
           persist-credentials: false
-      - uses: actions/setup-go@3041bf56c941b36c617f3a0c5b5c1f0d16f6b6b4 # v6.0.0
+      - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00d # v6.0.0
         with:
           go-version: '1.24'
       - name: Compile registry
