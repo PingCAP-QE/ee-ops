@@ -81,6 +81,10 @@
         }
       },
       "repositories": {
+        "mirrors/registry.gitlab.com/**": {
+          "anonymousPolicy": ["read"],
+          "defaultPolicy": ["read"]
+        },
         "personal/**": {
           "policies": [
             {
@@ -186,6 +190,18 @@
             {
               "prefix": "**",
               "destination": "/mirrors/ghcr"
+            }
+          ],
+          "onDemand": true,
+          "tlsVerify": true
+        },
+        {
+          "urls": ["https://registry.gitlab.com"],
+          "preserveDigest": true,
+          "content": [
+            {
+              "prefix": "**",
+              "destination": "/mirrors/registry.gitlab.com"
             }
           ],
           "onDemand": true,
