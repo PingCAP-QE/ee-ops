@@ -5,7 +5,7 @@
 replicaCount: 1
 
 image:
-  repository: registry.gitlab.com/grouperenault/git_cdn
+  repository: cr-qcloud.pingcap.net/mirrors/registry.gitlab.com/grouperenault/git_cdn
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
