@@ -31,7 +31,7 @@ spec:
           terminationGracePeriodSeconds: 60
           containers:
             - name: materialize-resource-serving
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-7-g6310d98
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-9-gbfdc2f9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
