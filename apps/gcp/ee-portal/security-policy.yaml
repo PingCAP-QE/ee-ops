@@ -32,6 +32,8 @@ spec:
     providers:
       - name: google-oidc
         issuer: https://accounts.google.com
+        remoteJWKS:
+          uri: https://www.googleapis.com/oauth2/v3/certs
         extractFrom:
           cookies:
             - ee-portal-id-token
