@@ -34,10 +34,10 @@ spec:
     resources:
       requests:
         cpu: "1"
-        memory: 1Gi
+        memory: 5Gi
       limits:
         cpu: "3"
-        memory: 3Gi
+        memory: 5Gi
     nodeSelector:
       kubernetes.io/arch: amd64
       compute-class: ee-application
