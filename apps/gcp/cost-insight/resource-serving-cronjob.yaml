@@ -72,6 +72,9 @@ spec:
                   value: "1"
                 - name: COST_INSIGHT_LOG_LEVEL
                   value: INFO
+                # Resource-serving rows include provider-label JSON; keep write batches bounded.
+                - name: COST_INSIGHT_SYNC_PAGE_SIZE
+                  value: "1000"
               resources:
                 requests:
                   cpu: "2"
