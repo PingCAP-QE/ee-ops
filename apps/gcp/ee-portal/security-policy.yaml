@@ -28,8 +28,8 @@ spec:
       - email
       - profile
   # OIDC establishes the browser session. The JWT filter reads the ID token
-  # cookie issued by OIDC, verifies it at the edge, and emits only the email
-  # claim as the application identity header.
+  # cookie issued by OIDC, verifies it at the edge, and emits the identity
+  # claims as application headers.
   jwt:
     optional: true
     providers:
