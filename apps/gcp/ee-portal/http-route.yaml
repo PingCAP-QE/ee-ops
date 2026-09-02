@@ -1,0 +1,40 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: ee-portal
+  namespace: ee-portal
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: eg-internal
+      namespace: infra
+  hostnames:
+    - prow.tidb.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /ee/api/tibuild
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api
+      backendRefs:
+        - name: v2-tibuild-v2
+          namespace: tibuild
+          port: 8080
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /ee
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: ee-portal
+          port: 8080

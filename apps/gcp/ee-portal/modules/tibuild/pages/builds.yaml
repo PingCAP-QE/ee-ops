@@ -1,0 +1,92 @@
+apiVersion: ee.pingcap.net/v1alpha1
+kind: Page
+metadata:
+  name: builds
+  module: tibuild
+  title: Development builds
+  description: Start a build or track work already in progress.
+spec:
+  type: list
+  route: /tibuild/builds
+  request:
+    dataSource: tibuild
+    method: GET
+    path: /devbuilds
+    query:
+      page: {from: state, pointer: /page}
+      pageSize: {from: state, pointer: /pageSize}
+      scope: {from: state, pointer: /scope}
+      status: {from: state, pointer: /status}
+      product: {from: state, pointer: /product}
+      q: {from: state, pointer: /q}
+  response: {itemsPointer: /}
+  itemRoute: /tibuild/builds/{id}
+  itemIDPointer: /id
+  columns:
+    - {label: ID, pointer: /id, format: code}
+    - {label: Status, pointer: /status/status, format: status, statusMap: {PENDING: info, PROCESSING: info, SUCCESS: success, FAILURE: danger, ERROR: danger, ABORTED: warning}}
+    - {label: Product, pointer: /spec/product}
+    - {label: Git ref, pointer: /spec/gitRef, format: code}
+    - {label: Creator, pointer: /meta/createdBy}
+    - {label: Created, pointer: /meta/createdAt, format: date-time}
+  filters:
+    - name: scope
+      label: Builds
+      type: scope
+      default: mine
+      options:
+        - {label: My builds, value: mine}
+        - {label: All builds, value: all}
+    - name: status
+      label: Status
+      type: select
+      default: ""
+      options:
+        - {label: Any status, value: ""}
+        - {label: Pending, value: PENDING}
+        - {label: Processing, value: PROCESSING}
+        - {label: Success, value: SUCCESS}
+        - {label: Failure, value: FAILURE}
+        - {label: Error, value: ERROR}
+        - {label: Aborted, value: ABORTED}
+    - name: product
+      label: Product
+      type: select
+      default: ""
+      options:
+        - {label: Any product, value: ""}
+        - {label: BR, value: br}
+        - {label: DM, value: dm}
+        - {label: Drainer, value: drainer}
+        - {label: Dumpling, value: dumpling}
+        - {label: Enterprise Plugin, value: enterprise-plugin}
+        - {label: NG Monitoring, value: ng-monitoring}
+        - {label: PD, value: pd}
+        - {label: Pump, value: pump}
+        - {label: TiCDC, value: ticdc}
+        - {label: TiCDC New Architecture, value: ticdc-newarch}
+        - {label: TiCI, value: tici}
+        - {label: TiDB, value: tidb}
+        - {label: TiDB Binlog, value: tidb-binlog}
+        - {label: TiDB Dashboard, value: tidb-dashboard}
+        - {label: TiDB Lightning, value: tidb-lightning}
+        - {label: TiDB Operator, value: tidb-operator}
+        - {label: TiDB Tools, value: tidb-tools}
+        - {label: TiFlash, value: tiflash}
+        - {label: TiKV, value: tikv}
+        - {label: TiProxy, value: tiproxy}
+  search:
+    name: q
+    label: Search builds
+    placeholder: Build ID, Git ref, or creator
+  pagination: {pageSize: 30}
+  polling:
+    intervalMs: 10000
+    whilePointer: /status/status
+    whileValues: [PENDING, PROCESSING]
+  empty:
+    title: No builds found
+    description: Change the filters or start a new development build.
+  primaryAction:
+    label: New build
+    navigate: /tibuild/builds/new

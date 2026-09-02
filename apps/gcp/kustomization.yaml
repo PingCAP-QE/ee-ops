@@ -15,6 +15,7 @@ resources:
   - roster
   - publisher
   - tibuild
+  - ee-portal
   # workloads
   - acr-runners
   - jenkins/beta

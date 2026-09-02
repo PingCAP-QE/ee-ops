@@ -1,0 +1,46 @@
+name: EE Portal configuration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - apps/gcp/ee-portal/**
+      - .github/workflows/ee_portal_config_test.yaml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout ee-ops
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          persist-credentials: false
+      - name: Checkout portal compiler
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          repository: PingCAP-QE/ee-apps
+          ref: main
+          path: _ci/ee-apps
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v5.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: _ci/ee-apps/experiments/portal/package-lock.json
+      - name: Compile registry
+        working-directory: _ci/ee-apps/experiments/portal
+        run: |
+          npm ci
+          npm run config:compile -- \
+            --input "$GITHUB_WORKSPACE/apps/gcp/ee-portal/modules" \
+            --output "$GITHUB_WORKSPACE/apps/gcp/ee-portal/generated/registry.json"
+      - name: Reject generated drift
+        run: git diff --exit-code -- apps/gcp/ee-portal/generated/registry.json
+      - name: Render deployment
+        run: kubectl kustomize apps/gcp/ee-portal >/dev/null

@@ -1,0 +1,15 @@
+apiVersion: ee.pingcap.net/v1alpha1
+kind: Module
+metadata:
+  name: tibuild
+  title: TiBuild
+  description: Start development builds and follow them from source ref to downloadable artifacts.
+  icon: TB
+  tags: [Build, Tekton, Developer tools]
+spec:
+  dataSources:
+    - name: tibuild
+      basePath: /ee/api/tibuild/v2
+  navigation:
+    - label: TiBuild
+      page: builds

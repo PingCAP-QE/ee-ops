@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-ee-portal
+  namespace: tibuild
+spec:
+  from:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      namespace: ee-portal
+  to:
+    - group: ""
+      kind: Service
+      name: v2-tibuild-v2
