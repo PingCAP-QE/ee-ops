@@ -4,6 +4,7 @@ metadata:
   name: ee-portal
   namespace: ee-portal
 spec:
+  # Reuse the shared infra Gateway; this module does not create a Gateway.
   parentRefs:
     - kind: Gateway
       name: eg-internal
