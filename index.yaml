@@ -236,6 +236,21 @@ entries:
     version: 0.1.0
   git-cdn:
   - apiVersion: v2
+    appVersion: 1.13.0-oss
+    created: "2026-09-02T10:52:54.486274426Z"
+    description: 'It''s a git mirror that you can place near your CI workers and developers.
+      It acts as a git+http(s) proxy, reducing WAN usage and accelerating git access
+      for large repositories. '
+    digest: ab2b6308bad923f862f2042d11c6243150ffbad90c55900fff40af6ff89a7b5c
+    maintainers:
+    - email: wuhuizuo@126.com
+      name: wuhuizuo
+    name: git-cdn
+    type: application
+    urls:
+    - https://github.com/PingCAP-QE/ee-ops/releases/download/git-cdn-0.1.2/git-cdn-0.1.2.tgz
+    version: 0.1.2
+  - apiVersion: v2
     appVersion: 1.10.2
     created: "2023-12-04T07:37:37.369246581Z"
     description: 'It''s a git mirror that you can place near your CI workers and developers.
@@ -1000,4 +1015,4 @@ entries:
     urls:
     - https://github.com/PingCAP-QE/ee-ops/releases/download/prow-crd-0.1.0/prow-crd-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-27T10:31:22.499053196Z"
+generated: "2026-09-02T10:52:54.486334307Z"
