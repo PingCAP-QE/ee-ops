@@ -15,20 +15,6 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /ee/api/tibuild
-      filters:
-        - type: URLRewrite
-          urlRewrite:
-            path:
-              type: ReplacePrefixMatch
-              replacePrefixMatch: /api
-      backendRefs:
-        - name: v2-tibuild-v2
-          namespace: tibuild
-          port: 8080
-    - matches:
-        - path:
-            type: PathPrefix
             value: /ee
       filters:
         - type: URLRewrite

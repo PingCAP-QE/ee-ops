@@ -28,16 +28,13 @@ jobs:
           ref: main
           path: _ci/ee-apps
           persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v5.0.0
+      - uses: actions/setup-go@3041bf56c941b36c617f3a0c5b5c1f0d16f6b6b4 # v6.0.0
         with:
-          node-version: 24
-          cache: npm
-          cache-dependency-path: _ci/ee-apps/experiments/portal/package-lock.json
+          go-version: '1.24'
       - name: Compile registry
-        working-directory: _ci/ee-apps/experiments/portal
+        working-directory: _ci/ee-apps/experiments/portal/cmd/portal-config
         run: |
-          npm ci
-          npm run config:compile -- \
+          go run . \
             --input "$GITHUB_WORKSPACE/apps/gcp/ee-portal/modules" \
             --output "$GITHUB_WORKSPACE/apps/gcp/ee-portal/generated/registry.json"
       - name: Reject generated drift

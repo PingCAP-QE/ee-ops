@@ -6,7 +6,6 @@ resources:
   - http-route.yaml
   - security-policy.yaml
   - external-secret.yaml
-  - reference-grant.yaml
 configMapGenerator:
   - name: ee-portal-registry
     namespace: ee-portal
