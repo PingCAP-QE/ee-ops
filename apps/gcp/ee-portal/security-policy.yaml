@@ -16,11 +16,25 @@ spec:
       name: ee-portal-oidc
     clientSecret:
       name: ee-portal-oidc
+    cookieNames:
+      idToken: ee-portal-id-token
     redirectURL: https://prow.tidb.net/ee/oauth2/callback
     logoutPath: /ee/logout
     scopes:
       - openid
       - email
       - profile
-    forwardIDToken:
-      header: X-EE-ID-Token
+  # OIDC establishes the browser session. The JWT filter reads the ID token
+  # cookie issued by OIDC, verifies it at the edge, and emits only the email
+  # claim as the application identity header.
+  jwt:
+    optional: true
+    providers:
+      - name: google-oidc
+        issuer: https://accounts.google.com
+        extractFrom:
+          cookies:
+            - ee-portal-id-token
+        claimToHeaders:
+          - claim: email
+            header: X-EE-User-Email
