@@ -26,7 +26,8 @@ CI recompiles the registry and rejects any diff. It also renders the Kustomize p
 ## Identity boundary
 
 Envoy Gateway owns Google OIDC/JWT authentication. It verifies the session and
-extracts the `email` claim into the Envoy-owned `X-EE-User-Email` header. The
-Portal and TiBuild services only consume that identity for display and
-ownership checks; they do not validate tokens or decide whether an account is
-allowed to enter the system.
+extracts the `email` claim from the OIDC ID-token cookie into the Envoy-owned
+`X-EE-User-Email` header. The Portal and TiBuild services only consume that
+identity for display and ownership checks; they do not validate tokens or
+decide whether an account is allowed to enter the system. The backend Service
+must remain reachable only through the trusted Gateway path.
