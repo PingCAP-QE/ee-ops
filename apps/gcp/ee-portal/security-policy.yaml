@@ -41,5 +41,9 @@ spec:
           cookies:
             - ee-portal-id-token
         claimToHeaders:
+          - claim: sub
+            header: X-User-Id
           - claim: email
-            header: X-EE-User-Email
+            header: X-User-Email
+          - claim: name
+            header: X-User-Name
