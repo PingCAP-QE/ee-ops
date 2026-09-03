@@ -17,9 +17,6 @@ spec:
       name: ee-portal-oidc
     clientSecret:
       name: ee-portal-oidc
-    disableTokenEncryption: true
-    cookieNames:
-      idToken: ee-portal-id-token
     redirectURL: https://prow.tidb.net/ee/oauth2/callback
     logoutPath: /ee/logout
     scopes:
