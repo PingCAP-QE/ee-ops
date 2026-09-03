@@ -1,0 +1,596 @@
+{
+  "compilerVersion": "0.2.0",
+  "minimumRuntimeVersion": "0.1.0",
+  "modules": [
+    {
+      "dataSources": [
+        {
+          "apiUrl": "/tibuild/api/v2",
+          "name": "tibuild"
+        }
+      ],
+      "description": "Start development builds and follow them from source ref to downloadable artifacts.",
+      "icon": "TB",
+      "id": "tibuild",
+      "navigation": [
+        {
+          "label": "TiBuild",
+          "page": "builds"
+        }
+      ],
+      "pages": [
+        {
+          "actions": [
+            {
+              "label": "Refresh",
+              "name": "refresh",
+              "type": "refresh"
+            },
+            {
+              "confirm": {
+                "description": "TiBuild will create a new build with the same source and platform settings.",
+                "title": "Rerun this build?"
+              },
+              "label": "Rerun build",
+              "name": "rerun",
+              "request": {
+                "dataSource": "tibuild",
+                "method": "POST",
+                "path": "/devbuilds/{id}/rerun"
+              },
+              "resultIDPointer": "/id",
+              "successNavigate": "/tibuild/builds/{id}",
+              "type": "request",
+              "visibleWhen": {
+                "equals": true,
+                "pointer": "/permissions/canRerun"
+              }
+            }
+          ],
+          "header": {
+            "statusPointer": "/status/status",
+            "subtitleFields": [
+              {
+                "label": "Product",
+                "pointer": "/spec/product"
+              },
+              {
+                "label": "Git ref",
+                "pointer": "/spec/gitRef"
+              },
+              {
+                "label": "Creator",
+                "pointer": "/meta/createdBy"
+              }
+            ],
+            "titleTemplate": "Build #{/id}"
+          },
+          "id": "build-detail",
+          "module": "tibuild",
+          "polling": {
+            "intervalMs": 5000,
+            "maxIntervalMs": 30000,
+            "whilePointer": "/status/status",
+            "whileValues": [
+              "PENDING",
+              "PROCESSING"
+            ]
+          },
+          "request": {
+            "dataSource": "tibuild",
+            "method": "GET",
+            "path": "/devbuilds/{id}"
+          },
+          "route": "/tibuild/builds/:id",
+          "sections": [
+            {
+              "fields": [
+                {
+                  "label": "Product",
+                  "pointer": "/spec/product"
+                },
+                {
+                  "label": "Edition",
+                  "pointer": "/spec/edition"
+                },
+                {
+                  "label": "Platform",
+                  "pointer": "/spec/platform"
+                },
+                {
+                  "format": "code",
+                  "label": "Git ref",
+                  "pointer": "/spec/gitRef"
+                },
+                {
+                  "format": "copy",
+                  "label": "Git commit",
+                  "pointer": "/spec/gitHash"
+                },
+                {
+                  "format": "date-time",
+                  "label": "Created",
+                  "pointer": "/meta/createdAt"
+                },
+                {
+                  "format": "date-time",
+                  "label": "Updated",
+                  "pointer": "/meta/updatedAt"
+                }
+              ],
+              "title": "Build information"
+            },
+            {
+              "fields": [
+                {
+                  "hideWhenEmpty": true,
+                  "label": "Error",
+                  "pointer": "/status/errMsg"
+                },
+                {
+                  "format": "link",
+                  "hideWhenEmpty": true,
+                  "label": "Pipeline",
+                  "pointer": "/status/pipelineViewURL"
+                }
+              ],
+              "title": "Failure summary"
+            },
+            {
+              "collectionFields": [
+                {
+                  "format": "code",
+                  "label": "Name",
+                  "pointer": "/name"
+                },
+                {
+                  "label": "Platform",
+                  "pointer": "/platform"
+                },
+                {
+                  "format": "status",
+                  "label": "Status",
+                  "pointer": "/status",
+                  "statusMap": {
+                    "Cancelled": "warning",
+                    "Failed": "danger",
+                    "Pending": "info",
+                    "Running": "info",
+                    "Succeeded": "success"
+                  }
+                },
+                {
+                  "format": "date-time",
+                  "label": "Started",
+                  "pointer": "/startAt"
+                },
+                {
+                  "format": "link",
+                  "label": "Details",
+                  "pointer": "/url"
+                }
+              ],
+              "collectionPointer": "/status/tektonStatus/pipelines",
+              "emptyText": "Pipeline information will appear after the build starts.",
+              "title": "Tekton pipelines"
+            },
+            {
+              "collectionFields": [
+                {
+                  "label": "Platform",
+                  "pointer": "/platform"
+                },
+                {
+                  "format": "copy",
+                  "label": "Image",
+                  "pointer": "/url"
+                },
+                {
+                  "format": "copy",
+                  "hideWhenEmpty": true,
+                  "label": "Internal mirror",
+                  "pointer": "/internalURL"
+                }
+              ],
+              "collectionPointer": "/status/buildReport/images",
+              "emptyText": "Images will appear after a successful build.",
+              "title": "Container images"
+            },
+            {
+              "collectionFields": [
+                {
+                  "label": "Component",
+                  "pointer": "/component"
+                },
+                {
+                  "label": "Platform",
+                  "pointer": "/platform"
+                },
+                {
+                  "format": "link",
+                  "label": "Download",
+                  "pointer": "/url"
+                },
+                {
+                  "format": "link",
+                  "hideWhenEmpty": true,
+                  "label": "SHA256",
+                  "pointer": "/sha256URL"
+                }
+              ],
+              "collectionPointer": "/status/buildReport/binaries",
+              "emptyText": "Binary downloads will appear after a successful build.",
+              "title": "Binary artifacts"
+            }
+          ],
+          "title": "Build details",
+          "type": "detail"
+        },
+        {
+          "columns": [
+            {
+              "format": "code",
+              "label": "ID",
+              "pointer": "/id"
+            },
+            {
+              "format": "status",
+              "label": "Status",
+              "pointer": "/status/status",
+              "statusMap": {
+                "ABORTED": "warning",
+                "ERROR": "danger",
+                "FAILURE": "danger",
+                "PENDING": "info",
+                "PROCESSING": "info",
+                "SUCCESS": "success"
+              }
+            },
+            {
+              "label": "Product",
+              "pointer": "/spec/product"
+            },
+            {
+              "format": "code",
+              "label": "Git ref",
+              "pointer": "/spec/gitRef"
+            },
+            {
+              "label": "Creator",
+              "pointer": "/meta/createdBy"
+            },
+            {
+              "format": "date-time",
+              "label": "Created",
+              "pointer": "/meta/createdAt"
+            }
+          ],
+          "empty": {
+            "description": "Change the filters or start a new development build.",
+            "title": "No builds found"
+          },
+          "filters": [
+            {
+              "default": "mine",
+              "label": "Builds",
+              "name": "scope",
+              "options": [
+                {
+                  "label": "My builds",
+                  "value": "mine"
+                },
+                {
+                  "label": "All builds",
+                  "value": "all"
+                }
+              ],
+              "type": "scope"
+            },
+            {
+              "default": "",
+              "label": "Status",
+              "name": "status",
+              "options": [
+                {
+                  "label": "Any status",
+                  "value": ""
+                },
+                {
+                  "label": "Pending",
+                  "value": "PENDING"
+                },
+                {
+                  "label": "Processing",
+                  "value": "PROCESSING"
+                },
+                {
+                  "label": "Success",
+                  "value": "SUCCESS"
+                },
+                {
+                  "label": "Failure",
+                  "value": "FAILURE"
+                },
+                {
+                  "label": "Error",
+                  "value": "ERROR"
+                },
+                {
+                  "label": "Aborted",
+                  "value": "ABORTED"
+                }
+              ],
+              "type": "select"
+            },
+            {
+              "default": "",
+              "label": "Product",
+              "name": "product",
+              "options": [
+                {
+                  "label": "Any product",
+                  "value": ""
+                },
+                {
+                  "label": "BR",
+                  "value": "br"
+                },
+                {
+                  "label": "DM",
+                  "value": "dm"
+                },
+                {
+                  "label": "Drainer",
+                  "value": "drainer"
+                },
+                {
+                  "label": "Dumpling",
+                  "value": "dumpling"
+                },
+                {
+                  "label": "Enterprise Plugin",
+                  "value": "enterprise-plugin"
+                },
+                {
+                  "label": "NG Monitoring",
+                  "value": "ng-monitoring"
+                },
+                {
+                  "label": "PD",
+                  "value": "pd"
+                },
+                {
+                  "label": "Pump",
+                  "value": "pump"
+                },
+                {
+                  "label": "TiCDC",
+                  "value": "ticdc"
+                },
+                {
+                  "label": "TiCDC New Architecture",
+                  "value": "ticdc-newarch"
+                },
+                {
+                  "label": "TiCI",
+                  "value": "tici"
+                },
+                {
+                  "label": "TiDB",
+                  "value": "tidb"
+                },
+                {
+                  "label": "TiDB Binlog",
+                  "value": "tidb-binlog"
+                },
+                {
+                  "label": "TiDB Dashboard",
+                  "value": "tidb-dashboard"
+                },
+                {
+                  "label": "TiDB Lightning",
+                  "value": "tidb-lightning"
+                },
+                {
+                  "label": "TiDB Operator",
+                  "value": "tidb-operator"
+                },
+                {
+                  "label": "TiDB Tools",
+                  "value": "tidb-tools"
+                },
+                {
+                  "label": "TiFlash",
+                  "value": "tiflash"
+                },
+                {
+                  "label": "TiKV",
+                  "value": "tikv"
+                },
+                {
+                  "label": "TiProxy",
+                  "value": "tiproxy"
+                }
+              ],
+              "type": "select"
+            }
+          ],
+          "id": "builds",
+          "itemIDPointer": "/id",
+          "itemRoute": "/tibuild/builds/{id}",
+          "module": "tibuild",
+          "pagination": {
+            "pageSize": 30
+          },
+          "polling": {
+            "intervalMs": 10000,
+            "whilePointer": "/status/status",
+            "whileValues": [
+              "PENDING",
+              "PROCESSING"
+            ]
+          },
+          "primaryAction": {
+            "label": "New build",
+            "navigate": "/tibuild/builds/new"
+          },
+          "request": {
+            "dataSource": "tibuild",
+            "method": "GET",
+            "path": "/devbuilds",
+            "query": {
+              "page": {
+                "from": "state",
+                "pointer": "/page"
+              },
+              "pageSize": {
+                "from": "state",
+                "pointer": "/pageSize"
+              },
+              "product": {
+                "from": "state",
+                "pointer": "/product"
+              },
+              "q": {
+                "from": "state",
+                "pointer": "/q"
+              },
+              "scope": {
+                "from": "state",
+                "pointer": "/scope"
+              },
+              "status": {
+                "from": "state",
+                "pointer": "/status"
+              }
+            }
+          },
+          "response": {
+            "itemsPointer": "/"
+          },
+          "route": "/tibuild/builds",
+          "search": {
+            "label": "Search builds",
+            "name": "q",
+            "placeholder": "Build ID, Git ref, or creator"
+          },
+          "title": "Development builds",
+          "type": "list"
+        },
+        {
+          "dynamicOptions": [
+            {
+              "field": "product",
+              "itemsPointer": "/products",
+              "labelPointer": "/label",
+              "request": {
+                "dataSource": "tibuild",
+                "method": "GET",
+                "path": "/devbuilds/capabilities"
+              },
+              "valuePointer": "/id"
+            }
+          ],
+          "id": "new-build",
+          "module": "tibuild",
+          "route": "/tibuild/builds/new",
+          "schema": {
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "properties": {
+              "gitRef": {
+                "description": "Use branch/\u003cname\u003e, tag/\u003cname\u003e, pull/\u003cnumber\u003e, commit/\u003c40-char SHA\u003e, or a full 40-char SHA.",
+                "minLength": 1,
+                "pattern": "^(branch/.+|tag/.+|pull/[0-9]+|commit/[0-9a-fA-F]{40}|[0-9a-fA-F]{40})$",
+                "title": "Git ref",
+                "type": "string"
+              },
+              "platform": {
+                "default": "linux",
+                "oneOf": [
+                  {
+                    "const": "linux",
+                    "title": "Linux — amd64 + arm64"
+                  },
+                  {
+                    "const": "linux/amd64",
+                    "title": "Linux — amd64"
+                  },
+                  {
+                    "const": "linux/arm64",
+                    "title": "Linux — arm64"
+                  }
+                ],
+                "title": "Platform",
+                "type": "string"
+              },
+              "product": {
+                "description": "Component to build.",
+                "title": "Product",
+                "type": "string"
+              }
+            },
+            "required": [
+              "product",
+              "gitRef",
+              "platform"
+            ],
+            "type": "object"
+          },
+          "submit": {
+            "label": "Start build",
+            "request": {
+              "body": {
+                "request": {
+                  "edition": {
+                    "const": "community"
+                  },
+                  "gitRef": {
+                    "from": "form",
+                    "pointer": "/gitRef"
+                  },
+                  "pipelineEngine": {
+                    "const": "tekton"
+                  },
+                  "platform": {
+                    "from": "form",
+                    "pointer": "/platform"
+                  },
+                  "product": {
+                    "from": "form",
+                    "pointer": "/product"
+                  }
+                }
+              },
+              "dataSource": "tibuild",
+              "method": "POST",
+              "path": "/devbuilds"
+            },
+            "resultIDPointer": "/id",
+            "successNavigate": "/tibuild/builds/{id}"
+          },
+          "title": "New development build",
+          "type": "form",
+          "uiSchema": {
+            "gitRef": {
+              "ui:placeholder": "branch/master"
+            },
+            "product": {
+              "ui:placeholder": "Select a product"
+            },
+            "ui:submitButtonOptions": {
+              "norender": true
+            }
+          }
+        }
+      ],
+      "tags": [
+        "Build",
+        "Tekton",
+        "Developer tools"
+      ],
+      "title": "TiBuild"
+    }
+  ],
+  "registryVersion": 1,
+  "sourceDigest": "6f29de0e3b76365ca127fe4001fda92e12a9610e71e8f7ed8154f78528d96b78"
+}

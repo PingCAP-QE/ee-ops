@@ -1,0 +1,59 @@
+id: new-build
+module: tibuild
+title: New development build
+type: form
+route: /tibuild/builds/new
+schema:
+  $schema: https://json-schema.org/draft/2020-12/schema
+  type: object
+  required: [product, gitRef, platform]
+  properties:
+    product:
+      type: string
+      title: Product
+      description: Component to build.
+    gitRef:
+      type: string
+      title: Git ref
+      description: "Use branch/<name>, tag/<name>, pull/<number>, commit/<40-char SHA>, or a full 40-char SHA."
+      minLength: 1
+      pattern: "^(branch/.+|tag/.+|pull/[0-9]+|commit/[0-9a-fA-F]{40}|[0-9a-fA-F]{40})$"
+    platform:
+      type: string
+      title: Platform
+      default: linux
+      oneOf:
+        - {const: linux, title: Linux — amd64 + arm64}
+        - {const: linux/amd64, title: Linux — amd64}
+        - {const: linux/arm64, title: Linux — arm64}
+uiSchema:
+  product:
+    ui:placeholder: Select a product
+  gitRef:
+    ui:placeholder: branch/master
+  ui:submitButtonOptions:
+    norender: true
+dynamicOptions:
+  - field: product
+    request:
+      dataSource: tibuild
+      method: GET
+      path: /devbuilds/capabilities
+    itemsPointer: /products
+    valuePointer: /id
+    labelPointer: /label
+submit:
+  label: Start build
+  request:
+    dataSource: tibuild
+    method: POST
+    path: /devbuilds
+    body:
+      request:
+        product: {from: form, pointer: /product}
+        gitRef: {from: form, pointer: /gitRef}
+        platform: {from: form, pointer: /platform}
+        edition: {const: community}
+        pipelineEngine: {const: tekton}
+  successNavigate: /tibuild/builds/{id}
+  resultIDPointer: /id
