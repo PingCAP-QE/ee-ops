@@ -30,7 +30,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/exp-ee-portal
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-ee-portal versioning=semver
-      tag: v0.1.0
+      tag: v2026.8.30-12-g926ee46
     registry:
       configMapName: ee-portal-registry
       key: registry.json
