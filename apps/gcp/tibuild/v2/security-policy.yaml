@@ -31,9 +31,11 @@ spec:
     clientSecret:
       name: tibuild-v2-oidc
     # Use the same OIDC cookie names as the Portal route so browser API calls
-    # do not start a second redirect-based login flow.
+    # do not start a second redirect-based login flow. Envoy Gateway v1.9
+    # supports explicit names, but not the cookie name suffix form.
     cookieNames:
-      suffix: ee-apps
+      accessToken: ee-apps-access-token
+      idToken: ee-apps-id-token
     redirectURL: https://prow.tidb.net/tibuild/oauth2/callback
     passThroughAuthHeader: true
     scopes:
