@@ -1,0 +1,25 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: ee-portal
+  namespace: ee-portal
+spec:
+  # Authentication is scoped to this HTTPRoute on the shared Gateway.
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: ee-portal
+  csrf: {}
+  oidc:
+    provider:
+      issuer: https://accounts.google.com
+    clientIDRef:
+      name: ee-portal-oidc
+    clientSecret:
+      name: ee-portal-oidc
+    redirectURL: https://prow.tidb.net/ee/oauth2/callback
+    logoutPath: /ee/logout
+    scopes:
+      - openid
+      - email
+      - profile

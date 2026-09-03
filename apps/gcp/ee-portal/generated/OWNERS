@@ -1,0 +1,6 @@
+approvers:
+  - sig-root-approvers
+reviewers:
+  - sig-root-reviewers
+labels:
+  - area/ee-portal
