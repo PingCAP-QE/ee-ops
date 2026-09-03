@@ -17,8 +17,6 @@ spec:
       name: ee-portal-oidc
     clientSecret:
       name: ee-portal-oidc
-    # The JWT claim-to-header filter consumes this cookie. It remains
-    # Secure/HttpOnly and is only sent over the TLS Gateway connection.
     disableTokenEncryption: true
     cookieNames:
       idToken: ee-portal-id-token
@@ -28,23 +26,3 @@ spec:
       - openid
       - email
       - profile
-  # OIDC establishes the browser session. The JWT filter reads the ID token
-  # cookie issued by OIDC, verifies it at the edge, and emits the identity
-  # claims as application headers.
-  jwt:
-    optional: true
-    providers:
-      - name: google-oidc
-        issuer: https://accounts.google.com
-        remoteJWKS:
-          uri: https://www.googleapis.com/oauth2/v3/certs
-        extractFrom:
-          cookies:
-            - ee-portal-id-token
-        claimToHeaders:
-          - claim: sub
-            header: X-User-Id
-          - claim: email
-            header: X-User-Email
-          - claim: name
-            header: X-User-Name
