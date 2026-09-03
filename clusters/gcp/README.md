@@ -20,6 +20,12 @@ Secrets that require manual preparation:
 | flux-system | lark-token-error  | `kubectl -n flux-system create secret generic lark-token-error --from-literal=address=<lark-webhook-url>` | GitOps alert webhook (error events)          |
 | apps        | prow-tls          | Create ingress TLS cert secret manually                                                                    | prow site ingress cert secret                |
 
+The dashboard reads the Google OAuth client credentials from the existing GCP
+Secret Manager secret `google-oauth2-client-ee-apps`. Its value must be a JSON
+object with `client-id` and `client-secret` fields, and the OAuth client must
+allow `https://prow.tidb.net/dashboard/oauth2/callback` as an authorized
+redirect URI.
+
 The gcp `chatops-lark` deployment reads its dedicated application configuration
 from the `gcp_chatops_lark_json` key in GCP Secret Manager. The JSON object must
 contain `app-id`, `app-secret`, and `config.yaml`. Its `devbuild.api_url` and

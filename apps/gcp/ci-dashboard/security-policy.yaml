@@ -1,0 +1,23 @@
+# Authentication for prow.tidb.net/dashboard/ through Google OIDC.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: ci-dashboard-oidc
+  namespace: apps
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: ci-dashboard
+  oidc:
+    provider:
+      issuer: https://accounts.google.com
+    clientIDRef:
+      name: ci-dashboard-oidc
+    clientSecret:
+      name: ci-dashboard-oidc
+    redirectURL: https://prow.tidb.net/dashboard/oauth2/callback
+    scopes:
+      - openid
+      - email
+      - profile
