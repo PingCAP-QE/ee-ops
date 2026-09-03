@@ -14,7 +14,7 @@ spec:
   prune: true
   postBuild:
     substitute:
-      GOOGLE_OAUTH_JSON: prod2_jenkins_beta_google_oauth_json
+      GOOGLE_OAUTH_JSON: google-oauth2-client-jenkins
       JENKINS_CACHE_S3_JSON: gcp_jenkins_cache_s3_json
       JENKINS_ARTIFACT_S3_JSON: gcp_jenkins_cache_s3_json
       CODECOV_TOKENS_JSON: prod2_jenkins_beta_codecov_tokens_json
