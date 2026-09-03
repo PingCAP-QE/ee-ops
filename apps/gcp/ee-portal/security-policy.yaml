@@ -17,6 +17,9 @@ spec:
       name: ee-portal-oidc
     clientSecret:
       name: ee-portal-oidc
+    # Share the OIDC session with the protected TiBuild API route.
+    cookieNames:
+      suffix: ee-apps
     redirectURL: https://prow.tidb.net/ee/oauth2/callback
     logoutPath: /ee/logout
     scopes:
