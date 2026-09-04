@@ -27,7 +27,7 @@ controller:
     -XX:+UseStringDeduplication -XX:+ParallelRefProcEnabled
     -XX:+DisableExplicitGC -XX:+UnlockExperimentalVMOptions
     -XX:+UnlockDiagnosticVMOptions -XX:+HeapDumpOnOutOfMemoryError
-    -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
+    -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc.log:utctime,pid,level,tags:filecount=2,filesize=100M
     -Dio.jenkins.plugins.artifact_manager_jclouds.s3.S3BlobStoreConfig.deleteArtifacts=true
     -Dio.jenkins.plugins.artifact_manager_jclouds.s3.S3BlobStoreConfig.deleteStashes=true
 
@@ -37,6 +37,24 @@ controller:
       image: "alpine:3.23.3"
       imagePullPolicy: Always
       command: ["mkdir", "-p", "/var/jenkins_home/logs"]
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsGroup: 1000
+        runAsUser: 1000
+      volumeMounts:
+        - mountPath: /var/jenkins_home
+          name: jenkins-home
+    # The timestamped filename above was used before the fixed gc.log name.
+    # Remove only those legacy files while the controller is stopped.
+    - name: remove-legacy-gc-logs
+      image: "alpine:3.23.3"
+      imagePullPolicy: Always
+      command:
+        - sh
+        - -ec
+        - |
+          find /var/jenkins_home/logs -maxdepth 1 -type f -name 'gc-*.log*' -print -delete
       securityContext:
         allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
