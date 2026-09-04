@@ -12,6 +12,22 @@ spec:
   hostnames:
     - prow.tidb.net
   rules:
+    # Keep module API calls on the same route-level OIDC policy as the Portal
+    # shell. This avoids starting a second OIDC session in the TiBuild route.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /ee/api/tibuild
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api
+      backendRefs:
+        - name: v2-tibuild-v2
+          namespace: tibuild
+          port: 80
     - matches:
         - path:
             type: PathPrefix

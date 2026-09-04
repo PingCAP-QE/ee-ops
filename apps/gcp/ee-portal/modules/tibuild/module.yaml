@@ -5,6 +5,6 @@ icon: TB
 tags: [Build, Tekton, Developer tools]
 dataSources:
   - name: tibuild
-    apiUrl: /tibuild/api/v2
+    apiUrl: /ee/api/tibuild/v2
 navigation:
   - {label: TiBuild, page: builds}

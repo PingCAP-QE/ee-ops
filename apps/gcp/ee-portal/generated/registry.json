@@ -5,7 +5,7 @@
     {
       "dataSources": [
         {
-          "apiUrl": "/tibuild/api/v2",
+          "apiUrl": "/ee/api/tibuild/v2",
           "name": "tibuild"
         }
       ],
@@ -592,5 +592,5 @@
     }
   ],
   "registryVersion": 1,
-  "sourceDigest": "6f29de0e3b76365ca127fe4001fda92e12a9610e71e8f7ed8154f78528d96b78"
+  "sourceDigest": "eec455129d2eddee130855536bda03a92c7536b4b14f133f26f4a719cd2ec5d2"
 }
