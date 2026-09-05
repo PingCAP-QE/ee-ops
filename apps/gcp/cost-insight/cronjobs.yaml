@@ -116,6 +116,120 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
+  name: cost-insight-sync-azure-billing-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-azure-billing-summary
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Interpreted with timeZone below: 21:30 Asia/Shanghai, after the GCP jobs.
+  schedule: "30 21 * * *"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-azure-billing-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          # Reuse the existing Workload Identity path; the bound GSA must have
+          # BigQuery jobUser plus Azure billing export dataset read access.
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-azure-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-18-g0f0987a
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-azure-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  python - <<'PY'
+                  import json
+                  from datetime import date
+
+                  from cost_insight.common.config import get_settings
+                  from cost_insight.common.db import build_engine
+                  from cost_insight.jobs.refresh_attribution_daily import (
+                      CostAttributionSource,
+                      run_refresh_cost_attribution_from_summary,
+                  )
+
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
+                  if isinstance(payload, dict):
+                      payload = [payload]
+
+                  settings = get_settings()
+                  engine = build_engine(settings)
+                  try:
+                      for item in payload or []:
+                          if not isinstance(item, dict):
+                              continue
+                          dates = [
+                              date.fromisoformat(value)
+                              for value in item.get("touched_usage_dates") or []
+                          ]
+                          if not dates:
+                              print(
+                                  f"No touched usage dates for {item.get('account_id')}; "
+                                  "skip attribution refresh."
+                              )
+                              continue
+                          summary = run_refresh_cost_attribution_from_summary(
+                              engine,
+                              source=CostAttributionSource(
+                                  vendor="azure",
+                                  account_id=item["account_id"],
+                              ),
+                              start_date=min(dates),
+                              end_date=max(dates),
+                          )
+                          print(summary)
+                  finally:
+                      engine.dispose()
+                  PY
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_AZURE_BILLING_TABLE
+                  value: gcp-digital-bi.azure_billing.azure_billing_cost_*
+                - name: COST_INSIGHT_AZURE_SYNC_LAG_DAYS
+                  value: "3"
+                - name: COST_INSIGHT_AZURE_EXPORT_OVERLAP_DAYS
+                  value: "3"
+                - name: COST_INSIGHT_AZURE_SYNC_PAGE_SIZE
+                  value: "5000"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
   name: cost-insight-sync-gcs-cache-last-seen
   namespace: apps
   labels:
