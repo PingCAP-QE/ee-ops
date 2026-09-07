@@ -1,0 +1,47 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: replace-internal-registry
+policies:
+  - ../../replace-internal-registry.yaml
+resources:
+  - resource-plain.yaml
+  - resource-init.yaml
+  - resource-existing-secret.yaml
+  - resource-ci-registry-auth.yaml
+  - resource-non-matching.yaml
+results:
+  - policy: replace-internal-registry
+    rule: replace-internal-registry
+    resources:
+      - pod-plain
+    kind: Pod
+    result: pass
+    patchedResources: patched-plain.yaml
+  - policy: replace-internal-registry
+    rule: replace-internal-registry
+    resources:
+      - pod-init
+    kind: Pod
+    result: pass
+    patchedResources: patched-init.yaml
+  - policy: replace-internal-registry
+    rule: replace-internal-registry
+    resources:
+      - pod-existing-secret
+    kind: Pod
+    result: pass
+    patchedResources: patched-existing-secret.yaml
+  - policy: replace-internal-registry
+    rule: replace-internal-registry
+    resources:
+      - pod-ci-registry-auth
+    kind: Pod
+    result: pass
+    patchedResources: patched-ci-registry-auth.yaml
+  - policy: replace-internal-registry
+    rule: replace-internal-registry
+    resources:
+      - pod-non-matching
+    kind: Pod
+    result: skip
