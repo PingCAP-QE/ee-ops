@@ -1,5 +1,17 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES.md
 controller:
+  # Protect the single controller pod from voluntary Karpenter disruption.
+  podAnnotations:
+    karpenter.sh/do-not-evict: "true"
+
+  # Do not voluntarily evict the only controller replica.
+  podDisruptionBudget:
+    enabled: true
+    apiVersion: policy/v1
+    maxUnavailable: "0"
+
+  terminationGracePeriodSeconds: 300
+
   podLabels:
     env: cicd
     team: eq
