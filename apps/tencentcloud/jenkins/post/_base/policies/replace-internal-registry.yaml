@@ -1,0 +1,76 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: replace-internal-registry
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
+    - name: has-internal-image
+      expression: >-
+        object.spec.containers.exists(c,
+          c.image.startsWith('us-docker.pkg.dev/pingcap-testing-account/internal/')) ||
+        object.spec.?initContainers.orValue([]).exists(c,
+          c.image.startsWith('us-docker.pkg.dev/pingcap-testing-account/internal/'))
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  variables:
+    - name: hasCiRegistryAuth
+      expression: >-
+        object.spec.?imagePullSecrets.orValue([]).exists(s,
+          s.?name.orValue('') == 'ci-registry-auth')
+    - name: hasImagePullSecrets
+      expression: object.spec.?imagePullSecrets.orValue([]).size() > 0
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.containers.map(c,
+            c.image.startsWith("us-docker.pkg.dev/pingcap-testing-account/internal/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/image",
+              value: c.image.replace(
+                "us-docker.pkg.dev/pingcap-testing-account/internal/",
+                "cr-qcloud.pingcap.net/mirrors/internal/")
+            } : null
+          ).filter(p, p != null)
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.?initContainers.orValue([]).map(c,
+            c.image.startsWith("us-docker.pkg.dev/pingcap-testing-account/internal/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/image",
+              value: c.image.replace(
+                "us-docker.pkg.dev/pingcap-testing-account/internal/",
+                "cr-qcloud.pingcap.net/mirrors/internal/")
+            } : null
+          ).filter(p, p != null)
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          variables.hasImagePullSecrets && !variables.hasCiRegistryAuth ?
+          [JSONPatch{op: "add", path: "/spec/imagePullSecrets/0", value: {"name": "ci-registry-auth"}}] :
+          []
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          !variables.hasImagePullSecrets && !variables.hasCiRegistryAuth ?
+          [JSONPatch{op: "add", path: "/spec/imagePullSecrets", value: [{"name": "ci-registry-auth"}]}] :
+          []
