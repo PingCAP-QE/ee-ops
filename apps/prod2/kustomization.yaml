@@ -7,7 +7,6 @@ resources:
   - publisher
   - zot
   - cloudevents-server
-  - chatops-lark
   - cache
   - dl
   - tibuild # experiment for v2
