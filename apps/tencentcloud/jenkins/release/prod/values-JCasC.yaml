@@ -183,7 +183,7 @@ controller:
             - envVars:
                 env:
                   - key: "GOPROXY"
-                    value: "http://goproxy.cache.svc,direct"
+                    value: "http://goproxy.cache.svc|https://proxy.golang.org|direct"
                   - key: "GOMODCACHE"
                     value: "/home/jenkins/agent/gomodcache"
                   - key: "GOCACHE"
