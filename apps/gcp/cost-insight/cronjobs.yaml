@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcp-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 21:10 Asia/Shanghai, intentionally outside BJ work time.
-  schedule: "10 21 * * *"
+  # Start the daily billing pipeline immediately after the 08:00–12:00 Beijing work window.
+  schedule: "10 12 * * *"
   timeZone: Asia/Shanghai
   # Initial allocation backfill is complete; keep source facts current with daily syncs.
   suspend: false
@@ -122,8 +122,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-azure-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 21:30 Asia/Shanghai, after the GCP jobs.
-  schedule: "30 21 * * *"
+  # Start after the Beijing work window; GCP starts first at 12:10.
+  schedule: "30 12 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -236,7 +236,7 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcs-cache-last-seen
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 21:20 Asia/Shanghai, after the other daily cost jobs.
+  # This audit-log aggregation is independent of the billing publication pipeline.
   schedule: "20 21 * * *"
   timeZone: Asia/Shanghai
   suspend: false
@@ -304,8 +304,9 @@ metadata:
     app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-delete-cas
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: daily 17:10 Asia/Shanghai.
-  schedule: "10 17 * * *"
+  # A 30-minute start allowance plus the 12-hour deadline still ends by 08:00 Beijing time.
+  # Starting later reduces contention with the afternoon allocation materialization.
+  schedule: "30 19 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -469,8 +470,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-aws-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 21:40 Asia/Shanghai, after the GCP summary job.
-  schedule: "40 21 * * *"
+  # Start after the Beijing work window; allocation waits for this and the other summaries.
+  schedule: "40 12 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -560,9 +561,9 @@ metadata:
     app.kubernetes.io/name: cost-insight-materialize-cost-allocations
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Starts after the AWS summary job's four-hour deadline and republishes the
-  # complete configured history.
-  schedule: "10 2 * * *"
+  # Begins after the Beijing work window. Its preflight waits for every active
+  # billing source and attribution refresh from this UTC day before publishing.
+  schedule: "0 14 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -572,7 +573,8 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 1
-      activeDeadlineSeconds: 43200
+      # A delayed start plus this deadline still finishes before 08:00 Beijing time.
+      activeDeadlineSeconds: 54000
       template:
         metadata:
           labels:
@@ -590,6 +592,59 @@ spec:
                 - -ec
               args:
                 - |
+                  python - <<'PY'
+                  import time
+                  from datetime import UTC, datetime
+
+                  from sqlalchemy import text
+
+                  from cost_insight.common.db import build_engine
+
+                  # ponytail: poll the existing job-state table instead of adding a workflow controller.
+                  statement = text(
+                      """
+                      SELECT source.vendor, source.account_id,
+                             summary.last_status AS summary_status,
+                             attribution.last_status AS attribution_status
+                      FROM cost_sources AS source
+                      LEFT JOIN cost_job_state AS summary
+                        ON summary.job_name = CONCAT(
+                             'sync_', source.vendor, '_billing_summary:',
+                             source.vendor, ':', source.account_id
+                           )
+                       AND summary.last_succeeded_at >= :cutoff
+                      LEFT JOIN cost_job_state AS attribution
+                        ON attribution.job_name = CONCAT(
+                             'refresh_cost_attribution_from_summary:',
+                             source.vendor, ':', source.account_id
+                           )
+                       AND attribution.last_succeeded_at >= :cutoff
+                      WHERE source.is_active = 1 AND source.vendor IN ('gcp', 'aws', 'azure')
+                      """
+                  )
+                  cutoff = datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+                  deadline = time.monotonic() + 3.5 * 60 * 60
+                  while True:
+                      engine = build_engine()
+                      try:
+                          with engine.connect() as connection:
+                              states = tuple(connection.execute(statement, {"cutoff": cutoff}).mappings())
+                      finally:
+                          engine.dispose()
+                      incomplete = [
+                          f"{row['vendor']}:{row['account_id']}"
+                          for row in states
+                          if row["summary_status"] != "succeeded"
+                          or row["attribution_status"] != "succeeded"
+                      ]
+                      if states and not incomplete:
+                          print("All active billing sources and attribution refreshes are current.")
+                          break
+                      if time.monotonic() >= deadline:
+                          raise RuntimeError("Timed out waiting for: " + ", ".join(incomplete or ["sources"]))
+                      print("Waiting for: " + ", ".join(incomplete or ["sources"]))
+                      time.sleep(300)
+                  PY
                   end_date="$(python - <<'PY'
                   from sqlalchemy import text
 
