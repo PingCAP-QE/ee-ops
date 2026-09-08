@@ -29,6 +29,7 @@ spec:
     ignoreFailures: false
   values:
     image:
+      repository: cr-qcloud.pingcap.net/mirrors/registry.gitlab.com/grouperenault/git_cdn
       tag: 1.13.0-oss
     replicaCount: 1
     resources:
