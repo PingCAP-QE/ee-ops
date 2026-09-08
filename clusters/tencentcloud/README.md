@@ -24,6 +24,11 @@ Other application secrets (e.g. publisher, cloudevents-server) are synced from
 external secret stores via `external-secrets`, see the corresponding app
 directories.
 
+The kellnr proxy cache also requires a GCP Secret Manager secret named
+`tencentcloud_kellnr_admin_json`, containing a JSON object with `adminPwd` and
+`adminToken` fields. It is synced to the `cache/kellnr-secret` Secret and used
+only during Kellnr's first initialization.
+
 ## Notification
 
 `clusters/tencentcloud/flux-system/notification.yaml` defines `Provider`/`Alert`
