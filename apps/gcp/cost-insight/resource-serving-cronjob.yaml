@@ -7,7 +7,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-resource-serving-materialization
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Starts after the complete-history allocation job's 12-hour deadline.
+  # This independent 30-day repair runs after the Beijing work window; daily attribution
+  # already republishes its affected resource-serving windows inline.
   schedule: "30 14 * * *"
   timeZone: Asia/Shanghai
   concurrencyPolicy: Forbid
