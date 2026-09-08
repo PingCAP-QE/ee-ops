@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: git-cdn
-      version: 0.1.0
+      version: 0.1.2
       sourceRef:
         kind: HelmRepository
         name: ee-ops
@@ -31,7 +31,14 @@ spec:
     image:
       repository: cr-qcloud.pingcap.net/mirrors/registry.gitlab.com/grouperenault/git_cdn
       tag: 1.13.0-oss
-    replicaCount: 1
+    kind: StatefulSet
+    replicaCount: 2
+    podManagementPolicy: Parallel
+    podAnnotations:
+      karpenter.sh/do-not-disrupt: "true"
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
     resources:
       requests:
         cpu: "1"
@@ -42,6 +49,14 @@ spec:
     nodeSelector:
       kubernetes.io/arch: amd64
       compute-class: ee-application
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: git-cdn
+                app.kubernetes.io/instance: git-cdn
+            topologyKey: kubernetes.io/hostname
     service:
       type: ClusterIP
     ingress:
@@ -49,10 +64,16 @@ spec:
     volumeMounts:
       - name: data
         mountPath: /data
-    volumes:
-      - name: data
-        persistentVolumeClaim:
-          claimName: git-cdn-data
+    volumeClaimTemplates:
+      - metadata:
+          name: data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: ci-rwo
+          resources:
+            requests:
+              storage: 100Gi
     configuration:
       GITSERVER_UPSTREAM: https://github.com/
       # Keep the cache below the 100Gi PVC capacity for filesystem overhead and temporary writes.
