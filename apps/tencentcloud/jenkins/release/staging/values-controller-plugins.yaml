@@ -1,5 +1,14 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
+  # Download plugins directly from a mainland mirror instead of following the
+  # updates.jenkins.io redirect to mirror.ossplanet.net.
+  initContainerEnv:
+    - name: JENKINS_UC_DOWNLOAD_URL
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/plugins
+  containerEnv:
+    - name: JENKINS_UC_DOWNLOAD_URL
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/plugins
+
   overwritePlugins: true
   installLatestPlugins: true
 
