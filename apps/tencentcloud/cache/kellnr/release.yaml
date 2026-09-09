@@ -1,0 +1,82 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kellnr
+spec:
+  chart:
+    spec:
+      chart: kellnr
+      # renovate: datasource=helm depName=kellnr registryUrl=https://kellnr.github.io/helm
+      version: 6.1.7
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: kellnr
+        namespace: flux-system
+  interval: 1h
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    fullnameOverride: kellnr
+    image:
+      repository: ghcr.io/kellnr/kellnr
+      # renovate: datasource=docker depName=ghcr.io/kellnr/kellnr versioning=semver
+      tag: 6.8.0
+    replicaCount: 1
+    nodeSelector:
+      kubernetes.io/arch: amd64
+      compute-class: ee-application
+    resources:
+      requests:
+        cpu: "500m"
+        memory: 1Gi
+      limits:
+        cpu: "2"
+        memory: 4Gi
+    secret:
+      existingSecret: kellnr-secret
+    kellnr:
+      setup:
+        adminPwd: null
+        adminPwdSecretRef:
+          name: kellnr-secret
+          key: adminPwd
+        adminToken: null
+        adminTokenSecretRef:
+          name: kellnr-secret
+          key: adminToken
+      registry:
+        dataDir: /var/lib/kellnr
+        authRequired: false
+      proxy:
+        enabled: true
+        numThreads: 20
+      origin:
+        # Kellnr still requires an origin for generating registry URLs. Use the
+        # cluster-local Service because this cache is not exposed outside the
+        # cluster.
+        hostname: kellnr.cache.svc
+        port: 8000
+        protocol: http
+      log:
+        format: json
+    pvc:
+      enabled: true
+      name: kellnr
+      storageClassName: ci-rwo
+      storage: 100Gi
+    ingress:
+      enabled: false
+    httproute:
+      enabled: false
+    pdb:
+      enabled: false

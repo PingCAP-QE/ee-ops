@@ -24,6 +24,15 @@ Other application secrets (e.g. publisher, cloudevents-server) are synced from
 external secret stores via `external-secrets`, see the corresponding app
 directories.
 
+The kellnr proxy cache also requires a GCP Secret Manager secret named
+`tencentcloud_kellnr_admin_json`, containing a JSON object with `adminPwd` and
+`adminToken` fields. It is synced to the `cache/kellnr-secret` Secret and used
+only during Kellnr's first initialization.
+
+The cache is cluster-internal only. Configure Cargo clients to use
+`sparse+http://kellnr.cache.svc:8000/api/v1/cratesio/` as the replacement for
+crates.io; no Ingress or HTTPRoute is created.
+
 ## Notification
 
 `clusters/tencentcloud/flux-system/notification.yaml` defines `Provider`/`Alert`
