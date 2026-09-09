@@ -6,3 +6,4 @@ resources:
   - brc.yaml
   - git-cdn
   - goproxy
+  - kellnr
