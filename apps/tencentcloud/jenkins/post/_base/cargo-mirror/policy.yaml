@@ -1,0 +1,49 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: inject-cargo-mirror
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
+    - name: has-runner-container
+      expression: object.spec.containers.exists(c, c.name == 'runner')
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  mutations:
+    - patchType: ApplyConfiguration
+      applyConfiguration:
+        expression: |
+          Object{
+            spec: Object.spec{
+              volumes: [Object.spec.volumes{
+                name: "cargo-mirror-config",
+                configMap: Object.spec.volumes.configMap{
+                  name: "cargo-mirror"
+                }
+              }],
+              containers: [Object.spec.containers{
+                name: "runner",
+                volumeMounts: [Object.spec.containers.volumeMounts{
+                  name: "cargo-mirror-config",
+                  mountPath: "/home/jenkins/.cargo/config.toml",
+                  subPath: "config.toml",
+                  readOnly: true
+                }]
+              }]
+            }
+          }

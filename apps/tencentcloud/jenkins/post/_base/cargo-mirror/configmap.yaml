@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cargo-mirror
+immutable: true
+data:
+  config.toml: |
+    [source.crates-io]
+    replace-with = "kellnr-cratesio"
+
+    [source.kellnr-cratesio]
+    registry = "sparse+http://kellnr.cache.svc:8000/api/v1/cratesio/"

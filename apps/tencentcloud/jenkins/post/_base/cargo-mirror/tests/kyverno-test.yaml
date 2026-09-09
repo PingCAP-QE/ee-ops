@@ -1,0 +1,41 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-cargo-mirror
+policies:
+  - ../policy.yaml
+resources:
+  - resource-runner.yaml
+  - resource-runner-with-sidecars.yaml
+  - resource-no-runner.yaml
+  - resource-no-jenkins-label.yaml
+results:
+  - policy: inject-cargo-mirror
+    rule: inject-cargo-mirror
+    resources:
+      - pod-runner
+    kind: Pod
+    result: pass
+    patchedResources: patched-runner.yaml
+
+  - policy: inject-cargo-mirror
+    rule: inject-cargo-mirror
+    resources:
+      - pod-runner-with-sidecars
+    kind: Pod
+    result: pass
+    patchedResources: patched-runner-with-sidecars.yaml
+
+  - policy: inject-cargo-mirror
+    rule: inject-cargo-mirror
+    resources:
+      - pod-no-runner
+    kind: Pod
+    result: skip
+
+  - policy: inject-cargo-mirror
+    rule: inject-cargo-mirror
+    resources:
+      - pod-no-jenkins-label
+    kind: Pod
+    result: skip
