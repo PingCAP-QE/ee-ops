@@ -5,6 +5,9 @@ metadata:
 immutable: true
 data:
   config.toml: |
+    [http]
+    timeout = 600
+
     [source.crates-io]
     replace-with = "kellnr-cratesio"
 
