@@ -61,9 +61,12 @@ spec:
         enabled: true
         numThreads: 20
       origin:
-        hostname: kellnr.pingcap.net
-        port: 443
-        protocol: https
+        # Kellnr still requires an origin for generating registry URLs. Use the
+        # cluster-local Service because this cache is not exposed outside the
+        # cluster.
+        hostname: kellnr.cache.svc
+        port: 8000
+        protocol: http
       log:
         format: json
     pvc:
@@ -74,13 +77,6 @@ spec:
     ingress:
       enabled: false
     httproute:
-      enabled: true
-      parentRefs:
-        - kind: Gateway
-          name: internal-https
-          namespace: infra
-      hostnames:
-        - kellnr.pingcap.net
-      path: /
+      enabled: false
     pdb:
       enabled: false

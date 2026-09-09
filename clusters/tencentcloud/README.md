@@ -29,6 +29,10 @@ The kellnr proxy cache also requires a GCP Secret Manager secret named
 `adminToken` fields. It is synced to the `cache/kellnr-secret` Secret and used
 only during Kellnr's first initialization.
 
+The cache is cluster-internal only. Configure Cargo clients to use
+`sparse+http://kellnr.cache.svc:8000/api/v1/cratesio/` as the replacement for
+crates.io; no Ingress or HTTPRoute is created.
+
 ## Notification
 
 `clusters/tencentcloud/flux-system/notification.yaml` defines `Provider`/`Alert`
