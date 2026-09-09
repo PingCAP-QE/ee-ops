@@ -32,7 +32,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-17-g4c68b56
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -146,7 +146,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-azure-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-18-g0f0987a
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -230,6 +230,123 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
+  name: cost-insight-sync-alibaba-billing-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-alibaba-billing-summary
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Start after the existing summary schedules and keep five stable days behind the export.
+  schedule: "50 12 * * *"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-alibaba-billing-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          # Reuse the existing Workload Identity and production Cost Insight database secret.
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-alibaba-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-alibaba-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  python - <<'PY'
+                  import json
+                  from datetime import date
+
+                  from cost_insight.common.config import get_settings
+                  from cost_insight.common.db import build_engine
+                  from cost_insight.jobs.refresh_attribution_daily import (
+                      CostAttributionSource,
+                      run_refresh_cost_attribution_from_summary,
+                  )
+
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
+                  if isinstance(payload, dict):
+                      payload = [payload]
+
+                  settings = get_settings()
+                  engine = build_engine(settings)
+                  try:
+                      for item in payload or []:
+                          if not isinstance(item, dict):
+                              continue
+                          dates = [
+                              date.fromisoformat(value)
+                              for value in item.get("touched_usage_dates") or []
+                          ]
+                          if not dates:
+                              print(
+                                  f"No touched usage dates for {item.get('account_id')}; "
+                                  "skip attribution refresh."
+                              )
+                              continue
+                          summary = run_refresh_cost_attribution_from_summary(
+                              engine,
+                              source=CostAttributionSource(
+                                  vendor="alibaba",
+                                  account_id=item["account_id"],
+                              ),
+                              start_date=min(dates),
+                              end_date=max(dates),
+                          )
+                          print(summary)
+                  finally:
+                      engine.dispose()
+                  PY
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_ALIBABA_BILLING_TABLE
+                  value: gcp-digital-bi.alibaba_cloud.daily_en_*
+                - name: COST_INSIGHT_ALIBABA_ACCOUNT_ID
+                  value: "5028760335873601"
+                - name: COST_INSIGHT_ALIBABA_EARLIEST_USAGE_DATE
+                  value: "2026-06-01"
+                - name: COST_INSIGHT_ALIBABA_SYNC_LAG_DAYS
+                  value: "5"
+                - name: COST_INSIGHT_ALIBABA_EXPORT_OVERLAP_DAYS
+                  value: "0"
+                - name: COST_INSIGHT_ALIBABA_SYNC_PAGE_SIZE
+                  value: "1000"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
   name: cost-insight-sync-gcs-cache-last-seen
   namespace: apps
   labels:
@@ -260,7 +377,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-17-g4c68b56
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -327,7 +444,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-17-g4c68b56
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -413,7 +530,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-17-g4c68b56
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -493,7 +610,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-17-g4c68b56
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -585,7 +702,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: materialize-cost-allocations
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-17-g4c68b56
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -718,7 +835,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.30-17-g4c68b56
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-5-g6adefe9
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
