@@ -2,11 +2,6 @@
 agent:
   maxRequestsPerHostStr: "200" # need to restart controller after updated it.
   containerCap: 200
-  # Dynamic `agent { kubernetes { ... } }` pipelines otherwise use the
-  # Kubernetes plugin's smaller built-in jnlp defaults (256Mi without a limit).
-  # Inherit this chart-managed template so every staging agent gets the
-  # resources and JVM settings below unless it explicitly overrides them.
-  defaultsProviderTemplate: "default"
   resources:
     requests:
       cpu: 100m
