@@ -100,7 +100,7 @@ spec:
         enabled: false
       image:
         repository: ghcr.io/ti-community-infra/prow/hook
-        tag: v20251224-1f667ada0
+        tag: v20260910-44fbbcd1d
       kubeconfigSecret: prow-kubeconfig
       additionalArgs:
         - --kubeconfig=/etc/kubeconfig/config
