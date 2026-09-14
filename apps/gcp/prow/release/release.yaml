@@ -127,6 +127,7 @@ spec:
             tikv/rocksdb
             tikv/rust-rocksdb
             tikv/tikv
+            tidbcloud/cloud-storage-engine
     pcm:
       image:
         repository: ghcr.io/ti-community-infra/prow/prow-controller-manager
