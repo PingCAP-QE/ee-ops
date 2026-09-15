@@ -37,7 +37,7 @@ spec:
     conf: |-
       # https://github.com/buchgr/bazel-remote#example-configuration-file
       dir: /data
-      # Keep these two limits below the volumeClaimTemplates storage size (200Gi) below,
+      # Keep these two limits below the volumeClaimTemplates storage size (500Gi) below,
       # leaving headroom for filesystem overhead and eviction lag so the PVC never fills
       # up. If you change the PVC size or the storageClass (see volumeClaimTemplates
       # below), update max_size/max_size_hard_limit accordingly.
@@ -63,7 +63,7 @@ spec:
     replicaCount: 2
     service:
       # A CI build runs many bazel steps; pin a client to a single replica so the
-      # per-pod local disk cache (170Gi) keeps hitting instead of bouncing between
+      # per-pod local disk cache (425Gi) keeps hitting instead of bouncing between
       # the two pods. timeoutSeconds covers the longest expected CI job.
       sessionAffinity: ClientIP
       sessionAffinityConfig:
@@ -91,7 +91,7 @@ spec:
             - ReadWriteOnce
           # ci-rwo maps to Tencent CBS CLOUD_HSSD (enhanced SSD); the built-in default
           # "cbs" class uses CLOUD_PREMIUM (HDD tier). Keep this an SSD class and keep
-          # the size above conf's max_size_hard_limit (180 GiB); see conf above.
+          # the size above conf's max_size_hard_limit (450 GiB); see conf above.
           storageClassName: ci-rwo
           resources:
             requests:
