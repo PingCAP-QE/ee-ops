@@ -32,6 +32,13 @@ spec:
       # renovate: datasource=docker depName=ghcr.io/kellnr/kellnr versioning=semver
       tag: 6.8.0
     replicaCount: 1
+    # The chart defaults to RollingUpdate (maxSurge: 100%, maxUnavailable: 0).
+    # With a single replica on a RWO volume, the surge pod lands on another node
+    # and can never attach the volume while the old pod still holds it, so the
+    # rollout deadlocks on Multi-Attach and Helm times out. Recreate terminates
+    # the old pod first, allowing the volume to reattach.
+    strategy:
+      type: Recreate
     nodeSelector:
       kubernetes.io/arch: amd64
       compute-class: ee-application
