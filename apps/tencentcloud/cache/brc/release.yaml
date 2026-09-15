@@ -71,11 +71,11 @@ spec:
           timeoutSeconds: 10800
     resources:
       requests:
-        cpu: "1"
-        memory: 12Gi
+        cpu: "4"
+        memory: 8Gi
       limits:
-        cpu: "3"
-        memory: 12Gi
+        cpu: "16"
+        memory: 16Gi
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
