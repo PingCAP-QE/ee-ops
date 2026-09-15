@@ -37,10 +37,10 @@ spec:
       compute-class: ee-application
     resources:
       requests:
-        cpu: "500m"
+        cpu: "100m"
         memory: 1Gi
       limits:
-        cpu: "2"
+        cpu: "1"
         memory: 4Gi
     secret:
       existingSecret: kellnr-secret
