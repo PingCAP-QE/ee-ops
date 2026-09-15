@@ -7,9 +7,11 @@ metadata:
     app.kubernetes.io/name: cost-insight-resource-serving-materialization
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # This independent 30-day repair runs after the Beijing work window; daily attribution
-  # already republishes its affected resource-serving windows inline.
-  schedule: "30 14 * * *"
+  # Run in the pre-work window, after the Monday unmatched-resource deadline
+  # and clear of the 14:00 allocation materialization. Daily attribution
+  # republishes every touched resource-serving window inline, so this does not
+  # delay fresh billing data.
+  schedule: "15 4 * * *"
   timeZone: Asia/Shanghai
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
@@ -18,8 +20,9 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 0
-      # Finish before the next billing-summary window starts at 21:10.
-      activeDeadlineSeconds: 21600
+      # Recent runs take about 37 minutes. Three hours leaves ample headroom
+      # while guaranteeing this repair cannot enter the 08:00 work window.
+      activeDeadlineSeconds: 10800
       ttlSecondsAfterFinished: 604800
       template:
         metadata:
