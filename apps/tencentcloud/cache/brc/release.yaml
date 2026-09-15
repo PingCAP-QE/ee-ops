@@ -41,8 +41,8 @@ spec:
       # leaving headroom for filesystem overhead and eviction lag so the PVC never fills
       # up. If you change the PVC size or the storageClass (see volumeClaimTemplates
       # below), update max_size/max_size_hard_limit accordingly.
-      max_size: 170 # The maximum size of bazel-remote's local disk cache in GiB (85% of PVC).
-      max_size_hard_limit: 180 # Reject writes once this GiB limit is reached to avoid ENOSPC (~90% of PVC).
+      max_size: 425 # The maximum size of bazel-remote's local disk cache in GiB (85% of PVC).
+      max_size_hard_limit: 450 # Reject writes once this GiB limit is reached to avoid ENOSPC (~90% of PVC).
       experimental_remote_asset_api: true
       access_log_level: all
       http_address: ":8080"
@@ -95,7 +95,7 @@ spec:
           storageClassName: ci-rwo
           resources:
             requests:
-              storage: 200Gi # Must stay larger than conf's max_size_hard_limit (180 GiB); see conf above.
+              storage: 500Gi # Must stay larger than conf's max_size_hard_limit (450 GiB); see conf above.
     volumeMounts:
       - mountPath: /data
         name: bazel-remote-cache
