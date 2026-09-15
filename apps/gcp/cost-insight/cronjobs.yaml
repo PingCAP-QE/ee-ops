@@ -421,9 +421,9 @@ metadata:
     app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-delete-cas
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # A 30-minute start allowance plus the 12-hour deadline still ends by 08:00 Beijing time.
-  # Starting later reduces contention with the afternoon allocation materialization.
-  schedule: "30 19 * * *"
+  # A 30-minute start allowance plus the 12-hour deadline ends by 07:30,
+  # leaving the 08:00 Beijing work window free for Dashboard traffic.
+  schedule: "0 19 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
