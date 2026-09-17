@@ -1,7 +1,7 @@
 # Envoy Gateway receives plain HTTP from this GKE HTTPS frontend and its OIDC
-# logout handler otherwise derives an http:// post-logout Location. Keep the
-# request on the Envoy path so its cookies are cleared, but canonicalize this
-# response for the Portal at the HTTPS edge.
+# logout handler otherwise derives an http:// post-logout Location for the
+# site root. Keep the request on the Envoy path so its cookies are cleared,
+# then send the Portal path through the Gateway's HTTP-to-HTTPS redirect.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -21,7 +21,7 @@ spec:
           responseHeaderModifier:
             set:
               - name: Location
-                value: https://prow.tidb.net/ee
+                value: http://prow.tidb.net/ee
       backendRefs:
         - name: eg-internal
           port: 80
