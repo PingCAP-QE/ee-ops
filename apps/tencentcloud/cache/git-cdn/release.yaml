@@ -64,6 +64,14 @@ spec:
     volumeMounts:
       - name: data
         mountPath: /data
+
+    # volumeClaimTemplates is immutable and only affects newly created PVCs, so Flux
+    # cannot apply a `storage` change here. To resize the existing PVCs, run:
+    #   SIZE=200Gi
+    #   for i in 0 1; do kubectl -n cache patch pvc data-git-cdn-$i --type merge -p "{\"spec\":{\"resources\":{\"requests\":{\"storage\":\"$SIZE\"}}}}"; done
+    #   kubectl -n cache delete pod git-cdn-0 git-cdn-1               # finish the filesystem resize
+    #   kubectl -n cache delete statefulset git-cdn --cascade=orphan  # keep pods/PVCs, allow new template
+    #   flux reconcile helmrelease git-cdn -n cache --force
     volumeClaimTemplates:
       - metadata:
           name: data
