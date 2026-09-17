@@ -32,6 +32,9 @@ metadata:
 spec:
   parentRefs:
     - name: external-https
+      sectionName: wildcard-tidb-net-https
+    - name: external-https
+      sectionName: wildcard-pingcap-net-https
   hostnames:
     - prow.tidb.net
     - publisher.pingcap.net
