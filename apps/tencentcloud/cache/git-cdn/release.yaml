@@ -73,11 +73,11 @@ spec:
           storageClassName: ci-rwo
           resources:
             requests:
-              storage: 100Gi
+              storage: 200Gi
     configuration:
       GITSERVER_UPSTREAM: https://github.com/
-      # Keep the cache below the 100Gi PVC capacity for filesystem overhead and temporary writes.
-      PACK_CACHE_SIZE_GB: 90
+      # Keep the cache below the 200Gi PVC capacity for filesystem overhead and temporary writes.
+      PACK_CACHE_SIZE_GB: 180
       # directory where to put cache files
       WORKING_DIRECTORY: /data
       PACK_CACHE_MULTI: true
