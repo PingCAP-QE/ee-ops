@@ -13,10 +13,6 @@ spec:
   oidc:
     provider:
       issuer: https://accounts.google.com
-      # Do not silently select the browser's existing Google session after a
-      # Portal logout. Google will show the account chooser on the next OIDC
-      # authorization request.
-      authorizationEndpoint: https://accounts.google.com/o/oauth2/v2/auth?prompt=select_account
     clientIDRef:
       name: ee-portal-oidc
     clientSecret:
