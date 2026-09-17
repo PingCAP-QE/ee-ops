@@ -7,4 +7,3 @@ resources:
   - envoy-healthz.yaml
   - route-gke-http-to-https.yaml
   - route-gke-to-envoy.yaml
-  - route-gke-to-envoy-ee-logout.yaml

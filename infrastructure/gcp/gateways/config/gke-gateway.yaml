@@ -5,8 +5,8 @@ metadata:
 spec:
   gatewayClassName: gke-l7-global-external-managed
   listeners:
-    # Keep the HTTP listener scoped to prow.tidb.net. It is used only for the
-    # gateway-level HTTP-to-HTTPS redirect after Portal logout.
+    # Keep the HTTP listener scoped to prow.tidb.net for the gateway-level
+    # HTTP-to-HTTPS redirect.
     - name: prow-tidb-net-http
       protocol: HTTP
       port: 80
