@@ -5,4 +5,5 @@ resources:
   - envoy-gatewayclass.yaml
   - envoy-gateway-internal.yaml
   - envoy-healthz.yaml
+  - route-gke-http-to-https.yaml
   - route-gke-to-envoy.yaml
