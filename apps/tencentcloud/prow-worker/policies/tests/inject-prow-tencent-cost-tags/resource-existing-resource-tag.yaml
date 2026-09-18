@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prow-existing-resource-tag
+  namespace: prow-test-pods
+  labels:
+    author: manual-author
+    created-by-prow: "true"
+    org: manual-org
+    repo: manual-repo
+    prow.k8s.io/refs.author: alice
+    prow.k8s.io/refs.base_ref: master
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+  annotations:
+    eks.tke.cloud.tencent.com/eks-id: eks-explicit-supernode
+    eks.tke.cloud.tencent.com/resource-tag: '{"workload":"manual"}'
+spec:
+  containers:
+    - name: test
+      image: busybox:1.36

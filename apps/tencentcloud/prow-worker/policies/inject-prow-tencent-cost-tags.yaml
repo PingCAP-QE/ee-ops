@@ -1,0 +1,104 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: inject-prow-tencent-cost-tags
+spec:
+  # Cost attribution must not make a Prow job unavailable.
+  failurePolicy: Ignore
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConditions:
+    - name: is-pod
+      expression: object.kind == 'Pod'
+    - name: is-prow-pod
+      expression: >-
+        string(object.metadata.?labels.orValue({})[?'created-by-prow'].orValue('')) == 'true'
+    - name: has-prow-repository-refs
+      expression: >-
+        string(object.metadata.?labels.orValue({})[?'prow.k8s.io/refs.org'].orValue('')) != '' &&
+        string(object.metadata.?labels.orValue({})[?'prow.k8s.io/refs.repo'].orValue('')) != ''
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE"]
+        resources: ["pods"]
+  variables:
+    - name: org
+      expression: string(object.metadata.labels['prow.k8s.io/refs.org'])
+    - name: repo
+      expression: string(object.metadata.labels['prow.k8s.io/refs.repo'])
+    - name: author
+      expression: >-
+        string(object.metadata.?labels.orValue({})[?'prow.k8s.io/refs.author'].orValue(''))
+    - name: targetBranch
+      expression: >-
+        string(object.metadata.?labels.orValue({})[?'prow.k8s.io/refs.base_ref'].orValue(''))
+    - name: resourceTags
+      expression: >-
+        variables.author != '' ?
+        (variables.targetBranch != '' ?
+          {'author': variables.author, 'org': variables.org, 'repo': variables.repo, 'target_branch': variables.targetBranch} :
+          {'author': variables.author, 'org': variables.org, 'repo': variables.repo}) :
+        (variables.targetBranch != '' ?
+          {'org': variables.org, 'repo': variables.repo, 'target_branch': variables.targetBranch} :
+          {'org': variables.org, 'repo': variables.repo})
+    - name: resourceTagJSON
+      expression: json.marshal(variables.resourceTags)
+    - name: hasResourceTag
+      expression: >-
+        has(object.metadata.annotations) &&
+        'eks.tke.cloud.tencent.com/resource-tag' in object.metadata.annotations
+    - name: hasEksID
+      expression: >-
+        has(object.metadata.annotations) &&
+        'eks.tke.cloud.tencent.com/eks-id' in object.metadata.annotations
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          // Keep generic Pod labels queryable. Prow refs are authoritative and
+          // replace conflicting generic labels; Tencent billing uses resource-tag.
+          (variables.author != '' ?
+            [JSONPatch{
+              op: "add",
+              path: "/metadata/labels/author",
+              value: variables.author
+            }] : []) +
+          [
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/org",
+              value: variables.org
+            },
+            JSONPatch{
+              op: "add",
+              path: "/metadata/labels/repo",
+              value: variables.repo
+            }
+          ] +
+          (has(object.metadata.annotations) ?
+            // Preserve explicit cloud scheduling and workload-attribution annotations.
+            (variables.hasResourceTag ? [] : [JSONPatch{
+              op: "add",
+              path: "/metadata/annotations/eks.tke.cloud.tencent.com~1resource-tag",
+              value: variables.resourceTagJSON
+            }]) +
+            (variables.hasEksID ? [] : [JSONPatch{
+              op: "add",
+              path: "/metadata/annotations/eks.tke.cloud.tencent.com~1eks-id",
+              value: "true"
+            }]) :
+            [JSONPatch{
+              op: "add",
+              path: "/metadata/annotations",
+              value: {
+                "eks.tke.cloud.tencent.com/resource-tag": variables.resourceTagJSON,
+                "eks.tke.cloud.tencent.com/eks-id": "true"
+              }
+            }]
+          )

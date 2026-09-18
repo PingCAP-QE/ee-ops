@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prow-missing-base-ref
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+    prow.k8s.io/refs.author: alice
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+spec:
+  containers:
+    - name: test
+      image: busybox:1.36
