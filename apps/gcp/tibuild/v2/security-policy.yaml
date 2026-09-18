@@ -36,10 +36,6 @@ spec:
     cookieNames:
       accessToken: ee-apps-access-token
       idToken: ee-apps-id-token
-    # Keep the ID token readable by the JWT claim extractor below. The cookie
-    # remains HttpOnly and Secure; Envoy still verifies the signature before
-    # forwarding any identity headers.
-    disableTokenEncryption: true
     redirectURL: https://prow.tidb.net/tibuild/oauth2/callback
     passThroughAuthHeader: true
     scopes:
@@ -57,17 +53,3 @@ spec:
           uri: https://www.googleapis.com/oauth2/v3/certs
         audiences:
           - prow.tidb.net
-          - 890604261603-al13mf4uv3g891tctf31pebp5ohavifk.apps.googleusercontent.com
-        extractFrom:
-          headers:
-            - name: Authorization
-              valuePrefix: "Bearer "
-          cookies:
-            - ee-apps-id-token
-        claimToHeaders:
-          - claim: sub
-            header: X-User-Id
-          - claim: email
-            header: X-User-Email
-          - claim: name
-            header: X-User-Name
