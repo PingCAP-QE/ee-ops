@@ -23,10 +23,6 @@ spec:
     cookieNames:
       accessToken: ee-apps-access-token
       idToken: ee-apps-id-token
-    # Keep the cookie format compatible with the TiBuild API policy, which
-    # validates the shared ID-token cookie when serving module API requests.
-    # This does not enable JWT authentication on the Portal route.
-    disableTokenEncryption: true
     redirectURL: https://prow.tidb.net/ee/oauth2/callback
     logoutPath: /ee/logout
     scopes:
