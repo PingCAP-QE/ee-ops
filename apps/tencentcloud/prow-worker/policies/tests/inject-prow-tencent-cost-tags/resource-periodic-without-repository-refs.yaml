@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prow-periodic-without-repository-refs
+  namespace: prow-test-pods
+  annotations:
+    prow.k8s.io/job: periodic-cluster-maintenance
+  labels:
+    created-by-prow: "true"
+spec:
+  containers:
+    - name: test
+      image: busybox:1.36

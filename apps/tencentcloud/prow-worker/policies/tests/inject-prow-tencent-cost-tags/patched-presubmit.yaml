@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    eks.tke.cloud.tencent.com/eks-id: "true"
+    eks.tke.cloud.tencent.com/resource-tag: '{"author":"alice","org":"pingcap","repo":"tidb","target_branch":"master"}'
+    prow.k8s.io/job: pull-tidb-test
+  labels:
+    author: alice
+    created-by-prow: "true"
+    org: pingcap
+    prow.k8s.io/refs.author: alice
+    prow.k8s.io/refs.base_ref: master
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+    repo: tidb
+  name: prow-presubmit
+  namespace: prow-test-pods
+spec:
+  containers:
+    - image: busybox:1.36
+      name: test
