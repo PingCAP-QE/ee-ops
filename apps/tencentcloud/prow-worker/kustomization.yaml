@@ -7,3 +7,5 @@ resources:
   - secrets
   # reuse from jenkins agent namespaced policies
   - ../jenkins/post/_base/policies/set-pod-compute-class.yaml
+  # TKE supernode organization-billing attribution for Prow Pods
+  - policies/inject-prow-tencent-cost-tags.yaml
