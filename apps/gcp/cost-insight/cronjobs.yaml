@@ -1000,7 +1000,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-tencent-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.13-5-g825d500
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.13-9-g78fa6a2
               imagePullPolicy: Always
               command:
                 - /bin/sh
