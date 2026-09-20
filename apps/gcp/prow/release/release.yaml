@@ -84,10 +84,14 @@ spec:
     tide:
       image:
         repository: ghcr.io/ti-community-infra/prow/tide
-        tag: v20260224-5ba85b827
+        tag: v20260920-62485cd77
       additionalArgs:
         - --sync-hourly-tokens=1200 # default is 800
         - --status-hourly-tokens=600 # default is 400
+        # Merge stacked PRs with the asynchronous merge endpoint. 'auto' keeps
+        # the synchronous fast path for regular PRs and only falls back to the
+        # asynchronous endpoint when GitHub rejects a stacked PR.
+        - --merge-mode=auto
       resources:
         requests:
           cpu: 1000m
