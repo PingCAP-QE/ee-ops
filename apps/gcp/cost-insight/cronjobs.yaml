@@ -790,7 +790,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: materialize-cost-allocations
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-1-gb8abd19
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -1000,7 +1000,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-tencent-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.13-9-g78fa6a2
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-1-gb8abd19
               imagePullPolicy: Always
               command:
                 - /bin/sh
@@ -1016,34 +1016,37 @@ spec:
 
                   from cost_insight.common.config import get_settings
                   from cost_insight.common.db import build_engine
-                  from cost_insight.jobs.refresh_attribution_daily import (
-                      CostAttributionSource,
-                      run_refresh_cost_attribution_from_summary,
+                  from cost_insight.jobs.allocate_tencent_ci_cost import (
+                      run_allocate_tencent_ci_cost,
                   )
 
                   with open("/tmp/summary.json", encoding="utf-8") as f:
                       payload = json.load(f)
-                  dates = [
+                  dates = sorted(
                       date.fromisoformat(value)
                       for value in payload.get("touched_usage_dates") or []
-                  ]
+                  )
                   if not dates:
-                      print("No Tencent usage dates changed; skip attribution refresh.")
-                  else:
-                      engine = build_engine(get_settings())
-                      try:
-                          result = run_refresh_cost_attribution_from_summary(
-                              engine,
-                              source=CostAttributionSource(
-                                  vendor="tencent",
-                                  account_id=payload["account_id"],
-                              ),
-                              start_date=min(dates),
-                              end_date=max(dates),
-                          )
-                          print(result)
-                      finally:
-                          engine.dispose()
+                      print("No Tencent usage dates changed; skip CI allocation.")
+                      raise SystemExit(0)
+
+                  engine = build_engine(get_settings())
+                  try:
+                      for usage_date in dates:
+                          try:
+                              result = run_allocate_tencent_ci_cost(
+                                  engine,
+                                  start_date=usage_date,
+                                  end_date=usage_date,
+                              )
+                          except ValueError as exc:
+                              if "lacks __tencent_product_code; reimport first" not in str(exc):
+                                  raise
+                              print(f"Skip Tencent CI allocation for {usage_date}: {exc}")
+                          else:
+                              print(result)
+                  finally:
+                      engine.dispose()
                   PY
               env:
                 - name: PYTHONUNBUFFERED
