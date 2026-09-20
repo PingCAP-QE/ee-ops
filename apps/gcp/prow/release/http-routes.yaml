@@ -10,6 +10,7 @@ spec:
       namespace: infra
   hostnames:
     - prow.tidb.net
+    - prow.pingcap.net
   rules:
     - backendRefs:
         - name: prow-deck
