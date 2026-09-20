@@ -71,7 +71,7 @@ spec:
     env:
       # Displayed in the dashboard sidebar; update with each dashboard release.
       - name: CI_DASHBOARD_VERSION
-        value: "1.8.3"
+        value: "1.8.4"
       - name: CI_DASHBOARD_LOG_LEVEL
         value: INFO
       - name: CI_DASHBOARD_ENABLE_RUNTIME_INSIGHTS
