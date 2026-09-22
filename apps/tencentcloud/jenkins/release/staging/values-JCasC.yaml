@@ -163,7 +163,10 @@ controller:
                 }
                 steps {
                   jobDsl {
-                    targets('jobs/**/*.groovy')
+                    # Scan both the legacy `jobs/` tree and the migrated
+                    # `jenkins/jobs/` tree so job discovery survives the
+                    # one-folder-per-job migration regardless of progress.
+                    targets('jobs/**/*.groovy\njenkins/jobs/**/*.groovy')
                     failOnMissingPlugin(false)
                     ignoreMissingFiles(true)
                     ignoreExisting(false)
