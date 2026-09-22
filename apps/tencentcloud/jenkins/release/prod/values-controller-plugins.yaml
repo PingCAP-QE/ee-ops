@@ -24,7 +24,7 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
-    - artifact-manager-s3:986.v7c9a_d15576b_b_
+    - artifact-manager-s3::https://github.com/wuhuizuo/artifact-manager-s3-plugin/releases/download/986.1-pingcap2/artifact-manager-s3-986.1-pingcap2.hpi
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-2/cdevents-1-40-pingcap-2.hpi
     - generic-webhook-trigger:2.4.2
