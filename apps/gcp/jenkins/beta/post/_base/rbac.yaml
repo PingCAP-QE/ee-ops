@@ -40,6 +40,3 @@ subjects:
   - kind: ServiceAccount
     name: jenkins
     namespace: ${CONTROLLER_NAMESPACE}
-  - kind: ServiceAccount
-    name: jenkins-staging
-    namespace: ${CONTROLLER_NAMESPACE}
