@@ -37,7 +37,7 @@ Each cluster has a `README.md` under `clusters/<cluster>/` listing required secr
 
 ## Jenkins Instances (this repo)
 
-- gcp: `apps/gcp/jenkins/beta/` — **two** instances: main (from `release/values-*.yaml`) and staging (from `release/staging/values-*.yaml`); both are active.
+- gcp: `apps/gcp/jenkins/beta/` — one instance: main (from `release/values-*.yaml`). The staging instance (`release/staging/`) was removed.
 - tencentcloud: `apps/tencentcloud/jenkins/` — only `release/staging/values-*.yaml` is active (non-staging files commented out in kustomization).
 - Values files are bundled into a secret via `secretGenerator: jenkins-release-values` in the release kustomization — a values file edit only takes effect after Flux regenerates that secret and the helm release upgrades.
 - **Jenkins global env vars**: declared in `values-JCasC.yaml` under the `global-env:` configScript (`jenkins.globalNodeProperties.envVars`). Example: tencentcloud sets `GOPROXY`, `BAZELISK_BASE_URL`; gcp instances each have their own `global-env` block. Pipelines read them via `env.<NAME>`. These are per-cloud — keep cloud-specific values (registries, mirrors) here, not in ci pipelines.
