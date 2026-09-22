@@ -9,7 +9,7 @@ Production cluster for Tekton CI/CD workloads, managed by FluxCD v2.
 | flux-system | `./clusters/prod2/flux-system` | Flux components, sync, notifications |
 | sources | `./clusters/prod2` (`sources.yaml`) | `GitRepository` sources (ci, artifacts) |
 | infrastructure | `./infrastructure/prod2` | external-secrets, gateways, kyverno, openebs, secret-generator, etc. |
-| apps | `./apps/prod2` | tekton, tibuild, publisher, zot, harbor, chatops-lark, etc. |
+| apps | `./apps/prod2` | tekton, tibuild, publisher, zot, harbor, etc. |
 
 ## Prepare
 
