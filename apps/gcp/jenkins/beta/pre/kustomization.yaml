@@ -5,7 +5,7 @@ resources:
   - secret-jenkins-cache.yaml
   - secret-jenkins-artifact-s3.yaml
   - credential-jenkins-artifact-s3-auth.yaml
-  # Provider credentials are consumed by GCP staging in this phase.
+  # Provider credentials are consumed by the Jenkins instances.
   - credential-github.yaml
   - credential-codecov.yaml
   - credential-ks3util.yaml
