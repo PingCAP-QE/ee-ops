@@ -701,7 +701,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-f04-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.13-3-g43f1a6f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-8-ged5b3ac
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
