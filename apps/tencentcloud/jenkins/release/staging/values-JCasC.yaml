@@ -163,13 +163,13 @@ controller:
                 }
                 steps {
                   jobDsl {
-                    # Scan both the legacy `jobs/` tree and the migrated
-                    # `jenkins/jobs/` tree so job discovery survives the
-                    # one-folder-per-job migration regardless of progress.
-                    # `*.groovy` rather than `dsl.groovy`: the folder
-                    # definitions in `aa_folder.groovy` must be executed too,
-                    # otherwise the folders (and their shared-library config)
-                    # are never generated.
+                    // Scan both the legacy `jobs/` tree and the migrated
+                    // `jenkins/jobs/` tree so job discovery survives the
+                    // one-folder-per-job migration regardless of progress.
+                    // `*.groovy` rather than `dsl.groovy`: the folder
+                    // definitions in `aa_folder.groovy` must be executed too,
+                    // otherwise the folders (and their shared-library config)
+                    // are never generated.
                     targets('jobs/**/*.groovy\njenkins/jobs/**/*.groovy')
                     failOnMissingPlugin(false)
                     ignoreMissingFiles(true)
