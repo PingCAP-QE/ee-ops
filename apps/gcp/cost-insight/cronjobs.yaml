@@ -678,11 +678,11 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-aws-f04-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Keep this paused until migration 023 is applied, the source is explicitly
-  # enabled after a dry run, and this manifest is updated to suspend: false.
+  # The source passed dry-run and backfill validation; its dedicated bounded job
+  # keeps this profile out of the general monthly AWS sync.
   schedule: "30 23 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
