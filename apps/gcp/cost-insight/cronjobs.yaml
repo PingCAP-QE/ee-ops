@@ -146,7 +146,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-azure-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-10-g20f57cb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -610,7 +610,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-1-gb8abd19
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-10-g20f57cb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -788,7 +788,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-10-g20f57cb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
