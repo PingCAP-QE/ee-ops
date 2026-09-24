@@ -60,7 +60,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/ci-dashboard
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/ci-dashboard versioning=semver
-      tag: v2026.9.20-7-g600b132
+      tag: v2026.9.20-13-gc1f5173
     resources:
       requests:
         cpu: "2"
@@ -71,7 +71,7 @@ spec:
     env:
       # Displayed in the dashboard sidebar; update with each dashboard release.
       - name: CI_DASHBOARD_VERSION
-        value: "1.9.1"
+        value: "1.9.3"
       - name: CI_DASHBOARD_LOG_LEVEL
         value: INFO
       - name: CI_DASHBOARD_ENABLE_RUNTIME_INSIGHTS
