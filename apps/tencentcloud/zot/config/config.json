@@ -4,7 +4,7 @@
     "rootDirectory": "/var/lib/registry",
     "remoteCache": true,
     "commit": true,
-    "dedupe": true,
+    "dedupe": false,
     "gc": true,
     "gcDelay": "1h",
     "gcInterval": "1h",
