@@ -196,6 +196,7 @@ spec:
                               ),
                               start_date=min(dates),
                               end_date=max(dates),
+                              tcms_allocation_table=settings.tcms_allocation.allocation_table,
                           )
                           print(summary)
                   finally:
