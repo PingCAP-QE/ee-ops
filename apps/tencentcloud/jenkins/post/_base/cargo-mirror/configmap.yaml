@@ -1,15 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: cargo-mirror-v2
+  name: cargo-mirror
 immutable: true
 data:
   config.toml: |
     [http]
     timeout = 600
-
-    [net]
-    git-fetch-with-cli = true
 
     [source.crates-io]
     replace-with = "kellnr-cratesio"

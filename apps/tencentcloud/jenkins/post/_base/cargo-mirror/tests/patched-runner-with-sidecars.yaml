@@ -23,4 +23,4 @@ spec:
   volumes:
     - name: cargo-mirror-config
       configMap:
-        name: cargo-mirror-v2
+        name: cargo-mirror

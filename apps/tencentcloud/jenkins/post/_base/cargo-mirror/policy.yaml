@@ -33,7 +33,7 @@ spec:
               volumes: [Object.spec.volumes{
                 name: "cargo-mirror-config",
                 configMap: Object.spec.volumes.configMap{
-                  name: "cargo-mirror-v2"
+                  name: "cargo-mirror"
                 }
               }],
               containers: [Object.spec.containers{
