@@ -379,7 +379,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.27-2-g18b8558
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
