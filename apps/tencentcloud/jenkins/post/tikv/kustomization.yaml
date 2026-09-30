@@ -4,4 +4,3 @@ namespace: jenkins-tikv
 resources:
   - namespace.yaml
   - ../_base
-  - ../_base/cargo-mirror
