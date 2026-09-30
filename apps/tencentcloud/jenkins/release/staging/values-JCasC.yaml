@@ -235,8 +235,6 @@ controller:
                     value: "https://rsproxy.cn"
                   - key: "RUSTUP_UPDATE_ROOT"
                     value: "https://rsproxy.cn/rustup"
-                  - key: "CARGO_NET_GIT_FETCH_WITH_CLI"
-                    value: "true"
       pipeline-cache: |
         unclassified:
           pipeline-cache:
