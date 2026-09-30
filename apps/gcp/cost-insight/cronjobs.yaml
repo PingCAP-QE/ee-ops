@@ -354,7 +354,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcs-cache-last-seen
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # This audit-log aggregation is independent of the billing publication pipeline.
+  # This audit-log aggregation is independent of the billing publication pipeline,
+  # but persists its execution state in the shared CI Dashboard/Cost Insight database.
   schedule: "20 21 * * *"
   timeZone: Asia/Shanghai
   suspend: false
@@ -378,7 +379,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.27-2-g18b8558
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -386,6 +387,9 @@ spec:
               args:
                 - |
                   cost-insight sync-gcs-cache-last-seen
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
               env:
                 - name: PYTHONUNBUFFERED
                   value: "1"
