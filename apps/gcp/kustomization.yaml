@@ -10,11 +10,13 @@ resources:
   - cloudevents-server
   - ci-dashboard
   - cost-insight
+  - chatops-lark
   - dl
   - roster
   - publisher
   - tibuild
   - mac-builder-operator
+  - ee-portal
   # workloads
   - acr-runners
   - jenkins/beta

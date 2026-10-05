@@ -1,0 +1,74 @@
+id: build-detail
+module: tibuild
+title: Build details
+type: detail
+route: /tibuild/builds/:id
+request:
+  dataSource: tibuild
+  method: GET
+  path: /devbuilds/{id}
+header:
+  titleTemplate: "Build #{/id}"
+  statusPointer: /status/status
+  subtitleFields:
+    - {label: Product, pointer: /spec/product}
+    - {label: Git ref, pointer: /spec/gitRef}
+    - {label: Creator, pointer: /meta/createdBy}
+sections:
+  - title: Build information
+    fields:
+      - {label: Product, pointer: /spec/product}
+      - {label: Edition, pointer: /spec/edition}
+      - {label: Platform, pointer: /spec/platform}
+      - {label: Git ref, pointer: /spec/gitRef, format: code}
+      - {label: Git commit, pointer: /spec/gitHash, format: copy}
+      - {label: Created, pointer: /meta/createdAt, format: date-time}
+      - {label: Updated, pointer: /meta/updatedAt, format: date-time}
+  - title: Failure summary
+    fields:
+      - {label: Error, pointer: /status/errMsg, hideWhenEmpty: true}
+      - {label: Pipeline, pointer: /status/pipelineViewURL, format: link, hideWhenEmpty: true}
+  - title: Tekton pipelines
+    collectionPointer: /status/tektonStatus/pipelines
+    emptyText: Pipeline information will appear after the build starts.
+    collectionFields:
+      - {label: Name, pointer: /name, format: code}
+      - {label: Platform, pointer: /platform}
+      - {label: Status, pointer: /status, format: status, statusMap: {Pending: info, Running: info, Succeeded: success, Failed: danger, Cancelled: warning}}
+      - {label: Started, pointer: /startAt, format: date-time}
+      - {label: Details, pointer: /url, format: link}
+  - title: Container images
+    collectionPointer: /status/buildReport/images
+    emptyText: Images will appear after a successful build.
+    collectionFields:
+      - {label: Platform, pointer: /platform}
+      - {label: Image, pointer: /url, format: copy}
+      - {label: Internal mirror, pointer: /internalURL, format: copy, hideWhenEmpty: true}
+  - title: Binary artifacts
+    collectionPointer: /status/buildReport/binaries
+    emptyText: Binary downloads will appear after a successful build.
+    collectionFields:
+      - {label: Component, pointer: /component}
+      - {label: Platform, pointer: /platform}
+      - {label: Download, pointer: /url, format: link}
+      - {label: SHA256, pointer: /sha256URL, format: link, hideWhenEmpty: true}
+actions:
+  - {name: refresh, label: Refresh, type: refresh}
+  - name: rerun
+    label: Rerun build
+    type: request
+    visibleWhen: {pointer: /permissions/canRerun, equals: true}
+    confirm:
+      title: Rerun this build?
+      description: TiBuild will create a new build with the same source and platform settings.
+    request:
+      dataSource: tibuild
+      method: POST
+      path: /devbuilds/{id}/rerun
+    successNavigate: /tibuild/builds/{id}
+    resultIDPointer: /id
+polling:
+  intervalMs: 5000
+  maxIntervalMs: 30000
+  whilePointer: /status/status
+  whileValues: [PENDING, PROCESSING]

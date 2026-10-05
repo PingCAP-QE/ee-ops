@@ -16,6 +16,6 @@ spec:
       ZOT_HTPASSWD: tencentcloud_zot_htpasswd
       ZOT_SESSION_KEYS_JSON: tencentcloud_zot_sessionKeys_json
       ZOT_SYNC_AUTH_CREDENTIALS_JSON: tencentcloud_zot_sync_auth_credentials_json
-      ZOT_GOOGLE_OAUTH_JSON: tencentcloud_zot_google_oauth_credentials
+      ZOT_GOOGLE_OAUTH_JSON: google-oauth2-client-zot
       ZOT_S3_JSON: tencentcloud_zot_s3_json
       S3_CREDENTIALS_JSON: tencentcloud_common_creds_json

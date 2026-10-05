@@ -5,4 +5,5 @@ resources:
   - ticdc
   - tidb
   - tiflash
+  - tiflow
   - tikv

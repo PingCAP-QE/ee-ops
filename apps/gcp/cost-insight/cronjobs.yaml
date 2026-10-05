@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcp-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 21:10 Asia/Shanghai, intentionally outside BJ work time.
-  schedule: "10 21 * * *"
+  # Start the daily billing pipeline immediately after the 08:00–12:00 Beijing work window.
+  schedule: "10 12 * * *"
   timeZone: Asia/Shanghai
   # Initial allocation backfill is complete; keep source facts current with daily syncs.
   suspend: false
@@ -32,7 +32,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-1-gb8abd19
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -116,13 +116,246 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
+  name: cost-insight-sync-azure-billing-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-azure-billing-summary
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Start after the Beijing work window; GCP starts first at 12:10.
+  schedule: "30 12 * * *"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-azure-billing-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          # Reuse the existing Workload Identity path; the bound GSA must have
+          # BigQuery jobUser plus Azure billing export dataset read access.
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-azure-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-10-g20f57cb
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-azure-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  python - <<'PY'
+                  import json
+                  from datetime import date
+
+                  from cost_insight.common.config import get_settings
+                  from cost_insight.common.db import build_engine
+                  from cost_insight.jobs.refresh_attribution_daily import (
+                      CostAttributionSource,
+                      run_refresh_cost_attribution_from_summary,
+                  )
+
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
+                  if isinstance(payload, dict):
+                      payload = [payload]
+
+                  settings = get_settings()
+                  engine = build_engine(settings)
+                  try:
+                      for item in payload or []:
+                          if not isinstance(item, dict):
+                              continue
+                          dates = [
+                              date.fromisoformat(value)
+                              for value in item.get("touched_usage_dates") or []
+                          ]
+                          if not dates:
+                              print(
+                                  f"No touched usage dates for {item.get('account_id')}; "
+                                  "skip attribution refresh."
+                              )
+                              continue
+                          summary = run_refresh_cost_attribution_from_summary(
+                              engine,
+                              source=CostAttributionSource(
+                                  vendor="azure",
+                                  account_id=item["account_id"],
+                              ),
+                              start_date=min(dates),
+                              end_date=max(dates),
+                              tcms_allocation_table=settings.tcms_allocation.allocation_table,
+                          )
+                          print(summary)
+                  finally:
+                      engine.dispose()
+                  PY
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_AZURE_BILLING_TABLE
+                  value: gcp-digital-bi.azure_billing.azure_billing_cost_*
+                - name: COST_INSIGHT_AZURE_SYNC_LAG_DAYS
+                  value: "3"
+                - name: COST_INSIGHT_AZURE_EXPORT_OVERLAP_DAYS
+                  value: "3"
+                - name: COST_INSIGHT_AZURE_SYNC_PAGE_SIZE
+                  value: "5000"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-insight-sync-alibaba-billing-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-alibaba-billing-summary
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Start after the existing summary schedules and keep five stable days behind the export.
+  schedule: "50 12 * * *"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 4
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-alibaba-billing-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          # Reuse the existing Workload Identity and production Cost Insight database secret.
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-alibaba-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              imagePullPolicy: IfNotPresent
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-alibaba-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  python - <<'PY'
+                  import json
+                  from datetime import date
+
+                  from cost_insight.common.config import get_settings
+                  from cost_insight.common.db import build_engine
+                  from cost_insight.jobs.refresh_attribution_daily import (
+                      CostAttributionSource,
+                      run_refresh_cost_attribution_from_summary,
+                  )
+
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
+                  if isinstance(payload, dict):
+                      payload = [payload]
+
+                  settings = get_settings()
+                  engine = build_engine(settings)
+                  try:
+                      for item in payload or []:
+                          if not isinstance(item, dict):
+                              continue
+                          dates = [
+                              date.fromisoformat(value)
+                              for value in item.get("touched_usage_dates") or []
+                          ]
+                          if not dates:
+                              print(
+                                  f"No touched usage dates for {item.get('account_id')}; "
+                                  "skip attribution refresh."
+                              )
+                              continue
+                          summary = run_refresh_cost_attribution_from_summary(
+                              engine,
+                              source=CostAttributionSource(
+                                  vendor="alibaba",
+                                  account_id=item["account_id"],
+                              ),
+                              start_date=min(dates),
+                              end_date=max(dates),
+                          )
+                          print(summary)
+                  finally:
+                      engine.dispose()
+                  PY
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_ALIBABA_BILLING_TABLE
+                  value: gcp-digital-bi.alibaba_cloud.daily_en_*
+                - name: COST_INSIGHT_ALIBABA_ACCOUNT_ID
+                  value: "5028760335873601"
+                - name: COST_INSIGHT_ALIBABA_EARLIEST_USAGE_DATE
+                  value: "2026-06-01"
+                - name: COST_INSIGHT_ALIBABA_SYNC_LAG_DAYS
+                  value: "5"
+                - name: COST_INSIGHT_ALIBABA_EXPORT_OVERLAP_DAYS
+                  value: "0"
+                - name: COST_INSIGHT_ALIBABA_SYNC_PAGE_SIZE
+                  value: "1000"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
   name: cost-insight-sync-gcs-cache-last-seen
   namespace: apps
   labels:
     app.kubernetes.io/name: cost-insight-sync-gcs-cache-last-seen
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 21:20 Asia/Shanghai, after the other daily cost jobs.
+  # This audit-log aggregation is independent of the billing publication pipeline,
+  # but persists its execution state in the shared CI Dashboard/Cost Insight database.
   schedule: "20 21 * * *"
   timeZone: Asia/Shanghai
   suspend: false
@@ -146,7 +379,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcs-cache-last-seen
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.27-2-g18b8558
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -154,6 +387,9 @@ spec:
               args:
                 - |
                   cost-insight sync-gcs-cache-last-seen
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
               env:
                 - name: PYTHONUNBUFFERED
                   value: "1"
@@ -190,8 +426,9 @@ metadata:
     app.kubernetes.io/name: cost-insight-cleanup-gcs-cache-delete-cas
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: daily 17:10 Asia/Shanghai.
-  schedule: "10 17 * * *"
+  # A 30-minute start allowance plus the 12-hour deadline ends by 07:30,
+  # leaving the 08:00 Beijing work window free for Dashboard traffic.
+  schedule: "0 19 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -212,7 +449,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: cleanup-gcs-cache-delete-cas
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -298,7 +535,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -355,8 +592,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-aws-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Interpreted with timeZone below: 21:40 Asia/Shanghai, after the GCP summary job.
-  schedule: "40 21 * * *"
+  # Start after the Beijing work window; allocation waits for this and the other summaries.
+  schedule: "40 12 * * *"
   timeZone: Asia/Shanghai
   suspend: false
   concurrencyPolicy: Forbid
@@ -366,7 +603,8 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 4
-      activeDeadlineSeconds: 7200
+      # The full AWS overlap-month sync plus per-day attribution took about two hours.
+      activeDeadlineSeconds: 14400
       template:
         metadata:
           labels:
@@ -377,7 +615,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-10-g20f57cb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -439,64 +677,71 @@ spec:
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cost-insight-materialize-cost-allocations
+  name: cost-insight-sync-aws-f04-billing-summary
   namespace: apps
   labels:
-    app.kubernetes.io/name: cost-insight-materialize-cost-allocations
+    app.kubernetes.io/name: cost-insight-sync-aws-f04-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Enable only after the initial backfill is validated. It runs after both
-  # billing-summary jobs and always republishes the complete configured history.
-  schedule: "10 22 * * *"
+  # The source passed dry-run and backfill validation; its dedicated bounded job
+  # keeps this profile out of the general monthly AWS sync.
+  schedule: "30 23 * * *"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
-  successfulJobsHistoryLimit: 3
-  failedJobsHistoryLimit: 3
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
   jobTemplate:
     spec:
-      backoffLimit: 1
-      activeDeadlineSeconds: 14400
+      backoffLimit: 2
+      activeDeadlineSeconds: 7200
       template:
         metadata:
           labels:
-            app.kubernetes.io/name: cost-insight-materialize-cost-allocations
+            app.kubernetes.io/name: cost-insight-sync-aws-f04-billing-summary
             app.kubernetes.io/part-of: cost-insight
         spec:
           serviceAccountName: ci-dashboard
           restartPolicy: Never
           containers:
-            - name: materialize-cost-allocations
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+            - name: sync-aws-f04-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-8-ged5b3ac
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
                 - -ec
               args:
                 - |
-                  end_date="$(python - <<'PY'
-                  from sqlalchemy import text
+                  bounds="$(python - <<'PY'
+                  from datetime import UTC, datetime, timedelta
 
-                  from cost_insight.common.db import build_engine
-
-                  engine = build_engine()
-                  try:
-                      with engine.begin() as connection:
-                          value = connection.execute(
-                              text("SELECT MAX(usage_date) FROM cost_attribution_daily")
-                          ).scalar_one()
-                  finally:
-                      engine.dispose()
-                  if value is None:
-                      raise RuntimeError("No native cost facts are available")
-                  print(value if isinstance(value, str) else value.isoformat())
+                  usage_end = datetime.now(UTC).date() - timedelta(days=1)
+                  usage_start = usage_end - timedelta(days=4)
+                  print(
+                      usage_start.isoformat(),
+                      usage_end.isoformat(),
+                      usage_start.replace(day=1).isoformat(),
+                      usage_end.replace(day=1).isoformat(),
+                  )
                   PY
                   )"
-                  cost-insight materialize-cost-allocations \
-                    --start-date "${COST_ALLOCATION_EARLIEST_DATE}" \
-                    --end-date "${end_date}" \
-                    --eq-root-lark-group-id "${COST_INSIGHT_EQ_ROOT_LARK_GROUP_ID}"
+                  set -- ${bounds}
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-aws-billing-summary \
+                    --account-id 380838443567 \
+                    --usage-start-date "$1" \
+                    --usage-end-date "$2" \
+                    --earliest-usage-date "$1" \
+                    --export-partition-start "$3" \
+                    --export-partition-end "$4" > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  cost-insight refresh-cost-attribution-from-summary \
+                    --vendor aws \
+                    --account-id 380838443567 \
+                    --start-date "$1" \
+                    --end-date "$2" \
+                    --split-by-day
               envFrom:
                 - secretRef:
                     name: ci-dashboard-eq-prd-insight-db
@@ -505,17 +750,17 @@ spec:
                   value: "1"
                 - name: COST_INSIGHT_LOG_LEVEL
                   value: INFO
-                - name: COST_ALLOCATION_EARLIEST_DATE
-                  value: "2026-06-01"
-                - name: COST_INSIGHT_EQ_ROOT_LARK_GROUP_ID
-                  value: od-ea02471a17b4244a1244d7e37dfca8ee
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: pingcap-testing-account
+                - name: COST_INSIGHT_AWS_SYNC_PAGE_SIZE
+                  value: "1000"
               resources:
                 requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
                   cpu: "2"
                   memory: 4Gi
-                limits:
-                  cpu: "4"
-                  memory: 8Gi
 ---
 apiVersion: batch/v1
 kind: CronJob
@@ -529,7 +774,7 @@ spec:
   # Interpreted with timeZone below: Monday 23:10 Asia/Shanghai, after the GCP unmatched job.
   schedule: "10 23 * * 1"
   timeZone: Asia/Shanghai
-  suspend: true
+  suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -537,7 +782,7 @@ spec:
   jobTemplate:
     spec:
       backoffLimit: 4
-      activeDeadlineSeconds: 7200
+      activeDeadlineSeconds: 14400
       template:
         metadata:
           labels:
@@ -548,7 +793,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.8.23-12-gd872cdc
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-10-g20f57cb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -586,6 +831,107 @@ spec:
                   value: "5"
                 - name: COST_INSIGHT_AWS_SYNC_PAGE_SIZE
                   value: "5000"
+              resources:
+                requests:
+                  cpu: "500m"
+                  memory: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-insight-sync-tencent-billing-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-tencent-billing-summary
+    app.kubernetes.io/part-of: cost-insight
+spec:
+  # Run after the other source summaries and before the 14:00 allocation materialization.
+  schedule: "0 13 * * *"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 7200
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-tencent-billing-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          serviceAccountName: ci-dashboard
+          restartPolicy: Never
+          containers:
+            - name: sync-tencent-billing-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-4-g1e9a237
+              imagePullPolicy: Always
+              command:
+                - /bin/sh
+                - -ec
+              args:
+                - |
+                  summary_json_path=/tmp/summary.json
+                  cost-insight sync-tencent-billing-summary > "${summary_json_path}"
+                  cat "${summary_json_path}"
+                  python - <<'PY'
+                  import json
+                  from datetime import date
+
+                  from cost_insight.common.config import get_settings
+                  from cost_insight.common.db import build_engine
+                  from cost_insight.jobs.allocate_tencent_ci_cost import (
+                      run_allocate_tencent_ci_cost,
+                  )
+
+                  with open("/tmp/summary.json", encoding="utf-8") as f:
+                      payload = json.load(f)
+                  dates = sorted(
+                      date.fromisoformat(value)
+                      for value in payload.get("touched_usage_dates") or []
+                  )
+                  if not dates:
+                      print("No Tencent usage dates changed; skip CI allocation.")
+                      raise SystemExit(0)
+
+                  engine = build_engine(get_settings())
+                  try:
+                      for usage_date in dates:
+                          try:
+                              result = run_allocate_tencent_ci_cost(
+                                  engine,
+                                  start_date=usage_date,
+                                  end_date=usage_date,
+                              )
+                          except ValueError as exc:
+                              if "lacks __tencent_product_code; reimport first" not in str(exc):
+                                  raise
+                              print(f"Skip Tencent CI allocation for {usage_date}: {exc}")
+                          else:
+                              print(result)
+                  finally:
+                      engine.dispose()
+                  PY
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: COST_INSIGHT_TENCENT_ACCOUNT_ID
+                  value: "100050658403"
+                - name: COST_INSIGHT_TENCENT_EARLIEST_BILL_DAY
+                  value: "2026-08-01"
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+                - secretRef:
+                    name: cost-insight-tencent-billing
               resources:
                 requests:
                   cpu: "500m"

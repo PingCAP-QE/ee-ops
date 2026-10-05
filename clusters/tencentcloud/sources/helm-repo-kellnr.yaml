@@ -1,0 +1,9 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kellnr
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://kellnr.github.io/helm

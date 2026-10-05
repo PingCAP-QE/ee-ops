@@ -1,0 +1,92 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: git-cdn
+spec:
+  releaseName: git-cdn
+  chart:
+    spec:
+      chart: git-cdn
+      version: 0.1.2
+      sourceRef:
+        kind: HelmRepository
+        name: ee-ops
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    image:
+      repository: cr-qcloud.pingcap.net/mirrors/registry.gitlab.com/grouperenault/git_cdn
+      tag: 1.13.0-oss
+    kind: StatefulSet
+    replicaCount: 2
+    podManagementPolicy: Parallel
+    podAnnotations:
+      karpenter.sh/do-not-disrupt: "true"
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
+    resources:
+      requests:
+        cpu: "1"
+        memory: 5Gi
+      limits:
+        cpu: "2"
+        memory: 5Gi
+    nodeSelector:
+      kubernetes.io/arch: amd64
+      compute-class: ee-application
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: git-cdn
+                app.kubernetes.io/instance: git-cdn
+            topologyKey: kubernetes.io/hostname
+    service:
+      type: ClusterIP
+    ingress:
+      enabled: false
+    volumeMounts:
+      - name: data
+        mountPath: /data
+
+    # volumeClaimTemplates is immutable and only affects newly created PVCs, so Flux
+    # cannot apply a `storage` change here. To resize the existing PVCs, run:
+    #   SIZE=200Gi
+    #   for i in 0 1; do kubectl -n cache patch pvc data-git-cdn-$i --type merge -p "{\"spec\":{\"resources\":{\"requests\":{\"storage\":\"$SIZE\"}}}}"; done
+    #   kubectl -n cache delete pod git-cdn-0 git-cdn-1               # only if PVC stays FileSystemResizePending
+    #   kubectl -n cache delete statefulset git-cdn --cascade=orphan  # keep pods/PVCs, allow new template
+    #   flux reconcile helmrelease git-cdn -n cache --force
+    volumeClaimTemplates:
+      - metadata:
+          name: data
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: ci-rwo
+          resources:
+            requests:
+              storage: 200Gi
+    configuration:
+      GITSERVER_UPSTREAM: https://github.com/
+      # Keep the cache below the 200Gi PVC capacity for filesystem overhead and temporary writes.
+      PACK_CACHE_SIZE_GB: 180
+      # directory where to put cache files
+      WORKING_DIRECTORY: /data
+      PACK_CACHE_MULTI: true
+      PACK_CACHE_DEPTH: true

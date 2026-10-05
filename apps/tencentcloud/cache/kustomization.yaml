@@ -4,4 +4,6 @@ namespace: cache
 resources:
   - namespace.yaml
   - brc.yaml
+  - git-cdn
   - goproxy
+  - kellnr

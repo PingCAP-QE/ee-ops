@@ -4,3 +4,4 @@ namespace: jenkins-tiflash
 resources:
   - namespace.yaml
   - ../_base
+  - ../_base/cargo-mirror

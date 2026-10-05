@@ -4,6 +4,27 @@
 
 replicaCount: 1
 
+# Workload resource type. StatefulSet replicas get independent PVCs through
+# volumeClaimTemplates.
+kind: Deployment
+
+# Deployment update strategy. Recreate avoids overlapping pods when the
+# legacy single-replica deployment uses a ReadWriteOnce PVC.
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxSurge: 25%
+    maxUnavailable: 25%
+
+# StatefulSet update strategy (used only when kind is StatefulSet).
+updateStrategy:
+  type: RollingUpdate
+
+# StatefulSet pod startup policy (used only when kind is StatefulSet).
+podManagementPolicy: OrderedReady
+
+terminationGracePeriodSeconds: 30
+
 image:
   repository: registry.gitlab.com/grouperenault/git_cdn
   pullPolicy: IfNotPresent
@@ -82,6 +103,10 @@ autoscaling:
   targetCPUUtilizationPercentage: 80
   # targetMemoryUtilizationPercentage: 80
 
+podDisruptionBudget:
+  enabled: false
+  minAvailable: 1
+
 # Additional volumes on the output Deployment definition.
 volumes: []
 # - name: foo
@@ -100,6 +125,9 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Per-replica PVCs; used only when kind is StatefulSet.
+volumeClaimTemplates: []
 
 # Server's configuration env variables:
 # Ref: https://gitlab.com/grouperenault/git_cdn#configuration

@@ -1,0 +1,6 @@
+approvers:
+  - sig-apps-gcp-approvers
+reviewers:
+  - sig-root-reviewers
+labels:
+  - area/tibuild

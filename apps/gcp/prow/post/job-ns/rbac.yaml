@@ -45,3 +45,50 @@ metadata:
   name: terraform-plan-reader
   annotations:
     iam.gke.io/gcp-service-account: terraform-plan-reader@pingcap-testing-account.iam.gserviceaccount.com
+---
+# RBAC for `.ci/verify-prow-jobs-run.sh` in PingCAP-QE/ci: the presubmit
+# `pull-verify-prow-jobs-run` actually creates a ProwJob (prowjobs.prow.k8s.io)
+# on the prow cluster to validate that changed kubernetes-agent prow jobs start
+# (image pulls + command boots), then deletes it.
+#
+# Namespace split on the prow cluster:
+#   - ProwJob CRs live in the prowjob namespace `apps` (plank watches it there)
+#   - the job pods plank spawns run in the pod namespace (this namespace)
+# The presubmit pod runs in this namespace with the dedicated ServiceAccount
+# `prow-job-validation` (set via spec.serviceAccountName), so we grant only that
+# SA the needed cluster-scoped permissions (least privilege).
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prow-job-validation
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: prow-job-validation
+rules:
+  # create/watch/delete the validation ProwJob (in the prowjob namespace)
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["create", "get", "list", "watch", "delete"]
+  # observe the pod plank spawns for the ProwJob (in this namespace)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prow-job-validation
+subjects:
+  - kind: ServiceAccount
+    name: prow-job-validation
+    namespace: ${TEST_PODS_NAMESPACE}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: prow-job-validation

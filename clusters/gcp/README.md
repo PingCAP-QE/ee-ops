@@ -20,6 +20,22 @@ Secrets that require manual preparation:
 | flux-system | lark-token-error  | `kubectl -n flux-system create secret generic lark-token-error --from-literal=address=<lark-webhook-url>` | GitOps alert webhook (error events)          |
 | apps        | prow-tls          | Create ingress TLS cert secret manually                                                                    | prow site ingress cert secret                |
 
+The dashboard reads the Google OAuth client credentials from the existing GCP
+Secret Manager secret `google-oauth2-client-ee-apps`. Its value must be a JSON
+object with `client-id` and `client-secret` fields, and the OAuth client must
+allow `https://prow.tidb.net/dashboard/oauth2/callback` as an authorized
+redirect URI.
+
+The gcp `chatops-lark` deployment reads its dedicated application configuration
+from the `gcp_chatops_lark_json` key in GCP Secret Manager. The JSON object must
+contain `app-id`, `app-secret`, and `config.yaml`. Its `devbuild.api_url` and
+`hotfix.api_url` should use the in-cluster `tibuild-v2` service endpoints:
+
+```text
+http://v2-tibuild-v2.tibuild.svc/api/v2/devbuilds
+http://v2-tibuild-v2.tibuild.svc/api/v2/hotfix
+```
+
 ## Terraform GitOps (tofu-controller)
 
 This cluster uses [tofu-controller](https://flux-iac.github.io/tofu-controller/) to manage GCP resources via GitOps.
@@ -138,7 +154,7 @@ Before bumping `clusters/gcp/flux-system/gotk-components.yaml` in the next upgra
 ./scripts/flux_gcp_preflight.sh --context <gke-context> --min-k8s <major.minor> --max-k8s <major.minor>
 ```
 
-The first check verifies that all GCP Flux `GitRepository` / `HelmRepository`, Flux `Kustomization`, `Alert` / `Provider`, and `HelmRelease` manifests have already moved to the PR1 API targets.
+The first check verifies that all Flux `GitRepository` / `HelmRepository`, `Kustomization`, `Alert` / `Provider`, and `HelmRelease` manifests use the API versions served by their target cluster (`prod2`, `gcp`, and `tencentcloud`).
 
 The second check verifies two live-cluster prerequisites:
 - the GKE control plane version is inside the support window for the target Flux release

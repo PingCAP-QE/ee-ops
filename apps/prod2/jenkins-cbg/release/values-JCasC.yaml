@@ -64,7 +64,7 @@ controller:
 
       # Public Jenkins URL (links, notifications). Must match values-controller.yaml jenkinsUrl.
       location-url: |
-        jenkins:
+        unclassified:
           location:
             url: "https://cicd.pingcap.cn/jenkins-pingkai/"
             adminAddress: "wuhui.zuo@pingcap.cn"

@@ -1,0 +1,59 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-prow-tencent-cost-tags
+policies:
+  - ../../inject-prow-tencent-cost-tags.yaml
+resources:
+  - resource-presubmit.yaml
+  - resource-periodic.yaml
+  - resource-non-prow.yaml
+  - resource-missing-repo.yaml
+  - resource-missing-base-ref.yaml
+  - resource-periodic-missing-base-ref.yaml
+  - resource-existing-resource-tag.yaml
+  - resource-periodic-without-repository-refs.yaml
+results:
+  - policy: inject-prow-tencent-cost-tags
+    rule: inject-prow-tencent-cost-tags
+    resources:
+      - prow-presubmit
+    kind: Pod
+    result: pass
+    patchedResources: patched-presubmit.yaml
+  - policy: inject-prow-tencent-cost-tags
+    rule: inject-prow-tencent-cost-tags
+    resources:
+      - prow-periodic
+    kind: Pod
+    result: pass
+    patchedResources: patched-periodic.yaml
+  - policy: inject-prow-tencent-cost-tags
+    rule: inject-prow-tencent-cost-tags
+    resources:
+      - prow-missing-base-ref
+    kind: Pod
+    result: pass
+    patchedResources: patched-missing-base-ref.yaml
+  - policy: inject-prow-tencent-cost-tags
+    rule: inject-prow-tencent-cost-tags
+    resources:
+      - prow-periodic-missing-base-ref
+    kind: Pod
+    result: pass
+    patchedResources: patched-periodic-missing-base-ref.yaml
+  - policy: inject-prow-tencent-cost-tags
+    rule: inject-prow-tencent-cost-tags
+    resources:
+      - prow-existing-resource-tag
+    kind: Pod
+    result: pass
+    patchedResources: patched-existing-resource-tag.yaml
+  - policy: inject-prow-tencent-cost-tags
+    rule: inject-prow-tencent-cost-tags
+    resources:
+      - non-prow
+      - prow-missing-repo
+      - prow-periodic-without-repository-refs
+    kind: Pod
+    result: skip

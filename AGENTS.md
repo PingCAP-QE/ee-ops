@@ -29,7 +29,6 @@ docs/             # TEKTON_MIGRATION.md, kyverno-policy-testing.md, gar-controll
 
 ## Clusters
 
-- **prod** — legacy, being deprecated (migration to prod2); only `ats` and `greenhouse` remain.
 - **prod2** — main production target (tekton, tibuild, zot, publisher, cache, tirelease...).
 - **gcp** — GCP cluster: jenkins (beta), jenkins-agents, tekton, prow, tibuild, publisher, kafka...
 - **tencentcloud** — Tencent Cloud cluster (newer): jenkins, jenkins-agents, tekton, tibuild, zot, kafka, cache...
@@ -38,7 +37,7 @@ Each cluster has a `README.md` under `clusters/<cluster>/` listing required secr
 
 ## Jenkins Instances (this repo)
 
-- gcp: `apps/gcp/jenkins/beta/` — **two** instances: main (from `release/values-*.yaml`) and staging (from `release/staging/values-*.yaml`); both are active.
+- gcp: `apps/gcp/jenkins/beta/` — one instance: main (from `release/values-*.yaml`). The staging instance (`release/staging/`) was removed.
 - tencentcloud: `apps/tencentcloud/jenkins/` — only `release/staging/values-*.yaml` is active (non-staging files commented out in kustomization).
 - Values files are bundled into a secret via `secretGenerator: jenkins-release-values` in the release kustomization — a values file edit only takes effect after Flux regenerates that secret and the helm release upgrades.
 - **Jenkins global env vars**: declared in `values-JCasC.yaml` under the `global-env:` configScript (`jenkins.globalNodeProperties.envVars`). Example: tencentcloud sets `GOPROXY`, `BAZELISK_BASE_URL`; gcp instances each have their own `global-env` block. Pipelines read them via `env.<NAME>`. These are per-cloud — keep cloud-specific values (registries, mirrors) here, not in ci pipelines.
@@ -48,7 +47,7 @@ Each cluster has a `README.md` under `clusters/<cluster>/` listing required secr
 
 - Per cluster: `apps/<cluster>/tekton/{configs,setup,configs.yaml,setup.yaml}`; configs include `rbac/` (ServiceAccounts), `secrets/`, `pipelines/`, `tasks/`, `triggers/` policies.
 - `setup/` installs the Tekton operator (operator-config, manual-approval gate).
-- See `docs/TEKTON_MIGRATION.md` for migration notes (prod Tekton deleted; workloads consolidated in prod2/gcp).
+- See `docs/TEKTON_MIGRATION.md` for migration notes (prod workloads consolidated in prod2/gcp).
 
 ## Validation & CI
 
@@ -57,7 +56,8 @@ Local validation (mirrors CI "CD Test" workflow):
 ```bash
 # yq + kustomize + kubeconform must be installed (see script header for versions)
 pushd infrastructure && $PWD/../scripts/validate_k8s_yaml.sh && popd
-# repeat for clusters/ and apps/ (clusters also runs scripts/check_gcp_flux_api_versions.sh)
+# repeat for clusters/ and apps/ (clusters also runs scripts/check_gcp_flux_api_versions.sh,
+# which checks Flux API versions for prod2, gcp, and tencentcloud)
 ```
 
 - `validate_k8s_yaml.sh` skips `charts/*/templates/` (Go templating), validates yq syntax everywhere, kubeconform for clusters (maxdepth 2) and every `kustomize build` overlay.

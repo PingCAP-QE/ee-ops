@@ -45,6 +45,15 @@ To speed up and stabilize kubelet pulls of `ghcr.io/*` pod images in the tencent
 
 Pods that already set their own `imagePullSecrets` keep pulling `ghcr.io` directly (mirror replacement is skipped). This policy replaces the previously disabled cluster-wide `replace-ghcr-registry` policy (which targeted the external `ghcr.nju.edu.cn` mirror); it lives in jenkins post and applies only to the `jenkins-*` namespaces.
 
+### Policy D: replace internal GAR pod images with the local zot mirror (tencentcloud)
+
+`replace-internal-registry` uses the same Jenkins-controller scope to route Pod image pulls from the GAR internal repository through TKE's local Zot on-demand mirror:
+
+- `us-docker.pkg.dev/pingcap-testing-account/internal/<path>` becomes `cr-qcloud.pingcap.net/mirrors/internal/<path>` for both containers and initContainers; the path, tag, and digest are preserved.
+- It ensures the existing `ci-registry-auth` image pull secret is present, preserving any caller-supplied image pull secrets and avoiding duplicate entries.
+
+The Zot sync configuration already mirrors `pingcap-testing-account/internal/**` to `mirrors/internal` with `stripPrefix: true`; this policy only redirects Jenkins-created TKE Pods to that existing mirror. Shared Pod templates in `PingCAP-QE/ci` intentionally continue to use the GAR source address so jobs on other clouds remain unchanged.
+
 ### Secret design (ExternalSecret sync, single Secret dual-use)
 
 ```yaml

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-init
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+spec:
+  initContainers:
+    - name: init
+      image: cr-qcloud.pingcap.net/mirrors/internal/test/init@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  containers:
+    - name: utils
+      image: busybox:1.36
+  imagePullSecrets:
+    - name: ci-registry-auth
