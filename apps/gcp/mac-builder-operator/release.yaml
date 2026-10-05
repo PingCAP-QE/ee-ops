@@ -31,8 +31,9 @@ spec:
       agent: false
       gc: true
       customRun: true
-    # Namespace where the CustomRun controller creates MacBuild objects.
-    macBuildNamespace: mac-builder-operator
+    # Namespace where the CustomRun controller creates MacBuild objects. Kept in
+    # the Tekton namespace (ee-cd) so MacBuilds sit next to their CustomRuns.
+    macBuildNamespace: ee-cd
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/mac-builder-operator
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/mac-builder-operator versioning=semver
