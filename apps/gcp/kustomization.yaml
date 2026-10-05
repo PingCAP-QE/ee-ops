@@ -15,6 +15,7 @@ resources:
   - roster
   - publisher
   - tibuild
+  - mac-builder-operator
   - ee-portal
   # workloads
   - acr-runners
