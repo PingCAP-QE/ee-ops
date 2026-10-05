@@ -14,6 +14,7 @@ resources:
   - roster
   - publisher
   - tibuild
+  - mac-builder-operator
   # workloads
   - acr-runners
   - jenkins/beta

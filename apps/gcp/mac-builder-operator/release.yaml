@@ -1,0 +1,56 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: mac-builder-operator
+spec:
+  chart:
+    spec:
+      chart: mac-builder-operator
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    replicaCount: 1
+    # In-cluster controllers: GC + the Tekton CustomRun controller. The macOS
+    # build agent runs outside the cluster on the mac workers.
+    controller:
+      agent: false
+      gc: true
+      customRun: true
+    # Namespace where the CustomRun controller creates MacBuild objects.
+    macBuildNamespace: mac-builder-operator
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/mac-builder-operator
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/mac-builder-operator versioning=semver
+      tag: v2026.10.4-1-g04c7323
+    resources:
+      requests:
+        cpu: "10m"
+        memory: 64Mi
+      limits:
+        cpu: "500m"
+        memory: 128Mi
+    serviceAccount:
+      create: true
+    rbac:
+      create: true
+    crd:
+      create: true
+    metrics:
+      enabled: true
+      service:
+        enabled: true
