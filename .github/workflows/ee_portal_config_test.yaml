@@ -30,7 +30,7 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00d # v6.0.0
         with:
-          go-version: '1.24'
+          go-version: '1.27'
       - name: Compile registry
         working-directory: _ci/ee-apps/experiments/portal/cmd/portal-config
         run: |
