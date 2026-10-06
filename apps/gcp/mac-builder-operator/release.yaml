@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: mac-builder-operator
-      version: 0.1.0
+      version: 0.2.0
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -34,6 +34,13 @@ spec:
     # Namespace where the CustomRun controller creates MacBuild objects. Kept in
     # the Tekton namespace (ee-cd) so MacBuilds sit next to their CustomRuns.
     macBuildNamespace: ee-cd
+    # External macOS worker agents (run outside the cluster): provision a
+    # dedicated ServiceAccount + RBAC and a long-lived token Secret so a worker
+    # can assemble a kubeconfig without gcloud.
+    worker:
+      create: true
+      token:
+        create: true
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/mac-builder-operator
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/mac-builder-operator versioning=semver
