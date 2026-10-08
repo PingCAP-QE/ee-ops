@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - ci-worker.yaml
+  - ci-worker-arm64.yaml
   - ci-worker-bigdisk.yaml
   - ci-worker-ondemand.yaml
   - ee-application.yaml

@@ -2,13 +2,58 @@ apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
   name: set-ci-worker-pod-defaults
+  # The test pods namespace. The owning Kustomization sets the effective namespace
+  # (`namespace: ${TEST_PODS_NAMESPACE}`, substituted by Flux) and overrides this
+  # value; it is kept here so `kyverno test` evaluates the rules instead of
+  # excluding every resource (a Policy without a namespace matches nothing).
+  namespace: prow-test-pods
 spec:
   rules:
+    # Arm64 workloads go through their own compute class: on-demand Arm64 capacity is
+    # scarce in us-central1, so that class tries spot Arm64 first. This rule must be
+    # evaluated before the generic rule below, and matches whenever the pod pins
+    # kubernetes.io/arch to arm64 (node affinity or node selector).
+    - name: set-ci-worker-arm64-compute-class
+      match:
+        resources:
+          kinds:
+            - Pod
+      preconditions:
+        any:
+          - key: >-
+              {{ request.object.spec.nodeSelector."kubernetes.io/arch" || '' }}
+            operator: Equals
+            value: arm64
+          - key: >-
+              {{ request.object.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[].matchExpressions[?key=='kubernetes.io/arch'][].values[] || `[]` }}
+            operator: AnyIn
+            value:
+              - arm64
+      mutate:
+        patchStrategicMerge:
+          metadata:
+            annotations:
+              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+          spec:
+            nodeSelector:
+              cloud.google.com/compute-class: ci-worker-arm64
+
     - name: set-ci-worker-compute-class
       match:
         resources:
           kinds:
             - Pod
+      preconditions:
+        all:
+          - key: >-
+              {{ request.object.spec.nodeSelector."kubernetes.io/arch" || '' }}
+            operator: NotEquals
+            value: arm64
+          - key: >-
+              {{ request.object.spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[].matchExpressions[?key=='kubernetes.io/arch'][].values[] || `[]` }}
+            operator: AllNotIn
+            value:
+              - arm64
       mutate:
         patchStrategicMerge:
           metadata:
