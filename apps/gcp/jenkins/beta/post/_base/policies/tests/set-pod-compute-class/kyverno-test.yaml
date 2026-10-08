@@ -10,6 +10,7 @@ resources:
   - resource-non-release.yaml
   - resource-release.yaml
   - resource-retry.yaml
+  - resource-special-job.yaml
 results:
   - policy: set-pod-compute-class
     rule: add-compute-class-and-annotations
@@ -79,9 +80,24 @@ results:
     result: pass
 
   - policy: set-pod-compute-class
-    rule: override-compute-class-for-retried-pods
+    rule: override-compute-class-retried
     resources:
       - pod-retry
     kind: Pod
     result: pass
     patchedResources: patched-retry.yaml
+
+  - policy: set-pod-compute-class
+    rule: add-compute-class-and-annotations
+    resources:
+      - pod-special-job
+    kind: Pod
+    result: pass
+
+  - policy: set-pod-compute-class
+    rule: override-compute-class-for-special-jenkins-jobs
+    resources:
+      - pod-special-job
+    kind: Pod
+    result: pass
+    patchedResources: patched-special-job.yaml

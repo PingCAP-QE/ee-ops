@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-release
+  name: pod-special-job
   namespace: jenkins-pd
-  annotations:
-    ci_refs: '{"org":"pingcap","repo":"tidb","base_ref":"release-8.5-20260301-v8.5.6"}'
-    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
   labels:
     kubernetes.jenkins.io/controller: ""
+  annotations:
+    ci_job: pingcap/tidb/pull_unit_test_1234
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 spec:
   containers:
     - name: main

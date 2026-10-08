@@ -2,6 +2,12 @@ apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
   name: set-pod-compute-class
+  # This base is shared by the per-instance overlays (pd/tidb/tikv/...), each of which
+  # sets its own `namespace:` so the policy lands in jenkins-pd, jenkins-tidb, ...
+  # The value here only exists so `kyverno test` evaluates the rules instead of
+  # excluding every resource (a namespaced Policy without a namespace matches
+  # nothing) and it matches the namespace used by the test fixtures.
+  namespace: jenkins-pd
 spec:
   rules:
     - name: add-compute-class-and-annotations
@@ -45,7 +51,7 @@ spec:
             default: false
             jmesPath: >-
               regex_match(
-              '^release-[0-9]+\\.[0-9]+-[0-9]{8}-v[0-9]+\\.[0-9]+\\.[0-9]+$',
+              '^release-[0-9]+\.[0-9]+-[0-9]{8}-v[0-9]+\.[0-9]+\.[0-9]+$',
               not_null(parsed_refs.base_ref, '')
               )
       preconditions:
