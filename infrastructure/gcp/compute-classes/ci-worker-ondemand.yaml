@@ -11,7 +11,7 @@ spec:
       locationPolicy: ANY
       zoneTypes: [STANDARD]
   priorities:
-    # --------- on-demand types only -----------
+    # --------- on-demand types (preferred) -----------
     - machineFamily: c4d
       priorityScore: 100
       spot: false
@@ -45,6 +45,26 @@ spec:
     - machineFamily: c3d
       priorityScore: 55
       spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+
+    # --------- spot Arm64 fallback (last resort) -----------
+    # GCE on-demand Arm64 (c4a/n4a) capacity in us-central1 is frequently exhausted
+    # (RESOURCE_POOL_EXHAUSTED), which leaves Arm64 jobs pending until Prow's 5m
+    # pod-pending timeout aborts them (e.g. pull-clippy-linux-arm64). Spot Arm64
+    # capacity is usually still available, so allow it as a fallback.
+    # Keep these entries last: x86 workloads keep preferring on-demand shapes, and
+    # Arm64 pods skip the x86 entries through their kubernetes.io/arch=arm64 node affinity.
+    - machineFamily: c4a # Arm64
+      priorityScore: 50
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4a # Arm64
+      priorityScore: 45
+      spot: true
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
