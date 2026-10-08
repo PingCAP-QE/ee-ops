@@ -1,0 +1,71 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: set-ci-worker-pod-defaults
+policies:
+  - ../../policies.yaml
+resources:
+  - resource-no-affinity.yaml
+  - resource-amd64-affinity.yaml
+  - resource-arm64-affinity.yaml
+  - resource-arm64-nodeselector.yaml
+results:
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-arm64-compute-class
+    resources:
+      - pod-no-affinity
+    kind: Pod
+    result: skip
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-compute-class
+    resources:
+      - pod-no-affinity
+    kind: Pod
+    result: pass
+    patchedResources: patched-no-affinity.yaml
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-arm64-compute-class
+    resources:
+      - pod-amd64-affinity
+    kind: Pod
+    result: skip
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-compute-class
+    resources:
+      - pod-amd64-affinity
+    kind: Pod
+    result: pass
+    patchedResources: patched-amd64-affinity.yaml
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-arm64-compute-class
+    resources:
+      - pod-arm64-affinity
+    kind: Pod
+    result: pass
+    patchedResources: patched-arm64-affinity.yaml
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-compute-class
+    resources:
+      - pod-arm64-affinity
+    kind: Pod
+    result: skip
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-arm64-compute-class
+    resources:
+      - pod-arm64-nodeselector
+    kind: Pod
+    result: pass
+    patchedResources: patched-arm64-nodeselector.yaml
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-compute-class
+    resources:
+      - pod-arm64-nodeselector
+    kind: Pod
+    result: skip

@@ -1,0 +1,43 @@
+apiVersion: cloud.google.com/v1
+kind: ComputeClass
+metadata:
+  name: ci-worker-arm64
+spec:
+  nodePoolAutoCreation:
+    enabled: true
+  whenUnsatisfiable: DoNotScaleUp
+  priorityDefaults:
+    location:
+      locationPolicy: ANY
+      zoneTypes: [STANDARD]
+  priorities:
+    # --------- spot Arm64 (preferred) -----------
+    # On-demand Arm64 (c4a/n4a) capacity in us-central1 is frequently exhausted
+    # (GCE returns 503 ZONE_RESOURCE_POOL_EXHAUSTED), which leaves Arm64 CI pods
+    # unscheduled. Spot Arm64 is usually available, so try it first here.
+    - machineFamily: c4a # Arm64
+      priorityScore: 100
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4a # Arm64
+      priorityScore: 90
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+
+    # --------- on-demand Arm64 fallback -----------
+    - machineFamily: c4a # Arm64
+      priorityScore: 50
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4a # Arm64
+      priorityScore: 40
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100

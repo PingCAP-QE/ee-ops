@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-amd64-affinity
+  namespace: prow-test-pods
+  annotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+spec:
+  containers:
+    - name: test
+      image: ghcr.io/pingcap-qe/ci/base:v2024.10.8-32-ge807718-go1.23
+      command: ["bash", "-ce", "make clippy"]
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/arch
+                operator: In
+                values:
+                  - amd64
+  nodeSelector:
+    cloud.google.com/compute-class: ci-worker-ondemand
