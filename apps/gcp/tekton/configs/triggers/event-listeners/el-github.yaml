@@ -27,6 +27,27 @@ spec:
         labelSelector:
           matchLabels:
             type: github-pr
+    - name: github-pr-review
+      interceptors:
+        - name: "filter on eventType"
+          ref:
+            name: github
+          params:
+            - name: eventTypes
+              value: ["pull_request_review"]
+        - name: "validate PR review action"
+          ref:
+            name: cel
+          params:
+            - name: filter
+              value: body.action in ['submitted', 'dismissed']
+      triggerSelector:
+        namespaceSelector:
+          matchNames:
+            - ee-cd
+        labelSelector:
+          matchLabels:
+            type: github-pr-review
     - name: github-branch-push
       interceptors:
         - name: "filter on eventType"
