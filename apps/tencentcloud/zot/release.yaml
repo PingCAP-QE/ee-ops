@@ -48,9 +48,6 @@ spec:
       storage: 10Gi # CBS minimum is 10Gi
       storageClassName: cbs
     replicaCount: 1
-    # 30d peak: ~0.6 CPU / 268Mi. requests give the scheduler real numbers
-    # (and keep Karpenter from treating the node as empty); limits leave headroom
-    # for large-layer pulls/pushes and move the pod out of BestEffort QoS.
     resources:
       requests:
         cpu: "200m"
