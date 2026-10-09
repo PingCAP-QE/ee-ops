@@ -48,6 +48,13 @@ spec:
       storage: 10Gi # CBS minimum is 10Gi
       storageClassName: cbs
     replicaCount: 1
+    resources:
+      requests:
+        cpu: "200m"
+        memory: 512Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
     service:
       type: ClusterIP
     nodeSelector:
