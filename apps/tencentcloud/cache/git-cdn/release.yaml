@@ -67,7 +67,7 @@ spec:
 
     # volumeClaimTemplates is immutable and only affects newly created PVCs, so Flux
     # cannot apply a `storage` change here. To resize the existing PVCs, run:
-    #   SIZE=200Gi
+    #   SIZE=300Gi
     #   for i in 0 1; do kubectl -n cache patch pvc data-git-cdn-$i --type merge -p "{\"spec\":{\"resources\":{\"requests\":{\"storage\":\"$SIZE\"}}}}"; done
     #   kubectl -n cache delete pod git-cdn-0 git-cdn-1               # only if PVC stays FileSystemResizePending
     #   kubectl -n cache delete statefulset git-cdn --cascade=orphan  # keep pods/PVCs, allow new template
@@ -81,10 +81,10 @@ spec:
           storageClassName: ci-rwo
           resources:
             requests:
-              storage: 200Gi
+              storage: 300Gi
     configuration:
       GITSERVER_UPSTREAM: https://github.com/
-      # Keep the cache below the 200Gi PVC capacity for filesystem overhead and temporary writes.
+      # Keep the cache below the 300Gi PVC capacity for filesystem overhead and temporary writes.
       PACK_CACHE_SIZE_GB: 180
       # directory where to put cache files
       WORKING_DIRECTORY: /data
