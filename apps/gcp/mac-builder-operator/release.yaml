@@ -44,7 +44,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/mac-builder-operator
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/mac-builder-operator versioning=semver
-      tag: v2026.10.4-6-g9142a27
+      tag: v2026.10.11-3-g61a7145
     resources:
       requests:
         cpu: "10m"
