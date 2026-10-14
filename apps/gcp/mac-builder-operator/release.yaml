@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: mac-builder-operator
-      version: 0.2.0
+      version: 0.3.0
       sourceRef:
         kind: HelmRepository
         name: ee-apps
