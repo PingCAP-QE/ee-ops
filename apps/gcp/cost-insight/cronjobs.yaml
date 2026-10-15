@@ -535,7 +535,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.11-9-g3cdbb10
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
