@@ -1,11 +1,64 @@
 # CI Dashboard: April-onward PR metadata repair
 
-## Status and release gate
+## Status and completion gate
 
-**Preparation only. No production repair has been submitted.** Do not merge this
-maintenance release until the scoped worker and in-cluster coordinator described
-below are reviewed and ready, and an operator approves the maintenance window.
-Merging the release does not itself approve launching a repair.
+The release was merged as [ee-ops #2469](https://github.com/PingCAP-QE/ee-ops/pull/2469)
+on 2026-10-16 at 01:22:38 UTC. The operator also authorized the ad-hoc GKE
+repair. It was submitted at approximately 01:36 UTC and runs independently of any
+local terminal or agent session.
+
+**Do not merge this schedule-restoration change until the run reports
+`state=completed`, all 100 child steps succeeded, and the final read-only
+verification passed.** No PR merge is authorized by the repair permission.
+
+### Submitted run and evidence
+
+- Context: `gke_pingcap-testing-account_us-central1-c_prow`; namespace: `apps`.
+- Run ID: `ci-prmeta-20260401-20261015-r1`.
+- Coordinator Job: `ci-prmeta-20260401-20261015-r1-coordinator`.
+- Durable status ConfigMap: `ci-prmeta-20260401-20261015-r1-progress`.
+- Immutable assets ConfigMap: `ci-prmeta-20260401-20261015-r1-assets` contains the
+  exact worker/coordinator script and compressed frozen scope; no DB credentials.
+- Script SHA-256: `7c158b35fb825c052cbd07b9a4d409c4f0a553981bb814d11ad94034b7723bc8`.
+- Plan SHA-256: `211d912e661a72d8e19e581e995c4fa912f79f0a1f48d5ea85d7a8a681006453`.
+- Frozen scope: 3,300 PRs, 54,773 distinct build IDs; expected 14,574 available
+  snapshot/timeline event upserts and 35,607 branch corrections.
+- 100 serial steps: 95 with writes (including canary), four empty-window checks,
+  and one final full-scope read-only verification. Main windows are at most five
+  inclusive dates, at most 50 records per child and 100 build IDs per transaction.
+  The canary and subsequent calendar work have disjoint PR/build scopes.
+- **Observed canary success:** four snapshots, 10 event upserts, 145 branch
+  corrections; all 158 associated builds verified. The other batches were still
+  running when this restoration change was prepared.
+- 17 local safety tests passed, covering scope/date/repo isolation, idempotence,
+  drift rejection, forbidden writes, restart reconciliation and failure stops.
+  The coordinator and sample child also passed server-side dry-run.
+
+Only `ci_l1_pr_events` and approved `ci_l1_builds.target_branch` values are written.
+The existing flaky/retry-loop computation uses
+`REQUIRE_RETEST_FOR_RETRY_LOOP=False`; case evidence also does not depend on PR
+metadata. Therefore no manual flag/case/failure-category recomputation is needed.
+No `prow_jobs` reimport, source-table repair, schema change or normal-watermark
+update is part of this run. Whole-group/out-of-window writes are avoided entirely.
+
+CronJobs have run-owned reconciliation-disable annotations while the repair is
+active. On success the coordinator removes its annotations and restores the
+pre-run settings, which are **suspended=true** from #2469. This follow-up GitOps
+change is needed to resume normal schedules. On failure the holds stay in place;
+no later child or uncertain-write retry is launched.
+
+Inspect progress without triggering later batches locally:
+
+```bash
+kubectl --context gke_pingcap-testing-account_us-central1-c_prow -n apps \
+  get cm ci-prmeta-20260401-20261015-r1-progress -o json
+kubectl --context gke_pingcap-testing-account_us-central1-c_prow -n apps \
+  logs job/ci-prmeta-20260401-20261015-r1-coordinator --tail=30
+```
+
+After resumption, the normal derived job may observe the newly updated PR events;
+its existing 5,000-build incremental cap remains unchanged. No generic manual
+refresh should be added afterward.
 
 The release updates the application and jobs to `v2026.10.11-12-g35d6248` from
 [ee-apps release run 38831184362](https://github.com/PingCAP-QE/ee-apps/actions/runs/38831184362),
@@ -27,8 +80,8 @@ Restore both schedules through a follow-up GitOps change after acceptance.
 ## Read-only inventory
 
 Snapshot: 2026-10-16, starting at 00:55 UTC, configured dashboard database `insight`.
-The serving workloads' Secret/endpoint must still be matched before execution;
-cluster inspection was blocked by expired gcloud authentication.
+Cluster authentication was renewed before execution. The serving workloads' DB
+Secret endpoint, identity and database matched the read-only audited database.
 
 Build-time scope is **[2026-04-01 00:00:00, 2026-10-16 00:00:00)**: complete
 calendar dates April 1 through October 15, using stored build timestamps. October
@@ -106,12 +159,11 @@ this repair cannot reconstruct uncollected PASS, cache or individual attempt dat
    watermarks. Keep the 3,300 missing-snapshot keys separate from the four reviewed
    discrepancies and the 610 source-absent blockers. Assign each PR once using its
    first in-scope build date; do not rediscover the same PR in every date window.
-3. **Prepare the missing execution assets before merging this release.** The
-   existing image has neither a PR-key-scoped repair CLI nor a durable coordinator.
-   Add/review a small worker that reuses snapshot/timeline parsing and idempotent
-   upserts, accepts the frozen repo/PR/build scope, avoids `ci_job_state` writes,
-   and rejects source/scope drift. Add regression and restart/failure tests. Do not
-   substitute the ordinary global sync command.
+3. **Use the reviewed, frozen execution assets.** The released image has neither
+   a PR-key-scoped repair CLI nor a durable coordinator. The ad-hoc assets reuse
+   released snapshot/timeline parsing and branch enrichment, enforce frozen
+   repo/PR/build/date scope and source fingerprints, and reject unrelated writes.
+   Do not substitute the ordinary global sync or full backfill command.
 4. **Roll out and establish one repair writer.** After authorized merge and Flux
    reconciliation, verify images, API health, both suspended CronJobs and the end
    of their old Jobs. Check for conflicting DB-heavy maintenance. CronJob
@@ -124,14 +176,16 @@ this repair cannot reconstruct uncollected PASS, cache or individual attempt dat
    five inclusive dates**. Initially cap each writing child at 50 frozen PR keys;
    smaller canary and sub-batches are allowed. The current first-build assignment
    has 37 nonempty windows, at most 223 PR keys in one window; a 50-key cap yields
-   roughly 85 writing sub-batches before any derived-group subdivision.
-6. **Repair metadata before dependent derived fields.** Recover snapshots and
-   available commit/retest events for each approved key batch, then refresh branch
-   and dependent signals for approved build IDs. Reuse released parsing/upsert
-   logic; do not reimport build facts, rebuild unrelated domains or reset normal
-   watermarks. Use small transaction chunks (start at 100 rows) and one PR/job
-   group at a time for signal recomputation. Preflight group sizes and event counts
-   as well as PR counts; split oversized batches before launching them.
+   roughly 85 PR-first-build sub-batches. The actual submitted plan instead enforces
+   hard build-date boundaries and a 100-build transaction cap: 95 writing children,
+   four empty-window children and one final read-only verification.
+6. **Repair only metadata and branch attribution.** Recover snapshots and
+   available commit/retest events, then enrich `target_branch` for approved build
+   IDs in the child's own date window. No manual signal recomputation is required
+   under the released `REQUIRE_RETEST_FOR_RETRY_LOOP=False` policy. Transactions
+   have at most 100 build IDs; available events are upserted in chunks of 100.
+   Reject more than 1,000 events in a single PR transaction (the frozen maximum
+   was 251). Do not reimport build facts or reset normal watermarks.
 7. **Stop on failure and reconcile.** A durable in-cluster coordinator creates
    exactly one DB-writing child Job at a time, waits for success, persists the
    completed window/sub-batch and only then creates the next. Use an explicit
@@ -172,6 +226,7 @@ In the released source (`ci-dashboard/src/ci_dashboard/jobs/`):
   a mutable image, large batches and retries. Do not run its defaults in production
   or invent unsupported `sync-pr-events-range` / `--repo` options.
 
-Only local rendering/validation and SELECT-only inventory have occurred so far.
-Server-side dry-run, live rollout checks, worker/coordinator implementation and all
-production execution remain pending explicit approval and readiness.
+The run's final verification must pass before schedules are restored. The 610
+source-absent non-doc/CI PR keys and four existing branch discrepancies remain
+separate unresolved scopes; completing this run is not a claim that those gaps or
+uncollected testcase executions have been reconstructed.
