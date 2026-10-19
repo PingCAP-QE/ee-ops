@@ -127,6 +127,7 @@ spec:
             pingcap/tiflow
             tikv/client-c
             tikv/client-go
+            tikv/client-rust
             tikv/pd
             tikv/rocksdb
             tikv/rust-rocksdb
