@@ -38,8 +38,11 @@ patterns intentionally do not admit these dev artifacts.
 4. Merge source cutover PRs, create the prescribed Git baselines on merged cutover
    commits and activate only explicit formal branch/tag routes. Confirm repository
    webhooks reach the GitHub EventListener. Keep old artifacts for rollback.
-5. Confirm the docker-image-controller runner identity has formal GAR read access
-   and target ECR/AliCloud writers/readers retain their existing permissions.
+5. Provision the ee-infra dedicated `serverless-image-sync-reader` identity and
+   GitHub OIDC provider. Its trust is restricted to the controller repository ID,
+   owner ID, main ref and the two named sync workflows; its GAR reader role covers
+   only `serverless`. Verify its main-branch authentication and retain target
+   ECR/AliCloud writers/readers on their existing permissions.
    Validate formal images in dev destinations before switching prod sources.
 
 No native regional Qdrant, TiKV, TiFlash, historical tag migration or business
