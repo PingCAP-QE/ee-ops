@@ -48,18 +48,39 @@ spec:
       storage: 10Gi # CBS minimum is 10Gi
       storageClassName: cbs
     replicaCount: 1
+    # Guaranteed QoS: requests must equal limits for both CPU and memory.
+    # zot is network/CPU bound and was CFS-throttled under CI artifact bursts
+    # with the previous 1-CPU limit, so give it 2 full CPUs.
     resources:
       requests:
-        cpu: "200m"
-        memory: 512Mi
+        cpu: "2"
+        memory: 1Gi
       limits:
-        cpu: "1"
+        cpu: "2"
         memory: 1Gi
     service:
       type: ClusterIP
     nodeSelector:
       kubernetes.io/arch: amd64
       compute-class: ee-application
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                # A 2-CPU request does not fit on the 2-vCPU BF1.MEDIUMx nodes
+                # (1930m allocatable), so require a >= 4 vCPU instance.
+                - key: karpenter.k8s.tke/instance-cpu
+                  operator: Gt
+                  values: ["2"]
+                # zot-pvc-zot-0 is bound to the CBS volume in ap-beijing-7
+                # (zone ID 800007) and CBS volumes cannot be attached across
+                # AZs. Pin the zone explicitly so Karpenter provisions the
+                # replacement node in the right subnet instead of leaving the
+                # single-replica StatefulSet Pending.
+                - key: topology.kubernetes.io/zone
+                  operator: In
+                  values: ["800007"]
 
     # Relax probes to avoid restart loops during zot cold start
     startupProbe:
