@@ -63,20 +63,6 @@ spec:
     nodeSelector:
       kubernetes.io/arch: amd64
       compute-class: ee-application
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                # zot-pvc-zot-0 is bound to a CBS volume in ap-beijing-7 (zone
-                # ID 800007); CBS volumes cannot be attached across AZs. The
-                # PV already pins the pod to that zone at scheduling time, but
-                # karpenter-provider-tke has no PV topology awareness, so state
-                # it here as well to keep new nodes in the right subnet. The
-                # 2-CPU request is what drives the >= 4 vCPU instance choice.
-                - key: topology.kubernetes.io/zone
-                  operator: In
-                  values: ["800007"]
 
     # Relax probes to avoid restart loops during zot cold start
     startupProbe:
