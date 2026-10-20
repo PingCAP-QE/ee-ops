@@ -68,16 +68,12 @@ spec:
         requiredDuringSchedulingIgnoredDuringExecution:
           nodeSelectorTerms:
             - matchExpressions:
-                # A 2-CPU request does not fit on the 2-vCPU BF1.MEDIUMx nodes
-                # (1930m allocatable), so require a >= 4 vCPU instance.
-                - key: karpenter.k8s.tke/instance-cpu
-                  operator: Gt
-                  values: ["2"]
-                # zot-pvc-zot-0 is bound to the CBS volume in ap-beijing-7
-                # (zone ID 800007) and CBS volumes cannot be attached across
-                # AZs. Pin the zone explicitly so Karpenter provisions the
-                # replacement node in the right subnet instead of leaving the
-                # single-replica StatefulSet Pending.
+                # zot-pvc-zot-0 is bound to a CBS volume in ap-beijing-7 (zone
+                # ID 800007); CBS volumes cannot be attached across AZs. The
+                # PV already pins the pod to that zone at scheduling time, but
+                # karpenter-provider-tke has no PV topology awareness, so state
+                # it here as well to keep new nodes in the right subnet. The
+                # 2-CPU request is what drives the >= 4 vCPU instance choice.
                 - key: topology.kubernetes.io/zone
                   operator: In
                   values: ["800007"]
