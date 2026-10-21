@@ -1,26 +1,42 @@
-Prod Cluster Decommissioning and Tekton Migration to prod2
-=========================================
+# Tekton Cluster Decommissioning History
 
-Overview
-- Tekton components have been migrated to prod2 and removed from prod.
-- The legacy prod cluster has since been decommissioned and its Flux GitOps configuration removed.
-- This document records the migration and decommissioning context and provides verification steps.
+This document records the two Tekton consolidation/decommissioning steps:
 
-What changed
-- prod: Tekton manifests and kustomization were removed during the migration.
-- prod: Flux bootstrap, application, and infrastructure configuration were removed when the cluster was decommissioned.
+1. legacy `prod` -> `prod2` (historical);
+2. `prod2` -> `gcp` / `tencentcloud` (2026-10).
 
-Rationale
-- Consolidate Tekton workloads in prod2 and remove the maintenance surface for the retired prod cluster.
+## Legacy prod -> prod2 (historical)
 
-Verification and validation
-- Confirm the clusters/prod, apps/prod, and infrastructure/prod directories are absent from the repository.
-- Confirm prod2 Flux kustomizations and workloads remain intact.
-- On cluster: prod resources should no longer be reconciled by Flux.
+- Tekton components were migrated to prod2 and removed from prod.
+- The legacy prod cluster was later decommissioned and its Flux GitOps
+  configuration removed.
+- Rationale: consolidate Tekton workloads in prod2 and remove the maintenance
+  surface for the retired prod cluster.
 
-Impact
-- No changes required for prod2 workloads.
-- CI/CD pipelines should continue to function against prod2 Tekton configurations.
+## prod2 -> gcp / tencentcloud (2026-10)
 
-Notes
-- References to `prod` in other clusters may identify an image registry or deployment stage and are unrelated to the retired cluster.
+- prod2 (`ksy-pingcap-cicd`) Tekton is retired. The `apps/prod2/tekton/`
+  directory and its four Flux Kustomizations are removed.
+- Remaining prod2 builds were migrated to `env-gcp` triggers:
+  - darwin: `build-component-darwin-mac` (gcp macbuild);
+  - linux: `build-component-linux` / `build-component-all-platforms-mac`;
+  - Harbor image-push triggers moved to the gcp Harbor EventListener.
+- `tibuild-v2` in prod2 no longer triggers local Tekton; use the gcp or
+  tencentcloud tibuild-v2 instance for devbuilds.
+- `cloudevents-server` in prod2 is removed once no non-Tekton consumer remains.
+
+## Verification and validation
+
+- Confirm `apps/prod2/tekton/`, `clusters/prod2` Tekton references, and the
+  `tekton-operator` / `tekton-pipelines` namespace policy entries are absent
+  from the repository.
+- Confirm prod2 Flux no longer reconciles `tekton-*` Kustomizations.
+- Confirm gcp/tencentcloud Tekton triggers exist for the migrated builds and
+  that a canary build succeeds.
+- On cluster: no Tekton CRDs, namespaces, webhooks, APIService, or
+  `ee-cd`-scoped Tekton resources remain in prod2.
+
+## Notes
+
+- References to `prod` in other clusters may identify an image registry or
+  deployment stage and are unrelated to the retired clusters.

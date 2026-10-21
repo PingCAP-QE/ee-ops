@@ -16,8 +16,6 @@ spec:
             - dl
             - kafka
             - publisher
-            - tekton-operator
-            - tekton-pipelines
             - tibuild
             - zot
             - tirelease
