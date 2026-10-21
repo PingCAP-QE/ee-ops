@@ -5,7 +5,6 @@ resources:
   - cluster-policies
   - publisher
   - zot
-  - cloudevents-server
   - cache
   - dl
   - tibuild # experiment for v2
