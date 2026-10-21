@@ -10,5 +10,6 @@ resources:
   - cache
   - dl
   - tibuild # experiment for v2
+  - github-token-broker
   - tirelease
   - jenkins-cbg

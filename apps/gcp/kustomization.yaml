@@ -15,6 +15,7 @@ resources:
   - roster
   - publisher
   - tibuild
+  - github-token-broker
   - mac-builder-operator
   - ee-portal
   # workloads
