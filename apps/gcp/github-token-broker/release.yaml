@@ -1,0 +1,61 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-token-broker
+spec:
+  releaseName: github-token-broker
+  chart:
+    spec:
+      chart: github-token-broker
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    replicaCount: 2
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/github-token-broker
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/github-token-broker versioning=semver
+      tag: v2026.10.18-8-gfd0c520
+    github:
+      appId: 214286
+      credentialsSecret:
+        name: github-app-credentials
+        key: privateKey.pem
+    policy:
+      existingSecret: github-token-broker-policy
+      key: policy.yaml
+    networkPolicy:
+      ingressNamespaces:
+        - ee-cd
+        - tibuild
+        - chatops-lark
+        - apps
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
+    serviceMonitor:
+      enabled: false
