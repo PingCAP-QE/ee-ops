@@ -29,8 +29,13 @@ spec:
     ignoreFailures: false
   values:
     image:
-      repository: cr-qcloud.pingcap.net/mirrors/registry.gitlab.com/grouperenault/git_cdn
+      # The zot on-demand mirror of registry.gitlab.com fails because the TKE
+      # egress to cdn.registry.gitlab-static.net times out, so the image is
+      # copied to cr.pingcap.net instead (same zot, internal route).
+      repository: cr.pingcap.net/personal/wuhui.zuo/git_cdn
       tag: 1.13.0-oss
+    imagePullSecrets:
+      - name: ci-registry-auth
     kind: StatefulSet
     replicaCount: 2
     podManagementPolicy: Parallel

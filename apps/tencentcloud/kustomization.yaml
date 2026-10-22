@@ -8,6 +8,7 @@ resources:
   - jenkins
   - jenkins-agents
   - tibuild
+  - github-token-broker
   - tekton
   - zot
   - prow-worker

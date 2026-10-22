@@ -3,10 +3,8 @@ kind: Kustomization
 resources:
   - ../_base
   - cluster-policies
-  - tekton
   - publisher
   - zot
-  - cloudevents-server
   - cache
   - dl
   - tibuild # experiment for v2

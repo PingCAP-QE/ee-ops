@@ -1,0 +1,99 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: github-token-broker
+spec:
+  releaseName: github-token-broker
+  chart:
+    spec:
+      chart: github-token-broker
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: true
+    ignoreFailures: false
+  values:
+    replicaCount: 2
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/github-token-broker
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/github-token-broker versioning=semver
+      tag: v2026.10.18-9-g12e89b7
+    github:
+      appId: 214286
+      credentialsSecret:
+        name: github-app-credentials
+        key: privateKey.pem
+    policy:
+      existingSecret: github-token-broker-policy
+      key: policy.yaml
+    podSecurityContext:
+      runAsNonRoot: true
+      runAsUser: 65532
+      runAsGroup: 65532
+      seccompProfile:
+        type: RuntimeDefault
+    networkPolicy:
+      ingressNamespaces:
+        - ee-cd
+        - tibuild
+        - chatops-lark
+        - apps
+      egress:
+        # DNS.
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: kube-system
+          ports:
+            - protocol: UDP
+              port: 53
+            - protocol: TCP
+              port: 53
+        # Kubernetes API (TokenReview/readiness) and GitHub API.
+        - to:
+            - ipBlock:
+                # Cluster service CIDR.
+                cidr: 10.116.0.0/20
+            - ipBlock:
+                # GitHub API ranges from https://api.github.com/meta.
+                cidr: 140.82.112.0/20
+            - ipBlock:
+                cidr: 192.30.252.0/22
+            - ipBlock:
+                cidr: 185.199.108.0/22
+            - ipBlock:
+                cidr: 143.55.64.0/20
+            - ipBlock:
+                cidr: 2a0a:a440::/29
+            - ipBlock:
+                cidr: 2606:50c0::/32
+          ports:
+            - protocol: TCP
+              port: 443
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        cpu: 500m
+        memory: 256Mi
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
+    serviceMonitor:
+      enabled: false

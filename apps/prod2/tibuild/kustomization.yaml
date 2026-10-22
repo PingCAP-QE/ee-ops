@@ -3,5 +3,4 @@ kind: Kustomization
 namespace: tibuild
 resources:
   - namespace.yaml
-  - v1
   - v2

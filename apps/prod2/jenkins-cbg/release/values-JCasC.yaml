@@ -22,7 +22,7 @@ controller:
                 jenkinsUrl: "http://jenkins-cbg.jenkins-cbg.svc.cluster.local:8080/jenkins-pingkai/"
                 # Chart exposes JNLP on a separate Service (<fullname>-agent).
                 jenkinsTunnel: "jenkins-cbg-agent.jenkins-cbg.svc.cluster.local:50000"
-                containerCap: 200
+                containerCap: 90
                 maxRequestsPerHost: 200
                 retentionTimeout: 5
                 connectTimeout: 5
