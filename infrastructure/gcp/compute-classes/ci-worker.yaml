@@ -36,6 +36,18 @@ spec:
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
+    - machineFamily: n4d
+      priorityScore: 70
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4
+      priorityScore: 65
+      spot: true
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
     - machineFamily: c3
       priorityScore: 60
       spot: true
@@ -69,6 +81,18 @@ spec:
         bootDiskSize: 100
     - machineFamily: n4a # Arm64
       priorityScore: 35
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4d
+      priorityScore: 30
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4
+      priorityScore: 28
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
