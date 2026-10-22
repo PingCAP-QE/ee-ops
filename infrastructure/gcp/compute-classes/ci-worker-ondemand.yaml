@@ -36,6 +36,18 @@ spec:
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
+    - machineFamily: n4d
+      priorityScore: 70
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: n4
+      priorityScore: 65
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
     - machineFamily: c3
       priorityScore: 60
       spot: false
