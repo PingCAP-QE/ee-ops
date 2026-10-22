@@ -24,13 +24,13 @@ controller:
   resources:
     requests:
       cpu: 500m
-      memory: 3Gi
+      memory: 6Gi
     limits:
       cpu: "4"
-      memory: 6Gi
+      memory: 8Gi
 
   javaOpts: >-
-    -Xms2048m -Xmx2048m -XX:+UseG1GC
+    -Xms4096m -Xmx4096m -XX:+UseG1GC
     -Dhudson.model.DirectoryBrowserSupport.CSP=
 
   customInitContainers:
