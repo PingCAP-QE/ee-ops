@@ -355,9 +355,10 @@ metadata:
 spec:
   # This audit-log aggregation is independent of the billing publication pipeline,
   # but persists its execution state in the shared CI Dashboard/Cost Insight database.
+  # Retired Bazel cache: keep suspended while its bucket and indexes are cleared.
   schedule: "20 21 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
@@ -427,9 +428,10 @@ metadata:
 spec:
   # A 30-minute start allowance plus the 12-hour deadline ends by 07:30,
   # leaving the 08:00 Beijing work window free for Dashboard traffic.
+  # Retired Bazel cache: do not run GC against the old AC/CAS indexes.
   schedule: "0 19 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
