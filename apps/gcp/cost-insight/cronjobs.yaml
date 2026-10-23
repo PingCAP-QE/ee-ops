@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcp-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Start the daily billing pipeline immediately after the 08:00–12:00 Beijing work window.
-  schedule: "10 12 * * *"
+  # Run after UTC date rollover and before the 09:10 Beijing freshness check.
+  schedule: "10 8 * * *"
   timeZone: Asia/Shanghai
   # Initial allocation backfill is complete; keep source facts current with daily syncs.
   suspend: false
@@ -65,6 +65,7 @@ spec:
                           max(dates),
                           min(export_partition_starts),
                           max(export_partition_ends),
+                          *sorted({item["account_id"] for item in payloads if isinstance(item, dict)}),
                       )
                   PY
                   )"
@@ -77,10 +78,17 @@ spec:
                       --usage-end-date "$2" \
                       --export-partition-start "$3" \
                       --export-partition-end "$4"
-                    cost-insight refresh-cost-attribution-from-summary \
-                      --start-date "$1" \
-                      --end-date "$2" \
-                      --split-by-day
+                    usage_start="$1"
+                    usage_end="$2"
+                    shift 4
+                    for account_id in "$@"; do
+                      cost-insight refresh-cost-attribution-from-summary \
+                        --vendor gcp \
+                        --account-id "${account_id}" \
+                        --start-date "${usage_start}" \
+                        --end-date "${usage_end}" \
+                        --split-by-day
+                    done
                   else
                     echo "No touched usage dates returned; skip GKE allocation and attribution refresh."
                   fi
