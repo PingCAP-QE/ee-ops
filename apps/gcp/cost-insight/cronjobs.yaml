@@ -7,8 +7,8 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-gcp-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Run after UTC date rollover and before the 09:10 Beijing freshness check.
-  schedule: "10 8 * * *"
+  # Start the daily billing pipeline immediately after the 08:00–12:00 Beijing work window.
+  schedule: "10 12 * * *"
   timeZone: Asia/Shanghai
   # Initial allocation backfill is complete; keep source facts current with daily syncs.
   suspend: false
