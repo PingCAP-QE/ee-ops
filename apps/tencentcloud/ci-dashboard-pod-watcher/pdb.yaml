@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "ee-cd"
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ci-dashboard-pod-watcher
+      app.kubernetes.io/part-of: ci-dashboard

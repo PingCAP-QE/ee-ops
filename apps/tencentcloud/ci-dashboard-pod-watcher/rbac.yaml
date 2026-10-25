@@ -1,0 +1,153 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ci-dashboard-pod-watcher
+  namespace: ee-cd
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "events"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "prow-test-pods"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "jenkins-agents"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "jenkins-pd"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "jenkins-ticdc"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "jenkins-tidb"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "jenkins-tiflash"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "jenkins-tiflow"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "jenkins-tikv"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: "ci-dashboard-pod-watcher-tencent"
+subjects:
+  - kind: ServiceAccount
+    name: "ci-dashboard-pod-watcher"
+    namespace: "ee-cd"
