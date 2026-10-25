@@ -5,6 +5,7 @@ resources:
   - cluster-policies
   - kafka
   - cloudevents-server
+  - ci-dashboard-pod-watcher
   - jenkins
   - jenkins-agents
   - tibuild

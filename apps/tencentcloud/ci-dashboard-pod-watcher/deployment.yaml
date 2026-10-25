@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "ci-dashboard-pod-watcher-tencent"
+  namespace: "ee-cd"
+  labels:
+    app.kubernetes.io/name: ci-dashboard-pod-watcher
+    app.kubernetes.io/part-of: ci-dashboard
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ci-dashboard-pod-watcher
+      app.kubernetes.io/part-of: ci-dashboard
+  template:
+    metadata:
+      annotations:
+        karpenter.sh/do-not-disrupt: "true"
+      labels:
+        app.kubernetes.io/name: ci-dashboard-pod-watcher
+        app.kubernetes.io/part-of: ci-dashboard
+    spec:
+      serviceAccountName: "ci-dashboard-pod-watcher"
+      nodeSelector:
+        compute-class: ee-application
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+      restartPolicy: Always
+      containers:
+        - name: pod-watcher
+          image: "ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs@sha256:cc1a7966163d51bc1ac9e5762e91a639c9d225ec6d407eb7ff30cab8117c323e"
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          args: ["watch-pods"]
+          ports:
+            - name: health
+              containerPort: 8081
+          envFrom:
+            - secretRef:
+                name: "ci-dashboard-pod-watcher-db"
+          env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
+            - name: CI_DASHBOARD_LOG_LEVEL
+              value: "INFO"
+            - name: CI_DASHBOARD_POD_WATCH_SOURCE_PROJECT
+              value: "tencent:ap-beijing:cls-9zpon9y1"
+            - name: CI_DASHBOARD_POD_WATCH_CLOUD_PHASE
+              value: "TENCENT"
+            - name: CI_DASHBOARD_POD_EVENT_NAMESPACES
+              value: "prow-test-pods,jenkins-agents,jenkins-pd,jenkins-ticdc,jenkins-tidb,jenkins-tiflash,jenkins-tiflow,jenkins-tikv"
+            - name: CI_DASHBOARD_POD_WATCH_TIMEOUT_SECONDS
+              value: "300"
+            - name: CI_DASHBOARD_POD_WATCH_RETRY_DELAY_SECONDS
+              value: "5"
+            - name: CI_DASHBOARD_POD_WATCH_HEALTH_PORT
+              value: "8081"
+            - name: CI_DASHBOARD_POD_WATCH_STALE_AFTER_SECONDS
+              value: "720"
+            - name: CI_DASHBOARD_JENKINS_POD_NAME_PREFIX_CACHE_SECONDS
+              value: "900"
+            - name: CI_DASHBOARD_POD_WATCH_DB_BATCH_SIZE
+              value: "100"
+            - name: CI_DASHBOARD_POD_WATCH_DB_RETRY_ATTEMPTS
+              value: "3"
+            - name: CI_DASHBOARD_POD_WATCH_DB_RETRY_BASE_DELAY_MS
+              value: "500"
+            - name: CI_DASHBOARD_POD_WATCH_DB_RETRY_MAX_DELAY_MS
+              value: "5000"
+            - name: CI_DASHBOARD_KUBERNETES_CLUSTER_NAME
+              value: "pingcap-ee"
+            - name: CI_DASHBOARD_KUBERNETES_LOCATION
+              value: "ap-beijing"
+
+          startupProbe:
+            httpGet:
+              path: /livez
+              port: health
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 18
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: health
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "1"
+              memory: "2Gi"
