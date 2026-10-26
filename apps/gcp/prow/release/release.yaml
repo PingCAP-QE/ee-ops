@@ -62,6 +62,9 @@ spec:
       image:
         repository: ghcr.io/ti-community-infra/prow/sinker
         tag: v20250905-a0cfed255
+      kubeconfigSecret: prow-kubeconfig
+      additionalArgs:
+        - --kubeconfig=/etc/kubeconfig/config
     horologium:
       image:
         repository: ghcr.io/ti-community-infra/prow/horologium
