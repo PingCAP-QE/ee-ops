@@ -13,3 +13,22 @@ resources:
   - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrole.yaml
   - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrolebinding.yaml
   # - https://storage.googleapis.com/tekton-releases-nightly/pipelines-in-pipelines/latest/release.yaml
+
+patches:
+  # Use GAR's GHCR cache for results sidecars on newly provisioned build nodes.
+  # Keep the version and digest aligned with the Pipeline bundled in the Operator.
+  # https://github.com/tektoncd/operator/blob/v0.77.0/docs/AirGapImageConfiguration.md
+  - patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: tekton-operator
+        namespace: tekton-operator
+      spec:
+        template:
+          spec:
+            containers:
+              - name: tekton-operator-lifecycle
+                env:
+                  - name: IMAGE_PIPELINES_ARG__SIDECARLOGRESULTS_IMAGE
+                    value: us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/tektoncd/pipeline/sidecarlogresults-7501c6a20d741631510a448b48ab098f:v1.3.1@sha256:4e2567d980cf1768423f51d053fdaeb2656ab8a07fad769ce3311f8e20f1ecab
