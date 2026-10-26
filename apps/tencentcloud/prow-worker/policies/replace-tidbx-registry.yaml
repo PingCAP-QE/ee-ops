@@ -1,4 +1,7 @@
 #yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+# Rewrite private Tidbx GAR images to the TKE-local zot mirror and inject the
+# ci-registry-auth pull secret. Scoped to Prow Pods in prow-test-pods so Prow
+# job configs stay cluster-agnostic.
 apiVersion: policies.kyverno.io/v1
 kind: NamespacedMutatingPolicy
 metadata:
@@ -7,6 +10,8 @@ spec:
   evaluation:
     admission:
       enabled: true
+    # Prow creates a fresh Pod for every job and image fields are immutable on
+    # running Pods, so there is nothing useful to mutate after admission.
     mutateExisting:
       enabled: false
   matchConditions:
