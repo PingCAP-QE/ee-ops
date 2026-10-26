@@ -28,6 +28,18 @@ spec:
       emptyDir: {}
     results-from: sidecar-logs
     max-result-size: 10240 # should <= 1572863
+    options:
+      deployments:
+        tekton-pipelines-controller:
+          spec:
+            template:
+              spec:
+                containers:
+                  - name: tekton-pipelines-controller
+                    # Options append args; the final occurrence overrides the default.
+                    # Keep the version and digest aligned with the bundled Pipeline.
+                    args:
+                      - -sidecarlogresults-image=us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/tektoncd/pipeline/sidecarlogresults-7501c6a20d741631510a448b48ab098f:v1.3.1@sha256:4e2567d980cf1768423f51d053fdaeb2656ab8a07fad769ce3311f8e20f1ecab
   result:
     disabled: true
   trigger:
