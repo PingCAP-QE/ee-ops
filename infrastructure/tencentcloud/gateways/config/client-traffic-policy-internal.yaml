@@ -1,0 +1,27 @@
+---
+# Envoy Gateway defaults are tuned for small API traffic, not for a registry
+# that streams 100 MB-1 GB blobs: 64 KiB initial stream window, 1 MiB
+# connection window and a 5 minute stream idle timeout. With many CI jobs
+# pulling at once (measured: ~135 MB/s aggregate through this entry point,
+# 4 MB/s per stream at 32 concurrent pulls) a slow stream could sit idle long
+# enough to be reset, which the client reports as "stream error: stream ID 3;
+# NO_ERROR; received from peer".
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: internal-https
+  namespace: infra
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: internal-https
+  http2:
+    # Envoy Gateway defaults: 64 KiB stream window, 1 MiB connection window.
+    initialStreamWindowSize: 1Mi
+    initialConnectionWindowSize: 16Mi
+  timeout:
+    http:
+      # Envoy default is 5m. Large blob pulls must not be reset just because
+      # the upstream (zot -> COS) is slow for a while.
+      streamIdleTimeout: 10m

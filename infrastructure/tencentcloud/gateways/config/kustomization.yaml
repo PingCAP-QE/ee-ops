@@ -6,3 +6,4 @@ resources:
   - gateway-internal.yaml
   - envoy-proxy-public.yaml
   - envoy-proxy-internal.yaml
+  - client-traffic-policy-internal.yaml
