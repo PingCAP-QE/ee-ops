@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-plain
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+spec:
+  containers:
+    - name: test
+      image: us-docker.pkg.dev/pingcap-testing-account/tidbx/tikv/pd/image:master-nextgen

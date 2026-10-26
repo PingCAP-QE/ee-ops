@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-plain
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+spec:
+  containers:
+    - name: test
+      image: cr-qcloud.pingcap.net/mirrors/tidbx/tikv/pd/image:master-nextgen
+  imagePullSecrets:
+    - name: ci-registry-auth

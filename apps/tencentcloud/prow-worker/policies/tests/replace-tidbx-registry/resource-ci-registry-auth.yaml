@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ci-registry-auth
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+spec:
+  imagePullSecrets:
+    - name: ci-registry-auth
+  containers:
+    - name: test
+      image: us-docker.pkg.dev/pingcap-testing-account/tidbx/tikv/pd/image:master-nextgen
