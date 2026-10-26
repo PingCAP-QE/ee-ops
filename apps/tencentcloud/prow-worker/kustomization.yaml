@@ -4,7 +4,6 @@ namespace: prow-test-pods
 resources:
   - namespace.yaml
   - rbac.yaml
-  - externalsecret-ci-registry-auth.yaml
   - serviceaccount-tidbx-puller.yaml
   - secrets
   # reuse from jenkins agent namespaced policies
