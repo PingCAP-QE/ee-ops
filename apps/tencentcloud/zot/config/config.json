@@ -49,7 +49,7 @@
     "externalUrl": "${EXTERNAL_URL}",
     "realm": "zot",
     "readTimeout": "600s",
-    "writeTimeout": "600s",
+    "writeTimeout": "1800s",
     "auth": {
       "failDelay": 5,
       "htpasswd": {
