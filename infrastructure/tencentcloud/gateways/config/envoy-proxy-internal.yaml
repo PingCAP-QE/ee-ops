@@ -14,24 +14,3 @@ spec:
           service.cloud.tencent.com/security-groups: "${security_group_id}"
           service.cloud.tencent.com/pass-to-target: "true"
           service.cloud.tencent.com/direct-access: 'true'
-  telemetry:
-    accessLog:
-      # One line per request on stdout. Without this a mid-download reset shows
-      # up only as "stream error: stream ID 3; NO_ERROR" on the client, with no
-      # way to tell whether Envoy, the upstream or a timeout closed the stream.
-      # The fields below are the ones needed for that: response flags/code
-      # details say *why* a stream ended, the durations say how long it lived,
-      # and bytes_sent says how much of the body made it.
-      settings:
-        - format:
-            type: Text
-            text: >-
-              [%START_TIME%] "%REQ(:METHOD)% %REQ(X-ENVOY-ORIGINAL-PATH?:PATH)% %PROTOCOL%"
-              %RESPONSE_CODE% flags=%RESPONSE_FLAGS% code_details=%RESPONSE_CODE_DETAILS%
-              termination=%CONNECTION_TERMINATION_DETAILS% duration=%DURATION%ms
-              upstream_duration=%RESPONSE_DURATION%ms sent=%BYTES_SENT%
-              upstream=%UPSTREAM_HOST% upstream_failure=%UPSTREAM_TRANSPORT_FAILURE_REASON%
-          sinks:
-            - type: File
-              file:
-                path: /dev/stdout
