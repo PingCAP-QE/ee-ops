@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-init
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+spec:
+  initContainers:
+    - name: sidecar-pd
+      image: us-docker.pkg.dev/pingcap-testing-account/tidbx/tikv/pd/image:master-nextgen
+    - name: sidecar-tikv
+      image: us-docker.pkg.dev/pingcap-testing-account/tidbx/tikv/tikv/image:cloud-engine-nextgen
+  containers:
+    - name: test
+      image: ghcr.io/pingcap-qe/ci/base:v2026.8.23-36-gd6f25768-go1.25

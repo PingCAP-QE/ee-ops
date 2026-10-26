@@ -1,0 +1,54 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: replace-tidbx-registry
+policies:
+  - ../../replace-tidbx-registry.yaml
+resources:
+  - resource-plain.yaml
+  - resource-init.yaml
+  - resource-existing-secret.yaml
+  - resource-ci-registry-auth.yaml
+  - resource-non-matching.yaml
+  - resource-not-prow.yaml
+results:
+  - policy: replace-tidbx-registry
+    rule: replace-tidbx-registry
+    resources:
+      - pod-plain
+    kind: Pod
+    result: pass
+    patchedResources: patched-plain.yaml
+  - policy: replace-tidbx-registry
+    rule: replace-tidbx-registry
+    resources:
+      - pod-init
+    kind: Pod
+    result: pass
+    patchedResources: patched-init.yaml
+  - policy: replace-tidbx-registry
+    rule: replace-tidbx-registry
+    resources:
+      - pod-existing-secret
+    kind: Pod
+    result: pass
+    patchedResources: patched-existing-secret.yaml
+  - policy: replace-tidbx-registry
+    rule: replace-tidbx-registry
+    resources:
+      - pod-ci-registry-auth
+    kind: Pod
+    result: pass
+    patchedResources: patched-ci-registry-auth.yaml
+  - policy: replace-tidbx-registry
+    rule: replace-tidbx-registry
+    resources:
+      - pod-non-matching
+    kind: Pod
+    result: skip
+  - policy: replace-tidbx-registry
+    rule: replace-tidbx-registry
+    resources:
+      - pod-not-prow
+    kind: Pod
+    result: skip

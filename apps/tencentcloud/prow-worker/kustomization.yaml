@@ -4,8 +4,11 @@ namespace: prow-test-pods
 resources:
   - namespace.yaml
   - rbac.yaml
+  - serviceaccount-tidbx-puller.yaml
   - secrets
   # reuse from jenkins agent namespaced policies
   - ../jenkins/post/_base/policies/set-pod-compute-class.yaml
   # TKE supernode organization-billing attribution for Prow Pods
   - policies/inject-prow-tencent-cost-tags.yaml
+  # Use the local zot mirror for private Tidbx GAR images and inject pull auth
+  - policies/replace-tidbx-registry.yaml
