@@ -23,6 +23,11 @@ spec:
             path:
               type: ReplaceFullPath
               replaceFullPath: /v1/token
+        - type: ExtensionRef
+          extensionRef:
+            group: gateway.envoyproxy.io
+            kind: HTTPRouteFilter
+            name: github-token-broker-upstream-credential
       backendRefs:
         - name: github-token-broker
           port: 80

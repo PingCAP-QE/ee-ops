@@ -14,12 +14,13 @@ code are unchanged.
 
 ```text
 client
-  Authorization: Bearer <api-key>
+  Authorization: Bearer <Google ID token>
     -> GKE external HTTPS (TLS terminated)
     -> eg-internal Envoy
          HTTPRoute: exact /gh-broker/v1/token, POST
          URLRewrite: /v1/token
-         SecurityPolicy: apiKeyAuth (Secret reference)
+         SecurityPolicy: JWT (issuer, audience) + claim authorization
+         HTTPRouteFilter: replace Authorization with the broker SA token
     -> Service github-token-broker:80
     -> broker: TokenReview + policy (unchanged)
 ```
@@ -29,39 +30,91 @@ cluster-internal.
 
 ## Authentication model
 
-- `ServiceAccount/external-reader` in the `github-token-broker` namespace has
-  **no RoleBindings or ClusterRoleBindings**. The token can authenticate to the
-  API server but cannot read cluster resources.
-- The API key is that ServiceAccount token. The gateway validates it with
-  `apiKeyAuth` and keeps the `Authorization` header (`sanitize: false`), so the
-  broker performs the normal Kubernetes `TokenReview`.
-- The API key Secret contains exactly one key (`external-client`). Never point
-  `apiKeyAuth` at the raw ServiceAccount token Secret: its `ca.crt` and
-  `namespace` keys would become valid API keys.
-
-### Why not OIDC
-
-A deployment-only gateway can validate a Google ID token, but the token
-audience is not an authorization control: any Google account can mint an ID
-token for the same audience. Restricting subjects would require an allowlist of
-internal identities in this public repository. The API key is secret-managed
-and does not expose internal identifiers.
-
-## Key lifecycle
+External callers present a **Google ID token** with:
 
 ```text
-Secret/external-reader-token (SA token, controller-managed)
-  -> PushSecret -> GCP Secret Manager
-  -> ExternalSecret -> Secret/github-token-broker-apikey (key: external-client)
-  -> SecurityPolicy/apiKeyAuth
+iss = https://accounts.google.com
+aud = https://prow.pingcap.net/gh-broker
+email = github-token-broker-external@pingcap-testing-account.iam.gserviceaccount.com
 ```
 
-- Both the push and the pull refresh hourly.
-- **Revoke**: delete `Secret/github-token-broker-apikey` (or the
-  `external-reader` ServiceAccount). New requests fail with `401`.
-- **Rotate**: delete `Secret/external-reader-token`; the controller recreates
-  the token, the push/pull chain republishes it, and clients receive the new
-  key through the normal distribution channel.
+The gateway validates the signature, issuer and audience, then the
+`authorization` policy allows only:
+
+- the service account email above (machine clients), or
+- `hd = pingcap.com` (PingCAP Workspace users, for future user-facing flows).
+
+The caller's token never reaches the broker. A `HTTPRouteFilter` overwrites the
+`Authorization` header with the token of a dedicated `external-reader`
+ServiceAccount, which has **no RoleBindings or ClusterRoleBindings**. The broker
+performs the normal `TokenReview` and policy check.
+
+### Issuing credentials to a machine client
+
+Create a JSON key for the service account and hand it to the client out of band:
+
+```bash
+gcloud iam service-accounts keys create key.json \
+  --iam-account=github-token-broker-external@pingcap-testing-account.iam.gserviceaccount.com \
+  --project=pingcap-testing-account
+```
+
+The service account has no GCP IAM roles. The key can only mint ID tokens with
+the audience above; it cannot call Google APIs. Use one key per client and
+delete the key to revoke that client (`gcloud iam service-accounts keys
+delete`).
+
+### Minting a token
+
+gcloud (activate the key in an isolated config directory):
+
+```bash
+export CLOUDSDK_CONFIG=$(mktemp -d)
+gcloud auth activate-service-account --key-file=key.json
+gcloud auth print-identity-token --audiences=https://prow.pingcap.net/gh-broker
+```
+
+Python:
+
+```python
+from google.auth.transport.requests import Request
+from google.oauth2 import service_account
+
+creds = service_account.IDTokenCredentials.from_service_account_file(
+    "key.json", target_audience="https://prow.pingcap.net/gh-broker"
+)
+creds.refresh(Request())
+print(creds.token)
+```
+
+Go:
+
+```go
+creds, err := idtoken.CredentialsFromJSON(ctx, keyJSON,
+    "https://prow.pingcap.net/gh-broker")
+tok, err := creds.TokenSource.Token()
+```
+
+Node:
+
+```js
+const auth = new GoogleAuth({keyFile: "key.json"});
+const client = await auth.getIdTokenClient("https://prow.pingcap.net/gh-broker");
+const headers = await client.getRequestHeaders();
+```
+
+## Broker identity
+
+```text
+Secret/external-reader-token (ServiceAccount token)
+  -> PushSecret -> GCP Secret Manager
+  -> ExternalSecret (template "Bearer {{ .token }}")
+  -> Secret/github-token-broker-upstream (key: credential)
+  -> HTTPRouteFilter/credentialInjection
+```
+
+Both directions refresh hourly. The broker never receives the caller's token,
+and the caller never receives the broker's ServiceAccount token.
 
 ## Authorization
 
@@ -86,20 +139,20 @@ deployment-only design.
 ## Verification
 
 ```bash
-# 401 without a key
+# 401 without a token
 curl -sS -o /dev/null -w '%{http_code}\n' -X POST \
   https://prow.pingcap.net/gh-broker/v1/token \
   -H 'Content-Type: application/json' \
   -d '{"repo":"example-org/example-repo","repositories":["example-repo"]}'
 
-# 200 with a valid key (do not echo the key)
+# 200 with a valid ID token (do not echo the token)
 curl -sS -o /dev/null -w '%{http_code}\n' -X POST \
   https://prow.pingcap.net/gh-broker/v1/token \
-  -H "Authorization: Bearer ${BROKER_API_KEY}" \
+  -H "Authorization: Bearer ${ID_TOKEN}" \
   -H 'Content-Type: application/json' \
   -d '{"repo":"example-org/example-repo","repositories":["example-repo"],"permissions":{"contents":"read"}}'
 
-# The ServiceAccount must not have RBAC permissions
+# The broker ServiceAccount must not have RBAC permissions
 kubectl auth can-i --list \
   --as=system:serviceaccount:github-token-broker:external-reader
 ```
@@ -113,15 +166,13 @@ kubectl auth can-i --list \
    on, not only the allowlist. Detect it by alerting on broker log entries for
    `external-reader` with `"repositories":[]`. A code guard or a dedicated
    GitHub App would close this gap.
-2. **Shared identity.** Every external caller shares `external-reader`; broker
-   audit logs and rate limits cannot distinguish callers.
-3. **Static credential.** The API key is long-lived. It is a namespace-scoped
-   ServiceAccount token with no RBAC, but it is still a cluster credential.
-4. **Header pass-through.** `apiKeyAuth` must forward the original
-   `Authorization` header. This is verified during rollout; if a future Envoy
-   Gateway version changes the behavior, use `HTTPRouteFilter.credentialInjection`
-   with a single-key `credential` Secret instead.
-5. **PAT fallback.** Keep `github.fallback.enabled=false`. If a PAT is
+2. **Shared broker identity.** Every external caller is mapped to
+   `external-reader`; broker audit logs and rate limits cannot distinguish
+   callers. Gateway logs can distinguish the JWT `email` only if claim-based
+   logging is added.
+3. **Long-lived keys.** Service account keys do not expire. Use one key per
+   client and rotate them; the ID tokens themselves are short-lived (one hour).
+4. **PAT fallback.** Keep `github.fallback.enabled=false`. If a PAT is
    configured, external callers could receive it for owners where the App is not
    installed.
 
@@ -129,9 +180,9 @@ kubectl auth can-i --list \
 
 - Remove the `github-token-broker-external` HTTPRoute: the public endpoint
   returns 404 and the broker stays available in-cluster.
-- Delete `Secret/github-token-broker-apikey`: all external requests fail with
-  `401`.
-- Remove the `external-reader` policy rule from the policy secret to revoke
-  authorization independently of the key.
+- Remove the `broker-clients` authorization rule (or delete the service account
+  key): external requests fail with 403/401.
+- Remove the `external-reader` policy rule to revoke authorization
+  independently of the gateway.
 
 None of these steps affects in-cluster callers.
