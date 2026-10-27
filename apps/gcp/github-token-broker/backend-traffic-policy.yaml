@@ -1,0 +1,18 @@
+# Coarse entry limit for the public token endpoint. Local rate limiting is per
+# route and per Envoy data-plane replica; the broker still enforces its own
+# per-caller limit (shared by every external caller).
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: github-token-broker-external-limit
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: github-token-broker-external
+  rateLimit:
+    local:
+      rules:
+        - limit:
+            requests: 300
+            unit: Minute

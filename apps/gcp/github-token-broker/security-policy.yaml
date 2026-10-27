@@ -1,0 +1,24 @@
+# Machine authentication for the public token endpoint.
+#
+# The API key is the external-reader ServiceAccount token (see
+# external-secret-apikey.yaml). The gateway validates it, keeps the
+# Authorization header (sanitize: false) and forwards it to the broker, which
+# performs the Kubernetes TokenReview and the read-only policy check.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: github-token-broker-apikey
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: github-token-broker-external
+  apiKeyAuth:
+    credentialRefs:
+      - group: ""
+        kind: Secret
+        name: github-token-broker-apikey
+    extractFrom:
+      - headers:
+          - Authorization
+    sanitize: false
