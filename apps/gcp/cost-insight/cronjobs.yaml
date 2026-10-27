@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7@sha256:4d0a9c9224c268af6cfee9fad9895ecf0c50665e3950dbf6bcfbc84dcdd66bf4
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -548,7 +548,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7@sha256:4d0a9c9224c268af6cfee9fad9895ecf0c50665e3950dbf6bcfbc84dcdd66bf4
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
