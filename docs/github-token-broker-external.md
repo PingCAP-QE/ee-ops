@@ -51,19 +51,14 @@ The caller's token never reaches the broker. A `HTTPRouteFilter` overwrites the
 ServiceAccount, which has **no RoleBindings or ClusterRoleBindings**. The broker
 performs the normal `TokenReview` and policy check.
 
-### Issuing credentials to a machine client
+### Client service accounts
 
-Use one service account per client, named `gh-broker-client-<client>`. The first
-one covers the macOS build workers:
+Client service accounts are managed outside this repository by the platform
+infrastructure process. The macOS worker identity is
+`gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com`; do not
+create or delete service accounts with `gcloud`.
 
-```bash
-gcloud iam service-accounts create gh-broker-client-macos \
-  --project=pingcap-testing-account \
-  --display-name="GitHub token broker client: macOS workers" \
-  --description="Identity for macOS build workers calling the external token broker. No GCP IAM roles."
-```
-
-None of these service accounts has GCP IAM roles. Create a JSON key per client
+The service accounts have no GCP IAM roles. Create a JSON key per client
 installation and hand it over out of band:
 
 ```bash
@@ -76,9 +71,9 @@ A key can only mint ID tokens with the audience above; it cannot call Google
 APIs. Use one key per client and delete the key to revoke that client
 (`gcloud iam service-accounts keys delete`).
 
-To onboard another client: create `gh-broker-client-<name>`, add its email to
-the `broker-clients` claim values in
-`apps/gcp/github-token-broker/security-policy.yaml`, and issue a key.
+To onboard another client, request a new service account through the platform
+infrastructure process, add the resulting email to the `broker-clients` claim
+values in `apps/gcp/github-token-broker/security-policy.yaml`, and issue a key.
 
 ### Minting a token
 
