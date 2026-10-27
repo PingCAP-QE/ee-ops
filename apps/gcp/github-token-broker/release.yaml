@@ -53,6 +53,8 @@ spec:
         - tibuild
         - chatops-lark
         - apps
+        # Envoy data plane that fronts the public /gh-broker route.
+        - infra
       egress:
         # DNS.
         - to:
