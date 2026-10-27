@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-1-gb8abd19
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7@sha256:4d0a9c9224c268af6cfee9fad9895ecf0c50665e3950dbf6bcfbc84dcdd66bf4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -106,6 +106,10 @@ spec:
                   value: pingcap-testing-account
                 - name: COST_INSIGHT_GCP_BILLING_TABLE
                   value: warehouse-f80fbbe8e8.raw_gcp_billing.gcp_billing_export_resource_v1_01D088_8F9CF2_8AF1C6
+                - name: COST_INSIGHT_BILLING_BQ_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_LOCATION
+                  value: us-west1
                 - name: COST_INSIGHT_SYNC_LAG_DAYS
                   value: "3"
                 - name: COST_INSIGHT_EXPORT_OVERLAP_DAYS
@@ -544,7 +548,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.11-9-g3cdbb10
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7@sha256:4d0a9c9224c268af6cfee9fad9895ecf0c50665e3950dbf6bcfbc84dcdd66bf4
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -580,6 +584,10 @@ spec:
                   value: pingcap-testing-account
                 - name: COST_INSIGHT_GCP_BILLING_TABLE
                   value: warehouse-f80fbbe8e8.raw_gcp_billing.gcp_billing_export_resource_v1_01D088_8F9CF2_8AF1C6
+                - name: COST_INSIGHT_BILLING_BQ_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_LOCATION
+                  value: us-west1
                 - name: COST_INSIGHT_UNMATCHED_RESOURCE_LAG_DAYS
                   value: "5"
                 - name: COST_INSIGHT_SYNC_PAGE_SIZE
