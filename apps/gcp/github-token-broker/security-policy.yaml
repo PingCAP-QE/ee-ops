@@ -35,7 +35,8 @@ spec:
             claims:
               - name: email
                 values:
-                  - github-token-broker-external@pingcap-testing-account.iam.gserviceaccount.com
+                  # One service account per client; add the next client here.
+                  - gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com
       - name: company-users
         action: Allow
         principal:

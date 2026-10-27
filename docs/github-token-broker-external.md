@@ -35,7 +35,7 @@ External callers present a **Google ID token** with:
 ```text
 iss = https://accounts.google.com
 aud = https://prow.pingcap.net/gh-broker
-email = github-token-broker-external@pingcap-testing-account.iam.gserviceaccount.com
+email = gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com
 ```
 
 The gateway validates the signature, issuer and audience, then the
@@ -53,27 +53,32 @@ performs the normal `TokenReview` and policy check.
 
 ### Issuing credentials to a machine client
 
-The service account is created once:
+Use one service account per client, named `gh-broker-client-<client>`. The first
+one covers the macOS build workers:
 
 ```bash
-gcloud iam service-accounts create github-token-broker-external \
+gcloud iam service-accounts create gh-broker-client-macos \
   --project=pingcap-testing-account \
-  --display-name="GitHub token broker external clients" \
-  --description="Identity for external clients of the GitHub token broker. No GCP IAM roles."
+  --display-name="GitHub token broker client: macOS workers" \
+  --description="Identity for macOS build workers calling the external token broker. No GCP IAM roles."
 ```
 
-It has no GCP IAM roles. Create a JSON key per client and hand it over out of
-band:
+None of these service accounts has GCP IAM roles. Create a JSON key per client
+installation and hand it over out of band:
 
 ```bash
 gcloud iam service-accounts keys create key.json \
-  --iam-account=github-token-broker-external@pingcap-testing-account.iam.gserviceaccount.com \
+  --iam-account=gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com \
   --project=pingcap-testing-account
 ```
 
 A key can only mint ID tokens with the audience above; it cannot call Google
 APIs. Use one key per client and delete the key to revoke that client
 (`gcloud iam service-accounts keys delete`).
+
+To onboard another client: create `gh-broker-client-<name>`, add its email to
+the `broker-clients` claim values in
+`apps/gcp/github-token-broker/security-policy.yaml`, and issue a key.
 
 ### Minting a token
 
@@ -177,10 +182,10 @@ kubectl auth can-i --list \
    on, not only the allowlist. Detect it by alerting on broker log entries for
    `external-reader` with `"repositories":[]`. A code guard or a dedicated
    GitHub App would close this gap.
-2. **Shared broker identity.** Every external caller is mapped to
-   `external-reader`; broker audit logs and rate limits cannot distinguish
-   callers. Gateway logs can distinguish the JWT `email` only if claim-based
-   logging is added.
+2. **Shared broker identity.** Every external caller is mapped to the same
+   broker `external-reader` ServiceAccount; broker audit logs and rate limits
+   cannot distinguish clients. The gateway can distinguish them by the JWT
+   `email` claim, but that requires claim-based logging.
 3. **Long-lived keys.** Service account keys do not expire. Use one key per
    client and rotate them; the ID tokens themselves are short-lived (one hour).
 4. **PAT fallback.** Keep `github.fallback.enabled=false`. If a PAT is
