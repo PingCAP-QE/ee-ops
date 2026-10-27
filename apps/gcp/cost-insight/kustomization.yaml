@@ -4,3 +4,4 @@ resources:
   - serviceaccount.yaml
   - cronjobs.yaml
   - resource-serving-cronjob.yaml
+  - warehouse-read-canary.yaml
