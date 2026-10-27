@@ -202,6 +202,15 @@ controller:
                     value: "github-bot-https"
                   - key: "GIT_CDN_ENABLED"
                     value: "true"
+                  # Mint GitHub App installation tokens from the in-cluster
+                  # token broker for the listed organizations instead of using
+                  # the ti-chi-bot SSH key/PAT (SAML-enforcing organizations).
+                  - key: "GIT_BROKER_ENABLED"
+                    value: "true"
+                  - key: "GIT_BROKER_URL"
+                    value: "http://github-token-broker.github-token-broker.svc"
+                  - key: "GIT_BROKER_ORGS"
+                    value: "tidbcloud"
                   # Route GitHub HTTPS and SSH-style URLs through the in-cluster Git CDN.
                   # Git uses the HTTP credential only when the CDN returns 401.
                   # Keep the count synchronized with every KEY_n/VALUE_n pair below.
