@@ -105,14 +105,14 @@ spec:
                             AND usage_date <= CURRENT_DATE()
                           """
                       read_query(table, f"""
-                          SELECT MAX(usage_date) AS max_usage_date
+                          SELECT COUNT(*) AS scope_rows, MAX(usage_date) AS max_usage_date
                           FROM `warehouse-f80fbbe8e8.mart_cloud_cost.{table}`
                           WHERE billing_period = DATE_TRUNC(CURRENT_DATE(), MONTH)
                           {usage_filter}
                       """)
 
                   read_query("gcp_raw_recent_export", """
-                      SELECT MAX(export_time) AS max_export_time
+                      SELECT COUNT(*) AS scope_rows, MAX(export_time) AS max_export_time
                       FROM `warehouse-f80fbbe8e8.raw_gcp_billing.gcp_billing_export_resource_v1_01D088_8F9CF2_8AF1C6`
                       WHERE _PARTITIONDATE BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY)
                                                AND CURRENT_DATE()

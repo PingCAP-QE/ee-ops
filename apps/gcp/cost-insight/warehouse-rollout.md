@@ -51,6 +51,25 @@ requires the GSA above before any table reads. It then reads:
 | `mart_cloud_cost.azure_daily_cost` | Current `billing_period` month; `MAX(usage_date)` |
 | `raw_gcp_billing.gcp_billing_export_resource_v1_01D088_8F9CF2_8AF1C6` | Today/yesterday UTC `_PARTITIONDATE` only; `MAX(export_time)` |
 
+Each table probe also records `COUNT(*) AS scope_rows`, distinguishing an empty
+scope from existing rows whose aggregate date is NULL. Counts are diagnostic;
+zero rows remain acceptable for this access/shape canary.
+
+Named-table metadata and bounded SELECTs were checked with the approved SA on
+2026-10-27: all three marts have DATE `billing_period` (month-start, monthly
+partition) and DATE `usage_date`; AWS also has STRING `charge_type`, including
+exact `Usage` and `SavingsPlanCoveredUsage` values. GCP has TIMESTAMP
+`export_time` and DATE ingestion `_PARTITIONDATE`. This local schema check does
+not replace the pending dedicated-KSA runtime test.
+
+For a first-run `Unrecognized name` or incompatible-type error, compare the
+exact named table's schema using BigQuery Tables.get / SDK `get_table().schema`
+with an authorized identity before diagnosing IAM. Dataset-wide
+`INFORMATION_SCHEMA.COLUMNS` may itself require metadata permissions this SA
+does not have; do not broaden IAM merely to troubleshoot a SQL column error.
+An actual Access Denied error should instead be triaged by its permission,
+principal, project and object. Do not increase scan caps as an auth/schema fix.
+
 Each SELECT has a preceding uncached dry-run and a **512 MiB per-query**
 `maximum_bytes_billed` cap. Unknown or over-budget estimates fail before data
 execution. Real queries also enforce that cap; errors stop the script without
