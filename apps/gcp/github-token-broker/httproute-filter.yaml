@@ -1,0 +1,15 @@
+# Replace the caller's Google ID token with the broker's dedicated
+# ServiceAccount token. The broker authenticates that token with TokenReview;
+# the external caller never sees it.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: HTTPRouteFilter
+metadata:
+  name: github-token-broker-upstream-credential
+spec:
+  credentialInjection:
+    overwrite: true
+    credential:
+      valueRef:
+        group: ""
+        kind: Secret
+        name: github-token-broker-upstream

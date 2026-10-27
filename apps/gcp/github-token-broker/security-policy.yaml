@@ -1,0 +1,48 @@
+# Machine authentication for the public token endpoint.
+#
+# Callers present a Google ID token whose audience is the broker URL. Only two
+# identities are accepted:
+#   - the service account we issue key JSON files for (external machines);
+#   - PingCAP Workspace users (hd=pingcap.com), for future user-facing flows.
+#
+# The token itself never reaches the broker: the HTTPRouteFilter replaces the
+# Authorization header with the dedicated read-only ServiceAccount token.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: github-token-broker-jwt
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: github-token-broker-external
+  jwt:
+    providers:
+      - name: google
+        issuer: https://accounts.google.com
+        remoteJWKS:
+          uri: https://www.googleapis.com/oauth2/v3/certs
+        audiences:
+          - https://prow.pingcap.net/gh-broker
+  authorization:
+    defaultAction: Deny
+    rules:
+      - name: broker-clients
+        action: Allow
+        principal:
+          jwt:
+            provider: google
+            claims:
+              - name: email
+                values:
+                  # One service account per client; add the next client here.
+                  - gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com
+      - name: company-users
+        action: Allow
+        principal:
+          jwt:
+            provider: google
+            claims:
+              - name: hd
+                values:
+                  - pingcap.com

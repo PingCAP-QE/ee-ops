@@ -51,6 +51,8 @@ spec:
       ingressNamespaces:
         - ee-cd
         - tibuild
+        # Jenkins agents run the SAML-organization jobs (jenkins-tidb).
+        - jenkins-tidb
       egress:
         # DNS.
         - to:
