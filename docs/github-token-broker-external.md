@@ -42,7 +42,9 @@ The gateway validates the signature, issuer and audience, then the
 `authorization` policy allows only:
 
 - the service account email above (machine clients), or
-- `hd = pingcap.com` (PingCAP Workspace users, for future user-facing flows).
+- `hd = pingcap.com` (reserved for a future internal OIDC provider; Google user
+  tokens carry the OAuth client ID in `aud`, so they cannot reach this endpoint
+  directly).
 
 The caller's token never reaches the broker. A `HTTPRouteFilter` overwrites the
 `Authorization` header with the token of a dedicated `external-reader`
@@ -51,7 +53,17 @@ performs the normal `TokenReview` and policy check.
 
 ### Issuing credentials to a machine client
 
-Create a JSON key for the service account and hand it to the client out of band:
+The service account is created once:
+
+```bash
+gcloud iam service-accounts create github-token-broker-external \
+  --project=pingcap-testing-account \
+  --display-name="GitHub token broker external clients" \
+  --description="Identity for external clients of the GitHub token broker. No GCP IAM roles."
+```
+
+It has no GCP IAM roles. Create a JSON key per client and hand it over out of
+band:
 
 ```bash
 gcloud iam service-accounts keys create key.json \
@@ -59,10 +71,9 @@ gcloud iam service-accounts keys create key.json \
   --project=pingcap-testing-account
 ```
 
-The service account has no GCP IAM roles. The key can only mint ID tokens with
-the audience above; it cannot call Google APIs. Use one key per client and
-delete the key to revoke that client (`gcloud iam service-accounts keys
-delete`).
+A key can only mint ID tokens with the audience above; it cannot call Google
+APIs. Use one key per client and delete the key to revoke that client
+(`gcloud iam service-accounts keys delete`).
 
 ### Minting a token
 
