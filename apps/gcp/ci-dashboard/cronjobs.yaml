@@ -172,6 +172,7 @@ spec:
             app.kubernetes.io/name: ci-dashboard-sync-flaky-issues
             app.kubernetes.io/part-of: ci-dashboard
         spec:
+          serviceAccountName: ci-dashboard
           restartPolicy: Never
           containers:
             - name: sync-flaky-issues
