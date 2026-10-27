@@ -173,6 +173,7 @@ spec:
             app.kubernetes.io/part-of: ci-dashboard
         spec:
           restartPolicy: Never
+          serviceAccountName: ci-dashboard
           containers:
             - name: sync-flaky-issues
               image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:replaced-by-kustomize
@@ -188,11 +189,8 @@ spec:
                   value: INFO
                 - name: CI_DASHBOARD_BATCH_SIZE
                   value: "200"
-                - name: GITHUB_TOKEN
-                  valueFrom:
-                    secretKeyRef:
-                      name: prow-github
-                      key: token
+                - name: CI_DASHBOARD_GITHUB_BROKER_URL
+                  value: http://github-token-broker.github-token-broker.svc
               resources:
                 requests:
                   cpu: "500m"
