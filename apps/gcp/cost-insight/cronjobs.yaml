@@ -552,20 +552,23 @@ spec:
               args:
                 - |
                   dates="$(python - <<'PY'
-                  from datetime import datetime, timedelta, timezone
+                  from datetime import date, datetime, timedelta, timezone
                   import os
 
                   lag_days = int(os.environ.get("COST_INSIGHT_UNMATCHED_RESOURCE_LAG_DAYS", "5"))
                   stable_date = datetime.now(timezone.utc).date() - timedelta(days=lag_days)
                   end_date = stable_date - timedelta(days=stable_date.weekday() + 1)
                   start_date = end_date - timedelta(days=6)
-                  print(start_date.isoformat(), end_date.isoformat())
+                  # October 15 is a merged old/new partition; the new table alone is not authoritative.
+                  export_start = max(start_date, date(2026, 10, 16))
+                  print(start_date.isoformat(), end_date.isoformat(), export_start.isoformat())
                   PY
                   )"
                   set -- ${dates}
                   cost-insight sync-gcp-unmatched-resources \
                     --usage-start-date "$1" \
-                    --usage-end-date "$2"
+                    --usage-end-date "$2" \
+                    --export-partition-start "$3"
               envFrom:
                 - secretRef:
                     name: ci-dashboard-eq-prd-insight-db
