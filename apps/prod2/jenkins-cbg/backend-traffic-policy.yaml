@@ -1,6 +1,10 @@
-# Protect jenkins-cbg only on the GWT webhook route.
-# Thresholds are intentionally high so normal daily webhook volume is
-# unaffected; limits engage only near overload / stampede.
+# Webhook admit-queue (no rate-limit reject).
+#
+# GWT has no built-in intake queue: each HTTP call is handled in Jenkins,
+# then triggered builds wait on the normal Jenkins build Queue.
+# This policy only shapes how many webhook HTTP calls hit Jenkins at once:
+# excess wait on Envoy (pending) and drain in, instead of 429/503.
+# UI/API stay on jenkins-cbg HTTPRoute and are unaffected.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: BackendTrafficPolicy
 metadata:
@@ -14,17 +18,9 @@ spec:
       kind: HTTPRoute
       name: jenkins-cbg-webhook
   circuitBreaker:
-    # Near-capacity only. Envoy defaults are 1024; keep headroom for
-    # legitimate bursts but stop unbounded pile-up onto Jenkins.
-    maxConnections: 256
-    maxParallelRequests: 128
-    maxPendingRequests: 256
-  rateLimit:
-    local:
-      rules:
-        # Per Envoy replica. With 5 internal-gateway replicas, cluster
-        # capacity is ~5x when traffic is balanced. 80 rps/replica is far
-        # above normal GWT HTTP rate; only a stampede trips it.
-        - limit:
-            requests: 80
-            unit: Second
+    # Cap concurrent webhook handlers inside Jenkins; everything else waits.
+    maxParallelRequests: 32
+    maxParallelRetries: 32
+    # Large pending = queue, do not reject under normal stampedes.
+    maxPendingRequests: 4096
+    maxConnections: 4096
