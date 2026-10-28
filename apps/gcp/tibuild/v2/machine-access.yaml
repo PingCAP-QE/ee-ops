@@ -1,0 +1,54 @@
+# A header match is more specific than the browser route's path-only match.
+# This is not an authentication bypass: the matching route requires a valid
+# JWT and never accepts the browser's OIDC cookies as authentication.
+# Keep path/rewrite/backend/port in sync with release.yaml and chart tibuild-v2.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tibuild-v2-machine
+  namespace: tibuild
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: eg-internal
+      namespace: infra
+  hostnames:
+    - prow.tidb.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild
+          headers:
+            - name: Authorization
+              type: RegularExpression
+              value: "^Bearer .+$"
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: tibuild-v2-machine-jwt
+  namespace: tibuild
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: tibuild-v2-machine
+  jwt:
+    optional: false
+    providers:
+      - name: google
+        issuer: https://accounts.google.com
+        remoteJWKS:
+          uri: https://www.googleapis.com/oauth2/v3/certs
+        audiences:
+          - prow.tidb.net

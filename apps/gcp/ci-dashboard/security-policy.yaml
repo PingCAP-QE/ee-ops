@@ -9,6 +9,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: ci-dashboard
+  csrf: {}
   oidc:
     provider:
       issuer: https://accounts.google.com
