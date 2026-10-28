@@ -21,16 +21,18 @@ controller:
 
   numExecutors: 0
 
+  # 2026-10-28: OOMKilled at 8Gi knocked out Generic Webhook Trigger intake.
+  # Keep headroom above heap for metaspace / direct / agent fan-in.
   resources:
     requests:
       cpu: 500m
-      memory: 6Gi
+      memory: 10Gi
     limits:
       cpu: "4"
-      memory: 8Gi
+      memory: 16Gi
 
   javaOpts: >-
-    -Xms4096m -Xmx4096m -XX:+UseG1GC
+    -Xms8192m -Xmx8192m -XX:+UseG1GC
     -Dhudson.model.DirectoryBrowserSupport.CSP=
 
   customInitContainers:
