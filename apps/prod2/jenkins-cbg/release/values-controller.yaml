@@ -21,16 +21,18 @@ controller:
 
   numExecutors: 0
 
+  # Controller RSS runs near the old 16Gi ceiling under normal load; keep
+  # container limit above heap for metaspace / direct / native overhead.
   resources:
     requests:
       cpu: 500m
-      memory: 6Gi
+      memory: 16Gi
     limits:
       cpu: "4"
-      memory: 8Gi
+      memory: 24Gi
 
   javaOpts: >-
-    -Xms4096m -Xmx4096m -XX:+UseG1GC
+    -Xms12288m -Xmx12288m -XX:+UseG1GC
     -Dhudson.model.DirectoryBrowserSupport.CSP=
 
   customInitContainers:
