@@ -7,4 +7,5 @@ resources:
   - release
   - post
   - httproute.yaml
+  - httproute-webhook.yaml
   - backend-traffic-policy.yaml
