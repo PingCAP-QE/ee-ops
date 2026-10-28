@@ -1,0 +1,32 @@
+# Protect jenkins-cbg from webhook stampedes / overload:
+# - Local rate limit on Generic Webhook Trigger path (per Envoy replica).
+# - Circuit breaker queues excess in-flight requests; when the pending
+#   queue is full Envoy returns 503 instead of piling onto Jenkins heap.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: BackendTrafficPolicy
+metadata:
+  name: jenkins-cbg-protect
+  labels:
+    app.kubernetes.io/name: jenkins-cbg
+    app.kubernetes.io/part-of: jenkins-cbg-migrate
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: jenkins-cbg
+  circuitBreaker:
+    # Cap concurrent upstream work so Jenkins stays responsive under burst.
+    maxConnections: 100
+    maxParallelRequests: 40
+    maxPendingRequests: 80
+  rateLimit:
+    local:
+      rules:
+        # Gitea/GWT webhook path only — UI and API are unaffected.
+        - clientSelectors:
+            - path:
+                type: PathPrefix
+                value: /jenkins-pingkai/generic-webhook-trigger
+          limit:
+            requests: 10
+            unit: Second
