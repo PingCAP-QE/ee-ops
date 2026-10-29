@@ -17,6 +17,8 @@ spec:
       name: ci-dashboard-oidc
     clientSecret:
       name: ci-dashboard-oidc
+    forwardIDToken:
+      header: X-CI-Dashboard-ID-Token
     redirectURL: https://prow.tidb.net/dashboard/oauth2/callback
     scopes:
       - openid

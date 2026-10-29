@@ -24,6 +24,9 @@ jobs:
       - name: Verify browser route CSRF policies
         if: matrix.path == 'apps'
         run: bash scripts/check_gcp_route_csrf.sh
+      - name: Verify Dashboard backend identity configuration
+        if: matrix.path == 'apps'
+        run: bash scripts/check_ci_dashboard_auth_config.sh
       - name: Verify Flux API versions
         if: matrix.path == 'clusters'
         run: |
