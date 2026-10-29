@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: tibuild-v2
-      version: 2.0.0-alpha.2
+      version: 2.0.0-alpha.4
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -26,7 +26,7 @@ spec:
   test:
     enable: true
   values:
-    replicaCount: 1
+    replicaCount: 2
     resources:
       requests:
         cpu: "200m"
@@ -37,7 +37,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2 versioning=semver
-      tag: v2026.10.18-25-gec2b91e
+      tag: v2026.10.25-24-gec67b53
     server:
       debug: false
       config:
@@ -57,6 +57,16 @@ spec:
           readOnly: true
     serviceAccount:
       create: false
+    worker:
+      enabled: true
+      replicaCount: 1
+      resources:
+        requests:
+          cpu: "200m"
+          memory: 256Mi
+        limits:
+          cpu: "500m"
+          memory: 512Mi
     httpRoute:
       enabled: true
       parentRefs:
