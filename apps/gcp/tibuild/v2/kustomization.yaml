@@ -6,4 +6,5 @@ resources:
   - external-secrets/oidc-secret.yaml
   - release.yaml
   - security-policy.yaml
+  - machine-access.yaml
   - reference-grant-ee-portal.yaml

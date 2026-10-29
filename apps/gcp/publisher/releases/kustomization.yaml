@@ -4,5 +4,6 @@ resources:
   - health-check-policy.yaml
   - publisher.yaml
   - security-policy.yaml
+  - machine-access.yaml
   - worker-tiup-prod.yaml
   - worker-tiup-staging.yaml

@@ -1,8 +1,7 @@
 # Authentication for publisher.pingcap.net:
 # - OIDC (Google): browser users via redirect-based login (session cookies)
-# - JWT: machine clients presenting a Google-issued ID token in the
-#   Authorization: Bearer header skip the OIDC redirect (passThroughAuthHeader)
-#   and are validated against Google's JWKS.
+# - JWT: Bearer clients select the more-specific route in machine-access.yaml,
+#   where a Google-issued ID token is required (OIDC cookies cannot bypass it).
 #
 # Machine clients obtain an ID token, e.g.:
 #   gcloud auth print-identity-token \
@@ -10,6 +9,8 @@
 #     --audiences=publisher.pingcap.net
 # or via Workload Identity Federation in CI (google-github-actions/auth,
 # token_format: id_token, target_audience: publisher.pingcap.net).
+# Browser writes require same-host Origin/Referer; verified JWT clients do not.
+# See docs/gcp-route-csrf.md for the request contract and rollout checks.
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
@@ -20,6 +21,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: publisher
+  csrf: {}
   oidc:
     provider:
       issuer: https://accounts.google.com

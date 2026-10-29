@@ -21,6 +21,9 @@ jobs:
           persist-credentials: false
       - name: Setup tools
         uses: ./.github/actions/flux2/tools
+      - name: Verify browser route CSRF policies
+        if: matrix.path == 'apps'
+        run: bash scripts/check_gcp_route_csrf.sh
       - name: Verify Flux API versions
         if: matrix.path == 'clusters'
         run: |
