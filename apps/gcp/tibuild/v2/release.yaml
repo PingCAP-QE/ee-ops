@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: tibuild-v2
-      version: 2.0.0-alpha.4
+      version: 2.0.0-alpha.5
       sourceRef:
         kind: HelmRepository
         name: ee-apps
