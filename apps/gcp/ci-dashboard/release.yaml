@@ -74,6 +74,13 @@ spec:
         value: "1.9.13"
       - name: CI_DASHBOARD_LOG_LEVEL
         value: INFO
+      - name: CI_DASHBOARD_OIDC_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            name: ci-dashboard-oidc
+            key: client-id
+      - name: CI_DASHBOARD_OIDC_HOSTED_DOMAINS
+        value: pingcap.com
       - name: CI_DASHBOARD_ENABLE_RUNTIME_INSIGHTS
         value: "true"
       - name: CI_DASHBOARD_ENABLE_COST_DASHBOARD
