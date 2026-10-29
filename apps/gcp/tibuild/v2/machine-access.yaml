@@ -52,3 +52,36 @@ spec:
           uri: https://www.googleapis.com/oauth2/v3/certs
         audiences:
           - prow.tidb.net
+  # A valid Google ID token for the audience is not an authorization: any
+  # Google identity (any project's service account, any Workspace user) can
+  # mint one, because the audience value is not a secret. Only the callers
+  # below may use the machine route, everything else gets a 403.
+  authorization:
+    defaultAction: Deny
+    rules:
+      - name: tibuild-clients
+        action: Allow
+        principal:
+          jwt:
+            provider: google
+            claims:
+              - name: email
+                values:
+                  # DevOps platform (dev and prod share one identity for now).
+                  - devops-server@gcp-resilience-dev.iam.gserviceaccount.com
+                  # tibuild-v2 API clients created for tirelease and TCMS
+                  # (see PingCAP-QE/ee-infra service-accounts module).
+                  - tirelease-tibuild-client@pingcap-testing-account.iam.gserviceaccount.com
+                  - tcms-tibuild-client@pingcap-testing-account.iam.gserviceaccount.com
+      # Keeps staff able to call the API with a user ID token
+      # (gcloud auth print-identity-token --audiences=prow.tidb.net).
+      # Drop this rule if only the service accounts above should be allowed.
+      - name: company-users
+        action: Allow
+        principal:
+          jwt:
+            provider: google
+            claims:
+              - name: hd
+                values:
+                  - pingcap.com
