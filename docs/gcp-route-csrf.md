@@ -1,11 +1,12 @@
 # GCP browser-route CSRF protection
 
 The route-level Envoy Gateway `SecurityPolicy` resources for EE Portal, TiBuild
-v2, Publisher and CI Dashboard enforce CSRF with `csrf: {}`. Protection on the
-Portal route does not cover requests matching the separate `/tibuild` route.
-Only Portal and TiBuild explicitly share the `ee-apps-*` cookie names; do not
-assume Publisher on its separate hostname shares that session. Dashboard is
-currently read-only, but uses the same guard without an application token framework.
+v2 and CI Dashboard enforce CSRF with `csrf: {}`. Protection on the Portal route
+does not cover requests matching the separate `/tibuild` route. Only Portal and
+TiBuild explicitly share the `ee-apps-*` cookie names. Dashboard is currently
+read-only, but uses the same guard without an application token framework.
+Publisher is not part of this surface: it has no HTTPRoute on this cluster and is
+reached only in-cluster as `http://publisher.publisher.svc`.
 
 ## Browser requests
 
@@ -20,13 +21,13 @@ by its existing policy; `/tibuild/api/v2/*` is covered by the TiBuild policy.
 
 ## Machine requests
 
-TiBuild and Publisher also have `machine-access.yaml` routes on the **same URLs**
-with an additional `Authorization: Bearer ...` header match. Gateway API's header
-match precedence selects these ahead of the path-only browser routes. Each has
-a separate JWT-only SecurityPolicy with `optional: false`, Google's issuer/JWKS
-and the existing API audience (`prow.tidb.net` or `publisher.pingcap.net`). These
-routes deliberately have no CSRF policy: clients such as production Tirelease
-(`apps/prod2/tirelease/configmaps.yaml`) do not send browser Origin headers.
+TiBuild also has a `machine-access.yaml` route on the **same URL** with an
+additional `Authorization: Bearer ...` header match. Gateway API's header match
+precedence selects it ahead of the path-only browser route. It has a separate
+JWT-only SecurityPolicy with `optional: false`, Google's issuer/JWKS and the API
+audience `prow.tidb.net`. This route deliberately has no CSRF policy: clients
+such as production Tirelease (`apps/prod2/tirelease/configmaps.yaml`, which sets
+`baseURL: https://prow.tidb.net/tibuild`) do not send browser Origin headers.
 
 The header only selects a route; it does **not** authenticate the request. An
 invalid, expired, wrongly signed or wrong-audience token is rejected, even if the
@@ -52,7 +53,7 @@ pinned Envoy Gateway v1.9.0-rc.1 CRD. In a non-production environment, verify:
 
 - Cookie-authenticated POST/PUT/PATCH/DELETE with foreign, absent and null origins
   fail; matching Origin and Referer fallback work. Include bodyless TiBuild
-  rerun through **both aliases** and Publisher reset-rate-limit.
+  rerun through **both aliases**.
 - Valid machine JWTs work without Origin on the original URLs. Invalid/missing
   JWTs cannot authenticate via the machine route, even with browser cookies.
 - Adding a dummy Bearer header cannot bypass CSRF/authentication. Matching Origin
@@ -65,4 +66,6 @@ verify the live Envoy configuration selects the required-JWT routes ahead of the
 browser fallback, and repeat safe browser/login/read smoke checks. A manifest or
 local filter test is not proof of live enforcement or completed rescanning.
 Track Helix finding `95054e85-c1c8-4827-acff-cc1f5ee1538f` through deployment and
-rescan separately; authentication/identity authorization remains a separate finding.
+rescan separately; the Publisher part of that finding is closed by removing the
+route instead of hardening it, and authentication/identity authorization remains
+a separate finding.

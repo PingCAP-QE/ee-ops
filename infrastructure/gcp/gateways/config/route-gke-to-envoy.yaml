@@ -24,7 +24,6 @@ spec:
 # for it; this / catch-all forwards everything else (/, /hook, /tibuild, ...)
 # to Envoy — requests hitting the host rule without a matching path rule would
 # otherwise get a GKE 404 ("fault filter abort") instead of falling through.
-# publisher.pingcap.net: no GKE routes; forwarded entirely to Envoy.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -35,7 +34,6 @@ spec:
   hostnames:
     - prow.tidb.net
     - prow.pingcap.net
-    - publisher.pingcap.net
   rules:
     - matches:
         - path:

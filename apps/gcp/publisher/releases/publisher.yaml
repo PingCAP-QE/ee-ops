@@ -38,19 +38,6 @@ spec:
         secretName: publisher-server-config
         secretKey: config.yaml
         debug: true
-    httpRoute:
-      enabled: true
-      parentRefs:
-        - kind: Gateway
-          name: eg-internal
-          namespace: infra
-      hostnames:
-        - publisher.pingcap.net
-      rules:
-        - matches:
-            - path:
-                type: PathPrefix
-                value: /
     volumes:
       - name: packages-config
         configMap:
