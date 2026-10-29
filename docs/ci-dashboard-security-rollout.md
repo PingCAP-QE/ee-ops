@@ -1,113 +1,142 @@
-# CI Dashboard security release: configuration before image
+# CI Dashboard 1.9.14: combined security and freshness release
 
-The 2026-10-29 release includes ee-apps #765, #766, #767, #770 and #776,
-plus the earlier #763 log redaction. The backend identity contract is documented
-in [ee-apps backend-auth.md](https://github.com/PingCAP-QE/ee-apps/blob/648777f2557f5260dcb5491f77cce8fb44756a25/ci-dashboard/docs/backend-auth.md).
-The separate ee-ops #2536 CSRF policies must remain enabled.
+This single OPS PR combines the application identity environment, Envoy ID-token
+forwarding, and the app/jobs image update. It supersedes the earlier proposal to
+use two dependent PRs; the standalone image PR is redundant and must not be
+merged separately.
 
-Do not merge the configuration and image changes as one unordered GitOps
-rollout. Use two dependent PRs targeting main. The image PR stays **Draft** until
-the configuration has reconciled and the real-identity canary below passes.
-Neither PR preparation nor static tests authorize a production change.
+The release contains ee-apps #765 (runtime limit validation), #766 (monthly Cost
+query bounds), #767 (bounded Jenkins console scanning), #770 (event/build
+identity consistency), #776 (backend company identity), and #778 (compact
+freshness alerts and UTC calendar-day lag). It retains earlier #763 log
+redaction and ee-ops #2536 gateway CSRF protection. The backend contract is
+[backend-auth.md](https://github.com/PingCAP-QE/ee-apps/blob/3f13263449b107a72c756d16cf849801612f09b5/ci-dashboard/docs/backend-auth.md).
 
-## Phase A: authentication prerequisites, unchanged image
+## One PR is not an atomic Kubernetes transaction
 
-The prerequisites PR adds only the application identity environment and the
-existing SecurityPolicy's `oidc.forwardIDToken` configuration. It deliberately
-keeps image `v2026.10.25-12-g9e55b52` and display version `1.9.13`.
-The old application ignores the additional environment/header and remains
-vulnerable until Phase B; this is not a completed security remediation.
+Splitting PRs was a conservative rollout choice, not an application requirement.
+The environment and gateway forwarding are backward-compatible with the old
+application, so they may be reviewed with the image change. However, Flux/Helm
+and Envoy reconcile independently: one Git commit does **not** guarantee that
+forwarding is active before new application Pods receive browser traffic.
+`maxUnavailable: 0` protects replica availability, not token compatibility.
+Readiness does not verify forwarding, real claims or session refresh; an app can
+be ready while company browser requests return 401.
 
-Before authorizing Phase A:
+Keep this combined PR **Draft** until the target release has succeeded, both
+images are present, the exact Workspace-domain policy is approved, and the
+pre-merge identity validation below has passed. Do not interpret one PR as an
+instruction to skip the validation or promise zero transient authentication
+errors. Preparation/static CI alone does not authorize a production mutation.
 
-- Confirm `pingcap.com` is the approved signed Google Workspace `hd` domain.
-  The policy is an exact allowlist, not an email suffix or wildcard. If additional
-  domains are approved, explicitly review both the manifest and static guard.
-- Confirm the existing `apps/ci-dashboard-oidc` Secret has `client-id` and
-  `client-secret` keys. Inspect key names only; do not dump values.
-- The app references only `client-id`; its audience must match the existing
-  Envoy OIDC client. Do not copy client secrets or signing keys into the app.
-- Verify the actual Gateway CRD/data plane supports `oidc.forwardIDToken`.
-  Retain issuer, callback, openid/email/profile scopes, encrypted sessions,
-  refresh and `csrf: {}`. The backend expects the raw decrypted Google ID token
-  in exactly one `X-CI-Dashboard-ID-Token` header, not an access token, forwarded
-  email, Authorization header or Cookie shortcut.
+## Configuration included in this PR
 
-After the approved merge, wait for Flux/Helm reconciliation. Require the live
-Dashboard SecurityPolicy to be Accepted for its **current generation**, and
-confirm the app has the intended environment while its image is still unchanged.
-A rendered YAML document or an old Accepted condition is insufficient.
+- App `CI_DASHBOARD_OIDC_CLIENT_ID` references the existing
+  `apps/ci-dashboard-oidc` Secret's `client-id` key; the backend needs no client
+  secret or signing key. The audience must match the gateway OIDC client.
+- App `CI_DASHBOARD_OIDC_HOSTED_DOMAINS=pingcap.com` is an exact signed Google
+  Workspace `hd` allowlist, not an email suffix/wildcard. Confirm this approved
+  domain before merge; additional approved domains require an explicit manifest
+  and static-guard review.
+- Existing Dashboard SecurityPolicy adds
+  `oidc.forwardIDToken.header: X-CI-Dashboard-ID-Token`. Forward the raw decrypted
+  Google ID token, not an access token, email assertion, Authorization header or
+  Cookie shortcut. Retain issuer/client refs/callback/openid/email/profile,
+  encrypted sessions, refresh defaults and `csrf: {}`.
+- Shared app/jobs release tag and sidebar version `1.9.14` are updated together.
+  The existing Kustomize replacements update all CronJobs, Jenkins worker and
+  pod watcher. Chart 0.3.3, scheduling, freshness configuration and Secret names
+  are unchanged. No SQL migration, CNI change or manual dependency install.
 
-## Canary gate before Phase B
+## Image provenance
 
-Before replacing the working app, obtain explicit authorization for a private
-canary and any temporary routing. Use the exact Phase B image, the same app
-environment, and actual Envoy Google OIDC forwarding; do not expose a new
-unauthenticated route or weaken the existing policy.
+Target workflow: [release run 40846589399](https://github.com/PingCAP-QE/ee-apps/actions/runs/40846589399).
+Source: `3f13263449b107a72c756d16cf849801612f09b5` (#778 merge).
 
-Require all of the following and record only pass/fail evidence:
-
-- Dashboard Pod DNS/HTTPS egress to
-  `https://www.googleapis.com/oauth2/v1/certs` works.
-- A real company user's read-only API request through the canary's authenticated
-  Gateway path returns 200. This must reach the new image, not the old app.
-- An unauthenticated direct canary Service/Pod API request returns 401. A public
-  anonymous request may instead redirect to Google at the Gateway, as designed.
-- Initial browser login and a real session refresh work. Successful readiness
-  does not verify the actual audience, Workspace domain, email claims, token
-  forwarding, refresh behavior or continuing certificate availability.
-
-Do not put tokens, Cookie headers, claims or raw data responses in logs, files,
-command history or PR comments. Halt on failure; never set
-`CI_DASHBOARD_AUTH_DISABLED=true` as a production workaround.
-The static guard forbids that development bypass.
-
-## Phase B: release the verified app and jobs together
-
-Only after Phase A and the canary gate, promote/review the dependent image PR,
-refresh CI against current main and authorize its merge. It changes only the
-HelmRelease image tag and sidebar display version to `1.9.14`:
+The workflow completed successfully. Its `Generating tags` output,
+`git describe` and GHCR agree on **`v2026.10.25-25-g3f13263`**:
 
 ```text
-ghcr.io/pingcap-qe/ee-apps/ci-dashboard:v2026.10.25-23-g648777f
-ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.10.25-23-g648777f
+ghcr.io/pingcap-qe/ee-apps/ci-dashboard:v2026.10.25-25-g3f13263
+ghcr.io/pingcap-qe/ee-apps/ci-dashboard-jobs:v2026.10.25-25-g3f13263
 ```
 
-The tag was emitted by successful
-[release run 40835363015](https://github.com/PingCAP-QE/ee-apps/actions/runs/40835363015),
-source `648777f2557f5260dcb5491f77cce8fb44756a25`. Both registry manifest lists
-contain linux/amd64 and linux/arm64. Index digests:
+Both registry manifest lists contain linux/amd64 and linux/arm64. Index digests:
 
-- app: `sha256:caa33ce3d820363ceefd81ee8fdde813a761be5a0fee6dbadb053e7624237efb`
-- jobs: `sha256:e02aa893156115985cc6dbbb737f210f2158e44c9c9d440d69f6c7cc0b2d1934`
+- app: `sha256:ffd772efc87fdbfcdd77701d70fa8db6b912a73390fbeab1cfa7cce538b1df9a`
+- jobs: `sha256:ca5fb0e4d4c448f6fa133b71c915ab29b83143530f1b58538a42257ceeaa89fb`
 
-Keep the existing Kustomize replacements: the HelmRelease tag propagates to all
-CronJobs, Jenkins worker and pod watcher. Verify the rendered and live images;
-changing only the web Deployment would omit worker-side fixes. No database
-migration, CNI change, new Secret name or manual dependency installation is
-required for these application fixes.
+Do not substitute the superseded `v2026.10.25-23-g648777f` image, which lacks #778,
+or infer future publication from a tag candidate or partially published build.
 
-## Post-check and rollback boundary
+## Pre-merge identity validation
 
-- Verify HelmRelease Ready, app `/livez` and `/readyz`, and actual workload image
-  references; preserve the existing two replicas and maxUnavailable 0 strategy.
-- Repeat real company browser login, session refresh, and read-only Cost/CI
-  requests. Anonymous direct Service/Pod, fabricated identity headers and forged
-  token signatures must not return data. External identities remain rejected;
-  protected API responses must be `private, no-store`.
-- Check worker/audit behavior and the next log archive job. The Jenkins console
-  reader now requires identity content encoding; confirm the real proxy/server
-  honors that contract. Rejected event identity conflicts are durably audited
-  and require explicit replay after a trusted repair, not automatic retry.
-- Missing app auth configuration produces 503 on readiness/protected routes.
-  Missing forwarding with otherwise valid configuration can leave readiness green
-  but browser requests returning 401. Do not infer successful login from probes.
-- A rollback to the previous image reopens the backend bypass and requires
-  explicit approval. Keep the safe gateway/environment prerequisites in place;
-  never disable authentication to force a rollout through.
-- Submit deployment/verification evidence for Helix review only after these
-  checks. Event producer authentication/authorization and Kafka ACLs, historical
-  credential retention, and other services' authorization remain separate work.
+Existing read-only preflight has confirmed: the old release is healthy, the OIDC
+Secret has `client-id`/`client-secret` key names, the served SecurityPolicy CRD
+supports `forwardIDToken.header`, and the old app Pod can fetch Google's public
+certificates. None of these prove the new image's real login behavior.
+
+Before replacing the working application, obtain explicit authorization for an
+isolated private canary and any temporary gateway configuration/routing. Use the
+exact final image, the same app environment, and actual Envoy Google OIDC raw
+ID-token forwarding. Keep the working application serving; do not create an
+unauthenticated public route. A canary may validate the candidate configuration
+before this combined PR is merged; it does not require a separate permanent
+prerequisite PR. If that validation cannot be arranged, leave the combined PR
+Draft rather than silently removing the gate.
+
+Require all of the following; record only pass/fail evidence:
+
+- New-image Pod DNS/HTTPS egress to
+  `https://www.googleapis.com/oauth2/v1/certs` works.
+- A real company user's read-only API request through the authenticated canary
+  path returns 200 and demonstrably reaches the new image, not the old app.
+- An unauthenticated direct canary Service/Pod API request returns 401. Public
+  anonymous requests may instead redirect to Google at the gateway.
+- Real initial browser login and session refresh work; the actual signed `hd`,
+  verified-email, issuer/audience/azp and forwarded-token conditions are met.
+- The canary's live SecurityPolicy is Accepted for its current generation and
+  actual forwarding is active, not merely present in rendered YAML.
+
+Never write tokens, Cookie headers, claims or raw data responses to logs, files,
+command history or PR comments. Never set `CI_DASHBOARD_AUTH_DISABLED=true` as a
+production workaround. The static guard forbids that development bypass.
+
+## Authorized rollout and post-check
+
+After the validation gates, refresh CI against current main and obtain explicit
+merge authorization for the combined PR. Check live gateway policy generation /
+Accepted and forwarded-token configuration as soon as reconciliation starts;
+then check the new application and worker/job image references. If reconciliation
+order briefly exposes the new app before forwarding is active, authenticated
+requests can return 401: treat that as a release problem, not successful login.
+Halt/contain a failing rollout under the approved operations plan; do not weaken
+authentication or improvise an automatic insecure fallback.
+
+- Verify HelmRelease Ready, `/livez` and `/readyz`; preserve two app replicas and
+  maxUnavailable 0. Missing auth environment causes readiness/protected 503;
+  missing forwarding can leave readiness green but browser requests at 401.
+- Recheck real company login/refresh and Cost/CI reads. Anonymous direct
+  Service/Pod, fabricated email headers and forged token signatures must not
+  return data. External identities stay rejected; API responses must be
+  `private, no-store`.
+- Check worker/audit and next log archive execution. The console reader requires
+  identity encoding from Jenkins/proxy. Rejected build-identity conflicts remain
+  audited and need explicit replay after a trusted repair, not automatic retry.
+- Observe the existing 09:10 Asia/Shanghai freshness job; #778 adds no job or
+  configuration. Evaluated healthy checks are silent; failures appear once per
+  item with lag/allowance/excess. Cost DATE thresholds use UTC days (D-4 passes,
+  D-5 fails; weekly D-10 passes, D-11 fails), while CI hour thresholds are unchanged.
+  Import gap 1 day and attribution gap 0 days are unchanged. AWS split/F04 scope
+  diagnostics are neither failures nor proof of success; real local gaps,
+  unknown vendors, query/config errors and the unresolved active Azure empty
+  source still alert. Do not force a real failure or rewrite data to test this.
+- A rollback to the old image reopens the backend bypass and requires explicit
+  approval. Safe gateway/environment settings may remain; never disable auth to
+  force the release through.
+- Submit deployment/test evidence to Helix only after verification. Producer
+  authentication/authorization and Kafka ACLs, historical credential retention,
+  Azure source-owner decisions and other services' authorization remain separate.
 
 ## Static validation
 
@@ -117,5 +146,5 @@ bash scripts/check_gcp_route_csrf.sh
 kustomize build apps/gcp/ci-dashboard --load-restrictor=LoadRestrictionsNone
 ```
 
-The auth and CSRF guards run in the apps CD Test job. Static validation is not
-proof that a live Secret, Gateway policy, real login or production rollout works.
+The guards run in apps CD Test. Static success is not proof of a live Secret,
+actual forwarding, real company login/refresh, successful deployment or rescan.

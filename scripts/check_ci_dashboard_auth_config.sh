@@ -20,8 +20,22 @@ def require(condition, message):
     if not condition:
         raise SystemExit("FAIL: " + message)
 
+resources = load("kustomization.yaml").get("resources", [])
+for name in ("release.yaml", "security-policy.yaml", "external-secret.yaml"):
+    require(name in resources, "kustomization.yaml must include " + name)
+
 release = load("release.yaml")
 policy = load("security-policy.yaml")["spec"]
+external = load("external-secret.yaml")
+require(external["metadata"].get("namespace") == "apps"
+        and external["spec"].get("target", {}).get("name") == "ci-dashboard-oidc",
+        "retain the apps/ci-dashboard-oidc Secret target")
+require(external["spec"].get("secretStoreRef") == {
+    "name": "ee-gcp-sm", "kind": "ClusterSecretStore",
+}, "retain the existing GCP Secret Manager store")
+extracts = external["spec"].get("dataFrom", [])
+require(len(extracts) == 1 and extracts[0].get("extract", {}).get("key")
+        == "google-oauth2-client-ee-apps", "retain the existing OIDC credential source")
 env = release["spec"]["values"]["env"]
 
 def one_env(name):
