@@ -27,7 +27,6 @@ check_policy() {
 
 check_policy apps/gcp/ee-portal/security-policy.yaml ee-portal ee-portal
 check_policy apps/gcp/tibuild/v2/security-policy.yaml tibuild v2-tibuild-v2
-check_policy apps/gcp/publisher/releases/security-policy.yaml publisher publisher
 check_policy apps/gcp/ci-dashboard/security-policy.yaml apps ci-dashboard
 
 check_machine_policy() {
@@ -69,10 +68,9 @@ check_machine_policy() {
 }
 
 check_machine_policy apps/gcp/tibuild/v2/machine-access.yaml tibuild-v2-machine prow.tidb.net
-check_machine_policy apps/gcp/publisher/releases/machine-access.yaml publisher-machine publisher.pingcap.net
 
 # Headerless browser fallbacks must remain available to cookie clients.
-for file in apps/gcp/tibuild/v2/release.yaml apps/gcp/publisher/releases/publisher.yaml apps/gcp/ci-dashboard/release.yaml; do
+for file in apps/gcp/tibuild/v2/release.yaml apps/gcp/ci-dashboard/release.yaml; do
   yq eval -e '
     [.spec.values.httpRoute.rules[].matches[] | select(has("headers"))] | length == 0
   ' "$repo_root/$file" > /dev/null
