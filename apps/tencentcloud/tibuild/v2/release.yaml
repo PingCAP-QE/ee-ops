@@ -66,6 +66,12 @@ spec:
           readOnly: true
     serviceAccount:
       create: false
+    # NOTE: worker.extraDeployments, the TiUP worker binary and the
+    # tiup/publish config keys ship with tibuild-v2 chart >= 2.0.0-alpha.7 and
+    # the matching exp-tibuild-worker image. The cutover PR bumps
+    # chart.spec.chart.version and image.tag to the released versions; until
+    # then this block is inert (Helm ignores unknown values) and the worker
+    # keeps running the image-delivery queue only.
     worker:
       enabled: true
       replicaCount: 1
@@ -76,5 +82,53 @@ spec:
         limits:
           cpu: "500m"
           memory: 512Mi
+      # One Deployment per TiUP mirror: each pod mounts only its own signing
+      # key, and the serial lane is what keeps the two mirrors from publishing
+      # at the same time.
+      extraDeployments:
+        - name: tiup-staging
+          config:
+            secretName: v2-config
+            secretKey: config-tiup-staging.yaml
+          volumes:
+            - name: tiup-credentials
+              secret:
+                secretName: tiup-credentials-staging
+            - name: docker-cred
+              secret:
+                secretName: image-release-cred
+                items:
+                  - key: .dockerconfigjson
+                    path: config.json
+          volumeMounts:
+            - name: tiup-credentials
+              subPath: private.json
+              mountPath: /root/.tiup/keys/private.json
+              readOnly: true
+            - name: docker-cred
+              mountPath: /root/.docker
+              readOnly: true
+        - name: tiup-prod
+          config:
+            secretName: v2-config
+            secretKey: config-tiup-prod.yaml
+          volumes:
+            - name: tiup-credentials
+              secret:
+                secretName: tiup-credentials-prod
+            - name: docker-cred
+              secret:
+                secretName: image-release-cred
+                items:
+                  - key: .dockerconfigjson
+                    path: config.json
+          volumeMounts:
+            - name: tiup-credentials
+              subPath: private.json
+              mountPath: /root/.tiup/keys/private.json
+              readOnly: true
+            - name: docker-cred
+              mountPath: /root/.docker
+              readOnly: true
     httpRoute:
       enabled: false

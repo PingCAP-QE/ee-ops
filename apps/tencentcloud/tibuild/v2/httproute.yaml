@@ -1,0 +1,43 @@
+# Publish-domain routes on the existing external gateway.
+#
+# Callers keep their current paths: the delivery tasks call
+# `https://do2.pingcap.net/tiup/...`, and the gateway rewrites the prefix onto
+# the tibuild-v2 API (/api/v2/...). The publisher keeps /publisher for rollback.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: v2-publish
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: infra
+  hostnames:
+    - do2.pingcap.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tiup
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2/tiup
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tidbcloud
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2/tidbcloud
