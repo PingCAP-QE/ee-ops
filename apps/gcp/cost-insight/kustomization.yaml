@@ -5,12 +5,4 @@ resources:
   - cronjobs.yaml
   - resource-serving-cronjob.yaml
   - aws-warehouse-cronjob.yaml
-configMapGenerator:
-  - name: cost-insight-aws-warehouse-worker
-    namespace: apps
-    files:
-      - sync_aws_warehouse_daily.py=scripts/sync_aws_warehouse_daily.py
-    options:
-      labels:
-        app.kubernetes.io/name: cost-insight-sync-aws-warehouse-summary
-        app.kubernetes.io/part-of: cost-insight
+  - azure-warehouse-cronjob.yaml

@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/part-of: cost-insight
   annotations:
     repair.pingcap.com/source: warehouse-f80fbbe8e8.raw_aws_billing.cur_line_items
-    repair.pingcap.com/source-commit: 75cb4d7b09aa9df97aa3d6bee39645b2c69578ce
+    repair.pingcap.com/source-commit: 22d4063cf63c274740947a57e226c559d9ba2466
     repair.pingcap.com/scope: four-ordinary-aws-accounts-only
 spec:
   # Warehouse snapshots arrive after the legacy noon pipeline. Keep this
@@ -40,13 +40,22 @@ spec:
           terminationGracePeriodSeconds: 60
           containers:
             - name: sync-aws-warehouse-summary
-              # Released warehouse-compatible query/normalization helpers; no
-              # mutable image tag or expiring BigQuery staging table.
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:4d0a9c9224c268af6cfee9fad9895ecf0c50665e3950dbf6bcfbc84dcdd66bf4
+              # Shared application worker; pinned multi-platform release digest.
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:48ed49f38d58be3c0ac6b40d15ad96424e88d79c9cdc0a0ecb76f8c8dde40cee
               imagePullPolicy: IfNotPresent
-              command:
-                - python
-                - /scripts/sync_aws_warehouse_daily.py
+              command: [cost-insight]
+              args:
+                - sync-warehouse-billing-summary
+                - --vendor
+                - aws
+                - --account-id
+                - "131464424160"
+                - --account-id
+                - "296171618728"
+                - --account-id
+                - "676546228356"
+                - --account-id
+                - "986330900858"
               envFrom:
                 - secretRef:
                     name: ci-dashboard-eq-prd-insight-db
@@ -69,10 +78,6 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
-              volumeMounts:
-                - name: worker
-                  mountPath: /scripts
-                  readOnly: true
               resources:
                 requests:
                   cpu: 500m
@@ -82,7 +87,3 @@ spec:
                   cpu: "2"
                   memory: 4Gi
                   ephemeral-storage: 4Gi
-          volumes:
-            - name: worker
-              configMap:
-                name: cost-insight-aws-warehouse-worker
