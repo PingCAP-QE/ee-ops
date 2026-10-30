@@ -4,3 +4,4 @@ namespace: tibuild
 resources:
   - namespace.yaml
   - v2
+  - tibuild-packages-config.yaml
