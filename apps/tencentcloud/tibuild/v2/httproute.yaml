@@ -2,7 +2,8 @@
 #
 # Callers keep their current paths: the delivery tasks call
 # `https://do2.pingcap.net/tiup/...`, and the gateway rewrites the prefix onto
-# the tibuild-v2 API (/api/v2/...). The publisher keeps /publisher for rollback.
+# the tibuild-v2 publish service (/api/v2/publish/tiup/...). The publisher keeps
+# /publisher for rollback.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -27,7 +28,7 @@ spec:
           urlRewrite:
             path:
               type: ReplacePrefixMatch
-              replacePrefixMatch: /api/v2/tiup
+              replacePrefixMatch: /api/v2/publish/tiup
     - matches:
         - path:
             type: PathPrefix
