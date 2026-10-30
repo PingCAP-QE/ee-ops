@@ -12,7 +12,10 @@ spec:
         name: ee-apps
         namespace: flux-system
   interval: 5m
-  timeout: 5m
+  # A chart bump rolls both the API and the worker because the pod template
+  # carries the helm.sh/chart label. With image pulls around a minute per pod
+  # and three worker replicas, 5m is not enough and Helm aborts mid-rollout.
+  timeout: 15m
   install:
     remediation:
       retries: 3
