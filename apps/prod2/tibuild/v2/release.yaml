@@ -68,10 +68,12 @@ spec:
     serviceAccount:
       create: false
     # prod2 publishes TiUP and runs no image copies: the default worker is
-    # disabled and the two per-mirror workers below do the work. Each mounts
-    # only its own signing key.
+    # disabled (worker.default.enabled) while the two per-mirror workers below
+    # do the work. Each mounts only its own signing key.
     worker:
-      enabled: false
+      enabled: true
+      default:
+        enabled: false
       replicaCount: 1
       image:
         # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
