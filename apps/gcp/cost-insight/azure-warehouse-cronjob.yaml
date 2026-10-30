@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/part-of: cost-insight
   annotations:
     repair.pingcap.com/source: warehouse-f80fbbe8e8.raw_azure_billing.azure_billing_cost_*
-    repair.pingcap.com/source-commit: 22d4063cf63c274740947a57e226c559d9ba2466
+    repair.pingcap.com/source-commit: 7e7ccd86d09b4e472fab2af57043b8f2c697dbe4
     repair.pingcap.com/account: aaa5414d-7537-4e24-99bd-a7a841221810
 spec:
   # Keep separate from the held legacy source and the 15:10 AWS route.
@@ -37,7 +37,7 @@ spec:
           terminationGracePeriodSeconds: 60
           containers:
             - name: sync-azure-warehouse-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:48ed49f38d58be3c0ac6b40d15ad96424e88d79c9cdc0a0ecb76f8c8dde40cee
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:bdc14202f06d21389ca47b756950c1997f85a8f50495dbd3a2f0b9ca17805758
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:

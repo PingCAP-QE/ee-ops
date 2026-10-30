@@ -7,11 +7,11 @@ image. Query adaptation, validation, scoped replacement, attribution and native
 publication live in `ee-apps/cost-insight`, not an ops ConfigMap.
 
 - Application: [ee-apps #804](https://github.com/PingCAP-QE/ee-apps/pull/804),
-  commit `22d4063cf63c274740947a57e226c559d9ba2466`.
+  commit `7e7ccd86d09b4e472fab2af57043b8f2c697dbe4`.
 - Published before this ops change by
-  [official release run 41051780499](https://github.com/PingCAP-QE/ee-apps/actions/runs/41051780499).
+  [official release run 41063707678](https://github.com/PingCAP-QE/ee-apps/actions/runs/41063707678).
 - Multi-platform digest (amd64 + arm64):
-  `sha256:48ed49f38d58be3c0ac6b40d15ad96424e88d79c9cdc0a0ecb76f8c8dde40cee`.
+  `sha256:bdc14202f06d21389ca47b756950c1997f85a8f50495dbd3a2f0b9ca17805758`.
 - The application PR remains a separate review/merge gate; publishing its reviewed
   branch image does not imply that the application or ops PR has been merged.
 
@@ -37,11 +37,17 @@ See the application README for the complete command contract and its tests.
 
 ## Migration checks — 2026-10-30
 
-- Application tests: 693 passed / 91.83% full line coverage; 141 new source/runner
-  tests / 96.67% combined statement+branch coverage. DeepSeek review CLEAN.
+- Application tests: 705 passed / 91.82% full line coverage; 168 focused
+  source/runner/vendor tests / 95.51% combined statement+branch coverage across
+  four affected runtime modules. The requested Codex → pi-DeepSeek review loop
+  finished round 1 CLEAN with no findings. Source-freeze/failure policies unchanged.
 - New-image **read-only** GKE Jobs completed successfully:
-  `cost-wh-image-preflight-aws-20261030-1204` and
-  `cost-wh-image-preflight-azure-20261030-1204`.
+  `cost-wh-simple-preflight-aws-20261030-1336` and
+  `cost-wh-simple-preflight-azure-20261030-1336`.
+- The discovery raw controls are reused for the five-day window: actual source
+  queries decreased from 15 to 10 across all five accounts (AWS 8, Azure 2).
+  Duplicate guard/audit calls and SQL text replacement were removed without
+  removing per-write snapshot checks or active-publication verification.
 - All five identities validated October 25–29. Maximum query estimates/actuals:
   AWS 991,309,371 bytes, Azure 132,416,142 bytes; both below 2 GiB.
 - Independent before/after SELECT snapshots were identical for summary facts,
