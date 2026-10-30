@@ -67,7 +67,7 @@ spec:
     serviceAccount:
       create: false
     # NOTE: worker.extraDeployments, the TiUP worker binary and the
-    # tiup/publish config keys ship with tibuild-v2 chart >= 2.0.0-alpha.7 and
+    # tiup/publish config keys ship with tibuild-v2 chart >= 2.0.0-alpha.8 and
     # the matching exp-tibuild-worker image. The cutover PR bumps
     # chart.spec.chart.version and image.tag to the released versions; until
     # then this block is inert (Helm ignores unknown values) and the worker
