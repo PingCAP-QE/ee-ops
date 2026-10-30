@@ -133,10 +133,11 @@ metadata:
     app.kubernetes.io/name: cost-insight-sync-azure-billing-summary
     app.kubernetes.io/part-of: cost-insight
 spec:
-  # Start after the Beijing work window; GCP starts first at 12:10.
+  # Preserve the live migration hold; the active subscription uses the separate
+  # warehouse route. Never resume this stale source over validated warehouse data.
   schedule: "30 12 * * *"
   timeZone: Asia/Shanghai
-  suspend: false
+  suspend: true
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
   successfulJobsHistoryLimit: 5
