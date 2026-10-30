@@ -43,6 +43,27 @@ spec:
       config:
         secretName: v2-config
         secretKey: config.yaml
+      # Registry credentials for the image copies (image-release-cred carries
+      # the same credential the Tekton delivery task uses) and the delivery
+      # rules mounted from the artifacts packages ConfigMap.
+      volumes:
+        - name: docker-cred
+          secret:
+            secretName: image-release-cred
+            items:
+              - key: .dockerconfigjson
+                path: config.json
+        - name: packages-config
+          configMap:
+            name: packages-config
+      volumeMounts:
+        - name: docker-cred
+          mountPath: /root/.docker
+          readOnly: true
+        - name: packages-config
+          subPath: delivery.yaml
+          mountPath: /etc/delivery/delivery.yaml
+          readOnly: true
     serviceAccount:
       create: false
     worker:
