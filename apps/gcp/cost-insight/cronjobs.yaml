@@ -640,7 +640,8 @@ spec:
               args:
                 - |
                   summary_json_path=/tmp/summary.json
-                  cost-insight sync-aws-billing-summary > "${summary_json_path}"
+                  # Ordinary CUR accounts use the separate warehouse route.
+                  cost-insight sync-aws-billing-summary --account-id 946646677266 > "${summary_json_path}"
                   cat "${summary_json_path}"
                   dates="$(python - <<'PY'
                   import json
@@ -661,6 +662,7 @@ spec:
                   if [ -n "${dates}" ]; then
                     set -- ${dates}
                     cost-insight refresh-cost-attribution-from-summary \
+                      --vendor aws --account-id 946646677266 \
                       --start-date "$1" \
                       --end-date "$2" \
                       --split-by-day
