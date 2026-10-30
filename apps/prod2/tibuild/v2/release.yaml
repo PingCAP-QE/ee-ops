@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: tibuild-v2
-      version: 2.0.0-alpha.6
+      version: 2.0.0-alpha.7
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -60,6 +60,15 @@ spec:
     worker:
       enabled: true
       replicaCount: 3
+      image:
+        # The worker code changed (configurable thresholds, global alert
+        # election) but the API image did not, so pin it separately.
+        # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
+        tag: v2026.10.25-37-g64e964c
+      podMonitor:
+        enabled: true
+        # Must match the Prometheus instance's podMonitorSelector in prod2.
+        additionalLabels: {}
       resources:
         requests:
           cpu: "200m"
