@@ -1,0 +1,88 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-insight-sync-aws-warehouse-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-aws-warehouse-summary
+    app.kubernetes.io/part-of: cost-insight
+  annotations:
+    repair.pingcap.com/source: warehouse-f80fbbe8e8.raw_aws_billing.cur_line_items
+    repair.pingcap.com/source-commit: 75cb4d7b09aa9df97aa3d6bee39645b2c69578ce
+    repair.pingcap.com/scope: four-ordinary-aws-accounts-only
+spec:
+  # Warehouse snapshots arrive after the legacy noon pipeline. Keep this
+  # ordinary-CUR route separate from the held split/F04 source routes.
+  schedule: "10 15 * * *"
+  timeZone: Asia/Shanghai
+  # Read-only and normal-command canaries verified all four accounts on 2026-10-30.
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      # An uncertain write must be inspected, never automatically replayed.
+      backoffLimit: 0
+      activeDeadlineSeconds: 10800
+      ttlSecondsAfterFinished: 1209600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-aws-warehouse-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          serviceAccountName: cost-insight-gcp-billing
+          nodeSelector:
+            cloud.google.com/compute-class: ee-application
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 60
+          containers:
+            - name: sync-aws-warehouse-summary
+              # Released warehouse-compatible query/normalization helpers; no
+              # mutable image tag or expiring BigQuery staging table.
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:4d0a9c9224c268af6cfee9fad9895ecf0c50665e3950dbf6bcfbc84dcdd66bf4
+              imagePullPolicy: IfNotPresent
+              command:
+                - python
+                - /scripts/sync_aws_warehouse_daily.py
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_LOCATION
+                  value: us-west1
+                - name: COST_INSIGHT_BILLING_BQ_IMPERSONATE_SERVICE_ACCOUNT
+                  value: ""
+                - name: COST_INSIGHT_TCMS_ALLOCATION_TABLE
+                  value: tcms_cost.resource_allocation
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              volumeMounts:
+                - name: worker
+                  mountPath: /scripts
+                  readOnly: true
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+                  ephemeral-storage: 4Gi
+          volumes:
+            - name: worker
+              configMap:
+                name: cost-insight-aws-warehouse-worker
