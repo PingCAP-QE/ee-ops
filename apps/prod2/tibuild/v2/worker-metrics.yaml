@@ -1,0 +1,44 @@
+# Metrics endpoint for the tibuild worker.
+#
+# The prod2 cluster runs the KSY MSP vmagent, which builds its scrape config
+# from ServiceMonitor objects only (the PodMonitor CRD is installed but nothing
+# consumes it). The chart has no Service for the worker because the API does not
+# call it, so this pair exposes the health port to the scraper.
+apiVersion: v1
+kind: Service
+metadata:
+  name: v2-tibuild-v2-worker-metrics
+  labels:
+    app.kubernetes.io/name: tibuild-v2-worker
+    app.kubernetes.io/instance: v2
+    app.kubernetes.io/component: worker
+spec:
+  selector:
+    app.kubernetes.io/name: tibuild-v2-worker
+    app.kubernetes.io/instance: v2
+  ports:
+    - name: health
+      port: 8081
+      targetPort: health
+      protocol: TCP
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: v2-tibuild-v2-worker
+  labels:
+    app.kubernetes.io/name: tibuild-v2-worker
+    app.kubernetes.io/instance: v2
+    app.kubernetes.io/component: worker
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tibuild-v2-worker
+      app.kubernetes.io/instance: v2
+  namespaceSelector:
+    matchNames:
+      - tibuild
+  endpoints:
+    - port: health
+      path: /metrics
+      interval: 30s

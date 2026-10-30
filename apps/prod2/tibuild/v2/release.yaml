@@ -65,10 +65,6 @@ spec:
         # election) but the API image did not, so pin it separately.
         # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
         tag: v2026.10.25-37-g64e964c
-      podMonitor:
-        enabled: true
-        # Must match the Prometheus instance's podMonitorSelector in prod2.
-        additionalLabels: {}
       resources:
         requests:
           cpu: "200m"
