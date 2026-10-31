@@ -1,0 +1,79 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cost-insight-sync-azure-warehouse-summary
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: cost-insight-sync-azure-warehouse-summary
+    app.kubernetes.io/part-of: cost-insight
+  annotations:
+    repair.pingcap.com/source: warehouse-f80fbbe8e8.raw_azure_billing.azure_billing_cost_*
+    repair.pingcap.com/source-commit: 7e7ccd86d09b4e472fab2af57043b8f2c697dbe4
+    repair.pingcap.com/account: aaa5414d-7537-4e24-99bd-a7a841221810
+spec:
+  # Keep separate from the held legacy source and the 15:10 AWS route.
+  schedule: "10 16 * * *"
+  timeZone: Asia/Shanghai
+  suspend: false
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 1800
+  successfulJobsHistoryLimit: 5
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 5400
+      ttlSecondsAfterFinished: 1209600
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: cost-insight-sync-azure-warehouse-summary
+            app.kubernetes.io/part-of: cost-insight
+        spec:
+          serviceAccountName: cost-insight-gcp-billing
+          nodeSelector:
+            cloud.google.com/compute-class: ee-application
+          restartPolicy: Never
+          terminationGracePeriodSeconds: 60
+          containers:
+            - name: sync-azure-warehouse-summary
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:bdc14202f06d21389ca47b756950c1997f85a8f50495dbd3a2f0b9ca17805758
+              imagePullPolicy: IfNotPresent
+              command: [cost-insight]
+              args:
+                - sync-warehouse-billing-summary
+                - --vendor
+                - azure
+                - --account-id
+                - aaa5414d-7537-4e24-99bd-a7a841221810
+              envFrom:
+                - secretRef:
+                    name: ci-dashboard-eq-prd-insight-db
+              env:
+                - name: PYTHONUNBUFFERED
+                  value: "1"
+                - name: COST_INSIGHT_LOG_LEVEL
+                  value: INFO
+                - name: GOOGLE_CLOUD_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_LOCATION
+                  value: us-west1
+                - name: COST_INSIGHT_BILLING_BQ_IMPERSONATE_SERVICE_ACCOUNT
+                  value: ""
+                - name: COST_INSIGHT_TCMS_ALLOCATION_TABLE
+                  value: tcms_cost.resource_allocation
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 1Gi
+                  ephemeral-storage: 1Gi
+                limits:
+                  cpu: "2"
+                  memory: 4Gi
+                  ephemeral-storage: 4Gi

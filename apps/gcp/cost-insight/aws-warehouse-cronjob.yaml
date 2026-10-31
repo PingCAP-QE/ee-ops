@@ -8,14 +8,15 @@ metadata:
     app.kubernetes.io/part-of: cost-insight
   annotations:
     repair.pingcap.com/source: warehouse-f80fbbe8e8.raw_aws_billing.cur_line_items
-    repair.pingcap.com/source-commit: 75cb4d7b09aa9df97aa3d6bee39645b2c69578ce
+    repair.pingcap.com/source-commit: 7e7ccd86d09b4e472fab2af57043b8f2c697dbe4
     repair.pingcap.com/scope: four-ordinary-aws-accounts-only
 spec:
   # Warehouse snapshots arrive after the legacy noon pipeline. Keep this
   # ordinary-CUR route separate from the held split/F04 source routes.
   schedule: "10 15 * * *"
   timeZone: Asia/Shanghai
-  # Read-only and normal-command canaries verified all four accounts on 2026-10-30.
+  # Existing route verified on 2026-10-30; the new image passed read-only preflight.
+  # Its first normal writer run remains a separate rollout gate.
   suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
@@ -40,13 +41,22 @@ spec:
           terminationGracePeriodSeconds: 60
           containers:
             - name: sync-aws-warehouse-summary
-              # Released warehouse-compatible query/normalization helpers; no
-              # mutable image tag or expiring BigQuery staging table.
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:4d0a9c9224c268af6cfee9fad9895ecf0c50665e3950dbf6bcfbc84dcdd66bf4
+              # Shared application worker; pinned multi-platform release digest.
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:bdc14202f06d21389ca47b756950c1997f85a8f50495dbd3a2f0b9ca17805758
               imagePullPolicy: IfNotPresent
-              command:
-                - python
-                - /scripts/sync_aws_warehouse_daily.py
+              command: [cost-insight]
+              args:
+                - sync-warehouse-billing-summary
+                - --vendor
+                - aws
+                - --account-id
+                - "131464424160"
+                - --account-id
+                - "296171618728"
+                - --account-id
+                - "676546228356"
+                - --account-id
+                - "986330900858"
               envFrom:
                 - secretRef:
                     name: ci-dashboard-eq-prd-insight-db
@@ -69,10 +79,6 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
-              volumeMounts:
-                - name: worker
-                  mountPath: /scripts
-                  readOnly: true
               resources:
                 requests:
                   cpu: 500m
@@ -82,7 +88,3 @@ spec:
                   cpu: "2"
                   memory: 4Gi
                   ephemeral-storage: 4Gi
-          volumes:
-            - name: worker
-              configMap:
-                name: cost-insight-aws-warehouse-worker
