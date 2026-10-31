@@ -1,6 +1,6 @@
 # Sync PingCAP-QE/artifacts/packages into the tibuild namespace so the prod2 API
 # can read the delivery rules when it plans a publication.
-apiVersion: source.toolkit.fluxcd.io/v1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: GitRepository
 metadata:
   name: artifacts-delivery
@@ -10,7 +10,7 @@ spec:
     branch: main
   url: https://github.com/PingCAP-QE/artifacts.git
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
 kind: Kustomization
 metadata:
   name: tibuild-packages-config
