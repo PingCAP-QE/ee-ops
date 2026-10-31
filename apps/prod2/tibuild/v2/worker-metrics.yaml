@@ -4,6 +4,10 @@
 # from ServiceMonitor objects only (the PodMonitor CRD is installed but nothing
 # consumes it). The chart has no Service for the worker because the API does not
 # call it, so this pair exposes the health port to the scraper.
+#
+# The chart runs one Deployment per worker kind (image sync plus the TiUP
+# staging/prod workers), so select on the common component label rather than a
+# single Deployment name.
 apiVersion: v1
 kind: Service
 metadata:
@@ -14,7 +18,7 @@ metadata:
     app.kubernetes.io/component: worker
 spec:
   selector:
-    app.kubernetes.io/name: tibuild-v2-worker
+    app.kubernetes.io/component: worker
     app.kubernetes.io/instance: v2
   ports:
     - name: health
