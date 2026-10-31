@@ -79,12 +79,15 @@ spec:
         # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
         tag: v2026.10.25-61-g1a7dd9e
       resources:
+        # TiUP publishes packages of ~90 MB (tidb/br/dumpling): the OCI layer is
+        # fetched into memory and `tiup mirror publish` reads the whole tarball,
+        # so 512Mi is not enough and the worker is OOMKilled mid-publish.
         requests:
           cpu: "200m"
-          memory: 256Mi
+          memory: 1Gi
         limits:
           cpu: "500m"
-          memory: 512Mi
+          memory: 2Gi
       extraDeployments:
         - name: tiup-staging
           config:
