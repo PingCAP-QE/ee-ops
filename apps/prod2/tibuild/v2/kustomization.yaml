@@ -4,6 +4,7 @@ resources:
   - external-secret-config.yaml
   - external-secret-httproute-auth.yaml
   - external-secrets/image-release-cred.yaml
+  - external-secrets/tiup-credentials.yaml
   - release.yaml
   - worker-metrics.yaml
   - http-route-v2-auth.yaml
