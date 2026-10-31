@@ -3,6 +3,9 @@ kind: Pod
 metadata:
   name: pod-retry
   namespace: jenkins-pd
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    kubernetes.jenkins.io/retry: "true"
   annotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
 spec:
