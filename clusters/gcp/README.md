@@ -28,8 +28,13 @@ redirect URI.
 
 The gcp `chatops-lark` deployment reads its dedicated application configuration
 from the `gcp_chatops_lark_json` key in GCP Secret Manager. The JSON object must
-contain `app-id`, `app-secret`, and `config.yaml`. Its `devbuild.api_url` and
-`hotfix.api_url` should use the in-cluster `tibuild-v2` service endpoints:
+contain `app-id`, `app-secret`, and `config.yaml`. The ExternalSecret renders
+`app_id`/`app_secret` into the mounted `config.yaml` from the dedicated
+`app-id`/`app-secret` keys; the application does not accept them as command-line
+arguments or environment variables. `app-id` and `app-secret` are kept in the
+resulting Kubernetes Secret so the previous chart can still start during a
+rollback. Its `devbuild.api_url` and `hotfix.api_url` should use the in-cluster
+`tibuild-v2` service endpoints:
 
 ```text
 http://v2-tibuild-v2.tibuild.svc/api/v2/devbuilds
