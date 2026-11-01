@@ -8,15 +8,15 @@ metadata:
     app.kubernetes.io/part-of: cost-insight
   annotations:
     repair.pingcap.com/source: warehouse-f80fbbe8e8.raw_aws_billing.cur_line_items
-    repair.pingcap.com/source-commit: 7e7ccd86d09b4e472fab2af57043b8f2c697dbe4
+    repair.pingcap.com/source-commit: e71fd9245fd3084d198cbfb1b3ea91053da67847
     repair.pingcap.com/scope: four-ordinary-aws-accounts-only
 spec:
   # Warehouse snapshots arrive after the legacy noon pipeline. Keep this
   # ordinary-CUR route separate from the held split/F04 source routes.
   schedule: "10 15 * * *"
   timeZone: Asia/Shanghai
-  # Existing route verified on 2026-10-30; the new image passed read-only preflight.
-  # Its first normal writer run remains a separate rollout gate.
+  # The same app source passed pre-merge read-only preflight on 2026-10-30.
+  # The main-release image's first normal writer run remains a rollout gate.
   suspend: false
   concurrencyPolicy: Forbid
   startingDeadlineSeconds: 1800
@@ -42,7 +42,7 @@ spec:
           containers:
             - name: sync-aws-warehouse-summary
               # Shared application worker; pinned multi-platform release digest.
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:bdc14202f06d21389ca47b756950c1997f85a8f50495dbd3a2f0b9ca17805758
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:fd11e3b746524bd048f2ce90e181ba85ba0be61a25bd8a1c85f8c8b76a89cd77
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:

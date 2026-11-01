@@ -7,13 +7,16 @@ image. Query adaptation, validation, scoped replacement, attribution and native
 publication live in `ee-apps/cost-insight`, not an ops ConfigMap.
 
 - Application: [ee-apps #804](https://github.com/PingCAP-QE/ee-apps/pull/804),
-  commit `7e7ccd86d09b4e472fab2af57043b8f2c697dbe4`.
-- Published before this ops change by
-  [official release run 41063707678](https://github.com/PingCAP-QE/ee-apps/actions/runs/41063707678).
+  merged on 2026-10-31 as `e71fd9245fd3084d198cbfb1b3ea91053da67847`.
+- Official main release:
+  [run 41154954036](https://github.com/PingCAP-QE/ee-apps/actions/runs/41154954036),
+  tag `v2026.10.25-49-ge71fd92`.
 - Multi-platform digest (amd64 + arm64):
-  `sha256:bdc14202f06d21389ca47b756950c1997f85a8f50495dbd3a2f0b9ca17805758`.
-- The application PR remains a separate review/merge gate; publishing its reviewed
-  branch image does not imply that the application or ops PR has been merged.
+  `sha256:fd11e3b746524bd048f2ce90e181ba85ba0be61a25bd8a1c85f8c8b76a89cd77`.
+- The `cost-insight/` source tree is identical to preflighted branch commit
+  `7e7ccd86d09b4e472fab2af57043b8f2c697dbe4`. This pin uses the merged main
+  release, not the earlier branch image. The ops PR still requires its own merge
+  authorization; source equivalence is not runtime validation of the new digest.
 
 | CronJob suffix | Schedule (Asia/Shanghai) | Explicit source identities |
 | --- | --- | --- |
@@ -41,7 +44,7 @@ See the application README for the complete command contract and its tests.
   source/runner/vendor tests / 95.51% combined statement+branch coverage across
   four affected runtime modules. The requested Codex → pi-DeepSeek review loop
   finished round 1 CLEAN with no findings. Source-freeze/failure policies unchanged.
-- New-image **read-only** GKE Jobs completed successfully:
+- Pre-merge branch-image (`7e7ccd86`) **read-only** GKE Jobs completed successfully:
   `cost-wh-simple-preflight-aws-20261030-1336` and
   `cost-wh-simple-preflight-azure-20261030-1336`.
 - The discovery raw controls are reused for the five-day window: actual source
@@ -52,14 +55,16 @@ See the application README for the complete command contract and its tests.
   AWS 991,309,371 bytes, Azure 132,416,142 bytes; both below 2 GiB.
 - Independent before/after SELECT snapshots were identical for summary facts,
   attribution, native publication pointers, registry and both routine job states.
-  These are dry-run results, **not** new-image writer/publication validation.
-- Existing mounted-worker routes remain enabled and successful during PR review.
+  These are branch-image dry-run results, **not** runtime validation of the merged
+  main-release digest or writer/publication validation.
+- At the 2026-10-30 checks, the mounted-worker routes were enabled and successful.
   Earlier normal runs repaired all five identities through October 29 without a
   separate backfill. No new-image writer or CronJob switch is implied here.
 
 ## Switch and recovery
 
-1. Complete application/ops review and obtain explicit merge authorization.
+1. The application PR is merged; complete ops review and obtain explicit merge
+   authorization before deployment.
 2. Before reconciliation, verify neither old warehouse job is active and preserve
    every legacy-source migration/Flux hold. Do not overlap old/new writers. Any
    manual cutover must target only these two CronJobs, not the held component.
