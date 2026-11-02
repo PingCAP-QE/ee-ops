@@ -27,6 +27,19 @@ spec:
     enable: true
   values:
     replicaCount: 2
+    # The API records TiDB-X image tags in the TCMS portal
+    # (tcms-portal.pingcap.net), whose network ACL only accepts the fixed egress
+    # IP of the `whitelist-nat` pool (Cloud NAT `whitelist-nat` ->
+    # `nat-whitelist-ip`). Calls from other node pools are reset at the TCP
+    # level. Keep the same scheduling contract the publisher had before it was
+    # replaced by tibuild-v2.
+    nodeSelector:
+      cloud.google.com/gke-nodepool: whitelist-nat
+    tolerations:
+      - key: network
+        operator: Equal
+        value: whitelist
+        effect: NoSchedule
     resources:
       requests:
         cpu: "200m"
