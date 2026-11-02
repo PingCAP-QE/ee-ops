@@ -27,7 +27,10 @@ spec:
     remediation:
       retries: 3
   test:
-    enable: true
+    # The chart's only test hook is the API connection pod, which is not
+    # rendered when server.enabled is false. Disable the Flux helm test so a
+    # rollout does not fail on an empty test suite.
+    enable: false
   values:
     replicaCount: 2
     resources:
@@ -42,6 +45,11 @@ spec:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2 versioning=semver
       tag: v2026.11.1-13-gb5ac5b5
     server:
+      # prod2 only keeps the two TiUP publish workers. The API has no consumers:
+      # both do2.pingcap.net/tibuild and internal2-do.pingcap.net/tibuild have
+      # zero upstream requests, and all CI/ops clients use prow.tidb.net or the
+      # in-cluster gcp service.
+      enabled: false
       debug: false
       config:
         secretName: v2-config
@@ -145,7 +153,10 @@ spec:
               mountPath: /root/.docker
               readOnly: true
     httpRoute:
-      enabled: true
+      # The internal2-do route is part of the API surface; it is removed with
+      # the server. The external do2 basicAuth route lives in its own manifests
+      # and is removed in the same change.
+      enabled: false
       parentRefs:
         - kind: Gateway
           name: internal-gateway
