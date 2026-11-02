@@ -28,6 +28,7 @@ check_policy() {
 check_policy apps/gcp/ee-portal/security-policy.yaml ee-portal ee-portal
 check_policy apps/gcp/tibuild/v2/security-policy.yaml tibuild v2-tibuild-v2
 check_policy apps/gcp/ci-dashboard/security-policy.yaml apps ci-dashboard
+check_policy apps/gcp/tekton/setup/dashboard-security-policy.yaml tekton-pipelines tekton
 
 check_machine_policy() {
   local file=$1 route=$2 audience=$3
