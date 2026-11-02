@@ -27,6 +27,9 @@ jobs:
       - name: Verify Dashboard backend identity configuration
         if: matrix.path == 'apps'
         run: bash scripts/check_ci_dashboard_auth_config.sh
+      - name: Verify RBAC for Group system:authenticated
+        if: matrix.path == 'apps'
+        run: bash scripts/check_gcp_rbac_system_authenticated.sh
       - name: Verify Flux API versions
         if: matrix.path == 'clusters'
         run: |

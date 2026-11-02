@@ -46,14 +46,9 @@ spec:
       kind: Deployment
       name: tekton-dashboard
       namespace: tekton-pipelines
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: manual-approval-gate-controller
-      namespace: tekton-pipelines
-    - apiVersion: apps/v1
-      kind: Deployment
-      name: manual-approval-gate-webhook
-      namespace: tekton-pipelines
+    # The ManualApprovalGate operand is not deployed, so it has no controller or
+    # webhook Deployments. Re-enabling it needs scoped RBAC; see
+    # setup/kustomization.yaml.
   patches:
     # replace namespace
     - target:
