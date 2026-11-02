@@ -22,8 +22,14 @@ spec:
   upgrade:
     cleanupOnFail: true
     crds: CreateReplace
+  # The chart test is `curl --retry 48 ... jenkins:80/jenkins/login` without
+  # `--retry-connrefused`, so a connection refused while the controller is
+  # still booting fails the test immediately. Every controller restart (image
+  # or checksum/config change) then marks the release Stalled/TestFailed even
+  # though Jenkins comes up seconds later. Readiness is already covered by the
+  # controller's startup/readiness probes.
   test:
-    enable: true
+    enable: false
     ignoreFailures: false
   valuesFrom:
     - { kind: Secret, name: jenkins-release-values, valuesKey: values1.yaml }
