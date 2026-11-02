@@ -22,7 +22,9 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    tag: "2.568.2-jdk21"
+    # 2.580.2-jdk21 was built after Debian DSA-6582-1 and ships
+    # libbrotli1 1.1.0-2+deb13u1 (fixes CVE-2026-111497).
+    tag: "2.580.2-jdk21@sha256:74401de6a6f92e1afe1b02d1c8e3d0c33f263bfb5275dd8813f9150355f2367b"
   resources:
     requests:
       cpu: "1"
