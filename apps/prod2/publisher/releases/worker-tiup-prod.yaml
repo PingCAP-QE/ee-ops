@@ -22,6 +22,8 @@ spec:
   test:
     enable: false
   values:
+    # Publishing moved to tibuild-v2; keep the chart for rollback.
+    replicaCount: 0
     # Additional volumes on the output Deployment definition.
     image:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/publisher-worker versioning=semver
