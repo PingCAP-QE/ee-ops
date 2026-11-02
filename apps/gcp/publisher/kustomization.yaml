@@ -4,7 +4,5 @@ namespace: publisher
 resources:
   - 00-namespace.yaml
   - 01-policies.yaml
-  - external-secrets
-  - publisher-packages-config.yaml
+  # Redis stays until the zero-traffic gate; the server and workers are gone.
   - redis
-  - releases.yaml
