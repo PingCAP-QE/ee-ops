@@ -9,7 +9,13 @@ controller:
     - kubernetes:4437.vd64141124d8f:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f/kubernetes-4437.vd64141124d8f.hpi
     - workflow-aggregator:608.v67378e9d3db_1
     - git:5.10.1
-    - configuration-as-code:2077.v41f1011a_5110
+    # Keep this at least at the chart's default (5.10.9 ships 2143) and never
+    # older than the requirement of the plugins resolved by `--latest`. With
+    # core 2.580.2, the latest `credentials` (1514) becomes eligible and needs
+    # configuration-as-code >= 2117; an older pin here fails the plugin
+    # resolution in the init container and CrashLoopBackOffs the controller.
+    # Ref: https://plugins.jenkins.io/credentials/
+    - configuration-as-code:2143.vc78d4eb_d4174
 
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
