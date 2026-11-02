@@ -40,7 +40,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2 versioning=semver
-      tag: v2026.11.1-12-gb7ab8dd
+      tag: v2026.11.1-13-gb5ac5b5
     server:
       debug: false
       config:
@@ -88,7 +88,7 @@ spec:
       replicaCount: 1
       image:
         # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
-        tag: v2026.11.1-12-gb7ab8dd
+        tag: v2026.11.1-13-gb5ac5b5
       resources:
         # TiUP publishes packages of ~90 MB (tidb/br/dumpling): the OCI layer is
         # fetched into memory and `tiup mirror publish` reads the whole tarball,
