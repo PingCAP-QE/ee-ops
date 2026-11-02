@@ -15,7 +15,6 @@ spec:
             - cs
             - dl
             - kafka
-            - publisher
             - tibuild
             - zot
             - tirelease

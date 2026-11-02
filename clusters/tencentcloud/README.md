@@ -9,7 +9,7 @@ Tencentcloud-based cluster for CI/CD workloads (jenkins, tekton, kafka, etc.), m
 | flux-system | `./clusters/tencentcloud/flux-system` | Flux components, sync, notifications |
 | sources | `./clusters/tencentcloud/sources` | Helm repositories (bitnami, ee-apps, ee-ops, external-secrets, kyverno, etc.) and `GitRepository` sources |
 | infrastructure | `./infrastructure/tencentcloud` | external-secrets, gateways, kyverno, node-pools, operators, etc. |
-| apps | `./apps/tencentcloud` | jenkins, jenkins-agents, tekton, tibuild, publisher, kafka, cloudevents-server, cache, etc. |
+| apps | `./apps/tencentcloud` | jenkins, jenkins-agents, tekton, tibuild, kafka, cloudevents-server, cache, etc. |
 
 ## Prepare
 
@@ -20,7 +20,7 @@ Tencentcloud-based cluster for CI/CD workloads (jenkins, tekton, kafka, etc.), m
 | flux-system | lark-token        | `kubectl -n flux-system create secret generic lark-token --from-literal=address=<lark-webhook-url>`       | GitOps notification webhook (info events)    |
 | flux-system | lark-token-error  | `kubectl -n flux-system create secret generic lark-token-error --from-literal=address=<lark-webhook-url>` | GitOps alert webhook (error events)          |
 
-Other application secrets (e.g. publisher, cloudevents-server) are synced from
+Other application secrets (e.g. cloudevents-server) are synced from
 external secret stores via `external-secrets`, see the corresponding app
 directories.
 
