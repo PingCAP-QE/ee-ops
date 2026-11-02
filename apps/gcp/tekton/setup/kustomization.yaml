@@ -5,7 +5,10 @@ resources:
   # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
   - https://github.com/tektoncd/operator/releases/download/v0.77.0/release.yaml
   - operator-config.yaml
-  - operator-manual-approval-gate.yaml
+  # The ManualApprovalGate operand is not deployed: its operator-generated RBAC
+  # binds a non-default ClusterRole to Group system:authenticated. Re-enable it
+  # only together with scoped RBAC that binds the
+  # manual-approval-gate-controller ServiceAccount alone.
 
   - http-route.yaml
   - cm-config-events.yaml
@@ -13,3 +16,26 @@ resources:
   - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrole.yaml
   - https://github.com/tektoncd/pipeline/raw/refs/tags/v1.3.1/optional_config/enable-log-access-to-controller/clusterrolebinding.yaml
   # - https://storage.googleapis.com/tekton-releases-nightly/pipelines-in-pipelines/latest/release.yaml
+patches:
+  # The operator release binds these read-only ClusterRoles to every
+  # authenticated user, which the GKE RBAC scan reports as a finding. Nothing
+  # relies on them, so delete the bindings; kustomize-controller prunes them
+  # from the cluster.
+  - target:
+      kind: ClusterRoleBinding
+      name: tekton-config-read-rolebinding
+    patch: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: tekton-config-read-rolebinding
+      $patch: delete
+  - target:
+      kind: ClusterRoleBinding
+      name: tekton-result-read-rolebinding
+    patch: |
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: ClusterRoleBinding
+      metadata:
+        name: tekton-result-read-rolebinding
+      $patch: delete
