@@ -26,6 +26,12 @@ object with `client-id` and `client-secret` fields, and the OAuth client must
 allow `https://prow.tidb.net/dashboard/oauth2/callback` as an authorized
 redirect URI.
 
+The Tekton Dashboard uses the same `google-oauth2-client-ee-apps` secret, so the
+OAuth client must also allow
+`https://prow.tidb.net/tekton/oauth2/callback` as an authorized redirect URI.
+The client is an "Internal" Google OAuth app, so only PingCAP Workspace accounts
+can log in; the `tekton-dashboard-oidc` SecurityPolicy requires that login.
+
 The gcp `chatops-lark` deployment reads its dedicated application configuration
 from the `gcp_chatops_lark_json` key in GCP Secret Manager. The JSON object must
 contain `app-id`, `app-secret`, and `config.yaml`. The ExternalSecret renders

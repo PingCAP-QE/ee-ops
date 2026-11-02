@@ -20,10 +20,10 @@ spec:
 # hostname + path routing and SecurityPolicy (OIDC/JWT).
 #
 # prow.tidb.net: still has other hostname-specific GKE routes (jenkins /jenkins,
-# dl /dl, tekton /tekton, ci-dashboard /dashboard/), so GKE keeps a host rule
-# for it; this / catch-all forwards everything else (/, /hook, /tibuild, ...)
-# to Envoy — requests hitting the host rule without a matching path rule would
-# otherwise get a GKE 404 ("fault filter abort") instead of falling through.
+# dl /dl), so GKE keeps a host rule for it; this / catch-all forwards everything
+# else (/, /hook, /tibuild, /dashboard, /tekton, ...) to Envoy — requests hitting
+# the host rule without a matching path rule would otherwise get a GKE 404
+# ("fault filter abort") instead of falling through.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
