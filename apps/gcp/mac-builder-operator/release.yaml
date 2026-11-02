@@ -46,7 +46,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/mac-builder-operator
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/mac-builder-operator versioning=semver
-      tag: v2026.11.1-10-g1a85d9c
+      tag: v2026.11.1-11-g6a9edd9
     # Serve per-build logs from the operator pod. The PVC uses the cluster
     # default storage class; the Service is reached through the API proxy.
     logServer:
