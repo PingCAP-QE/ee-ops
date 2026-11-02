@@ -17,11 +17,6 @@ spec:
       type: Opaque
       data:
         service-tidbcloud-ops.yaml: |
-          tibuild_v2:
-            api_base_url: "{{ .tibuild_api_base_url }}"
-            user: "{{ .tibuild_user }}"
-            password: "{{ .tibuild_password }}"
-
           stages:
             prod:
               api_base_url: "{{ .ops_prod_api_base_url }}"
@@ -124,12 +119,6 @@ spec:
 
 
   dataFrom:
-    - extract:
-        key: prod2_publisher_tibuild_v2_api_json
-      rewrite:
-        - regexp:
-            source: "(.*)"
-            target: "tibuild_$1"
     - extract:
         # json object contains keys: api_base_url, api_key
         key: tidbcloud_ops_api_prod_json
