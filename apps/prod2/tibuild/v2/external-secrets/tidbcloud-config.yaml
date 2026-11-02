@@ -2,6 +2,9 @@
 #
 # The values are the same ones publisher reads today; publishing them into the
 # tibuild namespace lets the API take over without a second copy of the keys.
+#
+# The prod2 API is currently disabled (server.enabled: false). This secret is
+# kept so that a rollback to server.enabled: true still has its config mounts.
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
