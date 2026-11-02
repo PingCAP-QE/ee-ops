@@ -3,8 +3,7 @@ kind: Kustomization
 namespace: publisher
 resources:
   - namespace.yaml
+  # Kafka and Redis stay until the zero-traffic gate; the server and workers
+  # are gone.
   - redis
   - kafka
-  - publisher-packages-config.yaml
-  - external-secrets
-  - releases.yaml
