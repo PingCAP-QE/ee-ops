@@ -1,6 +1,6 @@
 # Production 2 GitOps
 
-Production 2 cluster for CI/CD workloads (Jenkins, tibuild, publisher, zot,
+Production 2 cluster for CI/CD workloads (Jenkins, tibuild, zot,
 cache, dl, tirelease), managed by FluxCD v2. Tekton was retired from this
 cluster in 2026-10; Tekton workloads now run in gcp and tencentcloud.
 
@@ -11,7 +11,7 @@ cluster in 2026-10; Tekton workloads now run in gcp and tencentcloud.
 | flux-system | `./clusters/prod2/flux-system` | Flux components, sync, notifications |
 | sources | `./clusters/prod2` (`sources.yaml`) | `GitRepository` sources (ci, artifacts) |
 | infrastructure | `./infrastructure/prod2` | external-secrets, gateways, kyverno, openebs, secret-generator, etc. |
-| apps | `./apps/prod2` | tibuild, publisher, zot, harbor, cache, dl, tirelease, etc. |
+| apps | `./apps/prod2` | tibuild, zot, harbor, cache, dl, tirelease, etc. |
 
 ## Prepare
 

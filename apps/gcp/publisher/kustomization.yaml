@@ -1,8 +1,0 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
-namespace: publisher
-resources:
-  - 00-namespace.yaml
-  - 01-policies.yaml
-  # Redis stays until the zero-traffic gate; the server and workers are gone.
-  - redis

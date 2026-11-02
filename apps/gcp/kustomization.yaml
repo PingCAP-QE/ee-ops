@@ -13,7 +13,6 @@ resources:
   - chatops-lark
   - dl
   - roster
-  - publisher
   - tibuild
   - github-token-broker
   - mac-builder-operator
