@@ -4,6 +4,7 @@ resources:
   - external-secret-config.yaml
   - external-secret-httproute-auth.yaml
   - external-secrets/image-release-cred.yaml
+  - external-secrets/tidbcloud-config.yaml
   - external-secrets/tiup-credentials.yaml
   - release.yaml
   - worker-metrics.yaml

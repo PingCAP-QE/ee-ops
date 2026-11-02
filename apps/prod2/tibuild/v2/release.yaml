@@ -40,7 +40,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2 versioning=semver
-      tag: v2026.10.25-66-g7149944
+      tag: v2026.11.1-13-gb5ac5b5
     server:
       debug: false
       config:
@@ -57,6 +57,9 @@ spec:
         - name: packages-config
           configMap:
             name: packages-config
+        - name: tidbcloud-config
+          secret:
+            secretName: tibuild-v2-tidbcloud-config
       volumeMounts:
         - name: docker-cred
           mountPath: /root/.docker
@@ -64,6 +67,14 @@ spec:
         - name: packages-config
           subPath: delivery.yaml
           mountPath: /etc/delivery/delivery.yaml
+          readOnly: true
+        - name: tidbcloud-config
+          subPath: service-tidbcloud-ops.yaml
+          mountPath: /etc/tidbcloud/ops.yaml
+          readOnly: true
+        - name: tidbcloud-config
+          subPath: service-tidbcloud-testplatforms.yaml
+          mountPath: /etc/tidbcloud/testplatforms.yaml
           readOnly: true
     serviceAccount:
       create: false
@@ -77,7 +88,7 @@ spec:
       replicaCount: 1
       image:
         # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
-        tag: v2026.10.25-66-g7149944
+        tag: v2026.11.1-13-gb5ac5b5
       resources:
         # TiUP publishes packages of ~90 MB (tidb/br/dumpling): the OCI layer is
         # fetched into memory and `tiup mirror publish` reads the whole tarball,
