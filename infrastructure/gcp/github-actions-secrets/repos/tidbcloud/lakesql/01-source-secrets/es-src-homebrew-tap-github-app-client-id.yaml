@@ -7,7 +7,7 @@ metadata:
     ee.pingcap.com/managed-by: fluxcd
     ee.pingcap.com/github-org: tidbcloud
   annotations:
-    ee.pingcap.com/source-secret-id: gha__system__github_app_client_id
+    ee.pingcap.com/source-secret-id: gha__repo__tidbcloud__lakesql__homebrew_tap_github_app_client_id
     ee.pingcap.com/github-secret-name: HOMEBREW_TAP_GITHUB_APP_CLIENT_ID
 spec:
   refreshInterval: 1h
@@ -20,4 +20,4 @@ spec:
   data:
     - secretKey: value
       remoteRef:
-        key: gha__system__github_app_client_id
+        key: gha__repo__tidbcloud__lakesql__homebrew_tap_github_app_client_id
