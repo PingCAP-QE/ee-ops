@@ -35,7 +35,7 @@ spec:
     - matches:
         - path:
             type: PathPrefix
-            value: /
+            value: /webhook
       timeouts:
         request: 0s
       backendRefs:

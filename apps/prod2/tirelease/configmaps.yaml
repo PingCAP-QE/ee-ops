@@ -5,6 +5,7 @@ metadata:
 data:
   config.yaml: |
     enableApiGzip: true
+    enableProf: true
     runAutoMigrate: true
     enableCron: true
     bigQueryProject: pingcap-dbaas-build
@@ -36,6 +37,7 @@ metadata:
 data:
   config.yaml: |
     enableApiGzip: true
+    enableProf: false
     # Webhook handlers share production dependencies but do not run migrations
     # or the main service's cron/task executor.
     runAutoMigrate: false
