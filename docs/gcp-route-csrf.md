@@ -18,6 +18,9 @@ host and port, not scheme; this does not protect against same-origin XSS.
 No additional origins or shadow mode are configured. GET/HEAD and OIDC GET
 callbacks remain unaffected. The Portal's `/ee/api/tibuild/v2/*` alias is covered
 by its existing policy; `/tibuild/api/v2/*` is covered by the TiBuild policy.
+The browser `/tibuild` SecurityPolicy is OIDC-only: it has no JWT provider and
+no `passThroughAuthHeader`, so a non-canonical `Authorization` header cannot
+skip the OIDC login. Bearer clients must use the machine route below.
 
 ## Machine requests
 

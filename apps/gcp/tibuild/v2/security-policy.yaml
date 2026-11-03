@@ -1,7 +1,15 @@
 # Authentication for prow.tidb.net/tibuild:
-# - OIDC (Google): browser users via redirect-based login (session cookies)
-# - JWT: Bearer clients select the more-specific route in machine-access.yaml,
-#   where a Google-issued ID token is required (OIDC cookies cannot bypass it).
+# - Browser route: OIDC (Google) only. Browser users authenticate through a
+#   redirect-based login and carry the OIDC session cookies.
+# - Machine route: Bearer clients select the more-specific route in
+#   machine-access.yaml, where a Google-issued ID token is required and
+#   allowlisted by service-account / domain claims. OIDC cookies cannot
+#   authenticate that route.
+#
+# This browser policy deliberately has no JWT provider and no
+# passThroughAuthHeader: a request carrying a non-canonical Authorization
+# header must not be able to skip the OIDC login. Bearer clients use the
+# machine route instead.
 #
 # Machine clients obtain an ID token, e.g.:
 #   gcloud auth print-identity-token \
@@ -17,7 +25,7 @@
 apiVersion: gateway.envoyproxy.io/v1alpha1
 kind: SecurityPolicy
 metadata:
-  name: tibuild-v2-oidc-jwt
+  name: tibuild-v2-oidc
   namespace: tibuild
 spec:
   targetRefs:
@@ -39,19 +47,7 @@ spec:
       accessToken: ee-apps-access-token
       idToken: ee-apps-id-token
     redirectURL: https://prow.tidb.net/tibuild/oauth2/callback
-    passThroughAuthHeader: true
     scopes:
       - openid
       - email
       - profile
-  jwt:
-    # optional: browser users authenticated via OIDC have no JWT and must pass;
-    # invalid JWTs are still rejected regardless of this setting.
-    optional: true
-    providers:
-      - name: google
-        issuer: https://accounts.google.com
-        remoteJWKS:
-          uri: https://www.googleapis.com/oauth2/v3/certs
-        audiences:
-          - prow.tidb.net
