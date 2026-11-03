@@ -210,7 +210,7 @@ controller:
                   - key: "GIT_BROKER_URL"
                     value: "http://github-token-broker.github-token-broker.svc"
                   - key: "GIT_BROKER_ORGS"
-                    value: "tidbcloud"
+                    value: "tidbcloud,pingcap-inc"
                   # Route GitHub HTTPS and SSH-style URLs through the in-cluster Git CDN.
                   # Git uses the HTTP credential only when the CDN returns 401.
                   # Keep the count synchronized with every KEY_n/VALUE_n pair below.
