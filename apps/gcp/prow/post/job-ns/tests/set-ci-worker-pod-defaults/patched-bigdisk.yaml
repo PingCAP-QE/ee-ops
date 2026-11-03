@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-bigdisk
+  namespace: prow-test-pods
+  annotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+spec:
+  containers:
+    - name: test
+      image: ghcr.io/pingcap-qe/ci/base:v2024.10.8-32-ge807718-go1.23
+      command: ["bash", "-ce", "make ci_test"]
+  nodeSelector:
+    compute-class: ci-worker-bigdisk
+    cloud.google.com/compute-class: ci-worker-bigdisk

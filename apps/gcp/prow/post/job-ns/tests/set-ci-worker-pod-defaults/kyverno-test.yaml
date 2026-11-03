@@ -9,11 +9,38 @@ resources:
   - resource-amd64-affinity.yaml
   - resource-arm64-affinity.yaml
   - resource-arm64-nodeselector.yaml
+  - resource-bigdisk.yaml
 results:
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-bigdisk-compute-class
+    resources:
+      - pod-no-affinity
+      - pod-amd64-affinity
+      - pod-arm64-affinity
+      - pod-arm64-nodeselector
+    kind: Pod
+    result: skip
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-bigdisk-compute-class
+    resources:
+      - pod-bigdisk
+    kind: Pod
+    result: pass
+    patchedResources: patched-bigdisk.yaml
+
   - policy: set-ci-worker-pod-defaults
     rule: set-ci-worker-arm64-compute-class
     resources:
       - pod-no-affinity
+    kind: Pod
+    result: skip
+
+  - policy: set-ci-worker-pod-defaults
+    rule: set-ci-worker-arm64-compute-class
+    resources:
+      - pod-amd64-affinity
+      - pod-bigdisk
     kind: Pod
     result: skip
 
@@ -24,13 +51,6 @@ results:
     kind: Pod
     result: pass
     patchedResources: patched-no-affinity.yaml
-
-  - policy: set-ci-worker-pod-defaults
-    rule: set-ci-worker-arm64-compute-class
-    resources:
-      - pod-amd64-affinity
-    kind: Pod
-    result: skip
 
   - policy: set-ci-worker-pod-defaults
     rule: set-ci-worker-compute-class
@@ -52,6 +72,7 @@ results:
     rule: set-ci-worker-compute-class
     resources:
       - pod-arm64-affinity
+      - pod-bigdisk
     kind: Pod
     result: skip
 

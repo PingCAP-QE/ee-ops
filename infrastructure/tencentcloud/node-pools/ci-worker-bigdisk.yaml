@@ -1,0 +1,50 @@
+apiVersion: karpenter.sh/v1
+kind: NodePool
+metadata:
+  name: ci-worker-bigdisk
+spec:
+  template:
+    metadata:
+      labels:
+        compute-class: ci-worker-bigdisk
+    spec:
+      expireAfter: 168h
+      nodeClassRef:
+        group: karpenter.k8s.tke
+        kind: TKEMachineNodeClass
+        name: ci-worker-bigdisk
+      requirements:
+        # Rust compile jobs are builder-image heavy and write tens of GiB of
+        # artifacts to the node root disk; they are amd64-only in CI.
+        - key: kubernetes.io/arch
+          operator: In
+          values:
+            - amd64
+        # On-demand only: a spot reclaim 50 minutes into a 1.5h build wastes the
+        # whole run, which is the failure mode this pool exists to remove.
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values:
+            - on-demand
+        - key: karpenter.k8s.tke/instance-family
+          operator: In
+          values:
+            - SA9e # AMD Turin C, comparable to GCP C4D
+            - SA9 # AMD Turin D, comparable to GCP N4D
+            - S9pro # Intel latest gen high-performance
+            - S9e # Intel latest gen standard
+        - key: karpenter.k8s.tke/instance-cpu
+          operator: Lte
+          values:
+            - "64" # cap single node at 64 vCPU to avoid oversized instances
+        - key: karpenter.k8s.tke/instance-memory-gb
+          operator: Lte
+          values:
+            - "256" # cap single node at 256Gi
+  limits:
+    cpu: "512" # cap total pool capacity; bigdisk nodes are the expensive ones
+    memory: 2048Gi
+  disruption:
+    # Keep long builds alive: only release a node once nothing runs on it.
+    consolidationPolicy: WhenEmpty
+    consolidateAfter: 5m
