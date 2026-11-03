@@ -30,6 +30,29 @@ check_policy apps/gcp/tibuild/v2/security-policy.yaml tibuild v2-tibuild-v2
 check_policy apps/gcp/ci-dashboard/security-policy.yaml apps ci-dashboard
 check_policy apps/gcp/tekton/setup/dashboard-security-policy.yaml tekton-pipelines tekton
 
+# The browser route must stay OIDC-only. A JWT provider with optional: true, or
+# passThroughAuthHeader, lets a non-canonical Authorization header skip OIDC.
+check_oidc_only_browser_policy() {
+  local file=$1 namespace=$2 route=$3
+  if ! NAMESPACE="$namespace" ROUTE="$route" yq eval -e '
+    .kind == "SecurityPolicy" and
+    .metadata.namespace == strenv(NAMESPACE) and
+    .metadata.name == "tibuild-v2-oidc" and
+    (.spec | has("jwt") | not) and
+    (.spec.oidc | has("passThroughAuthHeader") | not) and
+    (.spec.targetRefs | length == 1) and
+    .spec.targetRefs[0].group == "gateway.networking.k8s.io" and
+    .spec.targetRefs[0].kind == "HTTPRoute" and
+    .spec.targetRefs[0].name == strenv(ROUTE)
+  ' "$repo_root/$file" > /dev/null; then
+    echo "FAIL: $file must keep the browser route OIDC-only (no JWT, no passThroughAuthHeader)" >&2
+    return 1
+  fi
+  echo "PASS: $namespace/$route is OIDC-only"
+}
+
+check_oidc_only_browser_policy apps/gcp/tibuild/v2/security-policy.yaml tibuild v2-tibuild-v2
+
 check_machine_policy() {
   local file=$1 route=$2 audience=$3
   local directory
