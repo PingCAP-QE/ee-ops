@@ -178,6 +178,12 @@ affinity: {}
 # env keys: https://github.com/cla-assistant/cla-assistant/tree/main?tab=readme-ov-file#supported-environment-variables
 envFromSecret: ""
 
+# If set, mount all keys from each named secret as environment variables.
+# Takes precedence over envFromSecret.
+envFromSecrets: []
+#  - cla-credentials
+#  - cla-session
+
 # env keys: https://github.com/cla-assistant/cla-assistant/tree/main?tab=readme-ov-file#supported-environment-variables
 additionalEnv:
   []

@@ -48,10 +48,18 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          {{- if .Values.envFromSecrets }}
+          envFrom:
+            {{- range .Values.envFromSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+          {{- else }}
           {{- with .Values.envFromSecret }}
           envFrom:
             - secretRef:
                 name: {{ . }}
+          {{- end }}
           {{- end }}
           {{- with .Values.additionalEnv }}
           env:

@@ -6,4 +6,5 @@ resources:
   - policies.yaml
   - mongodb-secret.yaml
   - mongodb-release.yaml
+  - session-secret.yaml
   - cla-release.yaml
