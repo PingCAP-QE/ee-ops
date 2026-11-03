@@ -377,6 +377,9 @@ spec:
                   value: "2147483648"
                 - name: FRESHNESS_COST_BQ_TIMEOUT_SECONDS
                   value: "30"
+                # Operator-approved exclusion: no source records after 2026-06-24.
+                - name: FRESHNESS_COST_BQ_EXCLUDED_SOURCES
+                  value: azure/abd27163-b965-4217-8cba-2a4c799579fe
               resources:
                 requests:
                   cpu: "100m"
