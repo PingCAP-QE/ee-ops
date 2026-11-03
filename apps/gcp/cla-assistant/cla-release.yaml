@@ -11,7 +11,7 @@ spec:
         kind: HelmRepository
         name: ee-ops
         namespace: flux-system
-      version: "0.3.0"
+      version: "0.3.1"
   dependsOn:
     - name: mongodb
   interval: 5m
@@ -27,8 +27,9 @@ spec:
   values:
     replicaCount: 2
     image:
+      repository: ghcr.io/ti-community-infra/cla-assistant/patched
       pullPolicy: Always
-      tag: pingcap
+      tag: v2026.11.3
     serviceAccount:
       create: false
     httpRoute:
@@ -44,7 +45,9 @@ spec:
             - path:
                 type: PathPrefix
                 value: /
-    envFromSecret: cla-credentials
+    envFromSecrets:
+      - cla-credentials
+      - cla-session
     additionalEnv:
       - name: HOST
         value: cla.pingcap.net
