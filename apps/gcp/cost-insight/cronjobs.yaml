@@ -267,12 +267,13 @@ spec:
             app.kubernetes.io/name: cost-insight-sync-alibaba-billing-summary
             app.kubernetes.io/part-of: cost-insight
         spec:
-          # Reuse the existing Workload Identity and production Cost Insight database secret.
-          serviceAccountName: ci-dashboard
+          # Direct warehouse Workload Identity; keep the existing database secret.
+          serviceAccountName: cost-insight-gcp-billing
           restartPolicy: Never
           containers:
             - name: sync-alibaba-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.6-9-g0ce9a7f
+              # Official main release v2026.10.25-49-ge71fd92 (ee-apps #804).
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:fd11e3b746524bd048f2ce90e181ba85ba0be61a25bd8a1c85f8c8b76a89cd77
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -336,9 +337,15 @@ spec:
                 - name: COST_INSIGHT_LOG_LEVEL
                   value: INFO
                 - name: GOOGLE_CLOUD_PROJECT
-                  value: pingcap-testing-account
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_LOCATION
+                  value: us-west1
+                - name: COST_INSIGHT_BILLING_BQ_IMPERSONATE_SERVICE_ACCOUNT
+                  value: ""
                 - name: COST_INSIGHT_ALIBABA_BILLING_TABLE
-                  value: gcp-digital-bi.alibaba_cloud.daily_en_*
+                  value: warehouse-f80fbbe8e8.raw_alibaba_billing.daily_en_*
                 - name: COST_INSIGHT_ALIBABA_ACCOUNT_ID
                   value: "5028760335873601"
                 - name: COST_INSIGHT_ALIBABA_EARLIEST_USAGE_DATE
