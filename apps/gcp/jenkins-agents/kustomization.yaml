@@ -3,5 +3,3 @@ kind: Kustomization
 namespace: jenkins-agents
 resources:
   - namespace.yaml
-  - rbac.yaml
-  - secret-token.yaml
