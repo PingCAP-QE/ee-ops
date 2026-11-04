@@ -14,6 +14,10 @@ spec:
           params:
             - name: eventTypes
               value: ["pull_request"]
+            - name: secretRef
+              value:
+                secretName: el-github-webhook
+                secretKey: secret
         - name: "validate PR state and add field"
           ref:
             name: cel
@@ -35,6 +39,10 @@ spec:
           params:
             - name: eventTypes
               value: ["pull_request_review"]
+            - name: secretRef
+              value:
+                secretName: el-github-webhook
+                secretKey: secret
         - name: "validate PR review action"
           ref:
             name: cel
@@ -56,6 +64,10 @@ spec:
           params:
             - name: eventTypes
               value: ["push"]
+            - name: secretRef
+              value:
+                secretName: el-github-webhook
+                secretKey: secret
         - name: exclude branch creation and the old branch when renaming
           # Filter out branch creation events and the old branch when renaming to prevent unnecessary processing
           ref:
@@ -87,6 +99,10 @@ spec:
           params:
             - name: eventTypes
               value: ["create"]
+            - name: secretRef
+              value:
+                secretName: el-github-webhook
+                secretKey: secret
         - name: "validate branch create"
           ref:
             name: cel
@@ -108,6 +124,10 @@ spec:
           params:
             - name: eventTypes
               value: ["create"]
+            - name: secretRef
+              value:
+                secretName: el-github-webhook
+                secretKey: secret
         - name: "validate tag create"
           ref:
             name: cel
@@ -129,6 +149,10 @@ spec:
           params:
             - name: eventTypes
               value: ["issue_comment"]
+            - name: secretRef
+              value:
+                secretName: el-github-webhook
+                secretKey: secret
         - name: validate issue comment
           ref:
             name: cel
