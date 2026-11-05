@@ -24,6 +24,10 @@ controller:
   additionalPlugins:
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
+    # Administrative action logging (who configured/deleted a job, ran a Groovy
+    # script, used a credential). Console logger writes to the controller's stdout,
+    # so the existing pod log pipeline collects it without extra infrastructure.
+    - audit-trail:472.vb_51e5934ec50
     - artifact-manager-s3::https://github.com/wuhuizuo/artifact-manager-s3-plugin/releases/download/986.1-pingcap2/artifact-manager-s3-986.1-pingcap2.hpi
     - build-failure-analyzer::https://github.com/PingCAP-QE/build-failure-analyzer-plugin/releases/download/v2.4.2-jobname/build-failure-analyzer.hpi
     - cdevents::https://github.com/dillon-zheng/cdevents-plugin/releases/download/cdevents-1-40-pingcap-2/cdevents-1-40-pingcap-2.hpi
