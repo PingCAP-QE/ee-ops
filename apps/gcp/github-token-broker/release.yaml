@@ -55,6 +55,16 @@ spec:
         - apps
         # Envoy data plane that fronts the public /gh-broker route.
         - infra
+        # Jenkins agent namespaces on this cluster (the `master: "1"`
+        # controller). `pingcap-inc` enforces SAML SSO, so `prow.checkoutRefs`
+        # mints App installation tokens here instead of using the `ti-chi-bot`
+        # SSH key. The jobs set `K8S_NAMESPACE` explicitly, so their pods land
+        # in these namespaces rather than the controller-wide `jenkins-agents`
+        # default:
+        #   jenkins-tidb   -> pingcap-inc/tidb, pingcap-inc/enterprise-extensions
+        #   jenkins-tiflow -> pingcap-inc/{ticdc,tiflow,tiflash-scripts}
+        - jenkins-tidb
+        - jenkins-tiflow
       egress:
         # DNS.
         - to:
