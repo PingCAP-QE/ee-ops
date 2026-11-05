@@ -296,3 +296,23 @@ controller:
             customSigningRegion: ${jenkins-artifact-s3-region}
             usePathStyleUrl: false
             disableSessionToken: true
+
+      # Administrative action logging: who configured/deleted a job, ran a Groovy
+      # script, or used a credential. The console logger writes to the
+      # controller's stdout, so the existing pod-log pipeline collects it.
+      audit-trail: |
+        unclassified:
+          audit-trail:
+            logBuildCause: true
+            logCredentialsUsage: true
+            logScriptUsage: true
+            logAuthEvents: true
+            loggers:
+              # JCasC keys an AuditLogger by its descriptor symbol, not by the
+              # implementation's fully-qualified name; `Console` is the symbol
+              # the plugin registers. `output` and `dateFormat` are constructor
+              # arguments and therefore mandatory.
+              - console:
+                  output: STD_OUT
+                  dateFormat: "yyyy-MM-dd HH:mm:ss"
+                  logPrefix: "audit"
