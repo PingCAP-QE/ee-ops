@@ -3,6 +3,11 @@ kind: ServiceAccount
 metadata:
   name: pod-cleaner
 ---
+# Cluster-wide but READ-ONLY: both CronJobs run `kubectl get pods -A` to find
+# stale pods across the cluster, which needs a cluster-wide `get`/`list`.
+# The `delete` verb is deliberately NOT here -- it is granted per CI namespace
+# by infrastructure/tencentcloud/pod-cleaner-rbac (Role + RoleBinding), so this
+# ClusterRole on its own cannot remove a pod.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -10,7 +15,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["pods"]
-    verbs: ["get", "list", "delete"]
+    verbs: ["get", "list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
