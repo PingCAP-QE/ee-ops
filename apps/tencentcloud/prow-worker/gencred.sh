@@ -5,13 +5,19 @@ set -euo pipefail
 usage() {
     cat <<'EOF'
 Usage:
-  ./gencred.sh [namespace] [serviceaccount] [output] [token_secret]
+  ./gencred.sh [namespace] [serviceaccount] [output] [token_secret] [context]
 
 Defaults:
   namespace:      prow-test-pods
   serviceaccount: k8s-pod-full
   output:         prow-test-pods-k8s-pod-full.conf
   token_secret:   k8s-pod-full-token
+  context:        tke-pingcap-cicd
+
+The context name is the Prow build-cluster alias: it must equal the `cluster:`
+value in the Prow job specs routed to this cluster, because Prow maps every
+kubeconfig context (other than the in-cluster one) to a build cluster of the
+same name.
 
 This script assumes the current kubectl context points to the target cluster.
 It creates a service-account-token Secret if needed, then writes a kubeconfig
@@ -54,7 +60,7 @@ main() {
     local account=${2:-k8s-pod-full}
     local output=${3:-${ns}-${account}.conf}
     local token_secret=${4:-${account}-token}
-    local cluster_name="${ns}-${account}"
+    local context=${5:-tke-pingcap-cicd}
 
     kubectl -n "$ns" get sa/"$account" >/dev/null
 
@@ -77,7 +83,7 @@ EOF
     local kube_ca
     kube_ca=$(kubectl config view --raw --minify -o jsonpath='{.clusters[0].cluster.certificate-authority-data}')
 
-    kubectl config set-cluster "$cluster_name" \
+    kubectl config set-cluster "$context" \
         --server="$kube_server" \
         --certificate-authority=<(printf '%s' "$kube_ca" | decode_base64) \
         --embed-certs=true \
@@ -87,15 +93,15 @@ EOF
         --token="$sa_token" \
         --kubeconfig="$output"
 
-    kubectl config set-context "$cluster_name" \
-        --cluster="$cluster_name" \
+    kubectl config set-context "$context" \
+        --cluster="$context" \
         --user="$account" \
         --namespace="$ns" \
         --kubeconfig="$output"
 
-    kubectl config use-context "$cluster_name" --kubeconfig="$output" >/dev/null
+    kubectl config use-context "$context" --kubeconfig="$output" >/dev/null
 
-    echo "wrote kubeconfig to $output"
+    echo "wrote kubeconfig to $output (context: $context)"
 }
 
 main "$@"
