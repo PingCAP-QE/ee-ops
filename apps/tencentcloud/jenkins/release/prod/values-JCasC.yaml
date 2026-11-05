@@ -88,7 +88,15 @@ controller:
     # for security.
     security:
       globalJobDslSecurityConfiguration:
-        useScriptSecurity: false
+        # Enable the Job DSL script-security gate, paired with `sandbox(true)`
+        # on the seed job below (mode B). The plugin's JobDslWhitelist allows
+        # Job DSL methods, so the pure-DSL definitions in PingCAP-QE/ci need no
+        # per-script approval, while arbitrary Groovy in a seed script has to
+        # pass the sandbox. First enabled on tencent staging (#2643). Rollback
+        # is the pair of lines: set this and the seed's sandbox back to
+        # `false`, then restart the controller so the JCasC ConfigMap is
+        # re-read.
+        useScriptSecurity: true
       gitHostKeyVerificationConfiguration:
         sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
 
@@ -178,7 +186,14 @@ controller:
                     removedConfigFilesAction('DELETE')
                     removedViewAction('DELETE')
                     lookupStrategy('SEED_JOB')
-                    sandbox(false)
+                    // Paired with `useScriptSecurity: true` above (mode B): the
+                    // Job DSL runs in the Groovy sandbox, where JobDslWhitelist
+                    // permits the DSL methods but blocks arbitrary Groovy. A
+                    // rejected script fails this build before jobs are updated,
+                    // so jobs stop being synced but are not deleted. Rollback:
+                    // back to `false` together with `useScriptSecurity: false`,
+                    // then restart the controller.
+                    sandbox(true)
                   }
                 }
               }
