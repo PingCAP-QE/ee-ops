@@ -19,6 +19,7 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: tekton
+  csrf: {}
   oidc:
     provider:
       issuer: https://accounts.google.com
