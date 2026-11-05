@@ -4,5 +4,4 @@ resources:
   - source.yaml
   - namespaces.yaml
   - release-1-controller.yaml
-  - release-2-runners-pingcap.yaml
   - release-2-runners-pingcap-qe.yaml
