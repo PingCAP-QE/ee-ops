@@ -3,7 +3,8 @@ kind: Kustomization
 # Deliberately no `namespace:` here: every Role/RoleBinding in
 # rbac-pod-delete.yaml names the namespace it grants, so a namespace
 # transformer at this level would rewrite all of them to a single value.
-# Same arrangement as apps/<cluster>/ci-dashboard-pod-watcher, which binds its
-# ClusterRole per watched namespace the same way.
+# Same arrangement as the existing pod-watcher RBAC in this cluster
+# (apps/gcp/ci-dashboard/pod-watcher-rbac.yaml), which binds its ClusterRole
+# per watched namespace the same way.
 resources:
   - rbac-pod-delete.yaml
