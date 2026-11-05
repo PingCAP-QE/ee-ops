@@ -8,6 +8,8 @@ resources:
   - operator-manual-approval-gate.yaml
 
   - http-route.yaml
+  - security-policy.yaml
+  - external-secret-oidc.yaml
   - cm-config-events.yaml
   # renovate: datasource=github-releases depName=tektoncd/operator versioning=semver
   - https://cdn.jsdelivr.net/gh/tektoncd/pipeline@v1.3.1/optional_config/enable-log-access-to-controller/clusterrole.yaml
