@@ -13,6 +13,11 @@ It manages the following resources:
 
 The namespace is pinned to `amd64` nodes through a namespace annotation.
 
+Job pods land here when their spec sets `cluster: tke-pingcap-cicd` (job configs
+live in `prow-jobs/` of PingCAP-QE/ci). That alias is a kubeconfig **context**
+name in the `gcp` Prow `prow-kubeconfig` secret, so the credential generated
+below must use `tke-pingcap-cicd` as its context name.
+
 ## TKE supernode cost tags
 
 On Pod `CREATE`, `inject-prow-tencent-cost-tags` best-effort adds missing
@@ -64,7 +69,8 @@ cluster. It will:
 1. Ensure the ServiceAccount `k8s-pod-full` exists.
 2. Create a `kubernetes.io/service-account-token` Secret if needed.
 3. Wait for Kubernetes to populate the token.
-4. Write a kubeconfig file for the `prow-test-pods` namespace.
+4. Write a kubeconfig file for the `prow-test-pods` namespace, with the context
+   named after the Prow cluster alias (`tke-pingcap-cicd`).
 
 Run:
 
@@ -79,22 +85,44 @@ Default values:
 - ServiceAccount: `k8s-pod-full`
 - Output kubeconfig: `prow-test-pods-k8s-pod-full.conf`
 - Token Secret: `k8s-pod-full-token`
+- Context (Prow cluster alias): `tke-pingcap-cicd`
 
 Custom usage:
 
 ```sh
-./gencred.sh [namespace] [serviceaccount] [output] [token_secret]
+./gencred.sh [namespace] [serviceaccount] [output] [token_secret] [context]
 ```
 
 ## Install the kubeconfig into `gcp` Prow
 
-After generating the kubeconfig, update the `prow-kubeconfig` Secret in the
-`apps` namespace of the `gcp` cluster:
+The `prow-kubeconfig` Secret in the `apps` namespace of the `gcp` cluster is
+owned by the ExternalSecret in `apps/gcp/prow/pre/secrets/prow-kubeconfig.yaml`,
+which mirrors the GCP Secret Manager secret
+`gcp_prow_external_clusters_kubeconfig`. Do not create or patch that Kubernetes
+Secret by hand: ExternalSecrets reconciles it and would overwrite manual edits.
+
+The Secret Manager value is a multi-context kubeconfig. Prow turns every context
+other than the in-cluster one into a build cluster named after the context, so
+merge the newly generated `tke-pingcap-cicd` context into it and publish a new
+version:
 
 ```sh
-kubectl --context <gcp-context> -n apps create secret generic prow-kubeconfig \
-  --from-file=config=prow-test-pods-k8s-pod-full.conf \
-  --dry-run=client -o yaml | kubectl apply -f -
+gcloud secrets versions access latest \
+  --secret=gcp_prow_external_clusters_kubeconfig \
+  --project=<gcp-project> > external.conf
+
+KUBECONFIG=external.conf:prow-test-pods-k8s-pod-full.conf \
+  kubectl config view --raw --flatten > merged.conf
+
+gcloud secrets versions add gcp_prow_external_clusters_kubeconfig \
+  --project=<gcp-project> --data-file=merged.conf
+```
+
+ExternalSecrets refreshes the Secret every hour; force an immediate sync with:
+
+```sh
+kubectl --context <gcp-context> -n apps annotate externalsecret prow-kubeconfig \
+  force-sync="$(date +%s)" --overwrite
 ```
 
 ## Verify access
@@ -103,9 +131,12 @@ Before updating `gcp` Prow, verify that the generated kubeconfig can manage pods
 in `prow-test-pods`:
 
 ```sh
-kubectl --kubeconfig=prow-test-pods-k8s-pod-full.conf -n prow-test-pods auth can-i create pods
-kubectl --kubeconfig=prow-test-pods-k8s-pod-full.conf -n prow-test-pods auth can-i delete pods
-kubectl --kubeconfig=prow-test-pods-k8s-pod-full.conf -n prow-test-pods auth can-i get pods
+kubectl --kubeconfig=prow-test-pods-k8s-pod-full.conf --context tke-pingcap-cicd \
+  -n prow-test-pods auth can-i create pods
+kubectl --kubeconfig=prow-test-pods-k8s-pod-full.conf --context tke-pingcap-cicd \
+  -n prow-test-pods auth can-i delete pods
+kubectl --kubeconfig=prow-test-pods-k8s-pod-full.conf --context tke-pingcap-cicd \
+  -n prow-test-pods auth can-i get pods
 ```
 
 ## Token Secret lifecycle
