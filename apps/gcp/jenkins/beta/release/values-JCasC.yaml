@@ -200,6 +200,21 @@ controller:
                     value: "github-bot-https"
                   - key: "GIT_CDN_ENABLED"
                     value: "false"
+                  # Mint GitHub App installation tokens from the in-cluster
+                  # token broker instead of using the `ti-chi-bot` SSH key/PAT
+                  # for SAML-enforcing organizations. `pingcap-inc` enforces
+                  # SAML SSO, which rejects the bot's user credentials at
+                  # checkout:
+                  #   ERROR: The 'pingcap-inc' organization has enabled or
+                  #   enforced SAML SSO.
+                  # Only that organization is routed here; every other job keeps
+                  # the SSH/PAT path.
+                  - key: "GIT_BROKER_ENABLED"
+                    value: "true"
+                  - key: "GIT_BROKER_URL"
+                    value: "http://github-token-broker.github-token-broker.svc"
+                  - key: "GIT_BROKER_ORGS"
+                    value: "pingcap-inc"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
                     value: "us-docker.pkg.dev/pingcap-testing-account/hub"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_TIDBX"
