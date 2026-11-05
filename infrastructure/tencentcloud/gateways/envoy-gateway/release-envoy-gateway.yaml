@@ -8,8 +8,17 @@ spec:
   chart:
     spec:
       chart: gateway-helm
-      version: v1.6.3
+      version: v1.9.3
       sourceRef:
         kind: HelmRepository
         name: envoyproxy
         namespace: infra
+  # The chart ships its CRDs (Envoy Gateway's own and the Gateway API bundle) in
+  # the crds/ directory of a subchart. Helm skips them on upgrade by default, so
+  # the controller would run against the old schema; ask helm-controller to
+  # replace them instead. GKE is different: its add-on owns the Gateway API CRDs,
+  # which is why the GCP release applies them out of band and skips chart CRDs.
+  install:
+    crds: Create
+  upgrade:
+    crds: CreateReplace
