@@ -96,7 +96,7 @@ spec:
       replicaCount: 1
       image:
         # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
-        tag: v2026.11.1-18-g7f06b83
+        tag: v2026.11.1-22-ga60864f
       resources:
         # TiUP packages can be several hundred MB (ctl is ~574 MB). The worker
         # streams the OCI layer to disk, but tiup still reads the whole
