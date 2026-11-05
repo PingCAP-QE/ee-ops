@@ -1,0 +1,368 @@
+# Namespace-scoped `delete pods` for the pod-cleaner ServiceAccount
+# (infra/pod-cleaner): one Role + RoleBinding per CI workload namespace.
+#
+# Why this directory exists: the cleaners' ClusterRole is read-only on purpose
+# (`get`/`list` only -- both CronJobs run `kubectl get pods -A` to find stale
+# pods cluster-wide), and the `delete` verb lives here instead, so pod-cleaner
+# can only remove pods in the namespaces listed below. Do NOT move `delete`
+# back into a ClusterRole.
+#
+# The list is explicit, never a wildcard. A new CI/build namespace needs a Role
+# + RoleBinding added here; otherwise its OOMKilled / NotReady leftovers are
+# never cleaned. The CronJob scripts run under `set -eo pipefail`, so a refused
+# delete fails the Job visibly (red Job) rather than silently skipping.
+#
+# Every binding points at the ServiceAccount created by
+# infrastructure/<cluster>/cleaners (its kustomization pins namespace: infra).
+
+---
+# apps: Prow workload namespace (apps/gcp/prow/namespace.yaml); live 2026-11-05: ~160 pods, 128 of them owned by Jobs (prow / ci-dashboard jobs).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# prow-test-pods: ProwJob pods created by plank (bare pods, no ownerReference); live: ~28 pods.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: prow-test-pods
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: prow-test-pods
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# ee-cd: Tekton build namespace (apps/gcp/tekton/configs/0-namespace.yaml) -- one shared namespace, NOT one per repo; live: ~19 pods owned by TaskRun.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: ee-cd
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: ee-cd
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# arc-runners: Actions Runner Controller ephemeral runner pods (apps/gcp/acr-runners/namespaces.yaml); live: 1 runner pod.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: arc-runners
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: arc-runners
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# jenkins-agents: Jenkins Kubernetes-plugin agent pods (apps/gcp/jenkins-agents/namespace.yaml), default agent namespace of the beta instance.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-agents
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-agents
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# jenkins-pd: Jenkins PD build pods (apps/gcp/jenkins/beta/post/pd/namespace.yaml).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-pd
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-pd
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# jenkins-tidb: Jenkins TiDB build pods (apps/gcp/jenkins/beta/post/tidb/namespace.yaml).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tidb
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tidb
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# jenkins-tikv: Jenkins TiKV build pods (apps/gcp/jenkins/beta/post/tikv/namespace.yaml).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tikv
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tikv
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# jenkins-tiflash: Jenkins TiFlash build pods (apps/gcp/jenkins/beta/post/tiflash/namespace.yaml).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tiflash
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tiflash
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# jenkins-tiflow: Jenkins TiFlow build pods (apps/gcp/jenkins/beta/post/tiflow/namespace.yaml).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tiflow
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-tiflow
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra
+
+---
+# jenkins-ticdc: Jenkins TiCDC build pods (apps/gcp/jenkins/beta/post/ticdc/namespace.yaml).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-ticdc
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-cleaner-pod-delete
+  namespace: jenkins-ticdc
+  labels:
+    app.kubernetes.io/name: pod-cleaner
+    app.kubernetes.io/component: pod-delete
+roleRef:
+  kind: Role
+  name: pod-cleaner-pod-delete
+  apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: pod-cleaner
+    namespace: infra

@@ -9,6 +9,7 @@ resources:
   - github-actions-secrets
   - operators
   - cleaners
+  - pod-cleaner-rbac
   - terraform
   - compute-classes
   - storage-classes

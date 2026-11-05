@@ -6,6 +6,7 @@ resources:
   - external-secrets
   - node-pools
   - cleaners
+  - pod-cleaner-rbac
   - gateways
   - operators
   - storage-classes
