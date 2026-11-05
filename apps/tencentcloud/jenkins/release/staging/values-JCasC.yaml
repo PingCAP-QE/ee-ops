@@ -296,3 +296,20 @@ controller:
             customSigningRegion: ${jenkins-artifact-s3-region}
             usePathStyleUrl: false
             disableSessionToken: true
+
+      # Administrative action logging. Staging-only first: the plugin version is
+      # pinned against the controller core, and a JCasC schema mistake here would
+      # keep the controller from starting, so it is validated on this instance
+      # before prod/gcp get it.
+      audit-trail: |
+        unclassified:
+          audit-trail:
+            logBuildCause: true
+            logCredentialsUsage: true
+            logScriptUsage: true
+            logAuthEvents: true
+            loggers:
+              - hudson.plugins.audit_trail.ConsoleAuditLogger:
+                  output: STD_OUT
+                  dateFormat: "yyyy-MM-dd HH:mm:ss"
+                  logPrefix: "audit"
