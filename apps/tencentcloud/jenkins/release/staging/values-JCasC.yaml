@@ -309,7 +309,11 @@ controller:
             logScriptUsage: true
             logAuthEvents: true
             loggers:
-              - hudson.plugins.audit_trail.ConsoleAuditLogger:
+              # JCasC keys an AuditLogger by its descriptor symbol, not by the
+              # implementation's fully-qualified name; `Console` is the symbol
+              # the plugin registers. `output` and `dateFormat` are constructor
+              # arguments and therefore mandatory.
+              - console:
                   output: STD_OUT
                   dateFormat: "yyyy-MM-dd HH:mm:ss"
                   logPrefix: "audit"
