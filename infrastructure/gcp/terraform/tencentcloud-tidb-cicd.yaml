@@ -1,9 +1,12 @@
+# Plan approval is manual on purpose: see the note in
+# gcp-pingcap-testing-account.yaml. The controller publishes the pending plan
+# in `.status.plan.pending`; applying it means putting that name into
+# `approvePlan` in a reviewed commit. Do not set it back to `auto`.
 apiVersion: infra.contrib.fluxcd.io/v1alpha2
 kind: Terraform
 metadata:
   name: tencentcloud-tidb-cicd
 spec:
-  approvePlan: auto
   interval: 1h
   retryInterval: 5m
   destroyResourcesOnDeletion: true

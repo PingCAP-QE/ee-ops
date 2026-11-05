@@ -3,17 +3,26 @@
 # Prerequisites:
 #   1. GCP Workload Identity is configured (see tofu-controller/post/runner-workload-identity.yaml)
 #   2. The GCP SA has roles/storage.admin permission
-#   3. Update the spec.approvePlan when you're ready to apply
+#
+# Plan approval is manual on purpose. `approvePlan: auto` makes the controller
+# apply every plan it produces with the runner's cloud credentials, so a git
+# change (or a drift-driven plan) reaches GCP without a second pair of eyes.
+# Instead, the controller publishes the plan it wants to apply in
+# `.status.plan.pending`; to apply it, put that plan name in `approvePlan` in a
+# reviewed commit:
+#
+#   kubectl -n flux-system get terraform gcp-pingcap-testing-account \
+#     -o jsonpath='{.status.plan.pending}'
+#
+# Do not set this back to `auto`. Destroying the resources (deleting this CR)
+# goes through the same approval, because the destroy plan is a plan too.
 apiVersion: infra.contrib.fluxcd.io/v1alpha2
 kind: Terraform
 metadata:
   name: gcp-pingcap-testing-account
 spec:
-  approvePlan: auto
   interval: 1h
   retryInterval: 5m
-  # Set to "auto" to auto-apply plans:
-  # approvePlan: auto
   destroyResourcesOnDeletion: true
   sourceRef:
     kind: GitRepository
