@@ -19,6 +19,11 @@ controller:
 
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
+    # Administrative action logging (who configured/deleted a job, ran a Groovy
+    # script, used a credential). Console logger writes to the controller's stdout,
+    # so the existing pod log pipeline collects it without extra infrastructure.
+    # Requires Jenkins core >= 2.555.3; this controller runs 2.580.2.
+    - audit-trail:472.vb_51e5934ec50
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
     - artifact-manager-s3:973.v6a_51253e896b_
