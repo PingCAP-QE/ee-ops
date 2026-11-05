@@ -43,7 +43,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2 versioning=semver
-      tag: v2026.11.1-18-g7f06b83
+      tag: v2026.11.1-23-gc452c3d
     server:
       # prod2 only keeps the two TiUP publish workers. The API has no consumers:
       # both do2.pingcap.net/tibuild and internal2-do.pingcap.net/tibuild have
