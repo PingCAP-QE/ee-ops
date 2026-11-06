@@ -3,7 +3,6 @@ kind: Kustomization
 resources:
   - rbac.yaml
   - webhook-secret.yaml
-  - network-policy.yaml
   - el-github.yaml
   - el-harbor.yaml
   - el-notify.yaml
