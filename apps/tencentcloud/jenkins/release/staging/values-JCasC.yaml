@@ -105,14 +105,15 @@ controller:
           - global:
               strategy: "triggeringUsersAuthorizationStrategy"
       globalJobDslSecurityConfiguration:
-        # Temporarily off. `sandbox(true)` on the seed job below needs the
-        # build to run as a real user, but every build on this instance runs as
-        # ACL.SYSTEM (no authorize-project / QueueItemAuthenticator in JCasC),
-        # so Job DSL aborted with: "You must configure the DSL job to run as a
-        # specific user in order to use the Groovy sandbox." Re-enable this and
-        # the seed sandbox in the same change that adds authorize-project plus
-        # its init script.
-        useScriptSecurity: false
+        # Job DSL script-security gate ON (mode B). Its prerequisite is in
+        # place: authorize-project is configured above (`queueItemAuthenticator`)
+        # and staging seed #42 ran as `Running as Flare Zuo` instead of SYSTEM
+        # and finished SUCCESS, so the sandbox now has a real user to run as.
+        # The plugin's JobDslWhitelist permits the Job DSL methods used by the
+        # pure-DSL job definitions in PingCAP-QE/ci, so no per-script approval
+        # is needed. Rollback: set this and the seed's sandbox back to `false`,
+        # then restart the controller so the JCasC ConfigMap is re-read.
+        useScriptSecurity: true
       gitHostKeyVerificationConfiguration:
         sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
 
@@ -202,11 +203,15 @@ controller:
                     removedConfigFilesAction('DELETE')
                     removedViewAction('DELETE')
                     lookupStrategy('SEED_JOB')
-                    // Keep the sandbox off until this instance authenticates
-                    // builds as the triggering user (authorize-project + its
-                    // init script): the Groovy sandbox refuses a build that is
-                    // authenticated as SYSTEM.
-                    sandbox(false)
+                    // Run the Job DSL inside the Groovy sandbox, paired with
+                    // `useScriptSecurity: true` above (mode B). The build runs
+                    // as the triggering user via authorize-project, which the
+                    // sandbox requires. A rejected script fails this build
+                    // before generated jobs are updated, so jobs stop being
+                    // synced but are never deleted. Rollback: `false` here
+                    // together with `useScriptSecurity: false`, then restart the
+                    // controller.
+                    sandbox(true)
                   }
                 }
               }
