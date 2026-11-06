@@ -87,15 +87,37 @@ controller:
 
     # for security.
     security:
+      queueItemAuthenticator:
+        # Access Control for Builds (authorize-project): run each build as the
+        # user who triggered it instead of the default ACL.SYSTEM identity.
+        # This is the precondition for the Job DSL Groovy sandbox -- job-dsl's
+        # SandboxDslScriptLoader refuses a build authenticated as SYSTEM, which
+        # is what failed the tencent staging seed #40 before this precondition
+        # existed.
+        # Already validated on tencent staging: seed #42/#43 ran as the
+        # triggering user. Builds with no triggering user (timer, SCM poll,
+        # remote trigger without a user cause) keep the previous SYSTEM
+        # behaviour: the strategy returns null and the next authenticator
+        # applies.
+        # Declarative JCasC form, checked against the pinned versions: core
+        # 2.580.2 (`@Symbol("queueItemAuthenticator")`, Security category),
+        # configuration-as-code 2143 (category + DescribableAttribute naming),
+        # authorize-project 534.
+        authenticators:
+          - global:
+              strategy: "triggeringUsersAuthorizationStrategy"
       globalJobDslSecurityConfiguration:
-        # Enable the Job DSL script-security gate, paired with `sandbox(true)`
-        # on the seed job below (mode B). The plugin's JobDslWhitelist allows
-        # Job DSL methods, so the pure-DSL definitions in PingCAP-QE/ci need no
-        # per-script approval, while arbitrary Groovy in a seed script has to
-        # pass the sandbox. First enabled on tencent staging (#2643). Rollback
-        # is the pair of lines: set this and the seed's sandbox back to
-        # `false`, then restart the controller so the JCasC ConfigMap is
-        # re-read.
+        # Enable the Job DSL script-security gate (mode B), paired with
+        # `sandbox(true)` on the seed job below. The authorize-project
+        # precondition above is in place on this instance: seed #29 ran as
+        # `Running as Flare Zuo` instead of SYSTEM and finished SUCCESS.
+        # Staging enabled this first (#2651) and is verified there: seed #43 ran
+        # as `Running as Flare Zuo`, finished SUCCESS, generated 437 DSL jobs,
+        # and /scriptApproval/ showed 0 pending -- the plugin's JobDslWhitelist
+        # permits the pure-DSL definitions in PingCAP-QE/ci, while arbitrary
+        # Groovy in a seed script does not pass the sandbox.
+        # Rollback is the pair of lines: set this and the seed's sandbox back to
+        # `false`, then restart the controller so the JCasC ConfigMap is re-read.
         useScriptSecurity: true
       gitHostKeyVerificationConfiguration:
         sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
@@ -186,13 +208,13 @@ controller:
                     removedConfigFilesAction('DELETE')
                     removedViewAction('DELETE')
                     lookupStrategy('SEED_JOB')
-                    // Paired with `useScriptSecurity: true` above (mode B): the
-                    // Job DSL runs in the Groovy sandbox, where JobDslWhitelist
-                    // permits the DSL methods but blocks arbitrary Groovy. A
-                    // rejected script fails this build before jobs are updated,
-                    // so jobs stop being synced but are not deleted. Rollback:
-                    // back to `false` together with `useScriptSecurity: false`,
-                    // then restart the controller.
+                    // Run the Job DSL inside the Groovy sandbox, paired with
+                    // `useScriptSecurity: true` above (mode B). Staging runs this
+                    // combination successfully (seed #43, 0 pending approvals).
+                    // A rejected script fails this build before generated jobs
+                    // are updated, so jobs stop being synced but are never
+                    // deleted. Rollback: `false` here together with
+                    // `useScriptSecurity: false`, then restart the controller.
                     sandbox(true)
                   }
                 }
