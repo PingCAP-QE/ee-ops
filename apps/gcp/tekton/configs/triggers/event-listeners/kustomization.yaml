@@ -7,3 +7,4 @@ resources:
   - el-harbor.yaml
   - el-notify.yaml
   - el-tibuild.yaml
+  - tibuild-webhook-secret.yaml
