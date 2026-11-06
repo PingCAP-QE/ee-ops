@@ -51,6 +51,33 @@ Symptoms seen in production (2026-11-06, `personal/liting/br-basic-test`):
 `ci-bot` / `cd-bot` are unaffected: they authenticate with htpasswd passwords, so their
 config-defined groups (`pullers` / `pushers`) are applied.
 
+## Isolation is enforced per user
+
+The `users` grant says *who may push to `personal/**` at all*; the CEL condition says
+*which sub-path*. Both must hold, so a listed user can only write `personal/<own-local-part>/`
+and a non-listed user can write nothing under `personal/`.
+
+Verified on zot `v2.1.18` with this exact policy shape in a throwaway namespace (API-key
+authentication, i.e. the same path production uses; the meta-DB group set was empty):
+
+| request (`POST /v2/<repo>/blobs/uploads/`) | identity | result |
+|---|---|---|
+| `personal/alice/app` | apikey of `alice@test` | `202` |
+| `personal/alice/team/app` | apikey of `alice@test` | `202` |
+| `personal/bob/app` | apikey of `alice@test` | `403` `only your personal namespace` |
+| `personal/alice-evil/app` (prefix trick) | apikey of `alice@test` | `403` `only your personal namespace` |
+| `personal/alice/app` | wrong apikey | `401` |
+| `personal/alice/app` | `-u bob@test -p <alice's key>` | `401` |
+| anything | anonymous | `401` |
+
+A `403` that carries the `reason` detail means the policy matched and the condition
+rejected it; a `403` without `reason` means no policy matched (the bug this document
+describes).
+
+`personal/**` keeps `defaultPolicy: ["read"]`, so reads (and kubelet/CI pulls of
+`personal/<user>/<image>`, e.g. `personal/wuhui.zuo/git_cdn`) stay available to any
+authenticated identity — write isolation does not depend on it.
+
 ## Adding a user
 
 1. Append the email to `tencentcloud_zot_personal_users` in GCP Secret Manager
