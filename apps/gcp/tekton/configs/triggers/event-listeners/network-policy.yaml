@@ -1,0 +1,64 @@
+# Who may deliver events to the EventListeners.
+#
+# NetworkPolicy is default-allow. Selecting a pod here switches it to
+# deny-by-default for the listed policy types, so only the sources below can
+# reach it. Scope is deliberately limited to the two listeners whose senders are
+# known:
+#   * tibuild  <- the in-cluster tibuild-v2 service (namespace `tibuild`).
+#     It sends CloudEvents for devbuild/hotfix; those events carry no signature,
+#     so anyone with a pod in the cluster could otherwise forge one and drive a
+#     build.
+#   * github   <- Prow (namespace `apps`), whose prow-tekton plugin forwards the
+#     original GitHub payload. The GitHub HMAC is verified by the listener, this
+#     policy adds the network layer.
+# `harbor` and `notify` are intentionally not covered yet: their senders still
+# need to be identified before restricting them.
+#
+# Rollback: delete these NetworkPolicy objects; traffic returns to
+# default-allow immediately.
+#
+# VALIDATION REQUIRED BEFORE MERGE
+# kubelet readiness probes originate from the node, not from a pod. If this
+# cluster's CNI enforces policy for host-to-pod traffic, the EventListener will
+# never become ready and NO CI event will be delivered. Validate on TKE first
+# (`kubectl -n ee-cd get pods -l eventlistener=tibuild` must stay Ready for
+# 10+ minutes and a devbuild must still trigger), then roll out to GCP.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: el-tibuild-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: EventListener
+      eventlistener: tibuild
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tibuild
+      ports:
+        - protocol: TCP
+          port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: el-github-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/managed-by: EventListener
+      eventlistener: github
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: apps
+      ports:
+        - protocol: TCP
+          port: 8080
