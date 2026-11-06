@@ -75,9 +75,6 @@
         },
         "pushers": {
           "users": ["cd-bot"]
-        },
-        "personal": {
-          "users": ${PERSONAL_USERS}
         }
       },
       "repositories": {
@@ -88,7 +85,7 @@
         "personal/**": {
           "policies": [
             {
-              "groups": ["personal"],
+              "users": ${PERSONAL_USERS},
               "actions": ["read", "create", "update", "delete"],
               "conditions": [
                 {
