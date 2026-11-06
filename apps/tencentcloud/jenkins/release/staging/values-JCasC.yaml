@@ -87,6 +87,23 @@ controller:
 
     # for security.
     security:
+      queueItemAuthenticator:
+        # Access Control for Builds (authorize-project): run each build as the
+        # user who triggered it instead of the default ACL.SYSTEM identity.
+        # This is the precondition for the Job DSL Groovy sandbox -- job-dsl's
+        # SandboxDslScriptLoader refuses a build authenticated as SYSTEM, which
+        # is why the staging seed failed with "You must configure the DSL job to
+        # run as a specific user in order to use the Groovy sandbox" (seed #40).
+        # Builds with no triggering user (timer, SCM poll, remote trigger
+        # without a user cause) keep the previous SYSTEM behaviour: the strategy
+        # returns null and the next authenticator applies.
+        # Declarative JCasC form, checked against the pinned versions: core
+        # 2.580.2 (`@Symbol("queueItemAuthenticator")`, Security category),
+        # configuration-as-code 2143 (category + DescribableAttribute naming),
+        # authorize-project 534.
+        authenticators:
+          - global:
+              strategy: "triggeringUsersAuthorizationStrategy"
       globalJobDslSecurityConfiguration:
         # Staging-first enable of the Job DSL script-security gate, paired with
         # `sandbox(true)` on the seed job below (mode B). The plugin's
