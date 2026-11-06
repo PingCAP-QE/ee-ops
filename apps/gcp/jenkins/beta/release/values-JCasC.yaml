@@ -110,7 +110,18 @@ controller:
           - global:
               strategy: "triggeringUsersAuthorizationStrategy"
       globalJobDslSecurityConfiguration:
-        useScriptSecurity: false
+        # Enable the Job DSL script-security gate (mode B), paired with
+        # `sandbox(true)` on the seed job below. The authorize-project
+        # precondition above is in place on this instance: seed #81 ran as
+        # `Running as Flare Zuo` instead of SYSTEM and finished SUCCESS.
+        # Staging enabled this first (#2651) and is verified there: seed #43 ran
+        # as `Running as Flare Zuo`, finished SUCCESS, generated 437 DSL jobs,
+        # and /scriptApproval/ showed 0 pending -- the plugin's JobDslWhitelist
+        # permits the pure-DSL definitions in PingCAP-QE/ci, while arbitrary
+        # Groovy in a seed script does not pass the sandbox.
+        # Rollback is the pair of lines: set this and the seed's sandbox back to
+        # `false`, then restart the controller so the JCasC ConfigMap is re-read.
+        useScriptSecurity: true
       gitHostKeyVerificationConfiguration:
         sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
 
@@ -196,7 +207,14 @@ controller:
                     removedConfigFilesAction('DELETE')
                     removedViewAction('DELETE')
                     lookupStrategy('SEED_JOB')
-                    sandbox(false)
+                    // Run the Job DSL inside the Groovy sandbox, paired with
+                    // `useScriptSecurity: true` above (mode B). Staging runs this
+                    // combination successfully (seed #43, 0 pending approvals).
+                    // A rejected script fails this build before generated jobs
+                    // are updated, so jobs stop being synced but are never
+                    // deleted. Rollback: `false` here together with
+                    // `useScriptSecurity: false`, then restart the controller.
+                    sandbox(true)
                   }
                 }
               }
