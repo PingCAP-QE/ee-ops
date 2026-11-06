@@ -1,5 +1,20 @@
 # please see: https://github.com/jenkinsci/helm-charts/blob/main/charts/jenkins/VALUES_SUMMARY.md
 controller:
+  # Download plugins directly from a mainland mirror instead of following the
+  # updates.jenkins.io redirect to overseas mirrors (mirror.dst.ca,
+  # mirror.globo, ...), which time out from this cluster. Same setting as the
+  # tencentcloud instances, where the plugin install finishes in ~5 minutes;
+  # without it the init container here took ~53 minutes for 130 plugins
+  # (installLatestPlugins resolves every plugin against the update center),
+  # which exceeds the HelmRelease's 15m `spec.timeout` and made every upgrade
+  # fail with `timeout waiting for StatefulSet/jenkins status: InProgress`.
+  initContainerEnv:
+    - name: JENKINS_UC_DOWNLOAD_URL
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/plugins
+  containerEnv:
+    - name: JENKINS_UC_DOWNLOAD_URL
+      value: https://mirrors.tuna.tsinghua.edu.cn/jenkins/plugins
+
   overwritePlugins: true
   installLatestPlugins: true
 
