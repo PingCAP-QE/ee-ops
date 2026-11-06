@@ -39,6 +39,15 @@ controller:
     # so the existing pod log pipeline collects it without extra infrastructure.
     # Requires Jenkins core >= 2.555.3; this controller runs 2.580.2.
     - audit-trail:472.vb_51e5934ec50
+    # Access Control for Builds: lets builds run as the user who triggered them
+    # (QueueItemAuthenticator + TriggeringUsersAuthorizationStrategy), the
+    # precondition for the Job DSL Groovy sandbox. The mapping itself is
+    # declarative in values-JCasC.yaml (`security.queueItemAuthenticator`).
+    # Already validated on tencent staging (#2649): seed #42/#43 ran as the
+    # triggering user instead of SYSTEM.
+    # requiredCore 2.479.3 <= this controller's 2.580.2; the only advisory for
+    # this plugin (SECURITY-3010) applies to versions <= 1.7.2.
+    - authorize-project:534.v2f208c45e11c
     # Ref: https://github.com/jenkinsci/plugin-installation-manager-tool#plugin-input-format
     # but without outer `plugin` key.
     - artifact-manager-s3:973.v6a_51253e896b_
