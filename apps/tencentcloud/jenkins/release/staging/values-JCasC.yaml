@@ -88,14 +88,14 @@ controller:
     # for security.
     security:
       globalJobDslSecurityConfiguration:
-        # Staging-first enable of the Job DSL script-security gate, paired with
-        # `sandbox(true)` on the seed job below (mode B). The plugin's
-        # JobDslWhitelist allows Job DSL methods, so the pure-DSL definitions in
-        # PingCAP-QE/ci need no per-script approval, while arbitrary Groovy in a
-        # seed script has to pass the sandbox. Rollback is the pair of lines:
-        # set this and the seed's sandbox back to `false`, then restart the
-        # controller so the JCasC ConfigMap is re-read.
-        useScriptSecurity: true
+        # Temporarily off. `sandbox(true)` on the seed job below needs the
+        # build to run as a real user, but every build on this instance runs as
+        # ACL.SYSTEM (no authorize-project / QueueItemAuthenticator in JCasC),
+        # so Job DSL aborted with: "You must configure the DSL job to run as a
+        # specific user in order to use the Groovy sandbox." Re-enable this and
+        # the seed sandbox in the same change that adds authorize-project plus
+        # its init script.
+        useScriptSecurity: false
       gitHostKeyVerificationConfiguration:
         sshHostKeyVerificationStrategy: "noHostKeyVerificationStrategy"
 
@@ -185,14 +185,11 @@ controller:
                     removedConfigFilesAction('DELETE')
                     removedViewAction('DELETE')
                     lookupStrategy('SEED_JOB')
-                    // Paired with `useScriptSecurity: true` above (mode B): the
-                    // Job DSL runs in the Groovy sandbox, where JobDslWhitelist
-                    // permits the DSL methods but blocks arbitrary Groovy. A
-                    // rejected script fails this build before jobs are updated,
-                    // so jobs stop being synced but are not deleted. Rollback:
-                    // back to `false` together with `useScriptSecurity: false`,
-                    // then restart the controller.
-                    sandbox(true)
+                    // Keep the sandbox off until this instance authenticates
+                    // builds as the triggering user (authorize-project + its
+                    // init script): the Groovy sandbox refuses a build that is
+                    // authenticated as SYSTEM.
+                    sandbox(false)
                   }
                 }
               }
