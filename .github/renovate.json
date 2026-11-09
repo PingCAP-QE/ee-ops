@@ -4,6 +4,9 @@
   "jenkins": {
     "enabled": true
   },
+  "flux": {
+    "managerFilePatterns": ["/^apps/gcp/acr-runners/.*\\.ya?ml$/"]
+  },
   "customManagers": [
     {
       "customType": "regex",
@@ -41,6 +44,31 @@
         "clusters/prod2/flux-system/gotk-components.yaml"
       ],
       "enabled": false
+    },
+    {
+      "description": "Open GCP ARC upgrade PRs during normal Renovate runs",
+      "matchManagers": ["flux"],
+      "matchFileNames": ["apps/gcp/acr-runners/**"],
+      "enabled": true,
+      "schedule": ["at any time"],
+      "dependencyDashboardApproval": false,
+      "automerge": false,
+      "ignoreUnstable": true
+    },
+    {
+      "description": "Upgrade the GCP ARC controller and runner scale-set charts together",
+      "matchManagers": ["flux"],
+      "matchFileNames": ["apps/gcp/acr-runners/**"],
+      "matchDepTypes": ["HelmChart"],
+      "groupName": "GCP Actions Runner Controller charts",
+      "groupSlug": "gcp-arc-charts"
+    },
+    {
+      "description": "Keep the GCP Actions runner image pinned when updating its tag or digest",
+      "matchManagers": ["flux"],
+      "matchFileNames": ["apps/gcp/acr-runners/**"],
+      "matchPackageNames": ["ghcr.io/actions/actions-runner"],
+      "pinDigests": true
     }
   ]
 }

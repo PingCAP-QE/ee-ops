@@ -26,8 +26,8 @@ spec:
         automountServiceAccountToken: false
         containers:
           - name: runner
-            # Pin instead of :latest so upstream cannot swap the runner image
-            # under us (2.338.2 is what :latest resolves to at the time).
+            # Pin the runner tag and digest so upgrades are reviewed through
+            # Renovate PRs.
             image: ghcr.io/actions/actions-runner:2.338.2@sha256:759a1d94a15b05941aba5196974ff43fe15b4cbba29b694b35cbc32a1166b232
             command: ["/home/runner/run.sh"]
             securityContext:
