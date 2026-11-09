@@ -99,15 +99,15 @@
           "defaultPolicy": ["read"]
         },
         "ttl-1h/**": {
-          "anonymousPolicy": ["read"],
+          "anonymousPolicy": [],
           "defaultPolicy": ["read", "create", "update"]
         },
         "ttl-1d/**": {
-          "anonymousPolicy": ["read"],
+          "anonymousPolicy": [],
           "defaultPolicy": ["read", "create", "update"]
         },
         "ttl-1w/**": {
-          "anonymousPolicy": ["read"],
+          "anonymousPolicy": [],
           "defaultPolicy": ["read", "create", "update"]
         },
         "**": {
