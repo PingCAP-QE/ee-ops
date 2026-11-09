@@ -709,9 +709,13 @@ metadata:
   labels:
     app.kubernetes.io/name: cost-insight-sync-aws-f04-billing-summary
     app.kubernetes.io/part-of: cost-insight
+  annotations:
+    repair.pingcap.com/source: warehouse-f80fbbe8e8.raw_aws_billing.cur_line_items
+    repair.pingcap.com/source-commit: 462f6518c4078b6636793000633e0b2a6fd591b5
+    repair.pingcap.com/account: "380838443567"
 spec:
-  # The source passed dry-run and backfill validation; its dedicated bounded job
-  # keeps this profile out of the general monthly AWS sync.
+  # Historical recovery is verified. Stage this new template while the live hold
+  # is retained, then release only F04 after the approved cutover in F04_WAREHOUSE.md.
   schedule: "30 23 * * *"
   timeZone: Asia/Shanghai
   suspend: false
@@ -721,54 +725,29 @@ spec:
   failedJobsHistoryLimit: 5
   jobTemplate:
     spec:
-      backoffLimit: 2
+      backoffLimit: 0
       activeDeadlineSeconds: 7200
+      ttlSecondsAfterFinished: 1209600
       template:
         metadata:
           labels:
             app.kubernetes.io/name: cost-insight-sync-aws-f04-billing-summary
             app.kubernetes.io/part-of: cost-insight
         spec:
-          serviceAccountName: ci-dashboard
+          serviceAccountName: cost-insight-gcp-billing
           restartPolicy: Never
           containers:
             - name: sync-aws-f04-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.9.20-8-ged5b3ac
+              # v2026.11.8-2-g462f651; release run 42621120435 (amd64 + arm64).
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:e2b633b85f3dd814a0227ce2fe7fc70ed0b8b84339e7851f742562db1e36c92a
               imagePullPolicy: IfNotPresent
-              command:
-                - /bin/sh
-                - -ec
+              command: [cost-insight]
               args:
-                - |
-                  bounds="$(python - <<'PY'
-                  from datetime import UTC, datetime, timedelta
-
-                  usage_end = datetime.now(UTC).date() - timedelta(days=1)
-                  usage_start = usage_end - timedelta(days=4)
-                  print(
-                      usage_start.isoformat(),
-                      usage_end.isoformat(),
-                      usage_start.replace(day=1).isoformat(),
-                      usage_end.replace(day=1).isoformat(),
-                  )
-                  PY
-                  )"
-                  set -- ${bounds}
-                  summary_json_path=/tmp/summary.json
-                  cost-insight sync-aws-billing-summary \
-                    --account-id 380838443567 \
-                    --usage-start-date "$1" \
-                    --usage-end-date "$2" \
-                    --earliest-usage-date "$1" \
-                    --export-partition-start "$3" \
-                    --export-partition-end "$4" > "${summary_json_path}"
-                  cat "${summary_json_path}"
-                  cost-insight refresh-cost-attribution-from-summary \
-                    --vendor aws \
-                    --account-id 380838443567 \
-                    --start-date "$1" \
-                    --end-date "$2" \
-                    --split-by-day
+                - sync-warehouse-billing-summary
+                - --vendor
+                - aws
+                - --account-id
+                - "380838443567"
               envFrom:
                 - secretRef:
                     name: ci-dashboard-eq-prd-insight-db
@@ -778,9 +757,19 @@ spec:
                 - name: COST_INSIGHT_LOG_LEVEL
                   value: INFO
                 - name: GOOGLE_CLOUD_PROJECT
-                  value: pingcap-testing-account
-                - name: COST_INSIGHT_AWS_SYNC_PAGE_SIZE
-                  value: "1000"
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_PROJECT
+                  value: warehouse-f80fbbe8e8
+                - name: COST_INSIGHT_BILLING_BQ_LOCATION
+                  value: us-west1
+                - name: COST_INSIGHT_BILLING_BQ_IMPERSONATE_SERVICE_ACCOUNT
+                  value: ""
+                - name: COST_INSIGHT_TCMS_ALLOCATION_TABLE
+                  value: tcms_cost.resource_allocation
+                - name: POD_NAME
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.name
               resources:
                 requests:
                   cpu: "500m"
