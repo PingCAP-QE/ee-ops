@@ -6,6 +6,8 @@ Both CronJobs use `cost-insight sync-warehouse-billing-summary` from the applica
 image. Query adaptation, validation, scoped replacement, attribution and native
 publication live in `ee-apps/cost-insight`, not an ops ConfigMap.
 
+The following is the initial migration baseline; the Azure-only update is recorded below.
+
 - Application: [ee-apps #804](https://github.com/PingCAP-QE/ee-apps/pull/804),
   merged on 2026-10-31 as `e71fd9245fd3084d198cbfb1b3ea91053da67847`.
 - Official main release:
@@ -37,6 +39,28 @@ replacement. Empty days and oversized backlogs fail closed. Each day verifies
 summary → attribution → active native publication before continuing. Recent dates
 remain provisional; revisions older than five days require a separate repair.
 See the application README for the complete command contract and its tests.
+
+## Azure account-default release — 2026-11-09
+
+Only `sync-azure-warehouse-summary` advances to application
+[ee-apps #875](https://github.com/PingCAP-QE/ee-apps/pull/875), merged as
+`20e7d9e7042d12eea0268889066fd03e0fca33ab`. AWS and every other CronJob retain
+their existing images, schedules, source identities and suspension/Flux holds.
+
+- Release: [run 42588674762, attempt 2](https://github.com/PingCAP-QE/ee-apps/actions/runs/42588674762/attempts/2).
+- Verified tag: `v2026.11.8-1-g20e7d9e`.
+- Verified amd64 + arm64 manifest digest:
+  `sha256:d1df62338074852d0c8b828ee1835a4f69d6b22b5e6dda37f7a1feeebc7a4694`.
+- Attempt 1 was green but its push was canceled and neither release tag existed;
+  attempt 2 completed both platform pushes and published the verified manifest.
+- This enables explicit same-account `{}` TCMS default allocations with non-NULL
+  owners, including allocation `1030863` for the Azure subscription above.
+- Application validation: 742 tests passed, 91.82% total coverage; the independent
+  DeepSeek review/fix/verification loop has no open issues.
+- This image-only release does not backfill history. After rollout, the approved
+  account-scoped historical refresh from 2026-09-01 must run separately through
+  the latest imported usage date, in sequential in-GKE batches, preserving all
+  four monetary fields and verifying owner/service/project and native publication.
 
 ## Migration checks — 2026-10-30
 
