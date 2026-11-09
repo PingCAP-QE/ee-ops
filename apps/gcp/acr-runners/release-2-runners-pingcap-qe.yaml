@@ -21,9 +21,13 @@ spec:
     maxRunners: 10
     template:
       spec:
-        # Runner registration is delivered via JIT config; the pod does not
-        # need to talk to the API server.
-        automountServiceAccountToken: false
+        # Runner registration is delivered via JIT config, so the runner itself
+        # does not need the API server. The projected ServiceAccount token is
+        # mounted for the workloads instead: in-cluster services that authenticate
+        # callers with TokenReview (the github-token-broker) need to know which
+        # workload is asking. The chart's ServiceAccount carries no RBAC
+        # bindings, so the token cannot reach the API server.
+        automountServiceAccountToken: true
         containers:
           - name: runner
             # Pin instead of :latest so upstream cannot swap the runner image
