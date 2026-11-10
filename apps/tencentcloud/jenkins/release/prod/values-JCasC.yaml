@@ -277,6 +277,8 @@ controller:
                     value: "cr-qcloud.pingcap.net/mirrors/hub"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_DEV"
                     value: "cr-qcloud.pingcap.net/mirrors/dev"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_GHCR"
+                    value: "cr-qcloud.pingcap.net/mirrors/ghcr"
                   - key: "RUSTUP_DIST_SERVER"
                     value: "https://rsproxy.cn"
                   - key: "RUSTUP_UPDATE_ROOT"

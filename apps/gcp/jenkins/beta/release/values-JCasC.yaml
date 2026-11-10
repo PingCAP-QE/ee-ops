@@ -262,6 +262,8 @@ controller:
                     value: "us-docker.pkg.dev/pingcap-testing-account/hub"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_DEV"
                     value: "us-docker.pkg.dev/pingcap-testing-account/dev"
+                  - key: "_JENKINS_OCI_ARTIFACT_HOST_GHCR"
+                    value: "ghcr.io"
 
       pipeline-cache: |
         unclassified:
