@@ -14,6 +14,59 @@ spec:
         kind: HelmRepository
         name: kyverno
         namespace: flux-system
+  # The admission controller enforces this cluster's policies and runs with the
+  # privileges needed to mutate/reject every workload, so its images (and the
+  # other Kyverno controllers') are pinned by digest: the chart exposes only
+  # `registry`/`repository`/`tag`, which would let a registry swap the image
+  # under an existing tag. Digests below are the ones the running pods already
+  # have, and they match the upstream `ghcr.io` digests of these tags.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: kyverno-admission-controller
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/image
+                value: ghcr.io/kyverno/kyverno:v1.18.2@sha256:0a540e2ddf74d0d2d3d45f9ef248d7dbc96576accdbcc6a2dd7eaff9fea56504
+              - op: replace
+                path: /spec/template/spec/initContainers/0/image
+                value: ghcr.io/kyverno/kyvernopre:v1.18.2@sha256:cd8cb4a31d25b3992734fb8f24a90ef691c90ce49338c89bea96792160eacb98
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: kyverno-background-controller
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/image
+                value: ghcr.io/kyverno/background-controller:v1.18.2@sha256:d62566ce41bd0d4a32bf2cf44b9ebfc02c36374f821f83070890287f62f68671
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: kyverno-cleanup-controller
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/image
+                value: ghcr.io/kyverno/cleanup-controller:v1.18.2@sha256:b0395d29ae332276e6910eb40418be9bc127c068d659f90aa1bcddd6be99ccb4
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: kyverno-reports-controller
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/image
+                value: ghcr.io/kyverno/reports-controller:v1.18.2@sha256:f09cf305170014e191b94e1c54f5be73163d8824eefad49349675c4efe43159a
+  # Not pinned: the `kyverno-migrate-resources` CRD-migration Job (a Helm hook,
+  # `kyverno-cli`). It runs once per chart upgrade, does not stay resident, and
+  # a Job's pod template is immutable, so patching it here would fail the
+  # release instead of securing it. It still pulls `kyverno-cli` from the same
+  # first-party registry.
   values:
     global:
       nodeSelector:
@@ -22,17 +75,17 @@ spec:
     admissionController:
       container:
         image:
-          registry: ghcr.nju.edu.cn
+          registry: ghcr.io
       initContainer:
         image:
-          registry: ghcr.nju.edu.cn
+          registry: ghcr.io
       autoscaling:
         enabled: true
         minReplicas: 1
         maxReplicas: 3
     backgroundController:
       image:
-        registry: ghcr.nju.edu.cn
+        registry: ghcr.io
       autoscaling:
         enabled: true
         minReplicas: 1
@@ -46,23 +99,19 @@ spec:
               verbs: ["get", "list", "watch", "delete"]
     cleanupController:
       image:
-        registry: ghcr.nju.edu.cn
+        registry: ghcr.io
       autoscaling:
         enabled: true
         minReplicas: 1
         maxReplicas: 2
     reportsController:
       image:
-        registry: ghcr.nju.edu.cn
+        registry: ghcr.io
       autoscaling:
         enabled: true
         minReplicas: 1
         maxReplicas: 2
-    policyReportsCleanup:
-      image:
-        registry: mirror.ccs.tencentyun.com
-        tag: latest
     crds:
       migration:
         image:
-          registry: ghcr.nju.edu.cn
+          registry: ghcr.io

@@ -13,9 +13,43 @@ spec:
         kind: HelmRepository
         name: external-secrets
         namespace: flux-system
+  # This controller holds the GCP Secret Manager credential and can read every
+  # secret in `pingcap-testing-account`, so its images are pinned by digest:
+  # the chart has no `digest` value, and a tag-only reference would let whoever
+  # controls the registry swap the image under an existing tag.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: external-secrets
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/image
+                value: ghcr.io/external-secrets/external-secrets:v2.8.0@sha256:24c0dd3699e0988520afd2218612758cd97d1f702757b5b4fcf89adaa33ef679
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: external-secrets-webhook
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/image
+                value: ghcr.io/external-secrets/external-secrets:v2.8.0@sha256:24c0dd3699e0988520afd2218612758cd97d1f702757b5b4fcf89adaa33ef679
+          - target:
+              group: apps
+              version: v1
+              kind: Deployment
+              name: external-secrets-cert-controller
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/image
+                value: ghcr.io/external-secrets/external-secrets:v2.8.0@sha256:24c0dd3699e0988520afd2218612758cd97d1f702757b5b4fcf89adaa33ef679
   values:
     global:
-      repository: ghcr.nju.edu.cn/external-secrets/external-secrets
+      repository: ghcr.io/external-secrets/external-secrets
     replicaCount: 2
     webhook:
       replicaCount: 2
