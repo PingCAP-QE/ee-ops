@@ -36,7 +36,9 @@ spec:
       kubernetes.io/arch: amd64
     image:
       repository: golang
-      tag: "1.23"
+      # github-mcp-server v1.14.0 requires go >= 1.26.8 and the image sets
+      # GOTOOLCHAIN=local, so the toolchain tag has to satisfy it.
+      tag: "1.26"
     livenessProbe: false
     readinessProbe: false
     # The MCP server is compiled at pod start, so the module reference decides
