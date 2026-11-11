@@ -29,7 +29,7 @@ spec:
     image:
       repository: ghcr.io/ti-community-infra/cla-assistant/patched
       pullPolicy: Always
-      tag: v2026.11.5
+      tag: v2026.11.6
     serviceAccount:
       create: false
     httpRoute:
