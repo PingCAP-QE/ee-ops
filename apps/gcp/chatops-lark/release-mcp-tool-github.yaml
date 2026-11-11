@@ -39,10 +39,15 @@ spec:
       tag: "1.23"
     livenessProbe: false
     readinessProbe: false
+    # The MCP server is compiled at pod start, so the module reference decides
+    # what code runs with the bot token in the environment. Pinning a release tag
+    # (v1.14.0, which provides `http --port/--read-only`) keeps it immutable; the
+    # previous `@http-sse` branch reference re-resolved to whatever the branch
+    # head was at every restart.
     command:
       - go
       - run
-      - github.com/github/github-mcp-server/cmd/github-mcp-server@http-sse
+      - github.com/github/github-mcp-server/cmd/github-mcp-server@v1.14.0
     args: [http, --port=80, --read-only, --enable-command-logging]
     env:
       - name: GITHUB_PERSONAL_ACCESS_TOKEN
