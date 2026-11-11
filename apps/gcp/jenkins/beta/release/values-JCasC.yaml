@@ -76,7 +76,7 @@ controller:
                 - user: "lifu.wu@pingcap.com"
                 - user: "yebin.li@pingcap.com"
 
-            # Readonly
+            # Readonly for logged-in users: everything.
             - name: "readonly"
               pattern: ".*"
               permissions:
@@ -85,8 +85,28 @@ controller:
                 - "Run/Read"
                 - "View/Read"
               entries:
-                - user: anonymous
                 - group: authenticated
+
+            # Anonymous callers: only the UI shell plus jobs that live under the
+            # public product folders. Everything else (tidbcloud/**, pingcap-inc/**
+            # and any future organization) is invisible without a login, including
+            # a direct link to a single build, because Jenkins gates a build page on
+            # the job's Job/Read.
+            - name: "anonymous-overall"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "View/Read"
+              entries:
+                - user: anonymous
+
+            - name: "anonymous-public-jobs"
+              pattern: "^(pingcap|tikv)/.*"
+              permissions:
+                - "Job/Read"
+                - "Run/Read"
+              entries:
+                - user: anonymous
 
     # for security.
     security:
