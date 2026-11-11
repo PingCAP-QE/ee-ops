@@ -25,7 +25,11 @@ check_policy() {
   echo "PASS: $namespace/$route enforces CSRF"
 }
 
-check_policy apps/gcp/ee-portal/security-policy.yaml ee-portal ee-portal
+# The EE Portal manifest set is intentionally down (no HTTPRoute, no policy);
+# the checks below resume automatically when those files come back.
+if [ -f "$repo_root/apps/gcp/ee-portal/security-policy.yaml" ]; then
+  check_policy apps/gcp/ee-portal/security-policy.yaml ee-portal ee-portal
+fi
 check_policy apps/gcp/tibuild/v2/security-policy.yaml tibuild v2-tibuild-v2
 check_policy apps/gcp/ci-dashboard/security-policy.yaml apps ci-dashboard
 check_policy apps/gcp/tekton/setup/dashboard-security-policy.yaml tekton-pipelines tekton

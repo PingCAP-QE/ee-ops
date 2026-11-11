@@ -3,8 +3,6 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - release.yaml
-  - security-policy.yaml
-  - external-secret.yaml
 configMapGenerator:
   - name: ee-portal-registry
     namespace: ee-portal
