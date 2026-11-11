@@ -39,12 +39,12 @@ email = gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com
 ```
 
 The gateway validates the signature, issuer and audience, then the
-`authorization` policy allows only:
+`authorization` policy allows only the service account emails listed one by one
+(machine clients; add the next client next to the existing entry).
 
-- the service account email above (machine clients), or
-- `hd = pingcap.com` (reserved for a future internal OIDC provider; Google user
-  tokens carry the OAuth client ID in `aud`, so they cannot reach this endpoint
-  directly).
+There is deliberately no domain-wide `hd = pingcap.com` rule: it would let any
+employee identity — or any compromised employee token — mint GitHub App
+installation tokens for the whole organisation.
 
 The caller's token never reaches the broker. A `HTTPRouteFilter` overwrites the
 `Authorization` header with the token of a dedicated `external-reader`

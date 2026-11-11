@@ -39,7 +39,7 @@ separately.
 | `prow.tidb.net/ti-community-owners`, `/tichi` | Public allowlist | Prow plugins |
 | `prow.tidb.net/ee`, `/ee/api/tibuild` | OIDC + CSRF | EE Portal |
 | `prow.tidb.net/tibuild` (browser) | OIDC + CSRF | `tibuild-v2-oidc`; no JWT, no `passThroughAuthHeader` |
-| `prow.tidb.net/tibuild` (`Authorization: Bearer`) | JWT + allowlist | `tibuild-v2-machine-jwt`; service accounts + `hd=pingcap.com` |
+| `prow.tidb.net/tibuild` (`Authorization: Bearer`) | JWT + allowlist | `tibuild-v2-machine-jwt`; service accounts only |
 | `prow.tidb.net/dashboard/` | OIDC + CSRF | CI Dashboard |
 | `prow.tidb.net/tekton` | OIDC + CSRF | Tekton Dashboard |
 | `prow.pingcap.net/gh-broker/v1/token` | JWT + allowlist | GitHub token broker |
@@ -107,10 +107,12 @@ service code and is therefore the fallback, not the preferred design.
 
 1. **Done:** browser `/tibuild` is OIDC-only; machine route is JWT-only;
    publisher/tibuild-v1 findings are closed as removed code.
-2. **Next:** add path-specific JWT-only routes for privileged `tibuild-v2`
+2. **Done:** path-specific JWT-only routes for privileged `tibuild-v2`
    operations (`/api/v2/publish/*`, `/api/v2/hotfix/*`,
-   `/api/v2/artifact/sync-images*`, `/api/v2/tidbcloud/*`) and remove the
-   `hd=pingcap.com` fallback on those paths. Keep read-only UI endpoints on the
+   `/api/v2/artifact/sync-images*`, `/api/v2/tidbcloud/*`), and the
+   `hd=pingcap.com` fallback is gone from the machine route as well: both
+   privileged machine routes (this one and the token broker) now allow only the
+   service accounts listed in their policy. Read-only UI endpoints stay on the
    OIDC route.
 3. **Then:** deploy the identity normalizer, strip client `X-User-*`, and make
    `b8720cf0`/`615a8b6d` service authorization use trusted identity.

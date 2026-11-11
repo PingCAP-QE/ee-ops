@@ -73,15 +73,6 @@ spec:
                   # (see PingCAP-QE/ee-infra service-accounts module).
                   - tirelease-tibuild-client@pingcap-testing-account.iam.gserviceaccount.com
                   - tcms-tibuild-client@pingcap-testing-account.iam.gserviceaccount.com
-      # Keeps staff able to call the API with a user ID token
-      # (gcloud auth print-identity-token --audiences=prow.tidb.net).
-      # Drop this rule if only the service accounts above should be allowed.
-      - name: company-users
-        action: Allow
-        principal:
-          jwt:
-            provider: google
-            claims:
-              - name: hd
-                values:
-                  - pingcap.com
+      # No domain-wide fallback: `hd == pingcap.com` would let any employee ID
+      # token call the machine API, which has no CSRF protection. Staff calls
+      # are expected to use one of the service accounts above.

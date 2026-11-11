@@ -1,9 +1,10 @@
 # Machine authentication for the public token endpoint.
 #
-# Callers present a Google ID token whose audience is the broker URL. Only two
-# identities are accepted:
-#   - the service account we issue key JSON files for (external machines);
-#   - PingCAP Workspace users (hd=pingcap.com), for future user-facing flows.
+# Callers present a Google ID token whose audience is the broker URL. The
+# accepted identities are listed one by one: the service accounts we issue key
+# JSON files for. A domain-wide rule (`hd == pingcap.com`) is deliberately not
+# used — it would let any employee identity, or any compromised employee token,
+# mint GitHub App installation tokens for the whole organisation.
 #
 # The token itself never reaches the broker: the HTTPRouteFilter replaces the
 # Authorization header with the dedicated read-only ServiceAccount token.
@@ -37,12 +38,3 @@ spec:
                 values:
                   # One service account per client; add the next client here.
                   - gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com
-      - name: company-users
-        action: Allow
-        principal:
-          jwt:
-            provider: google
-            claims:
-              - name: hd
-                values:
-                  - pingcap.com
