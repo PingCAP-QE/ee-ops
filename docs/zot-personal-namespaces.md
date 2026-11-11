@@ -1,8 +1,14 @@
 # zot `personal/**` namespaces (tencentcloud)
 
 `cr.pingcap.net` is the zot registry in the tencentcloud (TKE) cluster, deployed with
-Flux from `apps/tencentcloud/zot/`. Each listed employee gets a scratch namespace
-`personal/<email-local-part>/**` that only they can read/write.
+Flux from `apps/tencentcloud/zot/`. Each listed employee gets a personal publishing
+namespace `personal/<email-local-part>/**` that only they can read/write.
+
+`personal/` is a **self-service space**, not a tenant boundary: it exists so anyone on
+staff can push a scratch or experimental image without asking for a shared repository.
+Access to the registry itself is already limited to company staff (Google Workspace OIDC,
+`hd=pingcap.com`, or an API key issued after that login); the per-user condition below
+prevents accidental overwrites between colleagues, it does not separate customers.
 
 ## How it is wired
 
@@ -19,7 +25,7 @@ The CEL condition keeps a user inside their own namespace even if the list is wr
 req.repository.startsWith('personal/' + req.user.username.split('@')[0].lowerAscii() + '/')
 ```
 
-### Tenant key normalization
+### Namespace key normalization
 
 The namespace key is the **lower-cased email local part** — `Wuhui.Zuo@pingcap.com` maps to
 `personal/wuhui.zuo/`, not `personal/Wuhui.Zuo/`. Two reasons:
@@ -28,7 +34,7 @@ The namespace key is the **lower-cased email local part** — `Wuhui.Zuo@pingcap
   user could never push to (the registry answers `404` for the upper-case path before
   authorization even runs).
 - The three login paths (htpasswd, Google OIDC, API key) agree on the e-mail only in shape,
-  not in case, so without normalization the same person could map to two namespaces
+  not in case, so without normalization the same person could map to two namespace keys
   (`personal/wuhui.zuo` and `personal/Wuhui.Zuo`) while the condition matched only one.
 
 `lowerAscii()` is part of the CEL string extensions bundled with zot; it is validated at
@@ -66,11 +72,13 @@ Symptoms seen in production (2026-11-06, `personal/liting/br-basic-test`):
 `ci-bot` / `cd-bot` are unaffected: they authenticate with htpasswd passwords, so their
 config-defined groups (`pullers` / `pushers`) are applied.
 
-## Isolation is enforced per user
+## Per-user write separation
 
 The `users` grant says *who may push to `personal/**` at all*; the CEL condition says
 *which sub-path*. Both must hold, so a listed user can only write `personal/<own-local-part>/`
-and a non-listed user can write nothing under `personal/`.
+and a non-listed user can write nothing under `personal/`. This is a hygiene rule between
+colleagues sharing one registry, not a customer boundary — registry access itself is
+already restricted to company staff.
 
 Verified on zot `v2.1.18` with this exact policy shape in a throwaway namespace (API-key
 authentication, i.e. the same path production uses; the meta-DB group set was empty):
