@@ -5,6 +5,13 @@ metadata:
   namespace: ee-portal
 spec:
   # Authentication is scoped to this HTTPRoute on the shared Gateway.
+  #
+  # The route itself is currently removed (see apps/gcp/ee-portal/): the Portal
+  # was exposed to every OIDC employee with no principal allowlist, including a
+  # proxy to the whole TiBuild API. The policy and the OIDC client stay here so
+  # that re-enabling the Portal is a revert, but until `HTTPRoute/ee-portal`
+  # exists this policy has no target and reports Accepted=False.
+  # Do not recreate the route without deciding its authorization model.
   targetRefs:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute

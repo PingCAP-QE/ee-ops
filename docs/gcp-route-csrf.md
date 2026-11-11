@@ -16,8 +16,8 @@ falling back to `Referer` only when `Origin` is absent. Missing both headers,
 `Origin: null`, and a different host/port are rejected with 403. Envoy compares
 host and port, not scheme; this does not protect against same-origin XSS.
 No additional origins or shadow mode are configured. GET/HEAD and OIDC GET
-callbacks remain unaffected. The Portal's `/ee/api/tibuild/v2/*` alias no longer
-exists (the proxy rule was removed); `/tibuild/api/v2/*` is covered by the TiBuild
+callbacks remain unaffected. The EE Portal route (and its `/ee/api/tibuild/v2/*`
+alias) is removed from this repo; `/tibuild/api/v2/*` is covered by the TiBuild
 policy, except the privileged prefixes listed below.
 The browser `/tibuild` SecurityPolicy is OIDC-only: it has no JWT provider and
 no `passThroughAuthHeader`, so a non-canonical `Authorization` header cannot

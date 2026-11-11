@@ -103,5 +103,9 @@ for file in apps/gcp/tibuild/v2/release.yaml apps/gcp/ci-dashboard/release.yaml;
     [.spec.values.httpRoute.rules[].matches[] | select(has("headers"))] | length == 0
   ' "$repo_root/$file" > /dev/null
 done
-yq eval -e '[.spec.rules[].matches[] | select(has("headers"))] | length == 0' \
-  "$repo_root/apps/gcp/ee-portal/http-route.yaml" > /dev/null
+# The EE Portal route is intentionally absent right now (its exposure is being
+# reworked); keep asserting the fallback shape only when it exists.
+if [ -f "$repo_root/apps/gcp/ee-portal/http-route.yaml" ]; then
+  yq eval -e '[.spec.rules[].matches[] | select(has("headers"))] | length == 0' \
+    "$repo_root/apps/gcp/ee-portal/http-route.yaml" > /dev/null
+fi

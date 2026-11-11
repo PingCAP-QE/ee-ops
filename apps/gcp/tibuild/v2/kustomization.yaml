@@ -9,4 +9,3 @@ resources:
   - security-policy.yaml
   - machine-access.yaml
   - privileged-access.yaml
-  - reference-grant-ee-portal.yaml
