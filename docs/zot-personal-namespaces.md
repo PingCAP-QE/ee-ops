@@ -16,8 +16,23 @@ Flux from `apps/tencentcloud/zot/`. Each listed employee gets a scratch namespac
 The CEL condition keeps a user inside their own namespace even if the list is wrong:
 
 ```cel
-req.repository.startsWith('personal/' + req.user.username.split('@')[0] + '/')
+req.repository.startsWith('personal/' + req.user.username.split('@')[0].lowerAscii() + '/')
 ```
+
+### Tenant key normalization
+
+The namespace key is the **lower-cased email local part** — `Wuhui.Zuo@pingcap.com` maps to
+`personal/wuhui.zuo/`, not `personal/Wuhui.Zuo/`. Two reasons:
+
+- OCI repository names must be lower case, so an un-normalized key produced a namespace the
+  user could never push to (the registry answers `404` for the upper-case path before
+  authorization even runs).
+- The three login paths (htpasswd, Google OIDC, API key) agree on the e-mail only in shape,
+  not in case, so without normalization the same person could map to two namespaces
+  (`personal/wuhui.zuo` and `personal/Wuhui.Zuo`) while the condition matched only one.
+
+`lowerAscii()` is part of the CEL string extensions bundled with zot; it is validated at
+config load, so a typo fails the registry start-up instead of silently widening access.
 
 ## Why the policy must be `users`-based, never `groups`-based
 
