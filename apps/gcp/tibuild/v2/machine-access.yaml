@@ -43,6 +43,11 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: tibuild-v2-machine
+    # Privileged paths on the browser route (publish / hotfix / artifact):
+    # same JWT requirement and the same service-account allowlist.
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: tibuild-v2-privileged
   jwt:
     optional: false
     providers:

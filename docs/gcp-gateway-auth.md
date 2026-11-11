@@ -37,8 +37,8 @@ separately.
 | `prow.tidb.net/` (`prow` HTTPRoute) | Public allowlist | Prow Deck UI; upstream parity |
 | `prow.tidb.net/hook` | Public + Prow HMAC | GitHub webhook |
 | `prow.tidb.net/ti-community-owners`, `/tichi` | Public allowlist | Prow plugins |
-| `prow.tidb.net/ee`, `/ee/api/tibuild` | OIDC + CSRF | EE Portal |
-| `prow.tidb.net/tibuild` (browser) | OIDC + CSRF | `tibuild-v2-oidc`; no JWT, no `passThroughAuthHeader` |
+| `prow.tidb.net/ee` | OIDC + CSRF | EE Portal |
+| `prow.tidb.net/tibuild` (browser) | OIDC + CSRF | `tibuild-v2-oidc`; no JWT, no `passThroughAuthHeader`. Privileged prefixes (`/api/v2/publish|hotfix|artifact`) are carved out to the machine policy |
 | `prow.tidb.net/tibuild` (`Authorization: Bearer`) | JWT + allowlist | `tibuild-v2-machine-jwt`; service accounts only |
 | `prow.tidb.net/dashboard/` | OIDC + CSRF | CI Dashboard |
 | `prow.tidb.net/tekton` | OIDC + CSRF | Tekton Dashboard |
@@ -107,7 +107,9 @@ service code and is therefore the fallback, not the preferred design.
 
 1. **Done:** browser `/tibuild` is OIDC-only; machine route is JWT-only;
    publisher/tibuild-v1 findings are closed as removed code.
-2. **Done:** path-specific JWT-only routes for privileged `tibuild-v2`
+2. **Done:** the Portal's `/ee/api/tibuild` proxy is removed (it handed the whole
+   TiBuild API to any OIDC employee); privileged paths are served by a dedicated
+   JWT-only route (`tibuild-v2-privileged`). Path-specific JWT-only routes for privileged `tibuild-v2`
    operations (`/api/v2/publish/*`, `/api/v2/hotfix/*`,
    `/api/v2/artifact/sync-images*`, `/api/v2/tidbcloud/*`), and the
    `hd=pingcap.com` fallback is gone from the machine route as well: both
