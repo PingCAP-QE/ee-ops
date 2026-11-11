@@ -5,6 +5,9 @@ on:
     branches: [main]
     paths:
       - "charts/prow/**"
+  # Manual run: the job needs no repository secrets, so it can be exercised from
+  # the default branch to prove the chart test still passes without them.
+  workflow_dispatch:
 
 jobs:
   chart-test:
