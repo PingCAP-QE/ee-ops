@@ -57,6 +57,18 @@ spec:
           uri: https://www.googleapis.com/oauth2/v3/certs
         audiences:
           - prow.tidb.net
+        # Publish the verified claims as request headers so the service can
+        # authorize the caller without parsing tokens itself. Envoy writes these
+        # from the claims it validated, and because `optional: false` rejects a
+        # request without a valid token, a client cannot smuggle its own value
+        # through on this route.
+        claimToHeaders:
+          - claim: sub
+            header: X-User-Id
+          - claim: email
+            header: X-User-Email
+          - claim: name
+            header: X-User-Name
   # A valid Google ID token for the audience is not an authorization: any
   # Google identity (any project's service account, any Workspace user) can
   # mint one, because the audience value is not a secret. Only the callers
