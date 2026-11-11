@@ -3,6 +3,35 @@ kind: ClusterSecretStore
 metadata:
   name: ee-gcp-sm
 spec:
+  # Only these namespaces may read from this store. Without the constraint any
+  # namespace could create an ExternalSecret against it and pull *any* secret of
+  # the GCP project, because the store's own credential decides what is readable.
+  # Adding a namespace that needs GCP Secret Manager means adding it here; the
+  # list mirrors the ExternalSecrets that exist on this cluster today.
+  conditions:
+    - namespaceSelector:
+        matchExpressions:
+          - key: kubernetes.io/metadata.name
+            operator: In
+            values:
+              - "apps"
+              - "chatops-lark"
+              - "cs"
+              - "dl"
+              - "ee-cd"
+              - "flux-system"
+              - "github-token-broker"
+              - "infra"
+              - "jenkins"
+              - "jenkins-pd"
+              - "jenkins-ticdc"
+              - "jenkins-tidb"
+              - "jenkins-tiflash"
+              - "jenkins-tiflow"
+              - "jenkins-tikv"
+              - "prow-test-pods"
+              - "tekton-pipelines"
+              - "tibuild"
   provider:
     gcpsm:
       auth:
