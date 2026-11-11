@@ -106,7 +106,10 @@ jobs:
           kubectl -n prow get secrets
       - name: Setup prow CRD
         run: |
-          kubectl create -f https://raw.githubusercontent.com/kubernetes/test-infra/master/config/prow/cluster/prowjob-crd/prowjob_customresourcedefinition.yaml
+          # Prow moved out of kubernetes/test-infra; the old raw URL is a 404 and
+          # broke this job for every PR touching charts/prow/**. Pin the CRD to a
+          # commit in its new home so the test cannot silently change under us.
+          kubectl create -f https://raw.githubusercontent.com/kubernetes-sigs/prow/86b2c49084b4bc31ed77ec8643ae3efbe9b82dc4/config/prow/cluster/prowjob-crd/prowjob_customresourcedefinition.yaml
 
       - name: Run chart-testing (install)
         run: |
