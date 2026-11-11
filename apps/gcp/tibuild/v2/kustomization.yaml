@@ -8,4 +8,4 @@ resources:
   - release.yaml
   - security-policy.yaml
   - machine-access.yaml
-  - reference-grant-ee-portal.yaml
+  - privileged-access.yaml

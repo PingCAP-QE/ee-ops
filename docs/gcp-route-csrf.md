@@ -16,8 +16,9 @@ falling back to `Referer` only when `Origin` is absent. Missing both headers,
 `Origin: null`, and a different host/port are rejected with 403. Envoy compares
 host and port, not scheme; this does not protect against same-origin XSS.
 No additional origins or shadow mode are configured. GET/HEAD and OIDC GET
-callbacks remain unaffected. The Portal's `/ee/api/tibuild/v2/*` alias is covered
-by its existing policy; `/tibuild/api/v2/*` is covered by the TiBuild policy.
+callbacks remain unaffected. The EE Portal route (and its `/ee/api/tibuild/v2/*`
+alias) is removed from this repo; `/tibuild/api/v2/*` is covered by the TiBuild
+policy, except the privileged prefixes listed below.
 The browser `/tibuild` SecurityPolicy is OIDC-only: it has no JWT provider and
 no `passThroughAuthHeader`, so a non-canonical `Authorization` header cannot
 skip the OIDC login. Bearer clients must use the machine route below.
@@ -38,9 +39,13 @@ request carries valid OIDC cookies. There is no OIDC fallback on the machine
 route. This preserves Bearer clients without exempting arbitrary
 Authorization-bearing requests on a cookie-authenticated route. Browser cookies
 alone always use the CSRF-protected route. Machine clients must use the direct
-`/tibuild` URL, not the Portal's OIDC-only `/ee/api/tibuild` alias. This separates
-credential modes, not an account/service-account allowlist; principal authorization
-is unchanged and tracked separately. Do not make JWT optional on a machine
+`/tibuild` URL. This separates credential modes, not an account/service-account
+allowlist; principal authorization is tracked separately.
+
+Privileged paths (`/tibuild/api/v2/publish`, `/hotfix`, `/artifact`) are served by
+a longer-prefix route (`tibuild-v2-privileged`) that shares the machine policy, so
+an OIDC cookie alone cannot reach them: the JWT provider has `optional: false`, so
+the request is rejected before authorization runs. Do not make JWT optional on a machine
 route, attach OIDC to it, or add a wildcard CSRF origin to the browser policy.
 
 ## Verification and rollout

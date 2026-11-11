@@ -1,0 +1,69 @@
+# Privileged TiBuild endpoints (publish / hotfix / artifact) are machine-only.
+#
+# The browser route (`/tibuild`, OIDC + CSRF) deliberately has no principal
+# allowlist: its whole point is that any staff member can read the UI. Those
+# three prefixes, however, plan and publish releases, create hotfix tags and
+# trigger artifact syncs — the same capabilities the machine route exposes to a
+# service-account allowlist. Until this file existed they were reachable with a
+# browser session alone.
+#
+# Gateway API precedence selects the longest matching path prefix, so these
+# rules win over the `/tibuild` browser rule. They attach the machine route's
+# SecurityPolicy (`tibuild-v2-machine-jwt`): JWT required (`optional: false`)
+# and the service-account allowlist, which rejects OIDC cookies outright.
+#
+# `ReplacePrefixMatch` has to name the matched prefix itself, not `/`: the
+# matched prefix is longer than the browser rule's `/tibuild`, so rewriting to
+# `/` would drop the `api/v2/<kind>` part of the path.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: tibuild-v2-privileged
+  namespace: tibuild
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: eg-internal
+      namespace: infra
+  hostnames:
+    - prow.tidb.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild/api/v2/publish
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2/publish
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild/api/v2/hotfix
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2/hotfix
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild/api/v2/artifact
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2/artifact
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
