@@ -5,6 +5,5 @@ resources:
   - namespace.yaml
   - source.yaml
   - pre.yaml
-  - config.yaml
   - release.yaml
   - httproute-internal.yaml
