@@ -76,7 +76,7 @@ controller:
                 - user: "lifu.wu@pingcap.com"
                 - user: "yebin.li@pingcap.com"
 
-            # Readonly
+            # Readonly for logged-in users: everything.
             - name: "readonly"
               pattern: ".*"
               permissions:
@@ -85,8 +85,31 @@ controller:
                 - "Run/Read"
                 - "View/Read"
               entries:
-                - user: anonymous
                 - group: authenticated
+
+            # Anonymous callers: the UI shell plus the two public product folders.
+            # The pattern matches the folder items themselves (`pingcap`, `tikv`) so
+            # they can be opened, and everything below them.
+            #
+            # Every other folder (tidbcloud, pingcap-inc, any future organization)
+            # has no Job/Read for anonymous, so it is neither listed on the dashboard
+            # nor reachable by a direct URL — a build page is gated on the job's
+            # Job/Read. Overall/Read alone does not reveal items you cannot read.
+            - name: "anonymous-overall"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "View/Read"
+              entries:
+                - user: anonymous
+
+            - name: "anonymous-public-jobs"
+              pattern: "^(pingcap|tikv)(/.*)?$"
+              permissions:
+                - "Job/Read"
+                - "Run/Read"
+              entries:
+                - user: anonymous
 
     # for security.
     security:
