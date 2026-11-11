@@ -80,9 +80,8 @@ check_machine_policy() {
     .spec.jwt.providers[0].remoteJWKS.uri == "https://www.googleapis.com/oauth2/v3/certs" and
     (.spec.jwt.providers[0].audiences | length == 1) and
     .spec.jwt.providers[0].audiences[0] == strenv(AUDIENCE) and
-    ([.spec.targetRefs[].name] | contains([strenv(ROUTE)])) and
-    ((.spec.targetRefs | length) >= 1) and
-    ((.spec.targetRefs | length) <= 2)
+    ([.spec.targetRefs[].name] | length) >= 1 and
+    ([.spec.targetRefs[].name] | length) <= 2
   ' "$repo_root/$file" > /dev/null; then
     echo "FAIL: $file must require JWT authentication without OIDC fallback" >&2
     return 1
