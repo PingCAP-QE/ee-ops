@@ -74,6 +74,7 @@ controller:
                 - user: "yebin.li@pingcap.com"
 
             # Readonly
+            # Readonly for logged-in users: everything.
             - name: "readonly"
               pattern: ".*"
               permissions:
@@ -82,8 +83,27 @@ controller:
                 - "Run/Read"
                 - "View/Read"
               entries:
-                - user: anonymous
                 - group: authenticated
+
+            # Anonymous callers: the UI shell plus the two public product folders
+            # (the pattern matches the folder items themselves and everything below
+            # them). Any other folder has no Job/Read for anonymous, so it is not
+            # listed and a direct build link answers 403.
+            - name: "anonymous-overall"
+              pattern: ".*"
+              permissions:
+                - "Overall/Read"
+                - "View/Read"
+              entries:
+                - user: anonymous
+
+            - name: "anonymous-public-jobs"
+              pattern: "^(pingcap|tikv)(/.*)?$"
+              permissions:
+                - "Job/Read"
+                - "Run/Read"
+              entries:
+                - user: anonymous
 
     # for security.
     security:
