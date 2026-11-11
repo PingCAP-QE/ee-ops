@@ -69,6 +69,7 @@ spec:
                 values:
                   - devops-server@gcp-resilience-dev.iam.gserviceaccount.com # DevOps platform prod env
                   - devops-server-dev@gcp-resilience-dev.iam.gserviceaccount.com # DevOps platform dev env
+                  - devops-server-staging@gcp-resilience-dev.iam.gserviceaccount.com # DevOps platform staging env
                   # tibuild-v2 API clients created for tirelease and TCMS
                   # (see PingCAP-QE/ee-infra service-accounts module).
                   - tirelease-tibuild-client@pingcap-testing-account.iam.gserviceaccount.com
