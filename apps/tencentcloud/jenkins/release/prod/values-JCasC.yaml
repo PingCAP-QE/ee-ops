@@ -97,6 +97,9 @@ controller:
               entries:
                 - user: anonymous
 
+          # RBAS applies `pattern` to item roles only: under `roles.global` the
+          # pattern is ignored and the permissions would apply to every item.
+          items:
             - name: "anonymous-public-jobs"
               pattern: "^(pingcap|tikv)(/.*)?$"
               permissions:
