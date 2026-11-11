@@ -23,8 +23,19 @@ spec:
   values:
     mountSecret: true
     secretFiles: false # We are in charge of managing it(the secret `zot-secret`)
-    mountConfig: true
-    configFiles: false # We are in charge of managing it(the config map `zot-config`)
+    # The config is rendered by External Secrets into the Secret `zot-config`
+    # (see pre/external-secrets.yaml) and mounted below.
+    mountConfig: false
+    configFiles: false
+    extraVolumes:
+      - name: zot-config
+        secret:
+          secretName: zot-config
+    extraVolumeMounts:
+      - name: zot-config
+        mountPath: /etc/zot/config.json
+        subPath: config.json
+        readOnly: true
     httproute:
       enabled: true
       parentRefs:
