@@ -25,8 +25,11 @@ check_policy() {
   echo "PASS: $namespace/$route enforces CSRF"
 }
 
-# The EE Portal manifest set is intentionally down (no HTTPRoute, no policy);
-# the checks below resume automatically when those files come back.
+# The EE Portal is deliberately not exposed through the Gateway: its route
+# authorized any OIDC employee with no principal allowlist and its TiBuild pages
+# only called /tibuild/api/v2. It is in-cluster only. If a policy reappears
+# without its route it is dead weight, so keep checking the shape whenever it is
+# present; check_portal_not_routed below guards the route itself.
 if [ -f "$repo_root/apps/gcp/ee-portal/security-policy.yaml" ]; then
   check_policy apps/gcp/ee-portal/security-policy.yaml ee-portal ee-portal
 fi
@@ -107,12 +110,25 @@ for file in apps/gcp/tibuild/v2/release.yaml apps/gcp/ci-dashboard/release.yaml;
     [.spec.values.httpRoute.rules[].matches[] | select(has("headers"))] | length == 0
   ' "$repo_root/$file" > /dev/null
 done
-# The EE Portal route is intentionally absent right now (its exposure is being
-# reworked); keep asserting the fallback shape only when it exists.
-if [ -f "$repo_root/apps/gcp/ee-portal/http-route.yaml" ]; then
-  yq eval -e '[.spec.rules[].matches[] | select(has("headers"))] | length == 0' \
-    "$repo_root/apps/gcp/ee-portal/http-route.yaml" > /dev/null
-fi
+# The Portal must stay unrouted. It is reached with a port-forward; exposing it
+# again needs its own authorization model, and this check is what makes that a
+# deliberate change rather than an accident.
+check_portal_not_routed() {
+  local stray=""
+  local file
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    stray="$stray ${file#"$repo_root"/}"
+  done < <(grep -rl --include='*.yaml' -E '^kind: (HTTPRoute|GRPCRoute)$' \
+             "$repo_root/apps/gcp/ee-portal" 2>/dev/null || true)
+  if [ -n "$stray" ]; then
+    echo "FAIL: ee-portal must not be exposed through the Gateway (found:$stray); add an authorization model first" >&2
+    return 1
+  fi
+  echo "PASS: ee-portal is not routed"
+}
+
+check_portal_not_routed
 
 # Privileged TiBuild prefixes must be carved out of the browser route. This
 # drifted once already: `docs/gcp-gateway-auth.md` listed `/api/v2/tidbcloud/*`

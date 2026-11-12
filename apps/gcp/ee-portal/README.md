@@ -29,3 +29,17 @@ Portal and TiBuild services only consume that identity for display and
 ownership checks; they do not validate tokens or decide whether an account is
 allowed to enter the system. The backend Service must remain reachable only
 through the trusted Gateway path.
+
+## Not exposed through the Gateway
+
+This Portal has no HTTPRoute and is intentionally reachable only in-cluster
+(`kubectl -n ee-portal port-forward`). Its former route (`prow.tidb.net/ee`,
+including the `/ee/api/tibuild` proxy) authenticated any OIDC employee but
+authorized no principal, and the TiBuild pages only called `/tibuild/api/v2`.
+Exposing it again requires an authorization model of its own;
+`scripts/check_gcp_route_csrf.sh` fails if a route reappears here.
+
+Because of that, the `apiUrl` in `modules/*/module.yaml` is only meaningful when
+the Portal is served behind something that proxies the prefix (the compiler
+copies it verbatim into `generated/registry.json`). Under a port-forward it
+resolves against the Portal's own origin and will not reach TiBuild.
