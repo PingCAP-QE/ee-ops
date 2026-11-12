@@ -15,7 +15,8 @@ expected_api_version() {
   local kind=$2
   local api_version=$3
 
-  # prod2 runs Flux v2.2.3; gcp and tencentcloud run Flux v2.8.8.
+  # prod2 runs Flux v2.2.3; gcp is upgraded to Flux v2.10.0; tencentcloud
+  # remains on Flux v2.9.2 until its Kubernetes cluster is upgraded.
   case "${cluster}" in
     prod2)
       case "${kind}" in
@@ -33,7 +34,23 @@ expected_api_version() {
           ;;
       esac
       ;;
-    gcp|tencentcloud)
+    gcp)
+      case "${kind}" in
+        GitRepository|HelmRepository)
+          [[ "${api_version}" == source.toolkit.fluxcd.io/* ]] && echo "source.toolkit.fluxcd.io/v1"
+          ;;
+        Kustomization)
+          [[ "${api_version}" == kustomize.toolkit.fluxcd.io/* ]] && echo "kustomize.toolkit.fluxcd.io/v1"
+          ;;
+        Alert|Provider)
+          [[ "${api_version}" == notification.toolkit.fluxcd.io/* ]] && echo "notification.toolkit.fluxcd.io/v1"
+          ;;
+        HelmRelease)
+          [[ "${api_version}" == helm.toolkit.fluxcd.io/* ]] && echo "helm.toolkit.fluxcd.io/v2"
+          ;;
+      esac
+      ;;
+    tencentcloud)
       case "${kind}" in
         GitRepository|HelmRepository)
           [[ "${api_version}" == source.toolkit.fluxcd.io/* ]] && echo "source.toolkit.fluxcd.io/v1"

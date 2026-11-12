@@ -6,7 +6,7 @@ usage() {
   cat <<'EOF'
 Usage: flux_gcp_post_upgrade_verify.sh [--context <kubectl-context>] [--namespace <flux-namespace>]
 
-Checks after the GCP Flux v2.8.6 upgrade:
+Checks after the GCP Flux v2.10.0 upgrade:
   1. Flux controllers in the target namespace are rolled out
   2. Flux CRD status.storedVersions have migrated to the current storage versions
   3. `flux check` passes and no Flux resources remain NotReady
@@ -103,8 +103,8 @@ check_stored_versions helmrepositories.source.toolkit.fluxcd.io v1,v1beta2
 check_stored_versions ocirepositories.source.toolkit.fluxcd.io v1,v1beta2
 check_stored_versions kustomizations.kustomize.toolkit.fluxcd.io v1,v1beta2
 check_stored_versions helmreleases.helm.toolkit.fluxcd.io v2,v2beta1,v2beta2
-check_stored_versions alerts.notification.toolkit.fluxcd.io v1beta2,v1beta3
-check_stored_versions providers.notification.toolkit.fluxcd.io v1beta2,v1beta3
+check_stored_versions alerts.notification.toolkit.fluxcd.io v1,v1beta3
+check_stored_versions providers.notification.toolkit.fluxcd.io v1,v1beta3
 check_stored_versions receivers.notification.toolkit.fluxcd.io v1,v1beta2
 
 if [[ "${violations}" -ne 0 ]]; then
