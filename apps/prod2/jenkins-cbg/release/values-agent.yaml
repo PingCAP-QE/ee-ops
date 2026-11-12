@@ -1,3 +1,0 @@
-# Chart agent.* values apply only when JCasC.defaultConfig is true (see tencentcloud).
-# jenkins-cbg uses defaultConfig: false; Kubernetes cloud lives in values-JCasC.yaml.
-agent: {}

@@ -1,4 +1,0 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: apps # for compatibility with task configuration in pingkai CI

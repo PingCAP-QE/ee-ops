@@ -5,5 +5,4 @@ resources:
   - gateway-internal.yaml
   - gateway-public.yaml
   - client-traffic-policy-internal.yaml
-  - client-traffic-policy-jenkins-escaped-slashes.yaml
   - es-gateway-tls-certs.yaml
