@@ -5,6 +5,8 @@ resources:
   - namespace.yaml
   - external-secret-credentials.yaml
   - external-secret-policy.yaml
+  - external-secret-tls.yaml
+  - networkpolicy-arc-https.yaml
   - serviceaccount.yaml
   - external-secret-upstream.yaml
   - httproute-filter.yaml
