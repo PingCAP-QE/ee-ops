@@ -13,9 +13,16 @@
 # SecurityPolicy (`tibuild-v2-machine-jwt`): JWT required (`optional: false`)
 # and the service-account allowlist, which rejects OIDC cookies outright.
 #
-# `ReplacePrefixMatch` has to name the matched prefix itself, not `/`: the
-# matched prefix is longer than the browser rule's `/tibuild`, so rewriting to
-# `/` would drop the `api/v2/<kind>` part of the path.
+# `ReplacePrefixMatch` has to name the matched prefix itself, not `/`: in the
+# rules below the matched prefix is longer than the browser rule's `/tibuild`,
+# so rewriting to `/` would drop the `api/v2/<kind>` part of the path. The
+# method rule at the end matches exactly `/tibuild`, so `/` is correct there.
+#
+# The method rule is the invariant that survives new endpoints: whatever the
+# path, a mutating request under `/tibuild` is machine-only. It works because
+# the browser rule in release.yaml matches only GET/HEAD/OPTIONS — the two
+# method sets are disjoint, so ordering does not matter (Envoy Gateway sorts
+# same-path routes by path length and header count, not by method).
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -83,6 +90,35 @@ spec:
             path:
               type: ReplacePrefixMatch
               replacePrefixMatch: /api/v2/tidbcloud
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+    # Every mutating request under /tibuild, whatever its path. Endpoints that
+    # do not exist yet are covered the day they ship; the prefix rules above
+    # stay because they also pin the URL rewrite for the privileged paths.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild
+          method: POST
+        - path:
+            type: PathPrefix
+            value: /tibuild
+          method: PUT
+        - path:
+            type: PathPrefix
+            value: /tibuild
+          method: PATCH
+        - path:
+            type: PathPrefix
+            value: /tibuild
+          method: DELETE
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
       backendRefs:
         - name: v2-tibuild-v2
           port: 80

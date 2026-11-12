@@ -109,10 +109,23 @@ spec:
       hostnames:
         - prow.tidb.net
       rules:
+        # Reads only. Every mutating method under /tibuild is served by the
+        # machine-only route in privileged-access.yaml; keeping the two method
+        # sets disjoint is what makes the split deterministic, because Envoy
+        # Gateway orders same-path routes without considering the method.
         - matches:
             - path:
                 type: PathPrefix
                 value: /tibuild
+              method: GET
+            - path:
+                type: PathPrefix
+                value: /tibuild
+              method: HEAD
+            - path:
+                type: PathPrefix
+                value: /tibuild
+              method: OPTIONS
           filters:
             - type: URLRewrite
               urlRewrite:
