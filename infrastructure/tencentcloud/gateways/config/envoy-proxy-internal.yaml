@@ -68,5 +68,12 @@ spec:
               memory: 1Gi
   # Stop accepting new connections and drain in-flight ones before the pod
   # disappears, so the CLB can retire the backend first.
+  #
+  # TKE took ~35s to actually deregister a backend after the pod went away
+  # (2026-11-12: pod gone 15:28:55, BatchDeregisterTargets 15:29:30), so keep the
+  # process alive well past the Envoy Gateway default of 10s while it is already
+  # failing readiness — planned moves (rolling update, node drain) then never
+  # leave the load balancer pointing at a socket that no longer listens.
   shutdown:
+    minDrainDuration: 45s
     drainTimeout: 60s
