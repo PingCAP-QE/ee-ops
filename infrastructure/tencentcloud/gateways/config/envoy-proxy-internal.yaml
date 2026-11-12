@@ -56,6 +56,16 @@ spec:
                 matchLabels:
                   app.kubernetes.io/name: envoy
                   gateway.envoyproxy.io/owning-gateway-name: internal-https
+        container:
+          # Measured 324m CPU / ~100Mi under current traffic while the pod only
+          # requested 100m on a node that was 109% committed on limits. Keep the
+          # request high enough that the proxy is not starved by CI workloads.
+          resources:
+            requests:
+              cpu: "1"
+              memory: 512Mi
+            limits:
+              memory: 1Gi
   # Stop accepting new connections and drain in-flight ones before the pod
   # disappears, so the CLB can retire the backend first.
   shutdown:
