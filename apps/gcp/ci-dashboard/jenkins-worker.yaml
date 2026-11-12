@@ -38,7 +38,7 @@ spec:
             - name: CI_DASHBOARD_LOG_LEVEL
               value: INFO
             - name: CI_DASHBOARD_KAFKA_BOOTSTRAP_SERVERS
-              value: cluster-cd-kafka-bootstrap.kafka.svc:9092
+              value: cluster-cd-kafka-bootstrap.kafka.svc:9094
             - name: CI_DASHBOARD_KAFKA_JENKINS_EVENTS_TOPIC
               value: jenkins-event
             - name: CI_DASHBOARD_KAFKA_JENKINS_GROUP_ID
