@@ -1,0 +1,22 @@
+# SASL/SCRAM identity for the ci-dashboard jenkins worker (gcp only): it only
+# reads jenkins-event.
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaUser
+metadata:
+  name: ci-dashboard-jenkins-worker
+  labels:
+    strimzi.io/cluster: cluster-cd
+spec:
+  authentication:
+    type: scram-sha-512
+  authorization:
+    type: simple
+    acls:
+      - resource:
+          type: topic
+          name: jenkins-event
+        operations: [Describe, Read]
+      - resource:
+          type: group
+          name: ci-dashboard-v3-jenkins-worker
+        operations: [Read]
