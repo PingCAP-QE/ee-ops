@@ -148,3 +148,44 @@ check_privileged_prefixes() {
 }
 
 check_privileged_prefixes apps/gcp/tibuild/v2/privileged-access.yaml
+
+# `/tibuild` is read-only for browsers: every mutating method goes to the
+# machine-only route. The split only works because the two method sets are
+# disjoint — Envoy Gateway orders same-path routes by path length and header
+# count, not by method, so a method-less browser rule would tie with the write
+# rule and the winner would be arbitrary.
+check_write_methods() {
+  local route_file=$1 browser_file=$2
+
+  if ! yq eval -e '
+    [ .spec.values.httpRoute.rules[].matches[]
+      | select(.method == null or
+               (.method != "GET" and .method != "HEAD" and .method != "OPTIONS"))
+    ] | length == 0
+  ' "$repo_root/$browser_file" > /dev/null; then
+    echo "FAIL: $browser_file must match only GET/HEAD/OPTIONS; a method-less or mutating match lets a browser session reach writes" >&2
+    return 1
+  fi
+
+  local missing=""
+  local method
+  for method in POST PUT PATCH DELETE; do
+    if ! METHOD="$method" yq eval -e '
+      select(.kind == "HTTPRoute") |
+      [ .spec.rules[]
+        | select(.filters[0].urlRewrite.path.replacePrefixMatch == "/")
+        | .matches[]
+        | select(.method == strenv(METHOD) and .path.value == "/tibuild")
+      ] | length == 1
+    ' "$repo_root/$route_file" > /dev/null; then
+      missing="$missing $method"
+    fi
+  done
+  if [ -n "$missing" ]; then
+    echo "FAIL: $route_file must serve these mutating methods on /tibuild:$missing" >&2
+    return 1
+  fi
+  echo "PASS: tibuild writes are machine-only and reads stay on OIDC"
+}
+
+check_write_methods apps/gcp/tibuild/v2/privileged-access.yaml apps/gcp/tibuild/v2/release.yaml
