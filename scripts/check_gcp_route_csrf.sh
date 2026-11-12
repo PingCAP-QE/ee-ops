@@ -113,3 +113,38 @@ if [ -f "$repo_root/apps/gcp/ee-portal/http-route.yaml" ]; then
   yq eval -e '[.spec.rules[].matches[] | select(has("headers"))] | length == 0' \
     "$repo_root/apps/gcp/ee-portal/http-route.yaml" > /dev/null
 fi
+
+# Privileged TiBuild prefixes must be carved out of the browser route. This
+# drifted once already: `docs/gcp-gateway-auth.md` listed `/api/v2/tidbcloud/*`
+# as covered while the HTTPRoute only carried publish/hotfix/artifact, so an
+# OIDC employee could still roll component versions and sync kernel images.
+check_privileged_prefixes() {
+  local file=$1
+  local directory
+  directory=$(dirname "$file")
+  yq eval -e '.resources[] | select(. == "privileged-access.yaml")' \
+    "$repo_root/$directory/kustomization.yaml" > /dev/null
+
+  local broken=""
+  local prefix
+  for prefix in publish hotfix artifact tidbcloud; do
+    # Each prefix needs its own rule, and the rewrite has to name the prefix
+    # itself: rewriting to "/" drops the api/v2/<kind> part of the path.
+    if ! PREFIX="/tibuild/api/v2/$prefix" REWRITE="/api/v2/$prefix" yq eval -e '
+      select(.kind == "HTTPRoute") |
+      [.spec.rules[]
+        | select(.matches[0].path.value == strenv(PREFIX))
+        | select(.filters[0].urlRewrite.path.replacePrefixMatch == strenv(REWRITE))
+      ] | length == 1
+    ' "$repo_root/$file" > /dev/null; then
+      broken="$broken $prefix"
+    fi
+  done
+  if [ -n "$broken" ]; then
+    echo "FAIL: $file must route these privileged prefixes to the machine policy:$broken" >&2
+    return 1
+  fi
+  echo "PASS: privileged TiBuild prefixes are machine-only"
+}
+
+check_privileged_prefixes apps/gcp/tibuild/v2/privileged-access.yaml
