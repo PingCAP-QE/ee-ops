@@ -37,7 +37,7 @@ separately.
 | `prow.tidb.net/` (`prow` HTTPRoute) | Public allowlist | Prow Deck UI; upstream parity |
 | `prow.tidb.net/hook` | Public + Prow HMAC | GitHub webhook |
 | `prow.tidb.net/ti-community-owners`, `/tichi` | Public allowlist | Prow plugins |
-| `prow.tidb.net/tibuild` (browser) | OIDC + CSRF | `tibuild-v2-oidc`; no JWT, no `passThroughAuthHeader`. Privileged prefixes (`/api/v2/publish|hotfix|artifact`) are carved out to the machine policy |
+| `prow.tidb.net/tibuild` (browser) | OIDC + CSRF | `tibuild-v2-oidc`; no JWT, no `passThroughAuthHeader`. **Reads only** (`GET/HEAD/OPTIONS`); every mutating method is served by the machine route |
 | `prow.tidb.net/tibuild` (`Authorization: Bearer`) | JWT + allowlist | `tibuild-v2-machine-jwt`; service accounts only |
 | `prow.tidb.net/dashboard/` | OIDC + CSRF | CI Dashboard |
 | `prow.tidb.net/tekton` | OIDC + CSRF | Tekton Dashboard |
@@ -48,10 +48,15 @@ separately.
 | `prow.tidb.net/*` catch-all | Public allowlist | GKE → Envoy forwarder; host/path routing only |
 | `*/eg-healthz` | Internal | Envoy health check |
 
-No public HTTPRoute exists for `publisher` (removed), `cloudevents-server`,
-`mac-builder-operator` log API or `vector_search`. Those services are
-ClusterIP-only; Gateway policy does not apply. If one is exposed later, add a
-route and a policy in the same change.
+No public HTTPRoute exists for `publisher` (removed), `ee-portal`,
+`cloudevents-server`, `mac-builder-operator` log API or `vector_search`. Those
+services are ClusterIP-only; Gateway policy does not apply. If one is exposed
+later, add a route and a policy in the same change.
+
+`ee-portal` is the newest of these and is **not expected back**: its route
+authorized any OIDC employee with no principal allowlist, and its TiBuild pages
+only called `/tibuild/api/v2`. It is used through a port-forward now; a browser
+deployment would need its own authorization model before a route is added.
 
 ## Public allowlist
 
@@ -108,24 +113,33 @@ service code and is therefore the fallback, not the preferred design.
    publisher/tibuild-v1 findings are closed as removed code.
 2. **Done:** the EE Portal route (`prow.tidb.net/ee`, including its
    `/ee/api/tibuild` proxy to the whole TiBuild API) is removed from this repo —
-   it authorized any OIDC employee with no principal allowlist. It comes back only
-   with an authorization model of its own. Privileged TiBuild paths are served by a
-   dedicated JWT-only route (`tibuild-v2-privileged`). Path-specific JWT-only routes for privileged `tibuild-v2`
-   operations (`/api/v2/publish/*`, `/api/v2/hotfix/*`,
-   `/api/v2/artifact/sync-images*`, `/api/v2/tidbcloud/*`), and the
-   `hd=pingcap.com` fallback is gone from the machine route as well: both
-   privileged machine routes (this one and the token broker) now allow only the
-   service accounts listed in their policy. Read-only UI endpoints stay on the
-   OIDC route.
-3. **Then:** deploy the identity normalizer, strip client `X-User-*`, and make
-   `b8720cf0`/`615a8b6d` service authorization use trusted identity.
-4. **Separately:** fix service-side authorization for `chatops-lark`, the token
+   it authorized any OIDC employee with no principal allowlist. It is not coming
+   back: the Portal is reachable only in-cluster, and a browser deployment would
+   need its own authorization model first.
+3. **Done:** the TiBuild browser route is read-only. `GET/HEAD/OPTIONS` stay on
+   the OIDC route; `POST/PUT/PATCH/DELETE` under `/tibuild` are served by the
+   machine-only route (`tibuild-v2-privileged`), together with the privileged
+   prefixes (`/api/v2/publish|hotfix|artifact|tidbcloud`). The two method sets are
+   disjoint on purpose: Envoy Gateway orders same-path routes by path length and
+   header count, not by method, so a method-less browser rule would tie with the
+   write rule. The `hd=pingcap.com` fallback is gone from both machine routes
+   (this one and the token broker); only the service accounts in their policy are
+   allowed.
+4. **Deferred:** the identity normalizer (strip client `X-User-*`, inject verified
+   claims). With the browser route read-only and the Portal unexposed, no
+   browser-facing service currently acts as the user, so nothing consumes it. The
+   machine routes do get verified claims as headers (`claimToHeaders` on the
+   `google` provider); the normalizer becomes relevant again only if a
+   browser-facing service needs to authorize a person.
+5. **Separately:** fix service-side authorization for `chatops-lark`, the token
    broker's fail-open policy, `ci-dashboard` row-level access and `dl` KS3
    allowlists. These are not Gateway policy work.
 
 ## Regression guard
 
 `scripts/check_gcp_route_csrf.sh` asserts that the TiBuild browser policy stays
-OIDC-only (no JWT provider, no `passThroughAuthHeader`) and that the machine
-route still requires a verified JWT. Extend that script when a new protected
-route is added.
+OIDC-only (no JWT provider, no `passThroughAuthHeader`), that the machine route
+still requires a verified JWT, that the documented privileged prefixes are all on
+the machine route, and that `/tibuild` serves mutating methods there and only
+there. It also fails if an `ee-portal` route reappears. Extend that script when a
+new protected route is added.
