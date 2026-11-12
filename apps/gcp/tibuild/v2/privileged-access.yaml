@@ -1,9 +1,10 @@
-# Privileged TiBuild endpoints (publish / hotfix / artifact) are machine-only.
+# Privileged TiBuild endpoints (publish / hotfix / artifact / tidbcloud) are
+# machine-only.
 #
 # The browser route (`/tibuild`, OIDC + CSRF) deliberately has no principal
 # allowlist: its whole point is that any staff member can read the UI. Those
-# three prefixes, however, plan and publish releases, create hotfix tags and
-# trigger artifact syncs — the same capabilities the machine route exposes to a
+# four prefixes, however, plan and publish releases, create hotfix tags, trigger
+# artifact syncs and roll TiDB Cloud component versions / kernel images — the same capabilities the machine route exposes to a
 # service-account allowlist. Until this file existed they were reachable with a
 # browser session alone.
 #
@@ -64,6 +65,24 @@ spec:
             path:
               type: ReplacePrefixMatch
               replacePrefixMatch: /api/v2/artifact
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+    # TiDB Cloud ops: component-version rollout, TCMS image-tag records and
+    # kernel-image sync. These drive the production ops platform with the
+    # service's own credential, so they belong on the machine route for the
+    # same reason as publish/hotfix. CI reaches them over the in-cluster
+    # Service (`v2-tibuild-v2.tibuild.svc`), not through this route.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild/api/v2/tidbcloud
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2/tidbcloud
       backendRefs:
         - name: v2-tibuild-v2
           port: 80
