@@ -58,11 +58,14 @@ spec:
                   gateway.envoyproxy.io/owning-gateway-name: internal-https
         container:
           # Measured 324m CPU / ~100Mi under current traffic while the pod only
-          # requested 100m on a node that was 109% committed on limits. Keep the
-          # request high enough that the proxy is not starved by CI workloads.
+          # requested 100m on a node that was 109% committed on limits, so 500m is
+          # a real reservation (and still 5x the old value). It stays at 500m rather
+          # than 1 CPU because the public gateway shares this 2-node pool: with both
+          # data planes at 1 CPU a rolling update would have no node with room for
+          # the surge pod (3920m allocatable per node).
           resources:
             requests:
-              cpu: "1"
+              cpu: 500m
               memory: 512Mi
             limits:
               memory: 1Gi

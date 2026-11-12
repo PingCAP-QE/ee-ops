@@ -7,4 +7,5 @@ resources:
   - envoy-proxy-public.yaml
   - envoy-proxy-internal.yaml
   - pdb-internal.yaml
+  - pdb-public.yaml
   - client-traffic-policy-internal.yaml

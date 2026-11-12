@@ -1,0 +1,16 @@
+---
+# Keep at least one public gateway data plane pod serving while nodes are drained
+# (maintenance, node pool rotation). Without it a drain can take the only backend
+# of the public CLB away.
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: envoy-infra-external-https
+  namespace: infra
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: envoy
+      gateway.envoyproxy.io/owning-gateway-name: external-https
+      gateway.envoyproxy.io/owning-gateway-namespace: infra

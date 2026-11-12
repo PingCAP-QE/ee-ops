@@ -13,3 +13,54 @@ spec:
           service.cloud.tencent.com/security-groups: "${security_group_id}"
           service.cloud.tencent.com/pass-to-target: "true"
           service.cloud.tencent.com/direct-access: 'true'
+      # Same shape as the internal proxy: this data plane is the only backend of
+      # the public CLB, so a single replica has nothing to fail over to when the
+      # pod moves (node recycle, eviction, rolling update). It followed the
+      # karpenter churn on the shared CI pool until 2026-11-12.
+      envoyDeployment:
+        replicas: 2
+        strategy:
+          type: RollingUpdate
+          rollingUpdate:
+            maxUnavailable: 0
+            maxSurge: 1
+        pod:
+          nodeSelector:
+            compute-class: system
+          priorityClassName: system-cluster-critical
+          annotations:
+            # If the pool is ever brought under karpenter management, keep these
+            # pods (and their node) out of voluntary disruption.
+            karpenter.sh/do-not-disrupt: "true"
+          topologySpreadConstraints:
+            - maxSkew: 1
+              topologyKey: topology.kubernetes.io/zone
+              whenUnsatisfiable: DoNotSchedule
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: envoy
+                  gateway.envoyproxy.io/owning-gateway-name: external-https
+            - maxSkew: 1
+              topologyKey: kubernetes.io/hostname
+              whenUnsatisfiable: ScheduleAnyway
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: envoy
+                  gateway.envoyproxy.io/owning-gateway-name: external-https
+        container:
+          # Public traffic is small compared to the internal registry entrypoint
+          # (measured ~28m CPU / ~96Mi), so the request stays modest: the system
+          # pool also hosts the internal data plane and has to keep room for one
+          # extra pod during a rolling update.
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+  # TKE needed ~48s to deregister a backend after the pod went away (measured
+  # 2026-11-12 17:15), well past the Envoy Gateway default of 10s, so keep the
+  # process alive until the load balancer has actually dropped it.
+  shutdown:
+    minDrainDuration: 45s
+    drainTimeout: 60s
