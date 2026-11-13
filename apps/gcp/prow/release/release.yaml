@@ -240,8 +240,10 @@ spec:
         image:
           repository: ghcr.io/ti-community-infra/prow/cherrypicker
           tag: v20250805-57374e9b9
+        # Only organization members may request cherry picks: `--allow-all`
+        # skips the GitHub org membership check (upstream cherrypicker
+        # `server.go`: `if !s.allowAll { IsMember(org, user) }`).
         args:
-          - --allow-all
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
           - --github-app-private-key-path=/etc/github/app-private-key
