@@ -4,8 +4,6 @@ resources:
   - ../_base
   - cluster-policies
   - zot
-  - cache
   - dl
   - tibuild # experiment for v2
   - tirelease
-  - jenkins-cbg
