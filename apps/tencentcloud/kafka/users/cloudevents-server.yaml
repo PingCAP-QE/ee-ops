@@ -9,3 +9,10 @@ metadata:
 spec:
   authentication:
     type: scram-sha-512
+    # Password is seeded in Secret Manager so the same value can be rendered into
+    # cloudevents-server's config; Strimzi reads it instead of generating one.
+    password:
+      valueFrom:
+        secretKeyRef:
+          name: cloudevents-kafka-cred
+          key: password

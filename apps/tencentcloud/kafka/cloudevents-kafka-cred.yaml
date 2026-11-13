@@ -1,0 +1,15 @@
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: cloudevents-kafka-cred
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: cloudevents-kafka-cred
+    creationPolicy: Owner
+  data:
+    - secretKey: password
+      remoteRef:
+        key: tencentcloud_cloudevents_kafka_password

@@ -3,6 +3,7 @@ kind: Kustomization
 namespace: kafka
 resources:
   - cluster.yaml
+  - cloudevents-kafka-cred.yaml
   - users/cloudevents-server.yaml
   - users/ci-dashboard-jenkins-worker.yaml
   - topics/cloudevents-server.yaml
