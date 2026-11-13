@@ -39,7 +39,6 @@ spec:
     server:
       args:
         - --domain=0.0.0.0:80
-        - --ks3-config=/config/ks3.yaml
         - --oci-config=/config/oci.yaml
         - --oci-allowed-registries=us-docker.pkg.dev,hub.pingcap.net,hub-zot.pingcap.net
         - --gcs-allowed-buckets=hotfix-binaries

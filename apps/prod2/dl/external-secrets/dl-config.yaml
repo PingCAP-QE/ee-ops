@@ -12,6 +12,5 @@ spec:
   dataFrom:
     - extract:
         # json object contains keys:
-        # - ks3.yaml
         # - oci.yaml
         key: prod2_dl_config_json
