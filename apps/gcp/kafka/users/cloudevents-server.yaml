@@ -1,4 +1,4 @@
-# SASL/SCRAM identity for cloudevents-server: it produces every event and
+# SASL/SCRAM identity (authentication only for now) for cloudevents-server: it produces every event and
 # consumes the default channel plus the dead-letter topic.
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaUser
@@ -9,22 +9,3 @@ metadata:
 spec:
   authentication:
     type: scram-sha-512
-  authorization:
-    type: simple
-    acls:
-      - resource:
-          type: topic
-          name: cloudevents-default-channel
-        operations: [Describe, Read, Write]
-      - resource:
-          type: topic
-          name: cloudevents-dead-letter
-        operations: [Describe, Read, Write]
-      - resource:
-          type: topic
-          name: jenkins-event
-        operations: [Describe, Write]
-      - resource:
-          type: group
-          name: cloudevents-server-workers
-        operations: [Read]
