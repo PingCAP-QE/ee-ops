@@ -17,6 +17,9 @@
 #     spellings fail closed;
 #   * finding no Jenkins route files at all is a failure, so a renamed path
 #     cannot make the guard pass vacuously.
+#
+# Both the block and the flow YAML style are handled: entries are projected to
+# plain scalar lines by yq instead of being re-parsed from its pretty output.
 set -euo pipefail
 
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
@@ -53,47 +56,25 @@ while IFS= read -r file; do
   files=$((files + 1))
   rel=${file#"$repo_root"/}
 
-  # Emit one `<action>\t<header>\t<value>` line per modifier entry. `-P` forces
-  # block style, so a flow-style `remove: [x-frame-options]` or
-  # `set: {X-Frame-Options: ALLOWALL}` cannot slip past the line parser. The
-  # YAML is rendered through a fixed synthetic document because the yq pinned in
-  # CI (v4.6.1) predates `to_entries`, so map entries are split by awk instead.
-  entries=$(yq eval -P '
-    select(.kind == "HTTPRoute") |
-    (.spec.rules // [])[] | (.filters // [])[] |
-    select(.type == "ResponseHeaderModifier") |
-    {
-      "remove": (.responseHeaderModifier.remove // []),
-      "set": (.responseHeaderModifier.set // {}),
-      "add": (.responseHeaderModifier.add // {})
-    }
-  ' "$file" | awk '
-    BEGIN { state = "" }
-    /^remove:/ { state = "remove"; next }
-    /^set:/ { state = "set"; next }
-    /^add:/ { state = "add"; next }
-    state == "remove" && /^[[:space:]]+-[[:space:]]/ {
-      line = $0
-      sub(/^[[:space:]]+-[[:space:]]*/, "", line)
-      gsub(/"/, "", line)
-      print "remove\t" line "\t"
-      next
-    }
-    (state == "set" || state == "add") && /^[[:space:]]+[^[:space:]]/ {
-      line = $0
-      sub(/^[[:space:]]+/, "", line)
-      sep = index(line, ": ")
-      if (sep == 0) next
-      name = substr(line, 1, sep - 1)
-      value = substr(line, sep + 2)
-      gsub(/"/, "", name)
-      if (value ~ /^".*"$/) value = substr(value, 2, length(value) - 2)
-      print state "\t" name "\t" value
-    }
-  ')
+  # Emit one `<action>:<header>[:<value>]` line per modifier entry. Each branch
+  # repeats the path prefix and no yq variable is bound: yq v4.6.1 (the CI pin)
+  # cross-products documents when a bound variable is reused inside a comma
+  # sequence. `remove` entries are plain strings while `set`/`add` entries are
+  # Gateway API `HTTPHeader` objects (`name`/`value`), in both YAML styles.
+  entries=$(yq eval '
+    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] | (.filters // [])[] |
+      select(.type == "ResponseHeaderModifier") |
+      (.responseHeaderModifier.remove // [])[] | "remove:" + . ),
+    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] | (.filters // [])[] |
+      select(.type == "ResponseHeaderModifier") |
+      (.responseHeaderModifier.set // [])[] | "set:" + .name + ":" + .value ),
+    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] | (.filters // [])[] |
+      select(.type == "ResponseHeaderModifier") |
+      (.responseHeaderModifier.add // [])[] | "add:" + .name + ":" + .value )
+  ' "$file")
 
   problems=""
-  while IFS=$'\t' read -r action name value; do
+  while IFS=: read -r action name value; do
     [ -n "$name" ] || continue
 
     # Header names are matched case-insensitively; -x keeps the match on the

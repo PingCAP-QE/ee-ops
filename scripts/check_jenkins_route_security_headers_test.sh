@@ -4,6 +4,8 @@
 # Every case writes a throwaway fixture into a temp "repo" (the guard derives
 # its repo root from its own location, so it is copied next to the fixture) and
 # asserts the guard's exit code. Run it directly; it needs yq v4 on PATH.
+#
+# `set`/`add` use the Gateway API v1 shape: a list of `{name, value}` objects.
 set -euo pipefail
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -133,8 +135,7 @@ spec:
 EOF
 expect 0 "unrelated header name containing protected name passes" run_fixture
 
-# Regression 2b: flow-style YAML must not hide entries from the guard. yq keeps
-# the flow style when printing unless the guard forces block style.
+# Regression 2b: flow-style YAML must not hide entries from the guard.
 write_route <<'EOF'
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -177,49 +178,8 @@ spec:
 EOF
 expect nonzero "flow lowercase remove [content-security-policy] fails" run_fixture
 
-write_route <<'EOF'
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: jenkins
-spec:
-  rules:
-    - filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            set: {X-Frame-Options: ALLOWALL}
-EOF
-expect nonzero "flow set {X-Frame-Options: ALLOWALL} fails" run_fixture
-
-write_route <<'EOF'
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: jenkins
-spec:
-  rules:
-    - filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            add: {x-frame-options: ALLOWALL}
-EOF
-expect nonzero "flow add {x-frame-options: ALLOWALL} fails" run_fixture
-
-write_route <<'EOF'
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: jenkins
-spec:
-  rules:
-    - filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            set: {x-frame-options: SAMEORIGIN}
-EOF
-expect 0 "flow set {x-frame-options: SAMEORIGIN} passes" run_fixture
-
-# Regression 3: weakening `set` values, including lowercase keys.
+# Regression 3: weakening `set`/`add` entries. Gateway API models them as a
+# list of {name, value}; a map spelling is rejected by the API server.
 write_route <<'EOF'
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
@@ -231,9 +191,10 @@ spec:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
             set:
-              X-Frame-Options: ALLOWALL
+              - name: X-Frame-Options
+                value: ALLOWALL
 EOF
-expect nonzero "set X-Frame-Options ALLOWALL fails" run_fixture
+expect nonzero "set list X-Frame-Options ALLOWALL fails" run_fixture
 
 write_route <<'EOF'
 apiVersion: gateway.networking.k8s.io/v1
@@ -245,10 +206,9 @@ spec:
     - filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
-            set:
-              x-frame-options: ALLOWALL
+            set: [{name: x-frame-options, value: ALLOWALL}]
 EOF
-expect nonzero "lowercase set x-frame-options ALLOWALL fails" run_fixture
+expect nonzero "flow set list lowercase x-frame-options ALLOWALL fails" run_fixture
 
 write_route <<'EOF'
 apiVersion: gateway.networking.k8s.io/v1
@@ -261,9 +221,56 @@ spec:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
             add:
-              X-Frame-Options: ALLOWALL
+              - name: X-Frame-Options
+                value: ALLOWALL
 EOF
-expect nonzero "adding a second X-Frame-Options fails" run_fixture
+expect nonzero "add list X-Frame-Options ALLOWALL fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            add: [{name: x-frame-options, value: ALLOWALL}]
+EOF
+expect nonzero "flow add list lowercase x-frame-options ALLOWALL fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: content-security-policy
+                value: "default-src 'self'"
+EOF
+expect nonzero "set list content-security-policy fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: Cross-Origin-Opener-Policy
+                value: unsafe-none
+EOF
+expect nonzero "set list COOP unsafe-none fails" run_fixture
 
 # A `set` that matches the controller's own strictness stays allowed.
 write_route <<'EOF'
@@ -276,10 +283,25 @@ spec:
     - filters:
         - type: ResponseHeaderModifier
           responseHeaderModifier:
-            set:
-              x-frame-options: SAMEORIGIN
+            set: [{name: x-frame-options, value: SAMEORIGIN}]
 EOF
-expect 0 "set X-Frame-Options SAMEORIGIN passes" run_fixture
+expect 0 "flow set list x-frame-options SAMEORIGIN passes" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set:
+              - name: Cross-Origin-Opener-Policy
+                value: same-origin
+EOF
+expect 0 "set list COOP same-origin passes" run_fixture
 
 # Fail-closed: unparsable YAML must not be reported as PASS.
 write_route <<'EOF'
@@ -295,7 +317,7 @@ expect nonzero "unparsable YAML fails closed" run_fixture
 # Fail-closed: yq missing from PATH must not be reported as PASS.
 noyq_bin="$tmp/noyq-bin"
 mkdir -p "$noyq_bin"
-for tool in find grep sort dirname awk; do
+for tool in find grep sort dirname tr; do
   ln -s "$(command -v "$tool")" "$noyq_bin/$tool"
 done
 expect nonzero "missing yq fails closed" env PATH="$noyq_bin" /bin/bash \
@@ -304,7 +326,7 @@ expect nonzero "missing yq fails closed" env PATH="$noyq_bin" /bin/bash \
 # Fail-closed: a failing yq must abort instead of falling through to PASS.
 broken_bin="$tmp/broken-yq-bin"
 mkdir -p "$broken_bin"
-for tool in find grep sort dirname awk; do
+for tool in find grep sort dirname tr; do
   ln -s "$(command -v "$tool")" "$broken_bin/$tool"
 done
 cat > "$broken_bin/yq" <<'EOF'
