@@ -4,4 +4,5 @@ namespace: cs
 resources:
   - namespace.yaml
   - external-secret.yaml
+  - kafka-ca.yaml
   - release.yaml
