@@ -1,0 +1,19 @@
+# Same reason as cloudevents-server: a pod cannot mount a Secret from another
+# namespace, and Strimzi keeps its CA in `kafka`. Render a copy into `apps` from
+# Secret Manager (seeded once; a CA rotation needs a new version).
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kafka-cluster-ca
+  namespace: apps
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: kafka-cluster-ca
+    creationPolicy: Owner
+  data:
+    - secretKey: ca.crt
+      remoteRef:
+        key: gcp_kafka_cluster_ca
