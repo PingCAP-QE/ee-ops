@@ -3,7 +3,19 @@ kind: Terraform
 metadata:
   name: tencentcloud-tidb-cicd
 spec:
-  approvePlan: auto
+  # Left unset on purpose: the controller plans and then waits, so no change
+  # reaches the cluster without a human reading the plan.
+  #
+  # This stack's state and saved plans carry a standing cluster-admin
+  # credential (terraform/tencentcloud/tidb-cicd/docs/state-credentials.md in
+  # ee-infra), and the controller reconciles on an interval, so `auto` made
+  # "merge to main" the only control between a PR and a cluster-admin change.
+  #
+  # To apply a plan, copy the id the controller reports ("set approvePlan:
+  # plan-main-123 to apply this plan") into `.spec.approvePlan` below, commit and
+  # push. GitOps stays the approval channel.
+  #
+  # approvePlan: plan-<id>
   interval: 1h
   retryInterval: 5m
   destroyResourcesOnDeletion: true
