@@ -12,6 +12,19 @@ metadata:
   annotations:
     iam.gke.io/gcp-service-account: terraform-plan-reader@pingcap-testing-account.iam.gserviceaccount.com
 ---
+# `pull-verify-k8s-pod-yaml` in PingCAP-QE/ci resolves every image a changed
+# Pod template references with `crane`. Images in the private `internal`
+# Artifact Registry repository are unreadable without a Google identity, which
+# is why that repository still grants `allUsers` a reader. This ServiceAccount
+# gives the presubmit the project-wide `gar-reader` identity (bound in
+# PingCAP-QE/ee-infra) so the anonymous reader can be dropped.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gar-reader
+  annotations:
+    iam.gke.io/gcp-service-account: gar-reader@pingcap-testing-account.iam.gserviceaccount.com
+---
 # RBAC for `.ci/verify-prow-jobs-run.sh` in PingCAP-QE/ci: the presubmit
 # `pull-verify-prow-jobs-run` actually creates a ProwJob (prowjobs.prow.k8s.io)
 # on the prow cluster to validate that changed kubernetes-agent prow jobs start
