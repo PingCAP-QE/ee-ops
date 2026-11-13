@@ -74,7 +74,7 @@ spec:
       volumes:
         - name: kafka-ca
           secret:
-            secretName: cluster-cd-cluster-ca-cert
+            secretName: kafka-cluster-ca
             items:
               - key: ca.crt
                 path: ca.crt
