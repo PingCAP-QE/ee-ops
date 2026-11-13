@@ -4,5 +4,4 @@ namespace: chatops-lark
 resources:
   - namespace.yaml
   - external-secret.yaml
-  - external-secret-github.yaml
   - release.yaml
