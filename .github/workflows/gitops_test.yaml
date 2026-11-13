@@ -33,6 +33,9 @@ jobs:
       - name: Verify Jenkins routes keep browser protections
         if: matrix.path == 'apps'
         run: bash scripts/check_jenkins_route_security_headers.sh
+      - name: Self-test Jenkins route guard
+        if: matrix.path == 'apps'
+        run: bash scripts/check_jenkins_route_security_headers_test.sh
       - name: Verify Flux API versions
         if: matrix.path == 'clusters'
         run: |
