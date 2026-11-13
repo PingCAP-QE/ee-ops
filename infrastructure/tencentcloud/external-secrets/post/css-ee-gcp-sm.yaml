@@ -20,6 +20,7 @@ spec:
               - "github-token-broker"
               - "infra"
               - "jenkins"
+              - "kafka"
               - "jenkins-pd"
               - "jenkins-ticdc"
               - "jenkins-tidb"
