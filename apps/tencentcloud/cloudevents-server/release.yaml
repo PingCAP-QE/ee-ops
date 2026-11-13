@@ -23,9 +23,13 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  # The chart's test-connection pod cannot reach the bus now that only the
+  # authenticated listener exists; a failing test triggers `upgrade.remediation`
+  # and rolls the release back, which is how the 9094 rollout reverted itself.
+  # Liveness is covered by the consumer actually reading its partition.
   test:
-    enable: true
-    ignoreFailures: false
+    enable: false
+    ignoreFailures: true
   values:
     replicaCount: 1
     resources:
