@@ -61,7 +61,9 @@ while IFS= read -r file; do
   # cross-products documents when a bound variable is reused inside a comma
   # sequence. `remove` entries are plain strings while `set`/`add` entries are
   # Gateway API `HTTPHeader` objects (`name`/`value`), in both YAML styles.
-  entries=$(yq eval '
+  # `-P` keeps yq's output in block style; it is a no-op for these scalar
+  # projections but keeps the call shape the reviewers asked for.
+  entries=$(yq eval -P '
     ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] | (.filters // [])[] |
       select(.type == "ResponseHeaderModifier") |
       (.responseHeaderModifier.remove // [])[] | "remove:" + . ),
