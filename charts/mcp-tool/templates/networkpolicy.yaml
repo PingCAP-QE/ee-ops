@@ -1,0 +1,48 @@
+{{- if .Values.networkPolicy.enabled }}
+# The tool's handlers run with a platform token in the environment and the server
+# itself has no inbound authentication, so "reachable from any pod" is the whole
+# exposure. This policy narrows ingress to the consumers that were verified
+# against the cluster.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "mcp-tool.fullname" . }}
+  labels:
+    {{- include "mcp-tool.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "mcp-tool.selectorLabels" . | nindent 6 }}
+  policyTypes:
+    - Ingress
+  ingress:
+    # The release's own namespace: the consumer that ships with this chart.
+    - from:
+        - podSelector: {}
+      ports:
+        - port: {{ .Values.service.port }}
+          protocol: TCP
+    {{- with .Values.networkPolicy.allowedNamespaces }}
+    - from:
+        {{- range . }}
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: {{ . | quote }}
+        {{- end }}
+      ports:
+        - port: {{ $.Values.service.port }}
+          protocol: TCP
+    {{- end }}
+    # kubelet probes arrive from the node address, not from a pod. Dropping them
+    # leaves the Pod running but never Ready.
+    {{- with .Values.networkPolicy.nodeCIDRs }}
+    - from:
+        {{- range . }}
+        - ipBlock:
+            cidr: {{ . | quote }}
+        {{- end }}
+      ports:
+        - port: {{ $.Values.service.port }}
+          protocol: TCP
+    {{- end }}
+{{- end }}

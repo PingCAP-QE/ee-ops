@@ -28,6 +28,23 @@ spec:
     ignoreFailures: true
   values:
     replicaCount: 1
+    # The MCP server runs with the organisation bot PAT in its environment and has
+    # no inbound authentication of its own, so reachability is the boundary. Only
+    # the consumers below were verified against the cluster; everything else is
+    # denied.
+    networkPolicy:
+      enabled: true
+      # `kube-system` for DNS, `gmp-system` for the GMP collector that scrapes this
+      # target (`gmp-public` kept as the companion namespace).
+      allowedNamespaces:
+        - kube-system
+        - gmp-system
+        - gmp-public
+      # kubelet probes come from the node address. These are the ranges the prow
+      # nodes were observed in (`kubectl get nodes -o wide`).
+      nodeCIDRs:
+        - 10.128.0.0/24
+        - 172.16.0.0/24
     resources:
       limits:
         cpu: "500m"
