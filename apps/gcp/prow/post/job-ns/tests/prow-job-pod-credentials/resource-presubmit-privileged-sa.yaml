@@ -1,0 +1,22 @@
+# A PR-authored presubmit that runs as a Workload-Identity ServiceAccount:
+# `tidbx-puller` can mint GCP tokens for the `tidbx-gar-reader` identity.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prow-presubmit-privileged-sa
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+    prow.k8s.io/type: presubmit
+    prow.k8s.io/job: pull-integration-test
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+    prow.k8s.io/refs.pull: "12345"
+spec:
+  serviceAccountName: tidbx-puller
+  containers:
+    - name: test
+      image: ghcr.io/pingcap-qe/ci/test:latest
+      args:
+        - make
+        - integration-test
