@@ -5,4 +5,5 @@ resources:
   - envoy-gatewayclass.yaml
   - envoy-gateway-internal.yaml
   - envoy-healthz.yaml
+  - gcp-backend-policy-eg-internal.yaml
   - route-gke-to-envoy.yaml
