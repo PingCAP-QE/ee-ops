@@ -30,6 +30,9 @@ jobs:
       - name: Verify RBAC for Group system:authenticated
         if: matrix.path == 'apps'
         run: bash scripts/check_gcp_rbac_system_authenticated.sh
+      - name: Verify Jenkins routes keep browser protections
+        if: matrix.path == 'apps'
+        run: bash scripts/check_jenkins_route_security_headers.sh
       - name: Verify Flux API versions
         if: matrix.path == 'clusters'
         run: |

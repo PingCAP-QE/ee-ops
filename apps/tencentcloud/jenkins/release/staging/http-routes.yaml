@@ -18,10 +18,7 @@ spec:
         - path:
             type: PathPrefix
             value: "${INGRESS_PATH}-staging"
-      filters:
-        - type: ResponseHeaderModifier
-          responseHeaderModifier:
-            remove:
-              - X-Frame-Options
-              - Cross-Origin-Opener-Policy
-              - Content-Security-Policy
+      # Do not strip Jenkins' browser protections here. Removing
+      # X-Frame-Options / COOP / CSP turned any stored XSS in build output into
+      # a script running with the operator's session, and made framing possible.
+      # The controller sets these headers itself; the gateway must pass them through.
