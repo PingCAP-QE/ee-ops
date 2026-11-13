@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: github-token-broker-arc-https
+spec:
+  podSelector:
+    # Pinned to release.yaml's releaseName and the chart's default name.
+    # Do not set nameOverride/fullnameOverride there without updating this selector.
+    matchLabels:
+      app.kubernetes.io/name: github-token-broker
+      app.kubernetes.io/instance: github-token-broker
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: arc-runners
+      ports:
+        # Service 443 targets the broker's optional native TLS listener.
+        # Keep this port equal to server.tls.port in the activation template.
+        # Do not grant the ARC namespace access to the legacy HTTP listener.
+        - protocol: TCP
+          port: 8443
