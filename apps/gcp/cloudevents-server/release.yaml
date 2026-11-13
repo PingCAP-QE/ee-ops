@@ -40,13 +40,23 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/cloudevents-server
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/cloudevents-server versioning=semver
-      tag: v2026.10.25-56-gd0a6f3d # if you want to downgrade, please change the config secret as well.
+      tag: v2026.11.8-26-g8b4208f # if you want to downgrade, please change the config secret as well.
     server:
       args: [--config=/config/config.yaml]
       volumeMounts:
         - name: config
           mountPath: /config
+        - name: kafka-ca
+          mountPath: /etc/kafka/ca.crt
+          subPath: ca.crt
+          readOnly: true
       volumes:
         - name: config
           secret:
             secretName: cloudevents-server-config
+        - name: kafka-ca
+          secret:
+            secretName: cluster-cd-cluster-ca-cert
+            items:
+              - key: ca.crt
+                path: ca.crt
