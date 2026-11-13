@@ -1,0 +1,15 @@
+# The external GKE Gateway forwards OIDC-protected routes to this Service.
+# Keep the outer GKE backend timeout long enough for large artifact downloads;
+# the HTTPRoute timeout on the inner Envoy Gateway does not affect this hop.
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: eg-internal-backend-timeout
+  namespace: infra
+spec:
+  default:
+    timeoutSec: 3600
+  targetRef:
+    group: ""
+    kind: Service
+    name: eg-internal
