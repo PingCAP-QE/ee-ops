@@ -52,8 +52,10 @@ spec:
       - github.com/github/github-mcp-server/cmd/github-mcp-server@v1.14.0
     args: [http, --port=80, --read-only, --enable-command-logging]
     env:
+      # Dedicated read-only token (see external-secret-mcp-github.yaml), not the
+      # org-wide bot PAT the Prow controllers use.
       - name: GITHUB_PERSONAL_ACCESS_TOKEN
         valueFrom:
           secretKeyRef:
-            name: github
-            key: bot-token
+            name: mcp-github-token
+            key: token

@@ -5,5 +5,6 @@ resources:
   - namespace.yaml
   - external-secret.yaml
   - external-secret-github.yaml
+  - external-secret-mcp-github.yaml
   - release-mcp-tool-github.yaml
   - release.yaml
