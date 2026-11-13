@@ -1,0 +1,19 @@
+# A pod can only mount Secrets from its own namespace, and Strimzi's CA lives in
+# `kafka`. Keep a copy in `cs`, rendered from Secret Manager (the PEM was seeded
+# there once). A Strimzi CA rotation needs a new Secret Manager version.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: kafka-cluster-ca
+  namespace: cs
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: kafka-cluster-ca
+    creationPolicy: Owner
+  data:
+    - secretKey: ca.crt
+      remoteRef:
+        key: gcp_kafka_cluster_ca
