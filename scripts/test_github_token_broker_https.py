@@ -89,13 +89,22 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
                         self.assertIn(variable, result.stderr)
                         self.assertNotIn('unexpected-kubectl', result.stderr)
 
+    def test_http_stage_pins_published_tls_capable_release(self):
+        release = load('apps/gcp/github-token-broker/release.yaml')['spec']
+        self.assertEqual(release['chart']['spec']['version'], '0.2.0')
+        self.assertEqual(release['values']['image'], {
+            'repository': 'ghcr.io/pingcap-qe/ee-apps/github-token-broker',
+            'tag': 'v2026.11.8-19-g04ea8c8',
+        })
+        self.assertIs(release['values']['server']['tls']['enabled'], False)
+
     def test_resources_are_wired_without_premature_tls_activation(self):
         resources = load('apps/gcp/github-token-broker/kustomization.yaml')['resources']
         self.assertIn('external-secret-tls.yaml', resources)
         self.assertIn('networkpolicy-arc-https.yaml', resources)
         values = load('apps/gcp/github-token-broker/release.yaml')['spec']['values']
         self.assertNotIn('tls', values)
-        self.assertNotIn('tls', values.get('server', {}))
+        self.assertIs(values['server']['tls']['enabled'], False)
         self.assertNotIn('arc-runners', values.get('networkPolicy', {}).get('ingressNamespaces', []))
 
 

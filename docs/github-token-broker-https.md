@@ -10,18 +10,19 @@ HTTPS), see [External access to the GitHub token broker](github-token-broker-ext
 
 ## Scope and ordering
 
-1. Review/merge the ee-apps broker/chart implementation and wait for its image
-   and chart release. The server retains HTTP 8080 for existing callers/probes;
-   optional native TLS listens on 8443 and is exposed as Service port 443.
+1. The broker/chart implementation is merged in
+   [ee-apps PR 899](https://github.com/PingCAP-QE/ee-apps/pull/899), and its
+   Chart `0.2.0` and image `v2026.11.8-19-g04ea8c8` are published. This ee-ops
+   change pins those releases with **`server.tls.enabled: false`**: upgrade and
+   verify the existing HTTP service and new ARC runners first. The broker's
+   existing HTTP 8080, authentication and permissions remain unchanged.
 2. Provision the leaf certificate/key and distribute the public CA as below.
-   This ee-ops change prepares the TLS Secret, HTTPS-only ARC NetworkPolicy and
-   runner mount. It deliberately does **not** switch the live HelmRelease to an
-   unpublished chart/image or enable a listener the current image cannot serve.
-3. Update `apps/gcp/github-token-broker/release.yaml` to the **published, verified**
-   TLS-capable chart and immutable image using the activation template below,
-   enabling TLS with Secret `github-token-broker-tls`.
-   Do not reuse `v2026.10.25-1-g930f405`, which has no TLS listener. Review that
-   version/activation change before merging it; never guess a future image tag.
+   This change also prepares the TLS Secret, HTTPS-only ARC NetworkPolicy and
+   runner mount. Missing TLS material must not block this HTTP-only stage.
+3. In a **separate reviewed activation change**, enable HTTPS using the template
+   below only after the certificate and runner trust are ready. The additional
+   HTTPS listener uses 8443 and Service port 443. Do not merge the GitInsight
+   HTTPS-only client merely because the HTTP-only upgrade succeeded.
 4. Confirm the approved ARC caller-policy entry below is loaded, check HTTPS
    identity and Python availability from the actual ARC runner network, then
    merge/enable the GitInsight client and run one authorized crawl. Only after
@@ -34,12 +35,13 @@ untested URL change to the repository owner as a completed fix.
 
 ## Published-artifact activation (operator only)
 
-After the TLS-capable chart and image are actually published, an operator must
-populate `$TLS_CHART_VERSION` with the verified published chart version and
-`$TLS_IMAGE_TAG` with the verified published immutable TLS image tag. No concrete
-TLS release version is assumed here. Replace both placeholders with those actual
-values before reviewing the activation change; they are **not** automatic Flux
-or shell substitutions inside a YAML file.
+The HTTP-only stage pins Chart `0.2.0` and image `v2026.11.8-19-g04ea8c8`,
+verified against the completed [chart release](https://github.com/PingCAP-QE/ee-apps/actions/runs/43348037974)
+and [image release](https://github.com/PingCAP-QE/ee-apps/actions/runs/43348037966).
+The image digest is
+`sha256:7430bb2d479a78a0314307ba4331119133a1768ab53bc93b00171e34f2b493f5`.
+These published versions are used below; verify the selected artifacts again if
+updating either version in the later activation change.
 
 Merge these fields into the existing HelmRelease in
 `apps/gcp/github-token-broker/release.yaml`, preserving all other chart/source,
@@ -51,10 +53,10 @@ activate the current release:
 spec:
   chart:
     spec:
-      version: "$TLS_CHART_VERSION"
+      version: 0.2.0
   values:
     image:
-      tag: "$TLS_IMAGE_TAG"
+      tag: v2026.11.8-19-g04ea8c8
     server:
       tls:
         enabled: true
@@ -77,7 +79,7 @@ before approval. Its `server.tls.port` must also equal the allowed port in
 if changing it. In the same activation change, update
 `test_resources_are_wired_without_premature_tls_activation` in
 `scripts/test_github_token_broker_https.py` to assert the enabled TLS configuration
-instead of its preparatory absence. Run
+instead of its explicitly disabled HTTP-only stage. Run
 `python3 scripts/test_github_token_broker_https.py` to check the activation template
 against that NetworkPolicy. HTTP 8080 and existing probes remain enabled.
 
