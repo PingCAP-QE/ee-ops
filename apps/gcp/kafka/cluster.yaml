@@ -85,7 +85,7 @@ spec:
       # (cloudevents-server builds its tls.Config from the system roots). SCRAM
       # never sends the password, and the payload is no more exposed than the
       # plain listener it replaces.
-      - name: scram-plain
+      - name: scramplain
         port: 9095
         type: internal
         tls: false
