@@ -16,3 +16,14 @@ spec:
         secretKeyRef:
           name: cloudevents-kafka-cred
           key: password
+  authorization:
+    type: simple
+    acls:
+      - resource: {type: topic, name: cloudevents-default-channel}
+        operations: [Describe, Read, Write]
+      - resource: {type: topic, name: cloudevents-dead-letter}
+        operations: [Describe, Read, Write]
+      - resource: {type: topic, name: jenkins-event}
+        operations: [Describe, Write]
+      - resource: {type: group, name: cloudevents-server-workers}
+        operations: [Read]

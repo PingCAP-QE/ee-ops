@@ -14,3 +14,10 @@ spec:
         secretKeyRef:
           name: ci-dashboard-kafka-cred
           key: password
+  authorization:
+    type: simple
+    acls:
+      - resource: {type: topic, name: jenkins-event}
+        operations: [Describe, Read]
+      - resource: {type: group, name: ci-dashboard-v3-jenkins-worker}
+        operations: [Read]
