@@ -133,6 +133,92 @@ spec:
 EOF
 expect 0 "unrelated header name containing protected name passes" run_fixture
 
+# Regression 2b: flow-style YAML must not hide entries from the guard. yq keeps
+# the flow style when printing unless the guard forces block style.
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            remove: [x-frame-options]
+EOF
+expect nonzero "flow lowercase remove [x-frame-options] fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            remove: [X-Frame-Options, Cross-Origin-Opener-Policy]
+EOF
+expect nonzero "flow remove all protected headers fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            remove: [content-security-policy]
+EOF
+expect nonzero "flow lowercase remove [content-security-policy] fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set: {X-Frame-Options: ALLOWALL}
+EOF
+expect nonzero "flow set {X-Frame-Options: ALLOWALL} fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            add: {x-frame-options: ALLOWALL}
+EOF
+expect nonzero "flow add {x-frame-options: ALLOWALL} fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - filters:
+        - type: ResponseHeaderModifier
+          responseHeaderModifier:
+            set: {x-frame-options: SAMEORIGIN}
+EOF
+expect 0 "flow set {x-frame-options: SAMEORIGIN} passes" run_fixture
+
 # Regression 3: weakening `set` values, including lowercase keys.
 write_route <<'EOF'
 apiVersion: gateway.networking.k8s.io/v1

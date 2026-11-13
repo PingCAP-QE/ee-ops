@@ -53,10 +53,12 @@ while IFS= read -r file; do
   files=$((files + 1))
   rel=${file#"$repo_root"/}
 
-  # Emit one `<action>\t<header>\t<value>` line per modifier entry. The YAML is
-  # rendered through a fixed synthetic document because the yq pinned in CI
-  # (v4.6.1) predates `to_entries`, so map entries are split by awk instead.
-  entries=$(yq eval '
+  # Emit one `<action>\t<header>\t<value>` line per modifier entry. `-P` forces
+  # block style, so a flow-style `remove: [x-frame-options]` or
+  # `set: {X-Frame-Options: ALLOWALL}` cannot slip past the line parser. The
+  # YAML is rendered through a fixed synthetic document because the yq pinned in
+  # CI (v4.6.1) predates `to_entries`, so map entries are split by awk instead.
+  entries=$(yq eval -P '
     select(.kind == "HTTPRoute") |
     (.spec.rules // [])[] | (.filters // [])[] |
     select(.type == "ResponseHeaderModifier") |
