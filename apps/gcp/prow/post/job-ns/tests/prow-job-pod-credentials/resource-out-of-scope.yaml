@@ -1,0 +1,41 @@
+# Out-of-scope cases: the exposure exists, but these Pods are not PR-authored
+# presubmit/batch jobs, so the policy must skip them.
+#
+# 1. A periodic Job: timer-driven, no PR content in the Pod template.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prow-periodic-privileged
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+    prow.k8s.io/type: periodic
+    prow.k8s.io/job: periodic-cleanup
+  spec:
+    serviceAccountName: tidbx-puller
+    containers:
+      - name: test
+        image: ghcr.io/pingcap-qe/ci/test:latest
+        volumeMounts:
+          - name: github-token
+            mountPath: /etc/github
+            readOnly: true
+    volumes:
+      - name: github-token
+        secret:
+          secretName: github-token
+---
+# 2. A hand-made Pod in the same namespace (no `created-by-prow` label at all).
+apiVersion: v1
+kind: Pod
+metadata:
+  name: plain-pod-privileged
+  namespace: prow-test-pods
+spec:
+  serviceAccountName: prow-job-validation
+  containers:
+    - name: debug
+      image: busybox:1.36
+      envFrom:
+        - secretRef:
+            name: codecov-tokens
