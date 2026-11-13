@@ -47,6 +47,18 @@ spec:
               value: "1000"
             - name: CI_DASHBOARD_JENKINS_FINISHED_EVENT_TYPE
               value: dev.cdevents.pipelinerun.finished.0.1.0
+            # Authenticated listener (TLS + SCRAM). The password lives in the
+            # Secret Strimzi creates for the KafkaUser; the CA is the cluster's
+            # own, which is not in the image's trust store.
+            - name: CI_DASHBOARD_KAFKA_SASL_USERNAME
+              value: ci-dashboard-jenkins-worker
+            - name: CI_DASHBOARD_KAFKA_SASL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ci-dashboard-jenkins-worker
+                  key: password
+            - name: CI_DASHBOARD_KAFKA_SSL_CAFILE
+              value: /etc/kafka/ca.crt
           resources:
             requests:
               cpu: "500m"
@@ -54,3 +66,15 @@ spec:
             limits:
               cpu: "1"
               memory: 2Gi
+          volumeMounts:
+            - name: kafka-ca
+              mountPath: /etc/kafka/ca.crt
+              subPath: ca.crt
+              readOnly: true
+      volumes:
+        - name: kafka-ca
+          secret:
+            secretName: cluster-cd-cluster-ca-cert
+            items:
+              - key: ca.crt
+                path: ca.crt
