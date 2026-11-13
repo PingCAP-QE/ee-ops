@@ -55,7 +55,7 @@ spec:
             - name: CI_DASHBOARD_KAFKA_SASL_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: ci-dashboard-jenkins-worker
+                  name: ci-dashboard-kafka-cred
                   key: password
             - name: CI_DASHBOARD_KAFKA_SSL_CAFILE
               value: /etc/kafka/ca.crt

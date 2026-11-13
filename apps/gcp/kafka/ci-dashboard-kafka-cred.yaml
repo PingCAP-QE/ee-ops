@@ -1,0 +1,19 @@
+# The KafkaUser password must be visible both to Strimzi (kafka namespace) and to
+# the worker (apps namespace); Secrets cannot be referenced across namespaces, so
+# the same Secret Manager value is rendered into both.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: ci-dashboard-kafka-cred
+  namespace: kafka
+spec:
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: ee-gcp-sm
+  target:
+    name: ci-dashboard-kafka-cred
+    creationPolicy: Owner
+  data:
+    - secretKey: password
+      remoteRef:
+        key: gcp_ci_dashboard_kafka_password
