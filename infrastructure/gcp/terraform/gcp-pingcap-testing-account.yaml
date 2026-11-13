@@ -9,11 +9,21 @@ kind: Terraform
 metadata:
   name: gcp-pingcap-testing-account
 spec:
-  approvePlan: auto
+  # Left unset on purpose: the controller plans and then waits, so no change
+  # reaches the project without a human reading the plan.
+  #
+  # This CR reconciles the identity that holds compute.admin, container.admin,
+  # artifactregistry.admin and storage.admin, and the controller reconciles on an
+  # interval, so `auto` made "merge to main" the only control between a PR and a
+  # project-wide cloud change.
+  #
+  # To apply a plan, copy the id the controller reports ("set approvePlan:
+  # plan-main-123 to apply this plan") into `.spec.approvePlan` below, commit and
+  # push. GitOps stays the approval channel.
+  #
+  # approvePlan: plan-<id>
   interval: 1h
   retryInterval: 5m
-  # Set to "auto" to auto-apply plans:
-  # approvePlan: auto
   destroyResourcesOnDeletion: true
   sourceRef:
     kind: GitRepository
