@@ -6,4 +6,5 @@ resources:
   - cloudevents-kafka-cred.yaml
   - users/cloudevents-server.yaml
   - users/ci-dashboard-jenkins-worker.yaml
+  - ci-dashboard-kafka-cred.yaml
   - topics/cloudevents-server.yaml

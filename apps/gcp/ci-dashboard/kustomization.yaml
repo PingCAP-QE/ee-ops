@@ -7,6 +7,7 @@ resources:
   - scheduling-policy.yaml
   - cronjobs.yaml
   - jenkins-worker.yaml
+  - ci-dashboard-kafka-cred.yaml
   - kafka-ca.yaml
   - pod-watcher.yaml
   - pod-watcher-rbac.yaml
