@@ -1,8 +1,9 @@
 # FLA-326 regression suite for the tencentcloud `prow-test-pods` policy.
 #
-# The policy is Audit-only, so every case asserts which rule *would* deny:
-# `fail` = the rule matched (reported), `pass` = evaluated and allowed,
-# `skip` = out of the rule's scope (not a PR-authored presubmit/batch Pod).
+# Every rule is Audit, so each case asserts which rule *would* deny: `fail` = the
+# rule matched (reported), `pass` = evaluated and allowed, `skip` = out of the
+# rule's scope (not a PR-authored presubmit/batch Pod). The same expectations
+# hold after a rule is flipped to Enforce.
 apiVersion: cli.kyverno.io/v1alpha1
 kind: Test
 metadata:
@@ -16,6 +17,7 @@ resources:
   - resource-presubmit-decorator-gcs.yaml
   - resource-out-of-scope.yaml
 results:
+
   # 1. PR-authored presubmit that runs as `k8s-pod-full`.
   - policy: restrict-prow-job-pod-credentials
     rule: deny-privileged-service-account
@@ -24,13 +26,19 @@ results:
     kind: Pod
     result: fail
   - policy: restrict-prow-job-pod-credentials
-    rule: deny-org-wide-secret-reference
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-presubmit-namespace-admin-sa
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
     resources:
       - prow-presubmit-namespace-admin-sa
     kind: Pod
     result: pass
 
-  # 2. Batch job that mounts the org bot PAT as a volume.
+  # 2. Batch job that mounts the org bot PAT as a volume (org-admin tier).
   - policy: restrict-prow-job-pod-credentials
     rule: deny-privileged-service-account
     resources:
@@ -38,13 +46,19 @@ results:
     kind: Pod
     result: pass
   - policy: restrict-prow-job-pod-credentials
-    rule: deny-org-wide-secret-reference
+    rule: deny-org-admin-secret-reference
     resources:
       - prow-batch-org-secret-volume
     kind: Pod
     result: fail
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - prow-batch-org-secret-volume
+    kind: Pod
+    result: pass
 
-  # 3. Presubmit that reads Secrets through env/envFrom.
+  # 3. Presubmit that reads project-scoped Secrets through env/envFrom.
   - policy: restrict-prow-job-pod-credentials
     rule: deny-privileged-service-account
     resources:
@@ -52,14 +66,20 @@ results:
     kind: Pod
     result: pass
   - policy: restrict-prow-job-pod-credentials
-    rule: deny-org-wide-secret-reference
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-presubmit-org-secret-env
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
     resources:
       - prow-presubmit-org-secret-env
     kind: Pod
     result: fail
 
-  # 4. `gcs-credentials` (and `ci-registry-auth`) are injected into every Prow
-  #    Pod, so an ordinary decorated presubmit must not be reported.
+  # 4. `gcs-credentials` (decorator) and `ci-registry-auth` (image pull) reach
+  #    every Prow Pod, so an ordinary decorated presubmit must not be reported.
   - policy: restrict-prow-job-pod-credentials
     rule: deny-privileged-service-account
     resources:
@@ -67,7 +87,13 @@ results:
     kind: Pod
     result: pass
   - policy: restrict-prow-job-pod-credentials
-    rule: deny-org-wide-secret-reference
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-presubmit-decorator-gcs
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
     resources:
       - prow-presubmit-decorator-gcs
     kind: Pod
@@ -81,7 +107,13 @@ results:
     kind: Pod
     result: skip
   - policy: restrict-prow-job-pod-credentials
-    rule: deny-org-wide-secret-reference
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-periodic-privileged
+    kind: Pod
+    result: skip
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
     resources:
       - prow-periodic-privileged
     kind: Pod
@@ -95,7 +127,13 @@ results:
     kind: Pod
     result: skip
   - policy: restrict-prow-job-pod-credentials
-    rule: deny-org-wide-secret-reference
+    rule: deny-org-admin-secret-reference
+    resources:
+      - plain-pod-privileged
+    kind: Pod
+    result: skip
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
     resources:
       - plain-pod-privileged
     kind: Pod
