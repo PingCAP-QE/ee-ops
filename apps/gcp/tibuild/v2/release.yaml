@@ -24,7 +24,13 @@ spec:
     remediation:
       retries: 3
   test:
-    enable: true
+    # The chart's only test hook is a one-shot `wget` for /healthz, and busybox
+    # wget does not retry a refused connection. A rollout that replaces the API
+    # pods therefore turns the hook into "connection refused" and Flux rolls the
+    # whole release back, even though the pods come up healthy seconds later.
+    # The /healthz readiness probe (periodSeconds: 10) is the real gate; disable
+    # the hook so an image bump is not reverted by a spurious test failure.
+    enable: false
   values:
     replicaCount: 2
     # The API records TiDB-X image tags in the TCMS portal
