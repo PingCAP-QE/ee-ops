@@ -275,7 +275,7 @@ spec:
         replicaCount: 1
         image:
           repository: ghcr.io/ti-community-infra/prow/protected-changes
-          tag: v20261114-4c9072805
+          tag: v20261114-b0f1817e5
         ports:
           http: 8888
         args:
