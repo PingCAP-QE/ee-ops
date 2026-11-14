@@ -113,15 +113,33 @@ spec:
         # machine-only route in privileged-access.yaml; keeping the two method
         # sets disjoint is what makes the split deterministic, because Envoy
         # Gateway orders same-path routes without considering the method.
+        #
+        # One rule per method: the Gateway API only allows a ReplacePrefixMatch
+        # URLRewrite when the rule carries exactly one path match, so a single
+        # rule with GET/HEAD/OPTIONS matches is rejected by admission.
         - matches:
             - path:
                 type: PathPrefix
                 value: /tibuild
               method: GET
+          filters:
+            - type: URLRewrite
+              urlRewrite:
+                path:
+                  type: ReplacePrefixMatch
+                  replacePrefixMatch: /
+        - matches:
             - path:
                 type: PathPrefix
                 value: /tibuild
               method: HEAD
+          filters:
+            - type: URLRewrite
+              urlRewrite:
+                path:
+                  type: ReplacePrefixMatch
+                  replacePrefixMatch: /
+        - matches:
             - path:
                 type: PathPrefix
                 value: /tibuild
