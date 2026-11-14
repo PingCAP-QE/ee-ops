@@ -5,7 +5,7 @@ metadata:
 data:
   config.yaml: |
     enableApiGzip: true
-    enableProf: true
+    enableProf: false
     runAutoMigrate: true
     enableCron: true
     bigQueryProject: pingcap-dbaas-build
