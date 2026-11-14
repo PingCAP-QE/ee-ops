@@ -80,6 +80,24 @@ service:
   # This sets the ports more information can be found here: https://kubernetes.io/docs/concepts/services-networking/service/#field-spec-ports
   port: 80
 
+# Ingress restriction for the tool's Service.
+#
+# Disabled by default: a chart-wide default would change behaviour for every
+# release. Enable it per release once the allowlist has been checked against the
+# cluster (see the release's values for the verified list).
+#
+# `nodeCIDRs` matters: kubelet runs liveness/readiness probes from the node IP,
+# not from a pod, so a policy that only names namespaces silently breaks the
+# probes. Every CIDR a node can appear in has to be listed.
+networkPolicy:
+  enabled: false
+  # Namespaces allowed to reach the Service, in addition to this release's own
+  # namespace (always allowed).
+  allowedNamespaces: []
+  # Node address ranges allowed to reach the readiness/liveness ports.
+  nodeCIDRs: []
+
+
 # This block is for setting up the ingress for more information can be found here: https://kubernetes.io/docs/concepts/services-networking/ingress/
 ingress:
   enabled: false
