@@ -89,6 +89,11 @@ service:
 # `nodeCIDRs` matters: kubelet runs liveness/readiness probes from the node IP,
 # not from a pod, so a policy that only names namespaces silently breaks the
 # probes. Every CIDR a node can appear in has to be listed.
+#
+# Defence-in-depth only: gcp and TKE do not enforce NetworkPolicy (#2650 /
+# 34f9fcad measured an application-layer 400 across namespaces instead of a
+# timeout), so enabling this does not enforce isolation - see
+# templates/networkpolicy.yaml before treating it as a control.
 networkPolicy:
   enabled: false
   # Namespaces allowed to reach the Service, in addition to this release's own

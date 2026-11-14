@@ -3,6 +3,16 @@
 # itself has no inbound authentication, so "reachable from any pod" is the whole
 # exposure. This policy narrows ingress to the consumers that were verified
 # against the cluster.
+{{- /*
+Read the paragraph above with this one: the target clusters do not enforce
+NetworkPolicy. #2650 (34f9fcad) probed this namespace from another one and got an
+application-layer HTTP 400 instead of a timeout, so on gcp and TKE this object
+does not enforce isolation - the allowed-namespace list is intent, not a boundary.
+It is defence-in-depth only: never cite it as evidence that the tool is
+unreachable, and close the exposure on the authentication and token-scope side.
+(Kept as a template comment on purpose: a rendered manifest must stay
+byte-identical to the previous release.)
+*/}}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
