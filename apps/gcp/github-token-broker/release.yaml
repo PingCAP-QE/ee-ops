@@ -70,6 +70,10 @@ spec:
         #   jenkins-tiflow -> pingcap-inc/{ticdc,tiflow,tiflash-scripts}
         - jenkins-tidb
         - jenkins-tiflow
+        # Prow job Pods: `pull-error-log-review` mints a read-only token for the
+        # pull request's repository instead of mounting the org bot PAT. The
+        # policy grants `prow-test-pods/default` per repository.
+        - prow-test-pods
       egress:
         # DNS.
         - to:
