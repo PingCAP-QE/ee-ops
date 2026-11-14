@@ -10,6 +10,7 @@ This directory contains repository design notes, migration guides, and operation
 - `github-actions-secrets/README.md`: GitHub Actions secrets central management design
 - `git-cdn-jenkins-auth.md`: Jenkins Git CDN URL rewriting and public/private repository authentication
 - `github-token-broker-external.md`: public JWT entry for the GitHub token broker, key issuance, residual risks and rollback
+- `credential-rotation/sa-key-inventory.md`: register of the static GCP service-account keys (owner, creation date, maximum age), enforced by `scripts/check-sa-key-inventory.sh`
 - `zot-personal-namespaces.md`: `personal/**` namespaces on `cr.pingcap.net` (tencentcloud zot): how user lists are wired, why authorization must be users-based rather than groups-based, and the add-user / debug runbook
 
 ## Notes
