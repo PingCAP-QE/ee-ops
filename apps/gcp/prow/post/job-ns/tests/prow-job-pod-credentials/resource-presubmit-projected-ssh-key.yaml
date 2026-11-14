@@ -1,0 +1,28 @@
+# A presubmit that receives the bot SSH private key through a projected volume
+# (the shape `clonerefs` uses), instead of a plain secret volume.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prow-presubmit-projected-ssh-key
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+    prow.k8s.io/type: presubmit
+    prow.k8s.io/job: pull-verify
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+    prow.k8s.io/refs.pull: "2468"
+spec:
+  containers:
+    - name: test
+      image: ghcr.io/pingcap-qe/ci/test:latest
+      volumeMounts:
+        - name: ssh-key
+          mountPath: /root/.ssh
+          readOnly: true
+  volumes:
+    - name: ssh-key
+      projected:
+        sources:
+          - secret:
+              name: github-ssh-secret
