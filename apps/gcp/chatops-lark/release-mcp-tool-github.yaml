@@ -31,8 +31,9 @@ spec:
     # Defence-in-depth only: the gcp cluster does not enforce NetworkPolicy
     # (#2650 / 34f9fcad probed across namespaces and got an application-layer 400,
     # not a timeout), so this block does not enforce isolation. The reachability
-    # boundary here is intent, not a control - the exposure is closed by the
-    # dedicated read-only token, not by this policy. See
+    # boundary here is intent, not a control. Until #2729 lands the tool still runs
+    # with the organisation bot PAT; the exposure can only be closed by the
+    # dedicated read-only token, never by this policy. See
     # charts/mcp-tool/templates/networkpolicy.yaml.
     networkPolicy:
       enabled: true
