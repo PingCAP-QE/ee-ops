@@ -2,9 +2,9 @@
 prowjob_namespace: {{ .Release.Namespace }}
 pod_namespace: {{ .Values.prow.podsNamespace }}
 
-in_repo_config:
-  enabled:
-    "*": true
+# Off on purpose: it lets a pull request author the Pod spec of its own
+# presubmit, and those Pods run next to Prow's org-wide credentials. Job config
+# lives in PingCAP-QE/ci. FLA-326.
 
 deck:
   spyglass:
