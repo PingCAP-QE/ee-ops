@@ -28,10 +28,12 @@ spec:
     ignoreFailures: true
   values:
     replicaCount: 1
-    # The MCP server runs with the organisation bot PAT in its environment and has
-    # no inbound authentication of its own, so reachability is the boundary. Only
-    # the consumers below were verified against the cluster; everything else is
-    # denied.
+    # Defence-in-depth only: the gcp cluster does not enforce NetworkPolicy
+    # (#2650 / 34f9fcad probed across namespaces and got an application-layer 400,
+    # not a timeout), so this block does not enforce isolation. The reachability
+    # boundary here is intent, not a control - the exposure is closed by the
+    # dedicated read-only token, not by this policy. See
+    # charts/mcp-tool/templates/networkpolicy.yaml.
     networkPolicy:
       enabled: true
       # `kube-system` for DNS, `gmp-system` for the GMP collector that scrapes this
