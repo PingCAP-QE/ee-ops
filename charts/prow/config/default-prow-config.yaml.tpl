@@ -2,9 +2,16 @@
 prowjob_namespace: {{ .Release.Namespace }}
 pod_namespace: {{ .Values.prow.podsNamespace }}
 
-in_repo_config:
-  enabled:
-    "*": true
+# Deliberately off. `in_repo_config` lets a pull request author the Pod spec of
+# its own presubmit, and Prow job Pods here run in `prow-test-pods`, which also
+# holds the org-wide credentials Prow itself uses (github-token, the bot SSH
+# key, Workload-Identity ServiceAccounts). No repository used this feature, so
+# removing it costs nothing and takes the PR-authored Pod spec out of reach.
+# Re-enabling it for a single repository makes that repository's contributors
+# able to name those credentials in a Pod spec: only do that after the
+# credentials are out of the namespace, together with
+# apps/prow/policies/restrict-prow-job-pod-credentials.yaml being enforced.
+# FLA-326.
 
 deck:
   spyglass:
