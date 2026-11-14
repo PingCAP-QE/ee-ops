@@ -12,3 +12,5 @@ resources:
   - policies/inject-prow-tencent-cost-tags.yaml
   # Use the local zot mirror for private Tidbx GAR images and inject pull auth
   - policies/replace-tidbx-registry.yaml
+  # Report PR-authored Pods that name this namespace's credentials
+  - policies/restrict-prow-job-pod-credentials.yaml
