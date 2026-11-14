@@ -10,8 +10,23 @@ It manages the following resources:
 - Role and RoleBinding for basic pod lifecycle operations in `prow-test-pods`
 - `NamespacedMutatingPolicy` `inject-prow-tencent-cost-tags`, which applies TKE
   supernode organization-billing tags to eligible Prow Pods
+- The shared validation policy
+  [restrict-prow-job-pod-credentials](../../prow/policies/restrict-prow-job-pod-credentials.yaml),
+  which reports (and later denies) PR-authored Prow job Pods that name the
+  credentials in this namespace
 
 The namespace is pinned to `amd64` nodes through a namespace annotation.
+
+## Credential restriction
+
+This namespace materializes the same org-wide credentials as the `gcp`
+`prow-test-pods` namespace (`github-token`, `ci-job-params-mono`,
+`tencentcloud-terraform-creds`, ...). The policy that reports Pods naming them
+is not duplicated here: it comes from
+[apps/prow/policies](../../prow/policies), the same file the `gcp` overlay
+loads, so the two build clusters cannot drift. It is report-only until the
+credentials are moved out of the namespace; see the header of that file for the
+enforcement order.
 
 Job pods land here when their spec sets `cluster: tke-pingcap-cicd` (job configs
 live in `prow-jobs/` of PingCAP-QE/ci). That alias is a kubeconfig **context**

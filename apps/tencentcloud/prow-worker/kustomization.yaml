@@ -12,3 +12,19 @@ resources:
   - policies/inject-prow-tencent-cost-tags.yaml
   # Use the local zot mirror for private Tidbx GAR images and inject pull auth
   - policies/replace-tidbx-registry.yaml
+  # This namespace materializes the same org-wide credentials as the gcp one
+  # (github-token, tencentcloud-terraform-creds, ...), so it needs the same
+  # restriction that apps/gcp/prow/post/job-ns loads.
+  - ../../prow/policies
+# The shared policy reports by default. Flip a rule to Enforce here once the
+# presubmits that still need it are migrated (see the header of
+# apps/prow/policies/restrict-prow-job-pod-credentials.yaml):
+#
+# patches:
+#   - target:
+#       kind: Policy
+#       name: restrict-prow-job-pod-credentials
+#     patch: |-
+#       - op: replace
+#         path: /spec/rules/1/validate/failureAction
+#         value: Enforce

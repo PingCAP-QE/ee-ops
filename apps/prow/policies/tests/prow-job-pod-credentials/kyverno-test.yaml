@@ -1,0 +1,162 @@
+# FLA-326 regression suite for `restrict-prow-job-pod-credentials`.
+#
+# The policy reports only for now (every rule is `failureAction: Audit`), so
+# each case asserts which rule *would* deny: `fail` = the rule matched
+# (reported), `pass` = evaluated and allowed, `skip` = out of the rule's scope
+# (not a PR-authored presubmit/batch Pod). The same expectations hold after a
+# rule is flipped to Enforce, so this suite does not need to change then.
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-prow-job-pod-credentials
+policies:
+  - ../../restrict-prow-job-pod-credentials.yaml
+resources:
+  - resource-presubmit-privileged-sa.yaml
+  - resource-batch-org-secret-volume.yaml
+  - resource-presubmit-org-secret-env.yaml
+  - resource-presubmit-projected-ssh-key.yaml
+  - resource-presubmit-decorator-gcs.yaml
+  - resource-out-of-scope.yaml
+results:
+  # 1. PR-authored presubmit that names a Workload-Identity ServiceAccount.
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-privileged-service-account
+    resources:
+      - prow-presubmit-privileged-sa
+    kind: Pod
+    result: fail
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-presubmit-privileged-sa
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - prow-presubmit-privileged-sa
+    kind: Pod
+    result: pass
+
+  # 2. Batch job that mounts the org bot PAT as a volume (org-admin tier).
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-privileged-service-account
+    resources:
+      - prow-batch-org-secret-volume
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-batch-org-secret-volume
+    kind: Pod
+    result: fail
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - prow-batch-org-secret-volume
+    kind: Pod
+    result: pass
+
+  # 3. Presubmit that reads project-scoped Secrets through env/envFrom.
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-privileged-service-account
+    resources:
+      - prow-presubmit-org-secret-env
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-presubmit-org-secret-env
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - prow-presubmit-org-secret-env
+    kind: Pod
+    result: fail
+
+  # 4. The bot SSH key reaches the Pod through a projected volume source, which
+  #    is a different field than a plain secret volume (org-admin tier).
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-privileged-service-account
+    resources:
+      - prow-presubmit-projected-ssh-key
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-presubmit-projected-ssh-key
+    kind: Pod
+    result: fail
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - prow-presubmit-projected-ssh-key
+    kind: Pod
+    result: pass
+
+  # 5. `gcs-credentials` is injected by the decorator into every Pod, so it is
+  #    excluded on purpose: a normal decorated presubmit must not be reported.
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-privileged-service-account
+    resources:
+      - prow-presubmit-decorator-gcs
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-presubmit-decorator-gcs
+    kind: Pod
+    result: pass
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - prow-presubmit-decorator-gcs
+    kind: Pod
+    result: pass
+
+  # 6a. Same exposure, but a periodic Job is not PR-authored: out of scope.
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-privileged-service-account
+    resources:
+      - prow-periodic-privileged
+    kind: Pod
+    result: skip
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-org-admin-secret-reference
+    resources:
+      - prow-periodic-privileged
+    kind: Pod
+    result: skip
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - prow-periodic-privileged
+    kind: Pod
+    result: skip
+
+  # 6b. Same exposure on a hand-made Pod (no `created-by-prow` label): out of scope.
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-privileged-service-account
+    resources:
+      - plain-pod-privileged
+    kind: Pod
+    result: skip
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-org-admin-secret-reference
+    resources:
+      - plain-pod-privileged
+    kind: Pod
+    result: skip
+  - policy: restrict-prow-job-pod-credentials
+    rule: deny-project-secret-reference
+    resources:
+      - plain-pod-privileged
+    kind: Pod
+    result: skip
