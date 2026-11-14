@@ -10,6 +10,9 @@ It manages the following resources:
 - Role and RoleBinding for basic pod lifecycle operations in `prow-test-pods`
 - `NamespacedMutatingPolicy` `inject-prow-tencent-cost-tags`, which applies TKE
   supernode organization-billing tags to eligible Prow Pods
+- `Policy` `restrict-prow-job-pod-credentials`, which reports - and once the
+  credentials are moved out of the namespace, denies - PR-authored Prow job
+  Pods that name `k8s-pod-full` or one of the org-wide Secrets
 
 The namespace is pinned to `amd64` nodes through a namespace annotation.
 
