@@ -64,26 +64,21 @@ spec:
               cloud.google.com/compute-class: ci-worker-ondemand
 
 ---
-# FLA-326 #6: Prow job Pods share this namespace with org-wide credentials, so a
-# PR-authored job config can name a Workload-Identity ServiceAccount or mount a
-# bot Secret. This policy only *reports* that exposure
-# (`validationFailureAction: Audit`) so the blast radius can be measured before
-# anything is enforced; flipping it to Enforce depends on moving these
-# credentials out of this namespace (T1, see FLA-326).
+# FLA-326. The two secret rules are split by blast radius so the org-admin tier
+# can be enforced before the presubmits that still need the project tier are
+# migrated; each rule carries its own `failureAction`. All three are Audit here.
 apiVersion: kyverno.io/v1
 kind: Policy
 metadata:
   name: restrict-prow-job-pod-credentials
-  # Kept in sync with the namespace above: the owning Kustomization overrides
-  # both with `${TEST_PODS_NAMESPACE}`, and `kyverno test` needs the value to
-  # evaluate the rules instead of excluding every resource.
+  # The owning Kustomization sets `${TEST_PODS_NAMESPACE}`; `kyverno test` needs
+  # a value written here or the rules would match nothing.
   namespace: prow-test-pods
 spec:
+  # Rule-level `failureAction` wins; this is the default for any rule without one.
   validationFailureAction: Audit
   background: true
   rules:
-    # Workload-Identity / cluster-RBAC ServiceAccounts. A presubmit that names
-    # one of them can mint GCP access tokens or read cluster state.
     - name: deny-privileged-service-account
       match:
         any:
@@ -100,10 +95,11 @@ spec:
                       - presubmit
                       - batch
       validate:
+        failureAction: Audit
         allowExistingViolations: false
         message: >-
           PR-authored Prow job Pods must not run as a privileged
-          ServiceAccount; this namespace binds Workload-Identity and
+          ServiceAccount: this namespace binds Workload-Identity and
           cluster-scoped RBAC to these identities.
         deny:
           conditions:
@@ -111,18 +107,12 @@ spec:
               - key: "{{ request.object.spec.serviceAccountName || '' }}"
                 operator: AnyIn
                 value:
-                  - tidbx-puller
-                  - terraform-plan-reader
-                  - gar-reader
                   - prow-job-validation
+                  - terraform-plan-reader
+                  - tidbx-puller
+                  - gar-reader
 
-    # Org-wide credentials: `github-token` is the org bot PAT, `github-ssh-secret`
-    # the bot SSH key, and the rest are per-org tokens/params. `gcs-credentials`
-    # is deliberately absent: the decorator injects it into every decorated Pod
-    # (ti-community-infra/configs `prow/config/config.yaml`), so flagging it here
-    # would hit 100% of presubmits and make Enforce unusable; it is a separate
-    # T1 item.
-    - name: deny-org-wide-secret-reference
+    - name: deny-org-admin-secret-reference
       match:
         any:
           - resources:
@@ -138,11 +128,12 @@ spec:
                       - presubmit
                       - batch
       validate:
+        failureAction: Audit
         allowExistingViolations: false
         message: >-
-          PR-authored Prow job Pods must not reference org-wide Secrets
-          (github-token, github-ssh-secret, ci-job-params-mono, ci-smtp,
-          tencentcloud-terraform-creds, codecov-tokens, docs-cn).
+          PR-authored Prow job Pods must not reference org-wide credentials
+          (github-token, github-ssh-secret); read a short-lived token from
+          github-token-broker instead.
         deny:
           conditions:
             any:
@@ -152,6 +143,36 @@ spec:
                 value:
                   - github-token
                   - github-ssh-secret
+
+    - name: deny-project-secret-reference
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+              selector:
+                matchLabels:
+                  created-by-prow: "true"
+                matchExpressions:
+                  - key: prow.k8s.io/type
+                    operator: In
+                    values:
+                      - presubmit
+                      - batch
+      validate:
+        failureAction: Audit
+        allowExistingViolations: false
+        message: >-
+          PR-authored Prow job Pods must not reference project-scoped Secrets
+          (ci-job-params-mono, ci-smtp, tencentcloud-terraform-creds,
+          codecov-tokens, docs-cn).
+        deny:
+          conditions:
+            any:
+              - key: >-
+                  {{ request.object.spec | [volumes[].secret.secretName, volumes[].projected.sources[].secret.name, containers[].env[].valueFrom.secretKeyRef.name, containers[].envFrom[].secretRef.name, initContainers[].env[].valueFrom.secretKeyRef.name, initContainers[].envFrom[].secretRef.name] | [] }}
+                operator: AnyIn
+                value:
                   - ci-job-params-mono
                   - ci-smtp
                   - tencentcloud-terraform-creds
