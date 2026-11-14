@@ -269,6 +269,40 @@ spec:
           - --update-period=24h # default is 24 hours.
         service:
           type: ClusterIP
+      protected-changes:
+        service:
+          type: ClusterIP
+        replicaCount: 1
+        image:
+          repository: ghcr.io/ti-community-infra/prow/protected-changes
+          tag: v20261114-4c9072805
+        ports:
+          http: 8888
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/app-private-key
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+          - --config=/etc/protected-changes/protected_changes_config.yaml
+          # Re-read the ConfigMap instead of restarting the container; the
+          # plugin swaps the policy in without dropping a webhook.
+          - --config-reload-interval=30s
+        volumeMounts:
+          - name: protected-changes-config
+            mountPath: /etc/protected-changes
+            readOnly: true
+        volumes:
+          - name: protected-changes-config
+            configMap:
+              name: prow-protected-changes-config
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 300m
+            memory: 256Mi
       ti-community-autoresponder:
         service:
           type: ClusterIP
