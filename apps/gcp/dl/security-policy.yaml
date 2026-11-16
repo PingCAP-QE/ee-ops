@@ -1,0 +1,33 @@
+# Google OIDC login for every path under https://prow.tidb.net/dl.
+#
+# The pingcap.com domain restriction is enforced by the Google OAuth client:
+# it is an "Internal" Web application, so only PingCAP Workspace accounts can
+# complete the authorization. The client credentials are shared through the
+# GCP Secret Manager secret google-oauth2-client-ee-apps.
+#
+# The OAuth client must allow https://prow.tidb.net/dl/oauth2/callback as an
+# authorized redirect URI.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: dl-oidc
+  namespace: dl
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: dl
+  csrf: {}
+  oidc:
+    provider:
+      issuer: https://accounts.google.com
+    clientIDRef:
+      name: dl-oidc
+    clientSecret:
+      name: dl-oidc
+    redirectURL: https://prow.tidb.net/dl/oauth2/callback
+    logoutPath: /dl/logout
+    scopes:
+      - openid
+      - email
+      - profile
