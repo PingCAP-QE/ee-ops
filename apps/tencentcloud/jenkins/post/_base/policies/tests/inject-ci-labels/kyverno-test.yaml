@@ -1,0 +1,28 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-ci-labels
+policies:
+  - ../../inject-ci-labels.yaml
+resources:
+  - resources.yaml
+results:
+  - policy: inject-ci-labels
+    rule: inject-ci-labels
+    resources:
+      - bot-author
+      - label-length-boundary
+      - leading-trailing-punctuation
+      - punctuation-only
+      - trigger-user-fallback
+      - empty-refs
+    kind: Pod
+    result: pass
+    patchedResources: patched.yaml
+  - policy: inject-ci-labels
+    rule: inject-ci-labels
+    resources:
+      - no-controller
+      - no-ci-refs
+    kind: Pod
+    result: skip
