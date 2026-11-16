@@ -1,0 +1,127 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bot-author
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    keep: unchanged
+    prow.k8s.io/refs.org: tidbcloud
+    prow.k8s.io/refs.repo: cloud-storage-engine
+    prow.k8s.io/refs.base_ref: release-nextgen-202609
+    author: ti-chi-bot_bot
+    org: tidbcloud
+    repo: cloud-storage-engine
+    env: cicd
+  annotations:
+    ci_refs: '{"org":"tidbcloud","repo":"cloud-storage-engine","base_ref":"release-nextgen-202609","pulls":[{"author":"ti-chi-bot[bot]"}]}'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: label-length-boundary
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    prow.k8s.io/refs.org: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    prow.k8s.io/refs.repo: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    prow.k8s.io/refs.base_ref: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    author: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    org: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    repo: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    env: cicd
+  annotations:
+    ci_refs: '{"org":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail","repo":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail","base_ref":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail","pulls":[{"author":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail"}]}'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: leading-trailing-punctuation
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+    prow.k8s.io/refs.base_ref: feature_foo
+    author: some-user
+    org: pingcap
+    repo: tidb
+    env: cicd
+  annotations:
+    ci_refs: '{"org":"-_PingCAP_-","repo":"-_TiDB_-","base_ref":"-_feature/foo_-","pulls":[{"author":"-_Some-User_-"}]}'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: punctuation-only
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    prow.k8s.io/refs.org: ""
+    prow.k8s.io/refs.repo: ""
+    prow.k8s.io/refs.base_ref: ""
+    author: ""
+    org: ""
+    repo: ""
+    env: cicd
+  annotations:
+    ci_refs: '{"org":"[]/-_","repo":"[]/-_","base_ref":"[]/-_","pulls":[{"author":"[]/-_"}]}'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: trigger-user-fallback
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+    prow.k8s.io/refs.base_ref: master
+    author: dillon_zheng_example_com
+    org: pingcap
+    repo: tidb
+    env: cicd
+  annotations:
+    ci_refs: '{"org":"PingCAP","repo":"TiDB","base_ref":"master","pulls":[]}'
+    ci_trigger_user: Dillon Zheng@example.com
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-refs
+  namespace: jenkins-tidb
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    prow.k8s.io/refs.org: ""
+    prow.k8s.io/refs.repo: ""
+    prow.k8s.io/refs.base_ref: ""
+    author: ""
+    org: ""
+    repo: ""
+    env: cicd
+  annotations:
+    ci_refs: '{}'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bot-author
+  # The unrendered namespaced Policy defaults to this namespace in the CLI.
+  namespace: default
+  labels:
+    kubernetes.jenkins.io/controller: ""
+  annotations:
+    ci_refs: '{"org":"tidbcloud","repo":"cloud-storage-engine","base_ref":"release-nextgen-202609","pulls":[{"author":"ti-chi-bot[bot]"}]}'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: label-length-boundary
+  namespace: default
+  labels:
+    kubernetes.jenkins.io/controller: ""
+  annotations:
+    # The underscore is character 63 in each field.
+    ci_refs: '{"org":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail","repo":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail","base_ref":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail","pulls":[{"author":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa_tail"}]}'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36

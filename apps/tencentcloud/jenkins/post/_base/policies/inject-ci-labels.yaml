@@ -36,7 +36,7 @@ spec:
         string(variables.refs.pulls[0].?author.orValue('')) :
         string(object.metadata.?annotations.orValue({})[?'ci_trigger_user'].orValue(''))
     # compatible with prow style refs labels: lowercase, only [a-z0-9_-],
-    # truncated to 63 chars at patch time.
+    # truncated to 63 chars, then trimmed to alphanumeric boundaries at patch time.
     - name: sanitizedOrg
       expression: >-
         string(variables.refs.?org.orValue('')).lowerAscii()
@@ -61,32 +61,32 @@ spec:
             JSONPatch{
               op: "add",
               path: "/metadata/labels/prow.k8s.io~1refs.org",
-              value: size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg
+              value: (size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")
             },
             JSONPatch{
               op: "add",
               path: "/metadata/labels/prow.k8s.io~1refs.repo",
-              value: size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo
+              value: (size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")
             },
             JSONPatch{
               op: "add",
               path: "/metadata/labels/prow.k8s.io~1refs.base_ref",
-              value: size(variables.sanitizedBaseRef) > 63 ? variables.sanitizedBaseRef.substring(0, 63) : variables.sanitizedBaseRef
+              value: (size(variables.sanitizedBaseRef) > 63 ? variables.sanitizedBaseRef.substring(0, 63) : variables.sanitizedBaseRef).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")
             },
             JSONPatch{
               op: "add",
               path: "/metadata/labels/author",
-              value: size(variables.sanitizedAuthor) > 63 ? variables.sanitizedAuthor.substring(0, 63) : variables.sanitizedAuthor
+              value: (size(variables.sanitizedAuthor) > 63 ? variables.sanitizedAuthor.substring(0, 63) : variables.sanitizedAuthor).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")
             },
             JSONPatch{
               op: "add",
               path: "/metadata/labels/org",
-              value: size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg
+              value: (size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")
             },
             JSONPatch{
               op: "add",
               path: "/metadata/labels/repo",
-              value: size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo
+              value: (size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")
             },
             JSONPatch{
               op: "add",
