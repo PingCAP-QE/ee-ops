@@ -6,6 +6,9 @@
 # asserts the guard's exit code. Run it directly; it needs yq v4 on PATH.
 #
 # `set`/`add` use the Gateway API v1 shape: a list of `{name, value}` objects.
+# The same modifier can hang off a rule (`spec.rules[].filters[]`) or off a
+# backendRef (`spec.rules[].backendRefs[].filters[]`); both positions are
+# covered here because Envoy Gateway applies both.
 set -euo pipefail
 
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -302,6 +305,100 @@ spec:
                 value: same-origin
 EOF
 expect 0 "set list COOP same-origin passes" run_fixture
+
+# Regression 4: the same modifiers on a backendRef (`spec.rules[].backendRefs[]
+# .filters[]`) are applied by Envoy Gateway too, so they must fail the guard.
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 8080
+          filters:
+            - type: ResponseHeaderModifier
+              responseHeaderModifier:
+                remove:
+                  - x-frame-options
+EOF
+expect nonzero "backendRef remove lowercase x-frame-options fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 8080
+          filters:
+            - type: ResponseHeaderModifier
+              responseHeaderModifier:
+                set:
+                  - name: X-Frame-Options
+                    value: ALLOWALL
+EOF
+expect nonzero "backendRef set list X-Frame-Options ALLOWALL fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 8080
+          filters: [{type: ResponseHeaderModifier, responseHeaderModifier: {add: [{name: content-security-policy, value: "default-src *"}]}}]
+EOF
+expect nonzero "flow backendRef add content-security-policy fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 8080
+          filters: [{type: ResponseHeaderModifier, responseHeaderModifier: {remove: [x-frame-options]}}]
+EOF
+expect nonzero "flow backendRef remove [x-frame-options] fails" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 8080
+          filters: [{type: ResponseHeaderModifier, responseHeaderModifier: {set: [{name: x-frame-options, value: SAMEORIGIN}]}}]
+EOF
+expect 0 "flow backendRef set x-frame-options SAMEORIGIN passes" run_fixture
+
+write_route <<'EOF'
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: jenkins
+spec:
+  rules:
+    - backendRefs:
+        - name: jenkins
+          port: 8080
+EOF
+expect 0 "backendRef without filters passes" run_fixture
 
 # Fail-closed: unparsable YAML must not be reported as PASS.
 write_route <<'EOF'
