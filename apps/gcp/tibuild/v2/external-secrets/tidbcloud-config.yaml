@@ -29,15 +29,15 @@ spec:
                 tikv:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 tikv_worker:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 schema_manager:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 pd:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/pd
@@ -65,7 +65,7 @@ spec:
                 coprocessor_worker:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 tidb:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tidb
@@ -81,19 +81,19 @@ spec:
                 tibr_autobackup:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 tibr_restore:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 tibrgc_t2_dfsgc:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 tibrgc_t3_archive:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/tikv
-                  github_repo: tidbcloud/cloud-storage-engine
+                  github_repo: pingcap/ticse
                 classic_restore:
                   cluster_type: SHARED_POOL
                   base_image: us.gcr.io/pingcap-public/tidbx/br
