@@ -66,17 +66,34 @@ check_machine_policy() {
   directory=$(dirname "$file")
   yq eval -e '.resources[] | select(. == "machine-access.yaml")' \
     "$repo_root/$directory/kustomization.yaml" > /dev/null
+  # GET + Bearer must outrank the browser GET match; retain the method-less
+  # Bearer fallback for other methods with the same rewrite and backend.
   ROUTE="$route" AUDIENCE="$audience" yq eval -e '
     select(.kind == "HTTPRoute") |
     .metadata.name == strenv(ROUTE) and
     (.spec.hostnames | length == 1) and
     .spec.hostnames[0] == strenv(AUDIENCE) and
-    (.spec.rules | length == 1) and
-    (.spec.rules[0].matches | length == 1) and
-    (.spec.rules[0].matches[0].headers | length == 1) and
-    .spec.rules[0].matches[0].headers[0].name == "Authorization" and
-    .spec.rules[0].matches[0].headers[0].type == "RegularExpression" and
-    .spec.rules[0].matches[0].headers[0].value == "^Bearer .+$"
+    (.spec.rules | length == 2) and
+    .spec.rules[0].matches[0].method == "GET" and
+    (.spec.rules[1].matches[0] | has("method") | not) and
+    ([.spec.rules[] |
+      select(
+        (.matches | length == 1) and
+        .matches[0].path.type == "PathPrefix" and
+        .matches[0].path.value == "/tibuild" and
+        (.matches[0].headers | length == 1) and
+        .matches[0].headers[0].name == "Authorization" and
+        .matches[0].headers[0].type == "RegularExpression" and
+        .matches[0].headers[0].value == "^Bearer .+$" and
+        (.filters | length == 1) and
+        .filters[0].type == "URLRewrite" and
+        .filters[0].urlRewrite.path.type == "ReplacePrefixMatch" and
+        .filters[0].urlRewrite.path.replacePrefixMatch == "/" and
+        (.backendRefs | length == 1) and
+        .backendRefs[0].name == "v2-tibuild-v2" and
+        .backendRefs[0].port == 80
+      )
+    ] | length == 2)
   ' "$repo_root/$file" > /dev/null
   # The policy may cover the privileged-path route as well, so allow up to two
   # targets. Counted in bash: the yq release CI installs (v4.6.1) cannot parse

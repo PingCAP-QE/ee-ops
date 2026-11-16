@@ -1,4 +1,5 @@
-# A header match is more specific than the browser route's path-only match.
+# Explicit GET + Bearer matches outrank the browser GET route: Envoy Gateway
+# counts the method as an exact header match when ordering routes.
 # This is not an authentication bypass: the matching route requires a valid
 # JWT and never accepts the browser's OIDC cookies as authentication.
 # Keep path/rewrite/backend/port in sync with release.yaml and chart tibuild-v2.
@@ -15,6 +16,26 @@ spec:
   hostnames:
     - prow.tidb.net
   rules:
+    # The browser route matches GET too. Matching both the method and Bearer
+    # header gives machine reads priority without changing browser OIDC access.
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /tibuild
+          method: GET
+          headers:
+            - name: Authorization
+              type: RegularExpression
+              value: "^Bearer .+$"
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
     - matches:
         - path:
             type: PathPrefix
