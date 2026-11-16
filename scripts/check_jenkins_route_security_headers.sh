@@ -16,7 +16,10 @@
 #     defeats the protection just as well. Values are allow-listed, so unknown
 #     spellings fail closed;
 #   * finding no Jenkins route files at all is a failure, so a renamed path
-#     cannot make the guard pass vacuously.
+#     cannot make the guard pass vacuously;
+#   * both HTTPRoute filter positions are inspected, `spec.rules[].filters[]`
+#     and `spec.rules[].backendRefs[].filters[]`, because Envoy Gateway applies
+#     a backendRef modifier just as it applies a rule-level one.
 #
 # Both the block and the flow YAML style are handled: entries are projected to
 # plain scalar lines by yq instead of being re-parsed from its pretty output.
@@ -63,14 +66,25 @@ while IFS= read -r file; do
   # Gateway API `HTTPHeader` objects (`name`/`value`), in both YAML styles.
   # `-P` keeps yq's output in block style; it is a no-op for these scalar
   # projections but keeps the call shape the reviewers asked for.
+  #
+  # ResponseHeaderModifier appears in two places and both are live in Envoy
+  # Gateway: on the rule (`spec.rules[].filters[]`) and on a backendRef
+  # (`spec.rules[].backendRefs[].filters[]`, gateway-api v1.6.1
+  # `HTTPBackendRef.filters`, merged into DestinationFilters by EG's
+  # processDestinationFilters). Both positions are fed through one filter list
+  # below, so one rule covers them and the two can never drift apart; the
+  # self-test pins both.
   entries=$(yq eval -P '
-    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] | (.filters // [])[] |
+    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] |
+      ( (.filters // [])[], ((.backendRefs // [])[] | (.filters // [])[]) ) |
       select(.type == "ResponseHeaderModifier") |
       (.responseHeaderModifier.remove // [])[] | "remove:" + . ),
-    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] | (.filters // [])[] |
+    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] |
+      ( (.filters // [])[], ((.backendRefs // [])[] | (.filters // [])[]) ) |
       select(.type == "ResponseHeaderModifier") |
       (.responseHeaderModifier.set // [])[] | "set:" + .name + ":" + .value ),
-    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] | (.filters // [])[] |
+    ( select(.kind == "HTTPRoute") | (.spec.rules // [])[] |
+      ( (.filters // [])[], ((.backendRefs // [])[] | (.filters // [])[]) ) |
       select(.type == "ResponseHeaderModifier") |
       (.responseHeaderModifier.add // [])[] | "add:" + .name + ":" + .value )
   ' "$file")
