@@ -3,7 +3,7 @@ kind: Kustomization
 namespace: tirelease
 images:
   - name: hub.pingcap.net/ee/tirelease
-    newTag: c0ad0ac-dirty-amd64
+    newTag: f128792-dirty-amd64
 resources:
   - namespace.yaml
   - configmaps.yaml
