@@ -18,8 +18,15 @@ spec:
   timeout: 10m
   install:
     crds: CreateReplace
+    # A fresh install cannot gate on readiness: `prow-tide` re-syncs every
+    # configured repository before it serves its probes and is throttled by
+    # `--sync-hourly-tokens`, so a cold start takes tens of minutes. Waiting
+    # makes the install time out, and the install remediation then uninstalls
+    # the release it just created, which wipes the namespace.
+    disableWait: true
+    disableWaitForJobs: true
     remediation:
-      retries: 3
+      retries: 0
   rollback:
     cleanupOnFail: true
     recreate: true
@@ -29,8 +36,10 @@ spec:
     remediation:
       retries: 3
   test:
-    enable: true
-    ignoreFailures: false
+    # The chart's test hook connects to deck and hook, which are not serving yet
+    # right after a wait-less install, so it fails exactly when it matters least.
+    # Verification is done by checking the workloads after reconciliation.
+    enable: false
   values:
     podLabels:
       env: cicd
