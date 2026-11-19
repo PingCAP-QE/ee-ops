@@ -237,6 +237,8 @@ check_tibuild_service_isolation() {
     echo "FAIL: $directory/kustomization.yaml must ship networkpolicy.yaml" >&2
     return 1
   fi
+  # The yq release CI installs (v4.6.1) has neither sort nor contains for
+  # arrays, so compare the joined list. Order is part of the expectation.
   if ! yq eval -e '
     select(.kind == "NetworkPolicy") |
     .metadata.namespace == "tibuild" and
@@ -246,8 +248,8 @@ check_tibuild_service_isolation() {
     .spec.policyTypes[0] == "Ingress" and
     (.spec.ingress | length == 1) and
     ([ .spec.ingress[0].from[]
-       | .namespaceSelector.matchLabels."kubernetes.io/metadata.name" ] | sort | join(",")
-     == "chatops-lark,ee-portal,infra,tibuild") and
+       | .namespaceSelector.matchLabels."kubernetes.io/metadata.name" ] | join(",")
+     == "infra,tibuild,chatops-lark,ee-portal") and
     (.spec.ingress[0].ports | length == 1) and
     .spec.ingress[0].ports[0].port == 80
   ' "$repo_root/$file" > /dev/null; then
