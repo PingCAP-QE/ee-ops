@@ -6,6 +6,7 @@ resources:
   - external-secrets/tidbcloud-config.yaml
   - external-secrets/oidc-secret.yaml
   - release.yaml
+  - networkpolicy.yaml
   - security-policy.yaml
   - machine-access.yaml
   - privileged-access.yaml

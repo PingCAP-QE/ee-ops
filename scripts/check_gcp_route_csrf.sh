@@ -222,3 +222,39 @@ check_write_methods() {
 }
 
 check_write_methods apps/gcp/tibuild/v2/privileged-access.yaml apps/gcp/tibuild/v2/release.yaml
+
+# tibuild cannot authenticate its callers, so the Gateway has to be the only way
+# in. Without this policy any Pod in the cluster reaches the ClusterIP and skips
+# every SecurityPolicy above — the authentication finding this closes.
+# The admitted namespaces are reviewed: infra is the Envoy data plane, tibuild
+# is the release itself, chatops-lark and ee-portal proxy through the in-cluster
+# Service. Adding one here needs a reason it cannot use the Gateway.
+check_tibuild_service_isolation() {
+  local directory=apps/gcp/tibuild/v2
+  local file=$directory/networkpolicy.yaml
+  if ! yq eval -e '.resources[] | select(. == "networkpolicy.yaml")' \
+      "$repo_root/$directory/kustomization.yaml" > /dev/null; then
+    echo "FAIL: $directory/kustomization.yaml must ship networkpolicy.yaml" >&2
+    return 1
+  fi
+  if ! yq eval -e '
+    select(.kind == "NetworkPolicy") |
+    .metadata.namespace == "tibuild" and
+    .spec.podSelector.matchLabels."app.kubernetes.io/name" == "tibuild-v2" and
+    .spec.podSelector.matchLabels."app.kubernetes.io/instance" == "v2" and
+    (.spec.policyTypes | length == 1) and
+    .spec.policyTypes[0] == "Ingress" and
+    (.spec.ingress | length == 1) and
+    ([ .spec.ingress[0].from[]
+       | .namespaceSelector.matchLabels."kubernetes.io/metadata.name" ] | sort | join(",")
+     == "chatops-lark,ee-portal,infra,tibuild") and
+    (.spec.ingress[0].ports | length == 1) and
+    .spec.ingress[0].ports[0].port == 80
+  ' "$repo_root/$file" > /dev/null; then
+    echo "FAIL: $file must admit only the Gateway and the reviewed in-cluster consumers on port 80" >&2
+    return 1
+  fi
+  echo "PASS: tibuild's API is reachable only through the Gateway and reviewed consumers"
+}
+
+check_tibuild_service_isolation
