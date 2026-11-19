@@ -58,12 +58,12 @@ spec:
         - name: DL_DELIVERY_DATABASE_DSN
           valueFrom:
             secretKeyRef:
-              name: dl-delivery-tidb-management
-              key: dsn
+              name: dl-delivery-tidb
+              key: management_dsn
       volumes:
         - name: policy
-          secret:
-            secretName: dl-delivery-policy
+          configMap:
+            name: dl-delivery-policy
         # Reuses the registry credentials mounted by the internal release.
         - name: oci
           secret:

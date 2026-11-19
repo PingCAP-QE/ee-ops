@@ -38,8 +38,8 @@ spec:
             - name: DL_DELIVERY_DATABASE_DSN
               valueFrom:
                 secretKeyRef:
-                  name: dl-delivery-tidb-migrate
-                  key: dsn
+                  name: dl-delivery-tidb
+                  key: migrate_dsn
           resources:
             limits:
               cpu: "500m"
