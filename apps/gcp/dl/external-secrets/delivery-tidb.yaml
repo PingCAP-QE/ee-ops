@@ -14,7 +14,9 @@ kind: ExternalSecret
 metadata:
   name: dl-delivery-tidb
 spec:
-  refreshInterval: 1h
+  # Short interval so a rotated DSN reaches the Pods (and the migration Job)
+  # without waiting an hour; the Secret is a handful of bytes.
+  refreshInterval: 1m
   secretStoreRef:
     name: ee-gcp-sm
     kind: ClusterSecretStore

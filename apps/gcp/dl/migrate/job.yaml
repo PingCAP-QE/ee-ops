@@ -17,7 +17,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: dl-delivery-migrate-v1
+  name: dl-delivery-migrate-v2
   labels:
     app.kubernetes.io/name: dl
     app.kubernetes.io/component: delivery-migrate
