@@ -1,0 +1,92 @@
+# Anonymous redemption surface. Serves only GET/HEAD `/d/{token}`; probes and
+# metrics are on the private :8001 listener.
+#
+# No HTTPRoute is attached on purpose: the public hostname must match only `/d/`,
+# carry the TLS certificate, disable the request timeout and have token paths
+# redacted at the Gateway first. See
+# https://github.com/PingCAP-QE/ee-apps/blob/main/dl/docs/delivery.md ("Deployment and rollout in ee-ops").
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dl-public
+spec:
+  chart:
+    spec:
+      chart: dl
+      version: 0.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  # The chart's test hook probes `/healthz` on the application port, but
+  # delivery modes serve probes on the private :8001 listener only.
+  test:
+    enable: false
+  values:
+    replicaCount: 1
+    # Distinct Service/ServiceAccount names in the same namespace as the
+    # internal release; keep in sync with networkpolicy-delivery.yaml.
+    fullnameOverride: dl-public
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/dl
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
+      tag: v2026.11.15-6-gb1e99ab
+    server:
+      # Concurrency and rate limits are per replica; global limits belong at the
+      # edge. Defaults: 32 in-flight requests, 10 rps with a burst of 20,
+      # 24h transfer deadline.
+      args:
+        - --server-mode=public
+        - --domain=0.0.0.0:80
+        - --delivery-health-address=:8001
+        - --delivery-config=/etc/delivery/policy.yaml
+        - --oci-config=/etc/oci/oci.yaml
+        # The only registry the delivery policy may pin artifacts from.
+        - --oci-allowed-registries=hub.pingcap.net
+      env:
+        - name: DL_DELIVERY_DATABASE_DSN
+          valueFrom:
+            secretKeyRef:
+              name: dl-delivery-tidb-public
+              key: dsn
+      volumes:
+        - name: policy
+          secret:
+            secretName: dl-delivery-policy
+        # Reuses the registry credentials mounted by the internal release.
+        - name: oci
+          secret:
+            secretName: dl-config
+      volumeMounts:
+        - name: policy
+          mountPath: /etc/delivery
+          readOnly: true
+        - name: oci
+          mountPath: /etc/oci
+          readOnly: true
+    livenessProbe:
+      httpGet:
+        path: /livez
+        port: 8001
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: 8001
+    httpRoute:
+      enabled: false

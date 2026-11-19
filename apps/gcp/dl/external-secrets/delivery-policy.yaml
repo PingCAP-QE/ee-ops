@@ -1,0 +1,25 @@
+# Issuer policy for the delivery server modes: public origin, per-issuer
+# repository/tag/TTL scopes and the SHA-256 of each issuer bearer secret.
+#
+# The plaintext issuer secrets live with the issuing service, never here: the
+# policy only carries their hashes. Rotating an issuer secret means updating
+# this object and rolling both Deployments.
+#
+# The GSM payload is a JSON object with a single `policy.yaml` key whose value
+# is the YAML document. Start from
+# https://github.com/PingCAP-QE/ee-apps/blob/main/dl/examples/delivery-policy.yaml
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-delivery-policy
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-delivery-policy
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: gcp_dl_delivery_policy_json

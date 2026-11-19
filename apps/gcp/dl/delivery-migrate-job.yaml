@@ -1,0 +1,45 @@
+# One-shot delivery schema migration.
+#
+# TiDB DDL is not transactional, so this must run to completion before either
+# delivery Deployment can serve: `management` and `public` refuse to start until
+# `download_issuers` is queryable, and the runtime identities are not allowed to
+# change the schema themselves.
+#
+# The Job stays in git deliberately (no `ttlSecondsAfterFinished`): Flux would
+# recreate a finished-but-pruned Job on every reconcile. Re-running is
+# idempotent; delete the Job to migrate again after a schema change.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dl-delivery-migrate
+  labels:
+    app.kubernetes.io/name: dl
+    app.kubernetes.io/component: delivery-migrate
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dl
+        app.kubernetes.io/component: delivery-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
+          image: ghcr.io/pingcap-qe/ee-apps/dl:v2026.11.15-6-gb1e99ab
+          args:
+            - "--server-mode=delivery-migrate"
+          env:
+            # Only this identity may change the schema; it is not mounted into
+            # either runtime Deployment.
+            - name: DL_DELIVERY_DATABASE_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: dl-delivery-tidb-migrate
+                  key: dsn
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 256Mi

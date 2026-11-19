@@ -8,3 +8,7 @@ resources:
   - health-check-policy.yaml
   - http-route.yaml
   - release.yaml
+  - delivery-migrate-job.yaml
+  - release-management.yaml
+  - release-public.yaml
+  - networkpolicy-delivery.yaml

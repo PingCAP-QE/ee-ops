@@ -1,0 +1,56 @@
+# TiDB DSNs for the delivery server modes.
+#
+# Each mode uses its own least-privilege account; see
+# https://github.com/PingCAP-QE/ee-apps/blob/main/dl/docs/delivery.md for the
+# required grants. Both runtime roles must connect to the primary SQL endpoint,
+# not a stale-read or replica endpoint.
+#
+# Every GSM key below is a JSON object with a single `dsn` key, e.g.
+#   { "dsn": "dl_public:<password>@tcp(<host>:4000)/dl_delivery?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true" }
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-delivery-tidb-migrate
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-delivery-tidb-migrate
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: gcp_dl_delivery_tidb_migrate_json
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-delivery-tidb-management
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-delivery-tidb-management
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: gcp_dl_delivery_tidb_management_json
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-delivery-tidb-public
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-delivery-tidb-public
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: gcp_dl_delivery_tidb_public_json

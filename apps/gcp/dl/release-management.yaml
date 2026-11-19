@@ -1,0 +1,89 @@
+# Share-issuance API. Internal-only: no HTTPRoute is attached, see
+# https://github.com/PingCAP-QE/ee-apps/blob/main/dl/docs/delivery.md ("Management API").
+#
+# Callers must present `Authorization: Bearer <issuer-secret>`; the issuer never
+# comes from OIDC headers or the request body. Add a Gateway machine-JWT route
+# only together with an explicit caller allowlist.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dl-management
+spec:
+  chart:
+    spec:
+      chart: dl
+      version: 0.3.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 5m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  # The chart's test hook probes `/healthz` on the application port, but
+  # delivery modes serve probes on the private :8001 listener only.
+  test:
+    enable: false
+  values:
+    replicaCount: 1
+    # Distinct Service/ServiceAccount names in the same namespace as the
+    # internal release; keep in sync with networkpolicy-delivery.yaml.
+    fullnameOverride: dl-management
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 512Mi
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/dl
+      # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/dl versioning=docker
+      tag: v2026.11.15-6-gb1e99ab
+    server:
+      args:
+        - --server-mode=management
+        - --domain=0.0.0.0:80
+        - --delivery-health-address=:8001
+        - --delivery-config=/etc/delivery/policy.yaml
+        - --oci-config=/etc/oci/oci.yaml
+        - --oci-allowed-registries=hub.pingcap.net
+      env:
+        - name: DL_DELIVERY_DATABASE_DSN
+          valueFrom:
+            secretKeyRef:
+              name: dl-delivery-tidb-management
+              key: dsn
+      volumes:
+        - name: policy
+          secret:
+            secretName: dl-delivery-policy
+        # Reuses the registry credentials mounted by the internal release.
+        - name: oci
+          secret:
+            secretName: dl-config
+      volumeMounts:
+        - name: policy
+          mountPath: /etc/delivery
+          readOnly: true
+        - name: oci
+          mountPath: /etc/oci
+          readOnly: true
+    # Probes and metrics live on the private listener; never expose :8001
+    # through the Service, the HTTPRoute or a public hostname.
+    livenessProbe:
+      httpGet:
+        path: /livez
+        port: 8001
+    readinessProbe:
+      httpGet:
+        path: /healthz
+        port: 8001
+    httpRoute:
+      enabled: false
