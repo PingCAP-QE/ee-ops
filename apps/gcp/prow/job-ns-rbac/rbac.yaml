@@ -1,0 +1,218 @@
+# Transitional RBAC: lets the Prow components (still running in `apps`) read and
+# write ProwJob custom resources that are now created in the `prow` namespace.
+#
+# Prow treats the ProwJob namespace and the components' namespace as separate
+# settings, and the Helm chart only renders its Roles into the release
+# namespace. Until the release itself moves to `prow`, the components need the
+# same per-ServiceAccount rules there. Each Role mirrors the rules its
+# `apps` counterpart already has, limited to prowjobs.
+#
+# Delete this directory together with the Flux Kustomization once the release
+# runs in `prow` and the chart owns these objects.
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-pcm
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["get", "list", "watch", "update", "patch"]
+  # The controller manager takes its leader-election lease in the ProwJob
+  # namespace (upstream: LeaderElectionNamespace = cfg().ProwJobNamespace).
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["create"]
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    resourceNames: ["prow-controller-manager-leader-lock"]
+    verbs: ["get", "update"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-pcm
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-pcm
+subjects:
+  - kind: ServiceAccount
+    name: prow-pcm
+    namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-crier
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["get", "list", "watch", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-crier
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-crier
+subjects:
+  - kind: ServiceAccount
+    name: prow-crier
+    namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-sinker
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["get", "list", "watch", "delete"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-sinker
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-sinker
+subjects:
+  - kind: ServiceAccount
+    name: prow-sinker
+    namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-deck
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-deck
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-deck
+subjects:
+  - kind: ServiceAccount
+    name: prow-deck
+    namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-hook
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["create", "get", "list", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-hook
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-hook
+subjects:
+  - kind: ServiceAccount
+    name: prow-hook
+    namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-tide
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["create", "get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-tide
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-tide
+subjects:
+  - kind: ServiceAccount
+    name: prow-tide
+    namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-horologium
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["create", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-horologium
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-horologium
+subjects:
+  - kind: ServiceAccount
+    name: prow-horologium
+    namespace: apps
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: prow-status-reconciler
+  namespace: prow
+rules:
+  - apiGroups: ["prow.k8s.io"]
+    resources: ["prowjobs"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: prow-status-reconciler
+  namespace: prow
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: prow-status-reconciler
+subjects:
+  - kind: ServiceAccount
+    name: prow-status-reconciler
+    namespace: apps

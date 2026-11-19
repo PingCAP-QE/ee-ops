@@ -1,0 +1,19 @@
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: prow-job-ns-rbac
+  namespace: flux-system
+spec:
+  interval: 5m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./apps/gcp/prow/job-ns-rbac
+  prune: true
+  # The Prow components and the ProwJob custom resources temporarily live in
+  # different namespaces: the chart only renders its Roles into its release
+  # namespace, so this Kustomization grants the components the prowjobs (and
+  # leader-election) permissions they need in the ProwJob namespace.
+  targetNamespace: prow
