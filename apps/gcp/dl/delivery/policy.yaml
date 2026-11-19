@@ -20,7 +20,7 @@ metadata:
   name: dl-delivery-policy
 data:
   policy.yaml: |
-    public_url: https://delivery.example.com
+    public_url: https://dl.pingcap.net
     issuers:
       - id: release-service
         token_sha256: "0000000000000000000000000000000000000000000000000000000000000000"
