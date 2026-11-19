@@ -1,0 +1,38 @@
+name: ESO Scope Inventory
+
+# `ClusterSecretStore/ee-gcp-sm` gives every allowlisted namespace read access
+# to the whole GCP Secret Manager credential. docs/external-secrets-scope.md
+# records that blast radius; this workflow keeps the record honest by failing
+# when the committed block no longer matches the rendered Flux tree.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "apps/**"
+      - "clusters/**"
+      - "infrastructure/**"
+      - "docs/external-secrets-scope.md"
+      - "scripts/eso-scope-inventory.sh"
+      - "scripts/eso-scope-inventory_test.sh"
+      - ".github/workflows/eso_scope_inventory.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+
+      - name: Setup tools
+        uses: ./.github/actions/flux2/tools
+
+      - name: Self-test the inventory script
+        run: bash scripts/eso-scope-inventory_test.sh
+
+      - name: Check the scope document is not stale
+        run: bash scripts/eso-scope-inventory.sh --check

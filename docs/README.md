@@ -11,6 +11,7 @@ This directory contains repository design notes, migration guides, and operation
 - `git-cdn-jenkins-auth.md`: Jenkins Git CDN URL rewriting and public/private repository authentication
 - `github-token-broker-external.md`: public JWT entry for the GitHub token broker, key issuance, residual risks and rollback
 - `zot-personal-namespaces.md`: `personal/**` namespaces on `cr.pingcap.net` (tencentcloud zot): how user lists are wired, why authorization must be users-based rather than groups-based, and the add-user / debug runbook
+- `external-secrets-scope.md`: generated inventory of the namespaces and GCP secrets reachable through `ClusterSecretStore/ee-gcp-sm`, plus the trust-domain split planned to narrow it
 
 ## Notes
 
