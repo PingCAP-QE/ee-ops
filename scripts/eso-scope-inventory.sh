@@ -376,7 +376,7 @@ clusters = cluster_list.split()
 # migration, so adding a namespace has to be a deliberate decision.
 DOMAINS = OrderedDict([
     ("CORE", ["apps", "flux-system", "github-token-broker", "infra"]),
-    ("CI", ["ee-cd", "prow-test-pods", "tekton-pipelines"]),
+    ("CI", ["ee-cd", "prow", "prow-test-pods", "tekton-pipelines"]),
     ("JENKINS", ["jenkins"]),
     ("JENKINS-AGENTS", ["jenkins-pd", "jenkins-ticdc", "jenkins-tidb",
                         "jenkins-tiflash", "jenkins-tiflow", "jenkins-tikv"]),

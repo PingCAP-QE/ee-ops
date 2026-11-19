@@ -67,10 +67,10 @@ up as a reviewable diff instead of silently widening the blast radius.
 
 | Cluster | Allowlisted namespaces | Consuming namespaces | Namespaces without consumers | ExternalSecrets | Distinct GCP secrets |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| `gcp` | 20 | 19 | 1 | 65 | 47 |
+| `gcp` | 20 | 20 | 0 | 66 | 48 |
 | `tencentcloud` | 17 | 17 | 0 | 51 | 42 |
 | `prod2` | 6 | 6 | 0 | 14 | 26 |
-| **Total** | **43** | **42** | **1** | **130** | **83** |
+| **Total** | **43** | **43** | **0** | **131** | **84** |
 
 ### Consumers by namespace
 
@@ -78,7 +78,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 
 | Namespace | Trust domain | ExternalSecrets | GCP secret names |
 | :--- | :--- | ---: | :--- |
-| `apps` | CORE | 10 | `gcp_ci_dashboard_kafka_password`, `gcp_gcs_sa_json`, `gcp_kafka_cluster_ca`, `gcp_prow_external_clusters_kubeconfig`, `gcp_prow_github_app_json`, `gcp_prow_github_app_oauth_cookie_secret`, `gcp_prow_github_app_webhook_hmac`, `gcp_prow_jenkins_operator_0_auth_json`, `gcp_prow_jenkins_operator_1_auth_json`, `github-bot-token`, `google-oauth2-client-ee-apps` |
+| `apps` | CORE | 3 | `gcp_ci_dashboard_kafka_password`, `gcp_kafka_cluster_ca`, `google-oauth2-client-ee-apps` |
 | `chatops-lark` | APP | 2 | `gcp_chatops_lark_json`, `github-bot-token` |
 | `cs` | APP | 2 | `gcp_cloudevents_kafka_password`, `gcp_cloudevents_lark_app_secret`, `gcp_cloudevents_test_case_run_dsn`, `gcp_kafka_cluster_ca` |
 | `dl` | APP | 3 | `gcp_dl_config_json`, `gcp_dl_delivery_policy_json`, `gcp_dl_delivery_tidb_json` |
@@ -94,6 +94,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | `jenkins-tiflow` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
 | `jenkins-tikv` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
 | `kafka` | APP | 2 | `gcp_ci_dashboard_kafka_password`, `gcp_cloudevents_kafka_password` |
+| `prow` | CI | 8 | `gcp_gcs_sa_json`, `gcp_prow_external_clusters_kubeconfig`, `gcp_prow_github_app_json`, `gcp_prow_github_app_oauth_cookie_secret`, `gcp_prow_github_app_webhook_hmac`, `gcp_prow_jenkins_operator_0_auth_json`, `gcp_prow_jenkins_operator_1_auth_json`, `gcp_prow_openai_json`, `github-bot-token` |
 | `prow-test-pods` | CI | 8 | `gcp_ci_smtp_config_json`, `gcp_codecov_tokens_json`, `gcp_gcs_sa_json`, `gcp_prow_ci_job_params_flattened`, `gcp_prow_docs_cn_s3_json`, `github-bot-ssh-rsa-json`, `github-bot-token`, `tencentcloud_ci_terraform_creds` |
 | `tekton-pipelines` | CI | 1 | `google-oauth2-client-ee-apps` |
 | `tibuild` | APP | 4 | `gcp_dockerconfig_json_ee-releaser`, `gcp_sa_json_ee-releaser`, `gcp_tibuild_cloudevent_hmac`, `github-bot-token`, `google-oauth2-client-ee-apps`, `tcms_public_api_json`, `tibuild_v2_dsn`, `tibuild_v2_lark_app_id`, `tibuild_v2_lark_app_secret`, `tidbcloud_ops_api_dev_json`, `tidbcloud_ops_api_prod_json` |
@@ -137,8 +138,8 @@ up as a reviewable diff instead of silently widening the blast radius.
 
 | Domain | Target store | Namespaces | ExternalSecrets | Distinct GCP secrets |
 | :--- | :--- | :--- | ---: | ---: |
-| CORE | `ee-gcp-sm` | `apps`, `flux-system`, `github-token-broker`, `infra` | 17 | 18 |
-| CI | `ee-gcp-sm-ci` | `ee-cd`, `prow-test-pods`, `tekton-pipelines` | 17 | 16 |
+| CORE | `ee-gcp-sm` | `apps`, `flux-system`, `github-token-broker`, `infra` | 10 | 10 |
+| CI | `ee-gcp-sm-ci` | `ee-cd`, `prow`, `prow-test-pods`, `tekton-pipelines` | 25 | 22 |
 | JENKINS | `ee-gcp-sm-jenkins` | `jenkins` | 12 | 7 |
 | JENKINS-AGENTS | `ee-gcp-sm-jenkins-agents` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
 | APP | `ee-gcp-sm-app` | `chatops-lark`, `cs`, `dl`, `kafka`, `tibuild` | 13 | 20 |
@@ -182,7 +183,7 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gcp_dl_delivery_tidb_json` | `gcp` | `dl` |
 | `gcp_dockerconfig_json_ee-releaser` | `gcp` | `ee-cd`, `tibuild` |
 | `gcp_dockerconfig_json_ee-releaser` | `tencentcloud` | `ee-cd`, `tibuild` |
-| `gcp_gcs_sa_json` | `gcp` | `apps`, `prow-test-pods` |
+| `gcp_gcs_sa_json` | `gcp` | `prow`, `prow-test-pods` |
 | `gcp_gcs_sa_json` | `tencentcloud` | `prow-test-pods` |
 | `gcp_jenkins_cache_s3_json` | `gcp` | `jenkins` |
 | `gcp_kafka_cluster_ca` | `gcp` | `apps`, `cs` |
@@ -190,13 +191,14 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gcp_prow_ci_job_params_flattened` | `tencentcloud` | `prow-test-pods` |
 | `gcp_prow_docs_cn_s3_json` | `gcp` | `prow-test-pods` |
 | `gcp_prow_docs_cn_s3_json` | `tencentcloud` | `prow-test-pods` |
-| `gcp_prow_external_clusters_kubeconfig` | `gcp` | `apps` |
-| `gcp_prow_github_app_json` | `gcp` | `apps` |
-| `gcp_prow_github_app_oauth_cookie_secret` | `gcp` | `apps` |
-| `gcp_prow_github_app_webhook_hmac` | `gcp` | `apps`, `ee-cd` |
+| `gcp_prow_external_clusters_kubeconfig` | `gcp` | `prow` |
+| `gcp_prow_github_app_json` | `gcp` | `prow` |
+| `gcp_prow_github_app_oauth_cookie_secret` | `gcp` | `prow` |
+| `gcp_prow_github_app_webhook_hmac` | `gcp` | `ee-cd`, `prow` |
 | `gcp_prow_github_app_webhook_hmac` | `tencentcloud` | `ee-cd` |
-| `gcp_prow_jenkins_operator_0_auth_json` | `gcp` | `apps` |
-| `gcp_prow_jenkins_operator_1_auth_json` | `gcp` | `apps` |
+| `gcp_prow_jenkins_operator_0_auth_json` | `gcp` | `prow` |
+| `gcp_prow_jenkins_operator_1_auth_json` | `gcp` | `prow` |
+| `gcp_prow_openai_json` | `gcp` | `prow` |
 | `gcp_sa_json_ee-releaser` | `gcp` | `ee-cd`, `tibuild` |
 | `gcp_sa_json_ee-releaser` | `tencentcloud` | `ee-cd`, `tibuild` |
 | `gcp_sa_json_ee-releaser` | `prod2` | `tibuild` |
@@ -214,7 +216,7 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gha__system__github_app_private_key` | `prod2` | `arc-runners` |
 | `github-bot-ssh-rsa-json` | `gcp` | `ee-cd`, `jenkins`, `prow-test-pods` |
 | `github-bot-ssh-rsa-json` | `tencentcloud` | `ee-cd`, `jenkins` |
-| `github-bot-token` | `gcp` | `apps`, `chatops-lark`, `ee-cd`, `jenkins`, `prow-test-pods`, `tibuild` |
+| `github-bot-token` | `gcp` | `chatops-lark`, `ee-cd`, `jenkins`, `prow`, `prow-test-pods`, `tibuild` |
 | `github-bot-token` | `tencentcloud` | `ee-cd`, `jenkins`, `prow-test-pods`, `tibuild` |
 | `github-bot-token` | `prod2` | `tibuild` |
 | `github-bot-username` | `gcp` | `ee-cd`, `jenkins` |
@@ -287,7 +289,7 @@ Outside this inventory because they do not go through `ee-gcp-sm`:
 
 ### Findings
 
-- gcp: allowlisted namespaces without any ExternalSecret, to be dropped from the allowlist: `prow`
+- Allowlists match consumption and every namespace has a trust domain.
 <!-- END GENERATED: eso-scope -->
 
 ## Related
