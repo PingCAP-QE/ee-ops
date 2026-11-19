@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - dl-config.yaml
   - delivery-tidb.yaml
+  - delivery-policy.yaml

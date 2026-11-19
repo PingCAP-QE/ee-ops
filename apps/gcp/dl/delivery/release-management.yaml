@@ -61,9 +61,10 @@ spec:
               name: dl-delivery-tidb
               key: management_dsn
       volumes:
+        # Issuer policy; dl hot-reloads it when the projected file changes.
         - name: policy
-          configMap:
-            name: dl-delivery-policy
+          secret:
+            secretName: dl-delivery-policy
         # Reuses the registry credentials mounted by the internal release.
         - name: oci
           secret:
