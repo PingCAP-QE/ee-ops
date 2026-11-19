@@ -32,9 +32,16 @@ spec:
     recreate: true
   upgrade:
     crds: CreateReplace
+    # Same reason as install: helm waits on the Deployment, and Kubernetes marks
+    # `prow-tide` failed after `progressDeadlineSeconds` because its cold sync
+    # outlives that window. The wait therefore cannot distinguish a slow start
+    # from a broken rollout, and the remediation would roll back a healthy
+    # release. Upgrade the objects, then verify them explicitly.
+    disableWait: true
+    disableWaitForJobs: true
     cleanupOnFail: true
     remediation:
-      retries: 3
+      retries: 0
   test:
     # The chart's test hook connects to deck and hook, which are not serving yet
     # right after a wait-less install, so it fails exactly when it matters least.
