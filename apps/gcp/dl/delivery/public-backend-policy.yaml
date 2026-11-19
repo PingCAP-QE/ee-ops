@@ -1,0 +1,32 @@
+# Backend behaviour for the anonymous redemption route.
+#
+# logging.enabled: false is a security requirement, not a preference: the token
+# is part of the request path, and the GKE Gateway logs every HTTP request to
+# Cloud Logging by default. With this policy attached, token paths never reach
+# the load balancer log (application logging does not log them either).
+#
+# timeoutSec covers a full 24h transfer, matching
+# --delivery-transfer-timeout. Do not lower it to the 30s default: large
+# artifacts stream for minutes.
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: dl-public
+spec:
+  default:
+    timeoutSec: 86400
+    logging:
+      enabled: false
+    # Edge rate limiting is not attached yet: the project has no Cloud Armor
+    # policy. Create one before announcing the hostname, then uncomment:
+    #   gcloud compute security-policies create dl-public --project pingcap-testing-account
+    #   gcloud compute security-policies rules create 1000 \
+    #     --security-policy dl-public --project pingcap-testing-account \
+    #     --action rate-based-ban --rate-limit-threshold-count 120 \
+    #     --rate-limit-threshold-interval-sec 60 --ban-duration-sec 600 \
+    #     --conform-action allow --exceed-action deny-429 --src-ip-ranges '*'
+    # securityPolicy: dl-public
+  targetRef:
+    group: ""
+    kind: Service
+    name: dl-public

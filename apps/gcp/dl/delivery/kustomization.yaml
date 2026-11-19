@@ -8,3 +8,6 @@ resources:
   - release-management.yaml
   - release-public.yaml
   - networkpolicy.yaml
+  - public-route.yaml
+  - public-backend-policy.yaml
+  - public-health-check-policy.yaml
