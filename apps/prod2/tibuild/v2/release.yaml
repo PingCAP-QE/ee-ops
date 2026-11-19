@@ -65,9 +65,6 @@ spec:
         - name: packages-config
           configMap:
             name: packages-config
-        - name: tidbcloud-config
-          secret:
-            secretName: tibuild-v2-tidbcloud-config
       volumeMounts:
         - name: docker-cred
           mountPath: /root/.docker
@@ -75,14 +72,6 @@ spec:
         - name: packages-config
           subPath: delivery.yaml
           mountPath: /etc/delivery/delivery.yaml
-          readOnly: true
-        - name: tidbcloud-config
-          subPath: service-tidbcloud-ops.yaml
-          mountPath: /etc/tidbcloud/ops.yaml
-          readOnly: true
-        - name: tidbcloud-config
-          subPath: service-tidbcloud-testplatforms.yaml
-          mountPath: /etc/tidbcloud/testplatforms.yaml
           readOnly: true
     serviceAccount:
       create: false
