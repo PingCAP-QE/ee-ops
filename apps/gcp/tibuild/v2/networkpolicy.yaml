@@ -1,0 +1,58 @@
+# tibuild does not authenticate its own callers: the Gateway does (OIDC for the
+# browser route, a Google ID token plus a service-account allowlist for every
+# mutating method). That split only holds while the Gateway is the sole way in.
+# The Service is a ClusterIP, so without this policy any Pod in the cluster
+# could call `/api/v2/devbuilds/{id}` directly, arrive with no verified
+# identity, and skip every SecurityPolicy on the way.
+#
+# This policy makes the Gateway the only entry point for the API and names the
+# in-cluster consumers that legitimately call it:
+# - `infra`: the `eg-internal` Envoy data plane (all Gateway routes).
+# - `tibuild`: the chart's own Pods, so the Helm test hook and any same-release
+#   caller keep working.
+# - `chatops-lark`: creates devbuilds and hotfixes through the in-cluster
+#   `v2-tibuild-v2.tibuild.svc` Service (see clusters/gcp/README.md).
+# - `ee-portal`: the TiBuild pages' in-cluster proxy. The Portal has no Gateway
+#   route and must not gain one without its own authorization model
+#   (scripts/check_gcp_route_csrf.sh guards that).
+#
+# Add a namespace here only together with the reason its caller cannot use the
+# Gateway. Everything else is denied, including Pods in other namespaces that
+# hold a valid ID token.
+#
+# Probes are unaffected: GKE Dataplane V2 always admits kubelet probe traffic to
+# the Pod regardless of NetworkPolicy.
+# (https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tibuild-v2-api
+  namespace: tibuild
+spec:
+  podSelector:
+    # Pinned to release.yaml's releaseName (`v2`) and the chart's name. Do not
+    # set nameOverride/fullnameOverride there without updating this selector.
+    matchLabels:
+      app.kubernetes.io/name: tibuild-v2
+      app.kubernetes.io/instance: v2
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: tibuild
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: chatops-lark
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ee-portal
+      ports:
+        # chart default `service.port`, which is also the container port the
+        # server listens on (release.yaml does not override it).
+        - protocol: TCP
+          port: 80

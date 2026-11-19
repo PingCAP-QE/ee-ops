@@ -29,6 +29,13 @@ separately.
 5. **Public routes are explicit.** A route is public only when listed in
    "Public allowlist" below. Every other public HTTPRoute needs a
    `SecurityPolicy`.
+6. **A protected Service is not reachable directly.** Gateway policy only
+   decides what happens to traffic that arrives *through* the Gateway. When the
+   service cannot authenticate callers itself, a `NetworkPolicy` must restrict
+   its ingress to the Gateway and to the consumers named with a reason —
+   otherwise any Pod in the cluster can skip every `SecurityPolicy` with a
+   ClusterIP request. `tibuild`'s API is the reference implementation
+   (`apps/gcp/tibuild/v2/networkpolicy.yaml`).
 
 ## Current inventory (GCP)
 
@@ -39,6 +46,7 @@ separately.
 | `prow.tidb.net/ti-community-owners`, `/tichi` | Public allowlist | Prow plugins |
 | `prow.tidb.net/tibuild` (browser) | OIDC + CSRF | `tibuild-v2-oidc`; no JWT, no `passThroughAuthHeader`. **Reads only** (`GET/HEAD/OPTIONS`); every mutating method is served by the machine route |
 | `prow.tidb.net/tibuild` (`Authorization: Bearer`) | JWT + allowlist | `tibuild-v2-machine-jwt`; service accounts only |
+| `tibuild/api` in-cluster (`v2-tibuild-v2.tibuild.svc`) | NetworkPolicy | Ingress only from `infra` (Gateway), `tibuild`, `chatops-lark`, `ee-portal`; no other Pod can bypass the Gateway |
 | `prow.tidb.net/dashboard/` | OIDC + CSRF | CI Dashboard |
 | `prow.tidb.net/tekton` | OIDC + CSRF | Tekton Dashboard |
 | `prow.pingcap.net/gh-broker/v1/token` | JWT + allowlist | GitHub token broker |
@@ -56,7 +64,9 @@ later, add a route and a policy in the same change.
 `ee-portal` is the newest of these and is **not expected back**: its route
 authorized any OIDC employee with no principal allowlist, and its TiBuild pages
 only called `/tibuild/api/v2`. It is used through a port-forward now; a browser
-deployment would need its own authorization model before a route is added.
+deployment would need its own authorization model before a route is added. It is
+one of the namespaces `tibuild`'s NetworkPolicy admits by name, because its
+server proxies those pages to the in-cluster Service.
 
 ## Public allowlist
 
@@ -74,16 +84,23 @@ Everything else needs OIDC or JWT.
 
 ## Gaps that are not Gateway-only
 
-- **`b8720cf0` privileged operations.** `tibuild-v2` publish/hotfix/artifact
-  endpoints share the browser route today; a company user can call them.
-  Gateway can split those paths into a JWT-only route and allowlist only the
-  automation service accounts. `chatops-lark` sender authorization and the
-  token broker's fail-open policy are service-side checks and cannot be
-  expressed by an HTTP SecurityPolicy.
-- **`615a8b6d` client-supplied identity.** `tibuild-v2` reads `X-User-*`
-  headers, but the Gateway does not currently set or strip them. A Gateway
-  claim-to-header normalizer is required; see "Identity normalizer" below.
-  Object-level ownership checks remain in the service.
+- **`b8720cf0` privileged operations.** Done at the Gateway:
+  `tibuild-v2` publish/hotfix/artifact/tidbcloud paths and every mutating method
+  under `/tibuild` are served by the JWT-only route allowlisted to the
+  automation service accounts (`privileged-access.yaml`); the browser route is
+  reads only. `chatops-lark` sender authorization and the token broker's
+  fail-open policy are service-side checks and cannot be expressed by an HTTP
+  SecurityPolicy.
+- **`615a8b6d` client-supplied identity.** `tibuild-v2` read `X-User-*` without
+  the Gateway setting or stripping them. Two of the three layers now close it:
+  the mutating path is JWT-only, where `claimToHeaders` writes the claims Envoy
+  verified, and the API is no longer reachable from other namespaces
+  (`networkpolicy.yaml`). What remains is the browser route's read path, which
+  no longer acts as a person; the normalizer below becomes necessary only when a
+  browser-facing service needs to authorize a person. Object-level ownership
+  checks stay in the service (`PingCAP-QE/ee-apps` `tibuild/pkg/authz` and the
+  build-ownership rule) so a caller behind the Gateway still cannot touch
+  another user's build.
 - **`ci-dashboard` row-level authorization.** The Gateway verifies the user, but
   which repositories/jobs/spend rows a user may see is application
   authorization.
