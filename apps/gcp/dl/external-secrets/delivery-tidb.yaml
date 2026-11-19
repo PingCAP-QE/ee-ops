@@ -6,7 +6,7 @@
 # not a stale-read or replica endpoint.
 #
 # Every GSM key below is a JSON object with a single `dsn` key, e.g.
-#   { "dsn": "dl_public:<password>@tcp(<host>:4000)/dl_delivery?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true" }
+#   { "dsn": "dl_public:<password>@tcp(gateway01.<region>.prod.aws.tidbcloud.com:4000)/dl?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true" }
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
