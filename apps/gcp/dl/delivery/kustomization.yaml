@@ -1,0 +1,9 @@
+# Delivery server modes. Applied only after the schema migration Job in
+# `apps/gcp/dl/migrate` has succeeded (see clusters/gcp/03-dl-delivery.yaml).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dl
+resources:
+  - release-management.yaml
+  - release-public.yaml
+  - networkpolicy.yaml

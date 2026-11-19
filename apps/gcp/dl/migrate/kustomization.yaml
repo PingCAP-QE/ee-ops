@@ -1,0 +1,11 @@
+# Delivery schema migration, deliberately split into its own Flux Kustomization
+# (see clusters/gcp/03-dl-delivery.yaml) so the Deployments in `dl-delivery` are
+# only applied after the Job succeeds.
+#
+# Re-running: bump the Job name (for example `dl-delivery-migrate-v2`) or change
+# the image tag. Flux prunes the previous Job and creates the new one.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: dl
+resources:
+  - job.yaml

@@ -1,13 +1,14 @@
 # One-shot delivery schema migration.
 #
-# TiDB DDL is not transactional, so this must run to completion before either
-# delivery Deployment can serve: `management` and `public` refuse to start until
+# TiDB DDL is not transactional, so this must finish before either delivery
+# Deployment is created: `management` and `public` refuse to start until
 # `download_issuers` is queryable, and the runtime identities are not allowed to
 # change the schema themselves.
 #
-# The Job stays in git deliberately (no `ttlSecondsAfterFinished`): Flux would
-# recreate a finished-but-pruned Job on every reconcile. Re-running is
-# idempotent; delete the Job to migrate again after a schema change.
+# Ordering is enforced by Flux, not by kubectl: clusters/gcp/03-dl-delivery.yaml
+# runs this Kustomization with `wait: true` and only then applies
+# `apps/gcp/dl/delivery`. No `ttlSecondsAfterFinished` here — pruning a finished
+# Job would make Flux recreate it on every reconcile.
 apiVersion: batch/v1
 kind: Job
 metadata:
