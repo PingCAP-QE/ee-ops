@@ -37,7 +37,8 @@ spec:
   values:
     replicaCount: 1
     # Distinct Service/ServiceAccount names in the same namespace as the
-    # internal release; keep in sync with networkpolicy-delivery.yaml.
+    # internal release; keep in sync with networkpolicy-delivery.yaml and with
+    # the workloadIdentityUser bindings for tidbx-gar-reader.
     fullnameOverride: dl-public
     resources:
       limits:
@@ -81,6 +82,12 @@ spec:
         - name: oci
           mountPath: /etc/oci
           readOnly: true
+    serviceAccount:
+      create: true
+      annotations:
+        # Reads us-docker.pkg.dev/pingcap-testing-account/{hub,hotfix,tidbx} via
+        # the token minted by the Pod identity (artifact_registry_adc).
+        iam.gke.io/gcp-service-account: tidbx-gar-reader@pingcap-testing-account.iam.gserviceaccount.com
     livenessProbe:
       httpGet:
         path: /livez
