@@ -32,12 +32,6 @@ OAuth client must also allow
 The client is an "Internal" Google OAuth app, so only PingCAP Workspace accounts
 can log in; the `tekton-dashboard-oidc` SecurityPolicy requires that login.
 
-The download proxy (`/dl`) uses the same Google OAuth client. Add
-`https://prow.tidb.net/dl/oauth2/callback` to the authorized redirect URIs; the
-`dl-oidc` SecurityPolicy protects every `/dl` path. Machine callers that cannot
-complete an interactive login must use an in-cluster service URL or a separate
-machine-authentication route.
-
 The gcp `chatops-lark` deployment reads its dedicated application configuration
 from the `gcp_chatops_lark_json` key in GCP Secret Manager. The JSON object must
 contain `app-id`, `app-secret`, and `config.yaml`. The ExternalSecret renders

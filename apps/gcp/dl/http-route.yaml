@@ -1,10 +1,3 @@
-# The download proxy is served through Envoy Gateway (eg-internal) so the
-# route-level OIDC SecurityPolicy can protect every /dl path. The GKE gateway
-# forwards prow.tidb.net to eg-internal (see
-# infrastructure/gcp/gateways/config/route-gke-to-envoy.yaml).
-#
-# Large artifacts are streamed for minutes, so the route disables the Envoy
-# request timeout instead of relying on the former GKE GCPBackendPolicy.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -12,7 +5,7 @@ metadata:
 spec:
   parentRefs:
     - kind: Gateway
-      name: eg-internal
+      name: external-https
       namespace: infra
   hostnames:
     - prow.tidb.net
@@ -27,8 +20,8 @@ spec:
             path:
               type: ReplacePrefixMatch
               replacePrefixMatch: /
-      timeouts:
-        request: 0s
+      # Large artifact downloads are streamed for minutes. The GCPBackendPolicy
+      # (backend-policy.yaml) overrides the default 30s backend timeout to 1h.
       backendRefs:
         - name: dl
           port: 80
