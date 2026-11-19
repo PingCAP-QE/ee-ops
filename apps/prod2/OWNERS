@@ -1,4 +1,2 @@
-approvers:
-  - sig-apps-prod2-approvers
 labels:
   - env/prod2
