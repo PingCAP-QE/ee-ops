@@ -1,0 +1,19 @@
+# The delivery modes serve probes on the private :8001 listener only: port 80
+# answers `/d/{token}` and nothing else, so the default health check on `/`
+# would mark every backend unhealthy. Point the load balancer probe at the
+# private liveness endpoint instead.
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: dl-public
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 8001
+        requestPath: /livez
+  targetRef:
+    group: ""
+    kind: Service
+    name: dl-public
