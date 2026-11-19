@@ -12,13 +12,26 @@ controller:
   overwritePlugins: true
   installLatestPlugins: true
 
-  # Override the default list to use our own custom plugin
+  # The chart default list, pinned here explicitly. This block used to be
+  # commented out, so the effective plugin set (and its versions) came from
+  # whatever chart 5.x happened to default to — a chart bump then silently
+  # changed plugins, e.g. configuration-as-code 2143 -> 2147 in 5.13.3.
+  # Values below are byte-identical to the chart 5.13.3 defaults, so pinning
+  # them changes no behaviour; the next chart bump now has to be an explicit
+  # edit. Note: `kubernetes` is the upstream plugin here, not the 4437 fork
+  # the gcp instances install by URL.
   # Ref: https://artifacthub.io/packages/helm/jenkinsci/jenkins?modal=values&path=controller.installPlugins
-  # installPlugins:
-  #   - kubernetes:4437.vd64141124d8f-fork.3:https://github.com/wuhuizuo/jenkins-kubernetes-plugin/releases/download/4437.vd64141124d8f-fork.3/kubernetes.hpi
-  #   - workflow-aggregator:608.v67378e9d3db_1
-  #   - git:5.10.1
-  #   - configuration-as-code:2114.v67a_a_18696b_8f
+  installPlugins:
+    - kubernetes:4560.vc25b_83890c34
+    - workflow-aggregator:608.v67378e9d3db_1
+    - git:5.11.0
+    # Keep this at least at the chart's default (5.13.3 ships 2147) and never
+    # older than the requirement of the plugins resolved by `--latest`. With
+    # core 2.580.2, the latest `credentials` (1514) becomes eligible and needs
+    # configuration-as-code >= 2117; an older pin here fails the plugin
+    # resolution in the init container and CrashLoopBackOffs the controller.
+    # Ref: https://plugins.jenkins.io/credentials/
+    - configuration-as-code:2147.v8a_8d38668c72
 
   # List of plugins to install in addition to those listed in controller.installPlugins
   additionalPlugins:
