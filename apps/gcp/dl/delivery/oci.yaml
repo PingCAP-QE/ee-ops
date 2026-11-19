@@ -1,0 +1,21 @@
+# OCI client configuration for the delivery Pods.
+#
+# Public Artifact Registry repositories under
+# us-docker.pkg.dev/pingcap-testing-account (hub/, hotfix/) are readable by
+# allUsers, so the delivery Pods deliberately authenticate anonymously: oras
+# sends the first request without an Authorization header and only fetches a
+# credential after a 401 challenge, so an empty config means "no credential".
+#
+# Do not mount the Harbor robot from `dl-config` here: hub.pingcap.net is being
+# retired and an internet-facing Pod must not carry that credential.
+#
+# A private namespace (for example tidbx/) cannot be served this way. It needs
+# Workload Identity plus an Artifact Registry token source in dl; never put a
+# static service-account key in this file.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dl-delivery-oci
+data:
+  oci.yaml: |
+    {}

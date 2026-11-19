@@ -53,7 +53,7 @@ spec:
         - --delivery-health-address=:8001
         - --delivery-config=/etc/delivery/policy.yaml
         - --oci-config=/etc/oci/oci.yaml
-        - --oci-allowed-registries=hub.pingcap.net
+        - --oci-allowed-registries=us-docker.pkg.dev
       env:
         - name: DL_DELIVERY_DATABASE_DSN
           valueFrom:
@@ -65,10 +65,10 @@ spec:
         - name: policy
           secret:
             secretName: dl-delivery-policy
-        # Reuses the registry credentials mounted by the internal release.
+        # Anonymous pulls from the public GAR repositories; see oci.yaml.
         - name: oci
-          secret:
-            secretName: dl-config
+          configMap:
+            name: dl-delivery-oci
       volumeMounts:
         - name: policy
           mountPath: /etc/delivery
