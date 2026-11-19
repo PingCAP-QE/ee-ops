@@ -122,8 +122,15 @@ spec:
         repository: ghcr.io/ti-community-infra/prow/tide
         tag: v20260920-62485cd77
       additionalArgs:
-        - --sync-hourly-tokens=1200 # default is 800
-        - --status-hourly-tokens=600 # default is 400
+        # Prow runs with the GitHub App installation identity, whose budget is
+        # 5000 requests/hour per installation (higher for large organisations),
+        # so the old 1200/600 were self-imposed limits from the PAT era. Tide
+        # spends one request per open pull request on every cold start; at 1200
+        # that sync outlived the startup-probe window, at 3600 it finishes in
+        # about a third of the time while leaving the rest of the budget to
+        # crier, hook and the plugins that share the same installation tokens.
+        - --sync-hourly-tokens=3600 # default is 800
+        - --status-hourly-tokens=1200 # default is 400
         # Merge stacked PRs with the asynchronous merge endpoint. 'auto' keeps
         # the synchronous fast path for regular PRs and only falls back to the
         # asynchronous endpoint when GitHub rejects a stacked PR.
