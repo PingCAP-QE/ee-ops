@@ -42,6 +42,23 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 0
+  postRenderers:
+    # `prow-tide` re-syncs every configured repository before it serves its
+    # probes, at a couple of requests per minute through the cold ghproxy cache.
+    # That is far longer than the chart's 10-minute startup-probe window, so the
+    # kubelet kills the container mid-sync and the next attempt starts over.
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: prow-tide
+            patch: |-
+              - op: replace
+                path: /spec/template/spec/containers/0/startupProbe/failureThreshold
+                value: 240
+              - op: replace
+                path: /spec/template/spec/containers/0/startupProbe/periodSeconds
+                value: 15
   test:
     # The chart's test hook connects to deck and hook, which are not serving yet
     # right after a wait-less install, so it fails exactly when it matters least.
