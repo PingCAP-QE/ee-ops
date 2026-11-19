@@ -360,7 +360,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-cherrypicker-plugin
-          tag: v2.4.5
+          tag: v2026.11.19
         args:
           - --dry-run=false
           - --github-token-path=/etc/github/token
