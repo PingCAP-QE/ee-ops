@@ -33,7 +33,7 @@ It is stored under one canonical secret:
 
 | Secret Manager secret | Consumer |
 |---|---|
-| `github-bot-token` | Tekton `ee-cd/github` and `github-pat-secret`; Jenkins; `tibuild/v2-config`; `prow-test-pods/github-token`; `chatops-lark` MCP GitHub tool; Prow `apps/prow-github` |
+| `github-bot-token` | Tekton `ee-cd/github` and `github-pat-secret`; Jenkins; `tibuild/v2-config`; `prow-test-pods/github-token`; Prow `apps/prow-github` |
 | `tidbx-delivery-github-issue` | Tekton `ee-cd/image-delivery-notify-config-tidbx` (`dev_github_token` and `prod_github_token`) |
 
 The former `gcp_prow_github_pat` copy is no longer used; `prow-github` reads
@@ -125,7 +125,6 @@ TKE: same list without `apps/prow-github`, `chatops-lark/github`, and
 kubectl -n apps rollout restart \
   deploy/prow-jenkins-operator-0 deploy/prow-jenkins-operator-1 \
   deploy/prow-ti-community-cherrypicker
-kubectl -n chatops-lark rollout restart deploy/chatops-lark-mcp-tool-github
 ```
 
 `tibuild-v2` reloads its config (including the GitHub client) every 30 seconds;
