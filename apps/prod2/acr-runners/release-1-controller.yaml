@@ -1,0 +1,38 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: arc
+  namespace: arc-systems
+spec:
+  chart:
+    spec:
+      chart: gha-runner-scale-set-controller
+      version: 0.15.1
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller-charts
+        namespace: flux-system
+  interval: 15m
+  timeout: 10m
+  # The controller chart ships CRDs under crds/. Helm never upgrades them on
+  # `helm upgrade`, and Flux defaults `upgrade.crds` to Skip, so fields added
+  # after 0.11.0 (for example actionableRevision) would be pruned and break the
+  # revision-aware runner lifecycle.
+  upgrade:
+    crds: CreateReplace
+  values:
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi

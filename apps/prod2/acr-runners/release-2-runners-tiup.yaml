@@ -1,0 +1,94 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: arc-runner-set-tiup-release
+  namespace: arc-runners
+spec:
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      version: 0.15.1
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller-charts
+        namespace: flux-system
+  interval: 15m
+  timeout: 10m
+  values:
+    # The controller HelmRelease creates this ServiceAccount. Naming it
+    # explicitly avoids cross-chart discovery during a cold install.
+    controllerServiceAccount:
+      name: arc-gha-rs-controller
+      namespace: arc-systems
+    # Repository-level scale set: only pingcap/tiup can use this label.
+    githubConfigUrl: https://github.com/pingcap/tiup
+    githubConfigSecret: arc-runner-set-tiup-release-github-config
+    minRunners: 0
+    maxRunners: 4
+    listenerTemplate:
+      spec:
+        securityContext:
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        containers:
+          - name: listener
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+    template:
+      spec:
+        # JIT registration is delivered through the listener; the runner does
+        # not need the Kubernetes API.
+        automountServiceAccountToken: false
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: kubernetes.io/arch
+                      operator: In
+                      values:
+                        - amd64
+                    # This node cannot pull any non-KCE image (ErrImagePull),
+                    # so keep runners off it until the node is repaired.
+                    - key: kubernetes.io/hostname
+                      operator: NotIn
+                      values:
+                        - "10.2.15.75"
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/part-of: gha-runner-scale-set
+        containers:
+          - name: runner
+            # Pin tag and digest so Renovate reviews upgrades explicitly.
+            image: ghcr.io/actions/actions-runner:2.338.2@sha256:759a1d94a15b05941aba5196974ff43fe15b4cbba29b694b35cbc32a1166b232
+            imagePullPolicy: IfNotPresent
+            command: ["/home/runner/run.sh"]
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              seccompProfile:
+                type: RuntimeDefault
+            resources:
+              requests:
+                cpu: "1"
+                memory: 2Gi
+                ephemeral-storage: 10Gi
+              limits:
+                cpu: "4"
+                memory: 16Gi
+                ephemeral-storage: 20Gi
