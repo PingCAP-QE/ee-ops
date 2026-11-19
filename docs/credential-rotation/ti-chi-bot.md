@@ -122,7 +122,7 @@ TKE: same list without `apps/prow-github`, `chatops-lark/github`, and
 ### 4. Restart consumers that cache the value at startup
 
 ```bash
-kubectl -n apps rollout restart \
+kubectl -n prow rollout restart \
   deploy/prow-jenkins-operator-0 deploy/prow-jenkins-operator-1 \
   deploy/prow-ti-community-cherrypicker
 ```

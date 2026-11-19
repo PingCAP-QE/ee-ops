@@ -7,6 +7,13 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: prow
+  labels:
+    # The control plane runs stock upstream images without host namespaces,
+    # hostPath mounts or privileged containers, so baseline is enforceable.
+    # Everything above it is only reported until it has been quiet for a while.
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/audit: restricted
+    pod-security.kubernetes.io/warn: restricted
 ---
 apiVersion: v1
 kind: Namespace
