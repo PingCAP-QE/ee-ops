@@ -18,17 +18,19 @@ spec:
         name: ee-apps
         namespace: flux-system
   interval: 5m
-  timeout: 5m
+  # First rollout waits for the TiDB grants to land, which can take longer than
+  # the Helm default; keep enough headroom so the release is not left Stalled.
+  timeout: 10m
   install:
     remediation:
-      retries: 3
+      retries: 5
   rollback:
     cleanupOnFail: true
     recreate: true
   upgrade:
     cleanupOnFail: true
     remediation:
-      retries: 3
+      retries: 5
   # The chart's test hook probes `/healthz` on the application port, but
   # delivery modes serve probes on the private :8001 listener only.
   test:
