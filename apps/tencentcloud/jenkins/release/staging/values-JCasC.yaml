@@ -119,7 +119,7 @@ controller:
         # returns null and the next authenticator applies.
         # Declarative JCasC form, checked against the pinned versions: core
         # 2.580.2 (`@Symbol("queueItemAuthenticator")`, Security category),
-        # configuration-as-code 2143 (category + DescribableAttribute naming),
+        # configuration-as-code 2147 (category + DescribableAttribute naming),
         # authorize-project 534.
         authenticators:
           - global:
