@@ -1,0 +1,18 @@
+# OCI client configuration for the delivery Pods.
+#
+# Artifact Registry access for the delivery Pods, with no stored credential:
+# dl mints a short-lived OAuth2 token from the Pod's Google identity (Workload
+# Identity) for *.pkg.dev hosts. The Kubernetes ServiceAccount is annotated with
+# tidbx-gar-reader@pingcap-testing-account, which has artifactregistry.reader on
+# hub/, hotfix/ and the private tidbx/ namespace.
+#
+# Do not mount the Harbor robot from `dl-config` here: hub.pingcap.net is being
+# retired and an internet-facing Pod must not carry that credential. Never put a
+# static service-account key in this file either.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dl-delivery-oci
+data:
+  oci.yaml: |
+    artifact_registry_adc: true

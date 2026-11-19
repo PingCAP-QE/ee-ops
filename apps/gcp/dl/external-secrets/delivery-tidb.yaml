@@ -1,0 +1,26 @@
+# TiDB DSNs for every delivery server mode, from a single GSM object.
+#
+# GSM key: gcp_dl_delivery_tidb_json — a JSON object with three keys:
+#   { "migrate_dsn":    "dl_migrate:<pw>@tcp(<host>:4000)/dl?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true",
+#     "management_dsn": "dl_management:<pw>@tcp(<host>:4000)/dl?...",
+#     "public_dsn":     "dl_public:<pw>@tcp(<host>:4000)/dl?..." }
+#
+# Each workload injects only the key it needs through `secretKeyRef`, so a Pod
+# never sees the other identities' DSNs. All three accounts must use the TiDB
+# primary SQL endpoint, not a stale-read or replica endpoint. Grants for each
+# account are in https://github.com/PingCAP-QE/ee-apps/blob/main/dl/docs/delivery.md
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-delivery-tidb
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-delivery-tidb
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: gcp_dl_delivery_tidb_json

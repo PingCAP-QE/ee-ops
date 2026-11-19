@@ -1,0 +1,50 @@
+# One-shot delivery schema migration.
+#
+# TiDB DDL is not transactional, so this must finish before either delivery
+# Deployment is created: `management` and `public` refuse to start until
+# `download_issuers` is queryable, and the runtime identities are not allowed to
+# change the schema themselves.
+#
+# Ordering is enforced by Flux, not by kubectl: clusters/gcp/03-dl-delivery.yaml
+# runs this Kustomization with `wait: true` and only then applies
+# `apps/gcp/dl/delivery`. No `ttlSecondsAfterFinished` here — pruning a finished
+# Job would make Flux recreate it on every reconcile.
+#
+# The pod template of a Job is immutable, so this spec must never change in
+# place (that includes the image tag). A new migration gets a new name
+# (`-v2`, `-v3`, ...): Flux prunes the old Job and creates the new one. The tag
+# below is intentionally not renovate-managed.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dl-delivery-migrate-v1
+  labels:
+    app.kubernetes.io/name: dl
+    app.kubernetes.io/component: delivery-migrate
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: dl
+        app.kubernetes.io/component: delivery-migrate
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: ghcr.io/pingcap-qe/ee-apps/dl:v2026.11.15-6-gb1e99ab
+          args:
+            - "--server-mode=delivery-migrate"
+          env:
+            # Only this identity may change the schema; it is not mounted into
+            # either runtime Deployment.
+            - name: DL_DELIVERY_DATABASE_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: dl-delivery-tidb
+                  key: migrate_dsn
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 256Mi

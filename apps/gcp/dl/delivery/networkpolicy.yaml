@@ -1,0 +1,67 @@
+# The delivery modes assume the Gateway is the only way in. The Services are
+# ClusterIP, so without these policies any Pod in the cluster could call the
+# management issuer API (and, later, the public redemption surface) directly.
+#
+# `infra` hosts the `eg-internal` Envoy data plane, which is the only intended
+# caller of port 80 for both releases. Kubelet probes are unaffected: GKE
+# Dataplane V2 always admits probe traffic regardless of NetworkPolicy.
+# (https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2)
+#
+# Add a namespace only together with the reason its caller cannot use the
+# Gateway. If metrics are scraped from another namespace, add it to the :8001
+# rule of the matching policy instead of widening port 80.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dl-management-delivery
+spec:
+  podSelector:
+    # Pinned to release-management.yaml's `fullnameOverride` and release name.
+    matchLabels:
+      app.kubernetes.io/name: dl
+      app.kubernetes.io/instance: dl-management
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+      ports:
+        - protocol: TCP
+          port: 80
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+      ports:
+        - protocol: TCP
+          port: 8001
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dl-public-delivery
+spec:
+  podSelector:
+    # Pinned to release-public.yaml's `fullnameOverride` and release name.
+    matchLabels:
+      app.kubernetes.io/name: dl
+      app.kubernetes.io/instance: dl-public
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+      ports:
+        - protocol: TCP
+          port: 80
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+      ports:
+        - protocol: TCP
+          port: 8001
