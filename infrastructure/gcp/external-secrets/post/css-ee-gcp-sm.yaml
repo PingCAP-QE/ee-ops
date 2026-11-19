@@ -30,6 +30,7 @@ spec:
               - "jenkins-tiflash"
               - "jenkins-tiflow"
               - "jenkins-tikv"
+              - "prow"
               - "prow-test-pods"
               - "tekton-pipelines"
               - "tibuild"

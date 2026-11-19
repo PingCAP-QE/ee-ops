@@ -6,4 +6,9 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: prow
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: prow-test-pods
