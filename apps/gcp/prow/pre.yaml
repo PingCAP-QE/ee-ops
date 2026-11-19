@@ -5,7 +5,7 @@ metadata:
   name: prow-pre
   namespace: flux-system
 spec:
-  targetNamespace: apps
+  targetNamespace: prow
   interval: 5m0s
   sourceRef:
     kind: GitRepository

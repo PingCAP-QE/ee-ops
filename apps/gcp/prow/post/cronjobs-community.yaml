@@ -17,10 +17,9 @@ spec:
   prune: true
   postBuild:
     substitute:
-      # Kept on `apps` on purpose: these CronJobs mount the prow ConfigMaps and
-      # Secrets, so they can only follow the prow components. They move together
-      # with the release, not with the ProwJob namespace.
-      PROWJOB_NAMESPACE: apps
+      # These CronJobs mount the prow ConfigMaps and Secrets, so they live with
+      # the components rather than with the test pods.
+      PROWJOB_NAMESPACE: prow
       TEST_PODS_NAMESPACE: prow-test-pods
       BUCKET_NAME: prow-tidb-logs
       DOMAIN_NAME: prow.tidb.net
