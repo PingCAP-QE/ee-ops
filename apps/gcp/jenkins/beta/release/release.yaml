@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: jenkins
-      version: 5.10.9
+      version: 5.13.3
       sourceRef:
         kind: HelmRepository
         name: jenkins
@@ -22,12 +22,14 @@ spec:
   upgrade:
     cleanupOnFail: true
     crds: CreateReplace
-  # The chart test is `curl --retry 48 ... jenkins:80/jenkins/login` without
-  # `--retry-connrefused`, so a connection refused while the controller is
-  # still booting fails the test immediately. Every controller restart (image
-  # or checksum/config change) then marks the release Stalled/TestFailed even
-  # though Jenkins comes up seconds later. Readiness is already covered by the
-  # controller's startup/readiness probes.
+  # NOTE: dead configuration: the chart has no `test` value (neither 5.10.9
+  # nor 5.13.3 defines `test` in values.yaml), so neither key below reaches the
+  # rendered release and it must not be counted as startup protection. The test
+  # Pod is a `helm.sh/hook: test-success` hook, which Flux's helm-controller
+  # does not execute. (The hook itself is a bare `curl` without
+  # `--retry-connrefused`, so it would fail against a still-booting controller
+  # anyway.) Startup safety comes from the controller's startup/readiness
+  # probes plus `upgrade.cleanupOnFail: true` above.
   test:
     enable: false
     ignoreFailures: false

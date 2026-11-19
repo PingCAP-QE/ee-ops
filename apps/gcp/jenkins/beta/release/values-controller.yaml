@@ -8,9 +8,13 @@ controller:
   image:
     registry: "docker.io"
     repository: "jenkins/jenkins"
-    # 2.580.2-jdk21 was built after Debian DSA-6582-1 and ships
-    # libbrotli1 1.1.0-2+deb13u1 (fixes CVE-2026-111497).
-    tag: "2.580.2-jdk21@sha256:74401de6a6f92e1afe1b02d1c8e3d0c33f263bfb5275dd8813f9150355f2367b"
+    # LTS 2.580.2 (2026-10-28) is the current LTS line and is tested against
+    # JDK 21 and 25; the core version is unchanged here, this only moves the
+    # JVM from 21 to 25 (Java 21 EOS 2027-09, Java 25 EOS 2029-09).
+    # Digest is the manifest list for tag `2.580.2-jdk25` on Docker Hub
+    # (linux/amd64 858a3e9..., linux/arm64 2b3e3b9...). Pinning the digest keeps
+    # the runtime reproducible if the tag is ever repushed.
+    tag: "2.580.2-jdk25@sha256:415ab90d4e3b25148f7191bc04f455a20817d6c4c3b0a98f6c6b0da4877f7081"
   resources:
     requests:
       cpu: "12"
