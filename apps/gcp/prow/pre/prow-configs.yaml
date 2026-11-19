@@ -14,7 +14,9 @@ spec:
   postBuild:
     substitute:
       PROW_NAMESPACE: apps
-      PROWJOB_NAMESPACE: apps
+      # ProwJob CRs live in the control-plane namespace, next to the components
+      # that own them. The test pods keep their own namespace (TEST_PODS_NAMESPACE).
+      PROWJOB_NAMESPACE: prow
       TEST_PODS_NAMESPACE: prow-test-pods
       BUCKET_NAME: prow-tidb-logs
       DOMAIN_NAME: prow.tidb.net
