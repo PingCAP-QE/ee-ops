@@ -50,10 +50,17 @@ up as a reviewable diff instead of silently widening the blast radius.
 - **Namespaces without consumers** — allowlisted but with nothing to pull. Each
   of these is a namespace that can read the whole credential for no reason.
 - **Trust domain** — the store the namespace is planned to move to. `CORE` keeps
-  the existing `ee-gcp-sm`; `CI`, `JENKINS` and `APP` get their own store and
-  their own GCP service account on the GKE clusters. `unassigned` means the
-  namespace is not part of the approved split yet and needs a decision before
-  the migration, not a guess.
+  the existing `ee-gcp-sm`; `CI`, `JENKINS`, `JENKINS-AGENTS` and `APP` get their
+  own GCP service account on the GKE clusters. `JENKINS` is the controller
+  namespace only: the per-repo `jenkins-*` agent namespaces are the separate
+  `JENKINS-AGENTS` domain, whose identity and store come from the External
+  Secrets work in `pingcap-qe/ee-infra` rather than from this repository.
+  `unassigned` means the namespace is not part of the split yet and needs a
+  decision before the migration, not a guess.
+- **Counts** — the `ExternalSecrets` column counts objects, so the same
+  ExternalSecret name in two namespaces counts twice. The secret column counts
+  distinct GCP secret names, and one ExternalSecret may pull several, so the two
+  columns are not comparable with each other.
 
 <!-- BEGIN GENERATED: eso-scope (scripts/eso-scope-inventory.sh) -->
 ### Summary
@@ -80,12 +87,12 @@ up as a reviewable diff instead of silently widening the blast radius.
 | `github-token-broker` | CORE | 4 | `gha__system__github_app_private_key`, `github-token-broker-policy`, `github_token_broker_external_reader_token`, `github_token_broker_tls_json` |
 | `infra` | CORE | 2 | `gcp_wildcard_pingcap_net_cert_json`, `gcp_wildcard_tidb_net_cert_json` |
 | `jenkins` | JENKINS | 12 | `gcp_jenkins_cache_s3_json`, `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `google-oauth2-client-jenkins`, `prod2_jenkins_beta_codecov_tokens_json`, `prod2_jenkins_beta_ks3util_config` |
-| `jenkins-pd` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-ticdc` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tidb` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tiflash` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tiflow` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tikv` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-pd` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-ticdc` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tidb` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tiflash` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tiflow` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tikv` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
 | `kafka` | APP | 2 | `gcp_ci_dashboard_kafka_password`, `gcp_cloudevents_kafka_password` |
 | `prow-test-pods` | CI | 8 | `gcp_ci_smtp_config_json`, `gcp_codecov_tokens_json`, `gcp_gcs_sa_json`, `gcp_prow_ci_job_params_flattened`, `gcp_prow_docs_cn_s3_json`, `github-bot-ssh-rsa-json`, `github-bot-token`, `tencentcloud_ci_terraform_creds` |
 | `tekton-pipelines` | CI | 1 | `google-oauth2-client-ee-apps` |
@@ -101,12 +108,12 @@ up as a reviewable diff instead of silently widening the blast radius.
 | `github-token-broker` | CORE | 2 | `gha__system__github_app_private_key`, `github-token-broker-policy` |
 | `infra` | CORE | 2 | `gcp_wildcard_pingcap_net_cert_json`, `gcp_wildcard_tidb_net_cert_json` |
 | `jenkins` | JENKINS | 11 | `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `google-oauth2-client-jenkins`, `tencentcloud_common_creds_json`, `tencentcloud_jenkins_artifact_s3_json`, `tencentcloud_jenkins_cache_s3_json`, `tencentcloud_jenkins_codecov_tokens_json` |
-| `jenkins-pd` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-ticdc` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tidb` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tiflash` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tiflow` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
-| `jenkins-tikv` | JENKINS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-pd` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-ticdc` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tidb` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tiflash` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tiflow` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
+| `jenkins-tikv` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
 | `kafka` | APP | 1 | `tencentcloud_cloudevents_kafka_password` |
 | `prow-test-pods` | CI | 7 | `ci_registry_auth_dockerconfig_json`, `gcp_ci_smtp_config_json`, `gcp_codecov_tokens_json`, `gcp_gcs_sa_json`, `gcp_prow_ci_job_params_flattened`, `gcp_prow_docs_cn_s3_json`, `github-bot-token` |
 | `tekton-pipelines` | CI | 1 | `google-oauth2-client-ee-apps` |
@@ -132,8 +139,11 @@ up as a reviewable diff instead of silently widening the blast radius.
 | :--- | :--- | :--- | ---: | ---: |
 | CORE | `ee-gcp-sm` | `apps`, `flux-system`, `github-token-broker`, `infra` | 17 | 18 |
 | CI | `ee-gcp-sm-ci` | `ee-cd`, `prow-test-pods`, `tekton-pipelines` | 17 | 16 |
-| JENKINS | `ee-gcp-sm-jenkins` | `jenkins`, `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 18 | 8 |
+| JENKINS | `ee-gcp-sm-jenkins` | `jenkins` | 12 | 7 |
+| JENKINS-AGENTS | `ee-gcp-sm-jenkins-agents` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
 | APP | `ee-gcp-sm-app` | `chatops-lark`, `cs`, `dl`, `kafka`, `tibuild` | 13 | 20 |
+
+`JENKINS-AGENTS` is served by an identity and store owned by the External Secrets work in `pingcap-qe/ee-infra`; this repository does not create that store. `JENKINS` is the controller namespace only.
 
 #### `tencentcloud`
 
@@ -141,10 +151,13 @@ up as a reviewable diff instead of silently widening the blast radius.
 | :--- | :--- | :--- | ---: | ---: |
 | CORE | `ee-gcp-sm` | `github-token-broker`, `infra` | 4 | 4 |
 | CI | `ee-gcp-sm-ci-app` | `ee-cd`, `prow-test-pods`, `tekton-pipelines` | 17 | 17 |
-| JENKINS | `ee-gcp-sm-ci-app` | `jenkins`, `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 17 | 9 |
+| JENKINS | `ee-gcp-sm-ci-app` | `jenkins` | 11 | 8 |
+| JENKINS-AGENTS | `ee-gcp-sm-ci-app` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
 | APP | `ee-gcp-sm-ci-app` | `cache`, `cs`, `kafka`, `tibuild`, `zot` | 13 | 22 |
 
 `prod2` keeps a single store; 6 namespaces, 26 distinct secret names.
+
+The same store keeps the organisation-wide GitHub App private key (`gha__system__github_app_private_key`) readable from `arc-runners`, so narrowing this store's GCP IAM does not reduce that key's reach: it needs a separate store or an explicit accepted risk.
 
 ### Secret index
 
@@ -274,7 +287,7 @@ Outside this inventory because they do not go through `ee-gcp-sm`:
 
 ### Findings
 
-- gcp: allowlisted namespaces without any ExternalSecret: `prow`
+- gcp: allowlisted namespaces without any ExternalSecret, to be dropped from the allowlist: `prow`
 <!-- END GENERATED: eso-scope -->
 
 ## Related

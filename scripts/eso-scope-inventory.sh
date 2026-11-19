@@ -173,7 +173,7 @@ collect_objects() {
 import json
 import sys
 
-cluster, target_namespace, es_out, store_out, kust_out = sys.argv[1:6]
+cluster, target_namespace, es_out, store_out, kust_out, warnings_out = sys.argv[1:7]
 
 
 def metadata(obj):
@@ -231,18 +231,26 @@ with open(es_out, "a", encoding="utf-8") as es, \
             continue
 
         if kind == "ClusterSecretStore":
-            namespaces = [
-                value
-                for condition in spec.get("conditions") or []
-                for expression in dig(condition or {}, "namespaceSelector", "matchExpressions") or []
-                if expression.get("key") == "kubernetes.io/metadata.name"
-                for value in expression.get("values") or []
-            ]
+            namespaces = []
+            unsupported = []
+            for condition in spec.get("conditions") or []:
+                selector = dig(condition or {}, "namespaceSelector") or {}
+                if selector.get("matchLabels"):
+                    unsupported.append("matchLabels")
+                for expression in selector.get("matchExpressions") or []:
+                    expression = expression or {}
+                    operator = expression.get("operator") or ""
+                    key = expression.get("key") or ""
+                    if key == "kubernetes.io/metadata.name" and operator == "In":
+                        namespaces.extend(expression.get("values") or [])
+                    else:
+                        unsupported.append("%s %s" % (key or "matchLabels", operator or "-"))
             store.write(json.dumps({
                 "cluster": cluster,
                 "name": metadata(obj).get("name"),
                 "apiVersion": obj.get("apiVersion") or "",
                 "namespaces": namespaces,
+                "unsupported": sorted(set(unsupported)),
             }, sort_keys=True) + "\n")
             continue
 
@@ -256,12 +264,20 @@ with open(es_out, "a", encoding="utf-8") as es, \
         path = spec.get("path") or ""
         if not path or path.startswith("http://") or path.startswith("https://"):
             continue
+        if dig(spec, "postBuild", "substituteFrom"):
+            # postBuild also supports variables from ConfigMaps/Secrets; those
+            # cannot be resolved from the repository alone, so surface it instead
+            # of rendering a document with unknown placeholders.
+            with open(warnings_out, "a", encoding="utf-8") as warning:
+                warning.write(
+                    "%s: %s uses postBuild.substituteFrom; values from ConfigMaps/Secrets are not resolved\n"
+                    % (cluster, path))
         kust.write("\x1f".join([
             path,
             target_namespace or spec.get("targetNamespace") or "",
             json.dumps(dig(spec, "postBuild", "substitute") or {}, sort_keys=True),
         ]) + "\n")
-' "${cluster}" "${target_namespace}" "${es_records}" "${store_records}" "${kust_out}"
+' "${cluster}" "${target_namespace}" "${es_records}" "${store_records}" "${kust_out}" "${warnings}"
 }
 
 # walk_cluster <cluster>
@@ -352,14 +368,18 @@ es_records, store_records, warnings_path, cluster_list, store_name = sys.argv[1:
 clusters = cluster_list.split()
 
 # Trust domain split for the store migration: one store per domain on GCP, and
-# CORE plus a single extra store on TENCENTCLOUD. A namespace that is not listed
-# here is reported as unassigned instead of guessed: the split drives the
-# follow-up migration, so adding a namespace has to be a deliberate decision.
+# CORE plus a single extra store on TENCENTCLOUD. `JENKINS` is the controller
+# namespace only; the per-repo `jenkins-*` agent namespaces get their own
+# identity and store from the pingcap-qe/ee-infra External Secrets work, so they
+# form the separate `JENKINS-AGENTS` domain. A namespace that is not listed here
+# is reported as unassigned instead of guessed: the split drives the follow-up
+# migration, so adding a namespace has to be a deliberate decision.
 DOMAINS = OrderedDict([
     ("CORE", ["apps", "flux-system", "github-token-broker", "infra"]),
     ("CI", ["ee-cd", "prow-test-pods", "tekton-pipelines"]),
-    ("JENKINS", ["jenkins", "jenkins-pd", "jenkins-ticdc", "jenkins-tidb",
-                 "jenkins-tiflash", "jenkins-tiflow", "jenkins-tikv"]),
+    ("JENKINS", ["jenkins"]),
+    ("JENKINS-AGENTS", ["jenkins-pd", "jenkins-ticdc", "jenkins-tidb",
+                        "jenkins-tiflash", "jenkins-tiflow", "jenkins-tikv"]),
     ("APP", ["cache", "chatops-lark", "cs", "dl", "kafka", "tibuild", "zot"]),
 ])
 DOMAIN_OF = {ns: domain for domain, namespaces in DOMAINS.items() for ns in namespaces}
@@ -395,7 +415,7 @@ for line in open(store_records, encoding="utf-8"):
 
 warnings = [line.strip() for line in open(warnings_path, encoding="utf-8") if line.strip()]
 findings = []
-fatal = False
+fatal_reasons = []
 
 
 def scoped_records(cluster):
@@ -412,7 +432,25 @@ def store_allowlist(cluster):
         return None
     if len(matches) > 1:
         findings.append("%s: more than one `ClusterSecretStore/%s` is rendered" % (cluster, store_name))
+    # Only `kubernetes.io/metadata.name In [...]` can be evaluated offline. Any
+    # other selector would make the allowlist wrong in an unknown direction, so
+    # it fails the report instead of being dropped.
+    unsupported = matches[0]["unsupported"]
+    if unsupported:
+        fatal_reasons.append("%s: store allowlist uses selector expressions the inventory cannot evaluate: %s" % (
+            cluster, ", ".join(unsupported)))
     return set(matches[0]["namespaces"])
+
+
+def target_store(cluster, domain):
+    """Store that will serve one trust domain after the migration."""
+    if domain == "CORE":
+        return "`%s`" % store_name
+    if cluster == "tencentcloud":
+        # ESO 0.19 has no Workload Identity on TKE, so every non-CORE domain
+        # shares one store and one static key instead of four identities.
+        return "`%s-ci-app`" % store_name
+    return "`%s-%s`" % (store_name, domain.lower())
 
 
 def namespace_rows(cluster):
@@ -454,8 +492,7 @@ for cluster in clusters:
     if allowlist is not None:
         extra = used - allowlist
         if extra:
-            fatal = True
-            findings.append(
+            fatal_reasons.append(
                 "%s: namespaces consume the store but are missing from its allowlist: %s"
                 % (cluster, markdown_list(sorted(extra)))
             )
@@ -467,8 +504,9 @@ for cluster in clusters:
     write("| `%s` | %d | %d | %d | %d | %d |" % (
         cluster, len(allowlist or ()), len(used), len(zero), len(scoped_records(cluster)), len(keys)))
     if zero:
-        findings.append("%s: allowlisted namespaces without any ExternalSecret: %s" % (
-            cluster, markdown_list(sorted(zero))))
+        findings.append(
+            "%s: allowlisted namespaces without any ExternalSecret, to be dropped from the allowlist: %s"
+            % (cluster, markdown_list(sorted(zero))))
 write("| **Total** | **%d** | **%d** | **%d** | **%d** | **%d** |" % (
     totals["allow"], totals["used"], totals["zero"], totals["es"], len(totals["keys"])))
 write("")
@@ -507,6 +545,14 @@ for cluster in clusters:
         write("`%s` keeps a single store; %d namespaces, %d distinct secret names." % (
             cluster, len(namespaces), len(distinct_keys(cluster))))
         write("")
+        app_key = "gha__system__github_app_private_key"
+        key_holders = sorted(record["namespace"] for record in scoped_records(cluster) if app_key in record["keys"])
+        if key_holders:
+            write("The same store keeps the organisation-wide GitHub App private key "
+                  "(`%s`) readable from %s, so narrowing this store's GCP IAM does not "
+                  "reduce that key's reach: it needs a separate store or an explicit "
+                  "accepted risk." % (app_key, markdown_list(key_holders)))
+            write("")
         continue
     write("#### `%s`" % cluster)
     write("")
@@ -515,14 +561,7 @@ for cluster in clusters:
     rows = namespace_rows(cluster)
     for domain, domain_namespaces in DOMAINS.items():
         present = [namespace for namespace in domain_namespaces if namespace in rows]
-        if domain == "CORE":
-            target = "`%s`" % store_name
-        elif cluster == "tencentcloud":
-            # ESO 0.19 has no Workload Identity on TKE, so the non-CORE domains
-            # share one store and one static key instead of three.
-            target = "`%s-ci-app`" % store_name
-        else:
-            target = "`%s-%s`" % (store_name, domain.lower())
+        target = target_store(cluster, domain)
         write("| %s | %s | %s | %d | %d |" % (
             domain, target, markdown_list(present),
             sum(rows[namespace]["es"] for namespace in present),
@@ -534,6 +573,11 @@ for cluster in clusters:
             sum(rows[namespace]["es"] for namespace in unassigned),
             len(distinct_keys(cluster, set(unassigned)))))
     write("")
+    if cluster == "gcp":
+        write("`JENKINS-AGENTS` is served by an identity and store owned by the "
+              "External Secrets work in `pingcap-qe/ee-infra`; this repository does "
+              "not create that store. `JENKINS` is the controller namespace only.")
+        write("")
 
 write("### Secret index")
 write("")
@@ -569,16 +613,16 @@ write("")
 
 write("### Findings")
 write("")
-for finding in findings:
+for finding in findings + fatal_reasons:
     write("- %s" % finding)
 for warning in warnings:
     write("- %s" % warning)
-if not findings and not warnings:
+if not findings and not fatal_reasons and not warnings:
     write("- Allowlists match consumption and every namespace has a trust domain.")
 write("")
 
 print("\n".join(out).rstrip() + "\n", end="")
-sys.exit(1 if fatal else 0)
+sys.exit(1 if fatal_reasons else 0)
 PY
 }
 
