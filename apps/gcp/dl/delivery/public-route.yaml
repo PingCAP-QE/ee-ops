@@ -17,14 +17,9 @@ spec:
     - dl.pingcap.net
   rules:
     - matches:
-        # Redemption is read-only; refuse everything else at the edge even
-        # though the handler would answer 404 as well.
-        - method: GET
-          path:
-            type: PathPrefix
-            value: /d/
-        - method: HEAD
-          path:
+        # GKE rejects method matching (GWCER104), so the path is the only edge
+        # filter; the handler answers 404 to anything that is not GET/HEAD.
+        - path:
             type: PathPrefix
             value: /d/
       backendRefs:
