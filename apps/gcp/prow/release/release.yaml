@@ -5,7 +5,7 @@ metadata:
   namespace: flux-system
 spec:
   releaseName: prow
-  targetNamespace: apps
+  targetNamespace: prow
   chart:
     spec:
       chart: prow
@@ -223,7 +223,7 @@ spec:
             projected:
               sources:
                 - secret:
-                    name: prow-openai-new
+                    name: prow-openai-config
                     optional: true
                 - configMap:
                     name: prow-openai

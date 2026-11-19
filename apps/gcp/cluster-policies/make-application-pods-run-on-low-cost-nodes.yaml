@@ -11,6 +11,7 @@ spec:
             - Pod
           namespaces:
             - apps
+            - prow
             - arc-systems
             - jenkins
             - kafka

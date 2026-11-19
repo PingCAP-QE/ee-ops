@@ -11,3 +11,6 @@ spec:
     namespace: flux-system
   path: prow-jobs
   prune: true
+  # The job-config ConfigMap is consumed by the prow components, so it lives in
+  # their namespace. The manifests carry no namespace of their own.
+  targetNamespace: prow

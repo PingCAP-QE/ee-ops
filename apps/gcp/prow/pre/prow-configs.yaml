@@ -11,9 +11,9 @@ spec:
     namespace: flux-system
   path: prow
   prune: true
+  targetNamespace: prow
   postBuild:
     substitute:
-      PROW_NAMESPACE: apps
       # ProwJob CRs live in the control-plane namespace, next to the components
       # that own them. The test pods keep their own namespace (TEST_PODS_NAMESPACE).
       PROWJOB_NAMESPACE: prow
