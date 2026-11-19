@@ -17,15 +17,15 @@ spec:
     timeoutSec: 86400
     logging:
       enabled: false
-    # Edge rate limiting is not attached yet: the project has no Cloud Armor
-    # policy. Create one before announcing the hostname, then uncomment:
-    #   gcloud compute security-policies create dl-public --project pingcap-testing-account
-    #   gcloud compute security-policies rules create 1000 \
-    #     --security-policy dl-public --project pingcap-testing-account \
-    #     --action rate-based-ban --rate-limit-threshold-count 120 \
-    #     --rate-limit-threshold-interval-sec 60 --ban-duration-sec 600 \
-    #     --conform-action allow --exceed-action deny-429 --src-ip-ranges '*'
-    # securityPolicy: dl-public
+    # Edge rate limiting: Cloud Armor rate-based-ban policy `dl-public`, keyed
+    # on the client IP and enforced on the whole backend, so it covers every
+    # token under /d/. Keying on the path would be useless: each grant has its
+    # own path, so an attacker would just rotate tokens.
+    #   300 requests / 60s per IP, ban 300s, exceed -> 429
+    # Tune with:
+    #   gcloud compute security-policies rules update 1000 --security-policy dl-public \
+    #     --project pingcap-testing-account --rate-limit-threshold-count 600
+    securityPolicy: dl-public
   targetRef:
     group: ""
     kind: Service
