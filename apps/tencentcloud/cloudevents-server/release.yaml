@@ -44,7 +44,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/cloudevents-server
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/cloudevents-server versioning=semver
-      tag: v2026.11.15-11-g05e80b5 # if you want to downgrade, please change the config secret as well.
+      tag: v2026.11.15-12-g63c78a4 # if you want to downgrade, please change the config secret as well.
     server:
       args: [--config=/config/config.yaml]
       volumeMounts:
