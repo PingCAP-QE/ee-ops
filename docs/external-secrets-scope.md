@@ -68,9 +68,9 @@ up as a reviewable diff instead of silently widening the blast radius.
 | Cluster | Allowlisted namespaces | Consuming namespaces | Namespaces without consumers | ExternalSecrets | Distinct GCP secrets |
 | :--- | ---: | ---: | ---: | ---: | ---: |
 | `gcp` | 20 | 20 | 0 | 65 | 48 |
-| `tencentcloud` | 17 | 17 | 0 | 51 | 42 |
+| `tencentcloud` | 16 | 16 | 0 | 42 | 36 |
 | `prod2` | 6 | 6 | 0 | 14 | 26 |
-| **Total** | **43** | **43** | **0** | **130** | **84** |
+| **Total** | **42** | **42** | **0** | **121** | **83** |
 
 ### Consumers by namespace
 
@@ -104,8 +104,8 @@ up as a reviewable diff instead of silently widening the blast radius.
 | Namespace | Trust domain | ExternalSecrets | GCP secret names |
 | :--- | :--- | ---: | :--- |
 | `cache` | APP | 3 | `ci_registry_auth_dockerconfig_json`, `tencentcloud_common_creds_json`, `tencentcloud_kellnr_admin_json` |
-| `cs` | APP | 2 | `tekton_notify_lark_json`, `tencentcloud_cloudevents_kafka_password`, `tencentcloud_kafka_cluster_ca`, `tencentcloud_test_case_run_dsn` |
-| `ee-cd` | CI | 9 | `ga_offline_pkg_s3_json`, `gcp_dockerconfig_json_ee-releaser`, `gcp_prow_github_app_webhook_hmac`, `gcp_sa_json_ee-releaser`, `gcp_tibuild_cloudevent_hmac`, `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `tencentcloud_ci_dashboard_db_json`, `tidbx-delivery-github-issue` |
+| `cs` | APP | 2 | `tencentcloud_cloudevents_kafka_password`, `tencentcloud_kafka_cluster_ca`, `tencentcloud_test_case_run_dsn` |
+| `ee-cd` | CI | 1 | `tencentcloud_ci_dashboard_db_json` |
 | `github-token-broker` | CORE | 2 | `gha__system__github_app_private_key`, `github-token-broker-policy` |
 | `infra` | CORE | 2 | `gcp_wildcard_pingcap_net_cert_json`, `gcp_wildcard_tidb_net_cert_json` |
 | `jenkins` | JENKINS | 11 | `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `google-oauth2-client-jenkins`, `tencentcloud_common_creds_json`, `tencentcloud_jenkins_artifact_s3_json`, `tencentcloud_jenkins_cache_s3_json`, `tencentcloud_jenkins_codecov_tokens_json` |
@@ -117,8 +117,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | `jenkins-tikv` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
 | `kafka` | APP | 1 | `tencentcloud_cloudevents_kafka_password` |
 | `prow-test-pods` | CI | 7 | `ci_registry_auth_dockerconfig_json`, `gcp_ci_smtp_config_json`, `gcp_codecov_tokens_json`, `gcp_gcs_sa_json`, `gcp_prow_ci_job_params_flattened`, `gcp_prow_docs_cn_s3_json`, `github-bot-token` |
-| `tekton-pipelines` | CI | 1 | `google-oauth2-client-ee-apps` |
-| `tibuild` | APP | 3 | `gcp_dockerconfig_json_ee-releaser`, `gcp_sa_json_ee-releaser`, `gcp_tibuild_cloudevent_hmac`, `github-bot-token`, `tibuild_v2_dsn`, `tibuild_v2_lark_app_id`, `tibuild_v2_lark_app_secret`, `tidbx-ops-client-tibuild-v2-basic-auth` |
+| `tibuild` | APP | 3 | `gcp_dockerconfig_json_ee-releaser`, `gcp_sa_json_ee-releaser`, `github-bot-token`, `tibuild_v2_dsn`, `tibuild_v2_lark_app_id`, `tibuild_v2_lark_app_secret`, `tidbx-ops-client-tibuild-v2-basic-auth` |
 | `zot` | APP | 4 | `google-oauth2-client-zot`, `tencentcloud_common_creds_json`, `tencentcloud_zot_htpasswd`, `tencentcloud_zot_personal_users`, `tencentcloud_zot_redis_password`, `tencentcloud_zot_s3_json`, `tencentcloud_zot_sessionKeys_json`, `tencentcloud_zot_sync_auth_credentials_json` |
 
 #### `prod2`
@@ -151,10 +150,10 @@ up as a reviewable diff instead of silently widening the blast radius.
 | Domain | Target store | Namespaces | ExternalSecrets | Distinct GCP secrets |
 | :--- | :--- | :--- | ---: | ---: |
 | CORE | `ee-gcp-sm` | `github-token-broker`, `infra` | 4 | 4 |
-| CI | `ee-gcp-sm-ci-app` | `ee-cd`, `prow-test-pods`, `tekton-pipelines` | 17 | 17 |
+| CI | `ee-gcp-sm-ci-app` | `ee-cd`, `prow-test-pods` | 8 | 8 |
 | JENKINS | `ee-gcp-sm-ci-app` | `jenkins` | 11 | 8 |
 | JENKINS-AGENTS | `ee-gcp-sm-ci-app` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
-| APP | `ee-gcp-sm-ci-app` | `cache`, `cs`, `kafka`, `tibuild`, `zot` | 13 | 22 |
+| APP | `ee-gcp-sm-ci-app` | `cache`, `cs`, `kafka`, `tibuild`, `zot` | 13 | 20 |
 
 `prod2` keeps a single store; 6 namespaces, 26 distinct secret names.
 
@@ -168,7 +167,6 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `ci_registry_auth_dockerconfig_json` | `gcp` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` |
 | `ci_registry_auth_dockerconfig_json` | `tencentcloud` | `cache`, `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv`, `prow-test-pods` |
 | `ga_offline_pkg_s3_json` | `gcp` | `ee-cd` |
-| `ga_offline_pkg_s3_json` | `tencentcloud` | `ee-cd` |
 | `gcp_chatops_lark_json` | `gcp` | `chatops-lark` |
 | `gcp_ci_dashboard_kafka_password` | `gcp` | `apps`, `kafka` |
 | `gcp_ci_smtp_config_json` | `gcp` | `prow-test-pods` |
@@ -182,7 +180,7 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gcp_dl_delivery_policy_json` | `gcp` | `dl` |
 | `gcp_dl_delivery_tidb_json` | `gcp` | `dl` |
 | `gcp_dockerconfig_json_ee-releaser` | `gcp` | `ee-cd`, `tibuild` |
-| `gcp_dockerconfig_json_ee-releaser` | `tencentcloud` | `ee-cd`, `tibuild` |
+| `gcp_dockerconfig_json_ee-releaser` | `tencentcloud` | `tibuild` |
 | `gcp_gcs_sa_json` | `gcp` | `prow`, `prow-test-pods` |
 | `gcp_gcs_sa_json` | `tencentcloud` | `prow-test-pods` |
 | `gcp_jenkins_cache_s3_json` | `gcp` | `jenkins` |
@@ -195,15 +193,13 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gcp_prow_github_app_json` | `gcp` | `prow` |
 | `gcp_prow_github_app_oauth_cookie_secret` | `gcp` | `prow` |
 | `gcp_prow_github_app_webhook_hmac` | `gcp` | `ee-cd`, `prow` |
-| `gcp_prow_github_app_webhook_hmac` | `tencentcloud` | `ee-cd` |
 | `gcp_prow_jenkins_operator_0_auth_json` | `gcp` | `prow` |
 | `gcp_prow_jenkins_operator_1_auth_json` | `gcp` | `prow` |
 | `gcp_prow_openai_json` | `gcp` | `prow` |
 | `gcp_sa_json_ee-releaser` | `gcp` | `ee-cd`, `tibuild` |
-| `gcp_sa_json_ee-releaser` | `tencentcloud` | `ee-cd`, `tibuild` |
+| `gcp_sa_json_ee-releaser` | `tencentcloud` | `tibuild` |
 | `gcp_sa_json_ee-releaser` | `prod2` | `tibuild` |
 | `gcp_tibuild_cloudevent_hmac` | `gcp` | `ee-cd`, `tibuild` |
-| `gcp_tibuild_cloudevent_hmac` | `tencentcloud` | `ee-cd`, `tibuild` |
 | `gcp_wildcard_pingcap_cn_cert_json` | `prod2` | `infra` |
 | `gcp_wildcard_pingcap_net_cert_json` | `gcp` | `infra` |
 | `gcp_wildcard_pingcap_net_cert_json` | `tencentcloud` | `infra` |
@@ -215,18 +211,17 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gha__system__github_app_private_key` | `tencentcloud` | `github-token-broker` |
 | `gha__system__github_app_private_key` | `prod2` | `arc-runners` |
 | `github-bot-ssh-rsa-json` | `gcp` | `ee-cd`, `jenkins`, `prow-test-pods` |
-| `github-bot-ssh-rsa-json` | `tencentcloud` | `ee-cd`, `jenkins` |
+| `github-bot-ssh-rsa-json` | `tencentcloud` | `jenkins` |
 | `github-bot-token` | `gcp` | `ee-cd`, `jenkins`, `prow`, `prow-test-pods`, `tibuild` |
-| `github-bot-token` | `tencentcloud` | `ee-cd`, `jenkins`, `prow-test-pods`, `tibuild` |
+| `github-bot-token` | `tencentcloud` | `jenkins`, `prow-test-pods`, `tibuild` |
 | `github-bot-token` | `prod2` | `tibuild` |
 | `github-bot-username` | `gcp` | `ee-cd`, `jenkins` |
-| `github-bot-username` | `tencentcloud` | `ee-cd`, `jenkins` |
+| `github-bot-username` | `tencentcloud` | `jenkins` |
 | `github-token-broker-policy` | `gcp` | `github-token-broker` |
 | `github-token-broker-policy` | `tencentcloud` | `github-token-broker` |
 | `github_token_broker_external_reader_token` | `gcp` | `github-token-broker` |
 | `github_token_broker_tls_json` | `gcp` | `github-token-broker` |
 | `google-oauth2-client-ee-apps` | `gcp` | `apps`, `tekton-pipelines`, `tibuild` |
-| `google-oauth2-client-ee-apps` | `tencentcloud` | `tekton-pipelines` |
 | `google-oauth2-client-jenkins` | `gcp` | `jenkins` |
 | `google-oauth2-client-jenkins` | `tencentcloud` | `jenkins` |
 | `google-oauth2-client-zot` | `tencentcloud` | `zot` |
@@ -242,7 +237,6 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `prod2_zot_sessionKeys_json` | `prod2` | `zot` |
 | `prod2_zot_sync_auth_credentials_json` | `prod2` | `zot` |
 | `tcms_public_api_json` | `gcp` | `tibuild` |
-| `tekton_notify_lark_json` | `tencentcloud` | `cs` |
 | `tencentcloud_ci_dashboard_db_json` | `tencentcloud` | `ee-cd` |
 | `tencentcloud_ci_terraform_creds` | `gcp` | `flux-system`, `prow-test-pods` |
 | `tencentcloud_cloudevents_kafka_password` | `tencentcloud` | `cs`, `kafka` |
@@ -272,7 +266,6 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `tidbcloud_ops_api_dev_json` | `gcp` | `tibuild` |
 | `tidbcloud_ops_api_prod_json` | `gcp` | `tibuild` |
 | `tidbx-delivery-github-issue` | `gcp` | `ee-cd` |
-| `tidbx-delivery-github-issue` | `tencentcloud` | `ee-cd` |
 | `tidbx-ops-client-tibuild-v2-basic-auth` | `tencentcloud` | `tibuild` |
 | `tirelease-tibuild-sa-key_json` | `prod2` | `tirelease` |
 | `tirelease_secret_json` | `prod2` | `tirelease` |
