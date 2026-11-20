@@ -1,9 +1,8 @@
 # GitHub bot credentials (`github-bot-*`) rotation
 
-This document covers the long-lived GitHub credentials of the **machine user**
-`ti-chi-bot` used by CI/CD, and the fine-grained token the Lark chatops MCP tool
-runs with. Both are bearer tokens stored in GCP Secret Manager and both are
-rotated the same way.
+This document covers the long-lived credentials of the GitHub **machine user**
+`ti-chi-bot` used by CI/CD: the classic PAT and the SSH key. Both are stored in
+GCP Secret Manager and both are rotated the same way.
 
 It does not cover the GitHub **App** `ti-chi-bot` (App ID `214286`): its private
 key is a different credential class with a different rotation shape, see
@@ -44,51 +43,12 @@ The former `gcp_prow_github_pat` copy is no longer used; `prow-github` reads
 `github-bot-token` directly.
 
 The org-wide PAT must not be mounted into namespaces that run untrusted or
-unauthenticated code. `chatops-lark` used to hold a copy as the `github` Secret;
-it now uses its own narrow token (below). If a `github` Secret shows up in
-`chatops-lark` again, that is a regression, not a fix.
-
-## MCP tool token (`chatops-lark-mcp-github-token`)
-
-The chatops-lark GitHub MCP server runs with its token in the environment and has
-no inbound authentication of its own, so it must not carry the org-wide bot PAT.
-It reads a dedicated fine-grained token instead:
-
-- Secret Manager key: `chatops-lark-mcp-github-token`
-- `ExternalSecret` `chatops-lark/mcp-github-token` → Secret `mcp-github-token`,
-  key `token`
-- consumed by the `chatops-lark-mcp-tool-github` HelmRelease as
-  `GITHUB_PERSONAL_ACCESS_TOKEN`
-
-Issuance is a manual, org-admin step (a fine-grained token cannot be minted by
-automation). All four requirements are load-bearing:
-
-1. Fine-grained PAT with **read-only** repository permissions the tool needs:
-   `contents`, `issues`, `pull requests`, `metadata`.
-2. **Selected repositories only** — not "all repositories in the org".
-3. An **expiry date**. Record it next to the GSM key when the version is added;
-   a token without an expiry is the same problem in a smaller box.
-4. No organisation permissions, no administration scope.
-
-Rotation:
-
-```bash
-printf '%s' "$NEW_FINE_GRAINED_PAT" \
-  | gcloud secrets versions add chatops-lark-mcp-github-token \
-      --project=pingcap-testing-account --data-file=-
-
-kubectl -n chatops-lark annotate externalsecret mcp-github-token \
-  force-sync="$(date +%s)" --overwrite
-
-# The MCP server reads the token from its environment at process start.
-kubectl -n chatops-lark rollout restart deploy/chatops-lark-mcp-tool-github
-kubectl -n chatops-lark rollout status deploy/chatops-lark-mcp-tool-github
-```
-
-Verify that a read tool answers through the bot before revoking the old token,
-then revoke it in the GitHub UI (fine-grained tokens can also be deleted from
-the account's developer settings). Disable the superseded Secret Manager version
-with `gcloud secrets versions disable`.
+unauthenticated code. `chatops-lark` used to hold a copy as the `github` Secret
+for the GitHub MCP tool; that tool has been removed and the ExternalSecret is
+deleted with it, so the namespace no longer materialises this token at all. If a
+`github` Secret shows up there again, that is a regression, not a fix — and if a
+tool needs such a token again, it has to ship with its own scoped credential in
+the same change instead of mounting `github-bot-token`.
 
 ## SSH key
 
@@ -173,9 +133,6 @@ done
 
 TKE: same list without `apps/prow-github` and `prow-test-pods/github-ssh-secret`
 (Prow only runs on GCP).
-
-The chatops-lark MCP token is a separate credential and is not part of this
-loop; see its own section above.
 
 ### 4. Restart consumers that cache the value at startup
 

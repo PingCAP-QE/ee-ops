@@ -34,9 +34,10 @@ per-store. Consequences:
   gcp and tencentcloud lists today. Isolating it onto a narrower, secret-scoped
   store is tracked separately and is the highest-value fix in this area; do not
   "simplify" it back into `ee-gcp-sm`.
-- `apps/gcp/chatops-lark` has no `ExternalSecret` against this store beyond its
-  own credentials, and its GitHub PAT no longer comes from the org-wide
-  `github-bot-token`.
+- `apps/gcp/chatops-lark` reads only its own `gcp_chatops_lark_json` blob from
+  this store. The ExternalSecret that materialised the org-wide
+  `github-bot-token` there is gone because nothing consumed it; do not add a
+  GitHub PAT back into that namespace.
 
 ## Rotation
 

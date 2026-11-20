@@ -12,7 +12,7 @@ same PR.
 
 | Credential class | Document | Source of truth | Cadence |
 |---|---|---|---|
-| GitHub bot machine user: classic PAT + SSH key, and the chatops MCP fine-grained token | [`github-bot.md`](github-bot.md) | GCP Secret Manager `pingcap-testing-account` | yearly / at token expiry |
+| GitHub bot machine user: classic PAT + SSH key | [`github-bot.md`](github-bot.md) | GCP Secret Manager `pingcap-testing-account` | yearly / at token expiry |
 | GitHub App private keys (App `214286`) | [`github-app.md`](github-app.md) | GCP Secret Manager `pingcap-testing-account` | yearly or on exposure |
 | GCP service account key behind the `ee-gcp-sm` ClusterSecretStore | [`eso-gcp-sm.md`](eso-gcp-sm.md) | manual Secret `gcp-sm-sa-secret`, key issued in `pingcap-testing-account` | 90 days |
 | In-cluster generated secrets (CLA MongoDB password, session secret) | this page, [below](#in-cluster-generated-secrets) | the Kubernetes Secret itself | install-time; rotate deliberately |
@@ -78,7 +78,7 @@ deliberately:
 3. Verify `kubectl -n cla get secret mongodb-credentials -o jsonpath='{.data.password}'`
    decodes to the new value and that the CLA workload can still reach MongoDB.
 
-The Window between steps 1 and 2 is a short authentication failure for anything
+The window between steps 1 and 2 is a short authentication failure for anything
 holding the old value — do it off-peak. Do not delete the Secret to "force"
 regeneration: the generator would write a new password that MongoDB does not
 know, and the deployment would stay broken.
