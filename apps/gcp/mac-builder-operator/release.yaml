@@ -6,7 +6,7 @@ spec:
   chart:
     spec:
       chart: mac-builder-operator
-      version: 0.4.3
+      version: 0.4.4
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -36,6 +36,12 @@ spec:
     # Namespace where the CustomRun controller creates MacBuild objects. Kept in
     # the Tekton namespace (ee-cd) so MacBuilds sit next to their CustomRuns.
     macBuildNamespace: ee-cd
+    # Only CustomRuns from these namespaces may submit MacBuilds. The controller
+    # creates MacBuilds in the privileged build namespace, so every other
+    # namespace is refused (fail closed when this list is empty).
+    customRun:
+      namespaces:
+        - ee-cd
     # External macOS worker agents (run outside the cluster): provision a
     # dedicated ServiceAccount + RBAC and a long-lived token Secret so a worker
     # can assemble a kubeconfig without gcloud.
@@ -46,7 +52,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/mac-builder-operator
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/mac-builder-operator versioning=semver
-      tag: v2026.11.1-11-g6a9edd9
+      tag: v2026.11.15-8-g81216d5
     # Serve per-build logs from the operator pod. The PVC uses the cluster
     # default storage class; the Service is reached through the API proxy.
     logServer:
