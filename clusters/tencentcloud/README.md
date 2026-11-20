@@ -1,6 +1,6 @@
 # Tencentcloud GitOps
 
-Tencentcloud-based cluster for CI/CD workloads (jenkins, tekton, kafka, etc.), managed by FluxCD v2.
+Tencentcloud-based cluster for CI/CD workloads (jenkins, tibuild, kafka, etc.), managed by FluxCD v2.
 
 ## Layers
 
@@ -9,7 +9,7 @@ Tencentcloud-based cluster for CI/CD workloads (jenkins, tekton, kafka, etc.), m
 | flux-system | `./clusters/tencentcloud/flux-system` | Flux components, sync, notifications |
 | sources | `./clusters/tencentcloud/sources` | Helm repositories (bitnami, ee-apps, ee-ops, external-secrets, kyverno, etc.) and `GitRepository` sources |
 | infrastructure | `./infrastructure/tencentcloud` | external-secrets, gateways, kyverno, node-pools, operators, etc. |
-| apps | `./apps/tencentcloud` | jenkins, jenkins-agents, tekton, tibuild, kafka, cloudevents-server, cache, etc. |
+| apps | `./apps/tencentcloud` | jenkins, jenkins-agents, tibuild, kafka, cloudevents-server, cache, etc. |
 
 ## Prepare
 

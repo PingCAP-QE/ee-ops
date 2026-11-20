@@ -16,7 +16,7 @@
 # infrastructure/<cluster>/cleaners (its kustomization pins namespace: infra).
 
 ---
-# ee-cd: Tekton build namespace (apps/tencentcloud/tekton/configs/0-namespace.yaml); also hosts the event listeners.
+# ee-cd: CI namespace (apps/tencentcloud/ci-dashboard-pod-watcher/namespace.yaml); hosted the Tekton event listeners until Tekton was retired.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:

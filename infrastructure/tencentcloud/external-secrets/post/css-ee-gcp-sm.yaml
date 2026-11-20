@@ -28,7 +28,6 @@ spec:
               - "jenkins-tiflow"
               - "jenkins-tikv"
               - "prow-test-pods"
-              - "tekton-pipelines"
               - "tibuild"
               - "zot"
   provider:
