@@ -198,7 +198,7 @@ spec:
       enabled: true
       image:
         repository: ghcr.io/ti-community-infra/prow/jenkins-operator
-        tag: v20250105-d73428bb3
+        tag: v20261114-b0f1817e5
       instances:
         - name: jenkins-0
           replicaCount: 1
