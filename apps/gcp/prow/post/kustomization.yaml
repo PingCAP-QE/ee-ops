@@ -3,4 +3,5 @@ kind: Kustomization
 resources:
   - job-ns
   - netpol-ingress.yaml
+  - netpol-egress.yaml
   - cronjobs-community.yaml
