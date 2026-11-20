@@ -1,9 +1,12 @@
-# ti-chi-bot credential rotation
+# GitHub bot credentials (`github-bot-*`) rotation
 
 This document covers the long-lived credentials of the GitHub **machine user**
-`ti-chi-bot` used by CI/CD. It does not cover the GitHub App `ti-chi-bot`
-(App ID `214286`, bot user `ti-chi-bot[bot]`); its private key is a separate
-credential and currently cannot be rotated with two active keys.
+`ti-chi-bot` used by CI/CD: the classic PAT and the SSH key. Both are stored in
+GCP Secret Manager and both are rotated the same way.
+
+It does not cover the GitHub **App** `ti-chi-bot` (App ID `214286`): its private
+key is a different credential class with a different rotation shape, see
+[`github-app.md`](github-app.md).
 
 ## Source of truth
 
@@ -22,14 +25,14 @@ kubectl -n <namespace> annotate externalsecret <name> \
 
 ## PAT
 
-The PAT is a classic token with these scopes:
+The org-wide bot PAT is a classic token with these scopes:
 
 ```text
 admin:org, admin:repo_hook, notifications, project, repo,
 user, workflow
 ```
 
-It is stored under one canonical secret:
+It is stored under these canonical secrets:
 
 | Secret Manager secret | Consumer |
 |---|---|
@@ -38,6 +41,14 @@ It is stored under one canonical secret:
 
 The former `gcp_prow_github_pat` copy is no longer used; `prow-github` reads
 `github-bot-token` directly.
+
+The org-wide PAT must not be mounted into namespaces that run untrusted or
+unauthenticated code. `chatops-lark` used to hold a copy as the `github` Secret
+for the GitHub MCP tool; that tool has been removed and the ExternalSecret is
+deleted with it, so the namespace no longer materialises this token at all. If a
+`github` Secret shows up there again, that is a regression, not a fix — and if a
+tool needs such a token again, it has to ship with its own scoped credential in
+the same change instead of mounting `github-bot-token`.
 
 ## SSH key
 
@@ -57,6 +68,10 @@ runs `ssh-add` on every file in the mounted secret directory, so the target
 secret must contain private keys only, never `ssh-publickey`.
 
 ## Rotation procedure
+
+Cadence: yearly, or immediately on any suspicion of exposure. The PAT carries an
+expiry, so start two weeks before it lapses; the SSH key has no expiry and is
+rotated on the same yearly slot.
 
 ### 1. Create the new credentials
 
@@ -109,15 +124,15 @@ for item in \
   jenkins/github-pr-diff-token jenkins/github-bot-ssh \
   jenkins/github-sre-bot-ssh prow-test-pods/github-token \
   prow-test-pods/github-ssh-secret tibuild/v2-config \
-  apps/prow-github chatops-lark/github; do
+  apps/prow-github; do
   ns=${item%%/*}; name=${item#*/}
   kubectl -n "$ns" annotate externalsecret "$name" \
     force-sync="$(date +%s)" --overwrite
 done
 ```
 
-TKE: same list without `apps/prow-github`, `chatops-lark/github`, and
-`prow-test-pods/github-ssh-secret` (Prow only runs on GCP).
+TKE: same list without `apps/prow-github` and `prow-test-pods/github-ssh-secret`
+(Prow only runs on GCP).
 
 ### 4. Restart consumers that cache the value at startup
 
