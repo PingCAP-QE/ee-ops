@@ -1,0 +1,36 @@
+# Ingress for the Prow control plane.
+#
+# The namespace runs no workload that should accept traffic from anywhere except
+# the gateway that fronts it, and from itself (hook calls the external plugins,
+# the plugins call the ghproxy cache). Everything else — other namespaces,
+# cluster-wide scanners, anything that lands in the network — is dropped.
+#
+# Egress is deliberately not restricted here: its allow-list needs to cover
+# GitHub, GCS, the OpenAI API, the Jenkins installations, the build-cluster
+# apiservers and the gateway, and that list is being measured separately.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: prow-ingress
+  namespace: prow
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+  ingress:
+    # Envoy Gateway (`infra/eg-internal`) routes prow.tidb.net into deck, hook,
+    # the external plugins and tichi-web.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+      ports:
+        - protocol: TCP
+          port: 80
+        - protocol: TCP
+          port: 8080
+        - protocol: TCP
+          port: 8888
+    # hook -> external plugins, plugins -> ghproxy, deck -> ghproxy.
+    - from:
+        - podSelector: {}
