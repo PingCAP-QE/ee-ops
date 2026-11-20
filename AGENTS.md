@@ -31,7 +31,7 @@ docs/             # TEKTON_MIGRATION.md, kyverno-policy-testing.md, gar-controll
 
 - **prod2** — main production target (tekton, tibuild, zot, publisher, cache, tirelease...).
 - **gcp** — GCP cluster: jenkins (beta), jenkins-agents, tekton, prow, tibuild, publisher, kafka...
-- **tencentcloud** — Tencent Cloud cluster (newer): jenkins, jenkins-agents, tekton, tibuild, zot, kafka, cache...
+- **tencentcloud** — Tencent Cloud cluster (newer): jenkins, jenkins-agents, tibuild, zot, kafka, cache... (Tekton retired 2026-11, see `docs/TEKTON_MIGRATION.md`)
 
 Each cluster has a `README.md` under `clusters/<cluster>/` listing required secrets (e.g. tencentcloud needs `lark-token`/`lark-token-error` for Flux notifications) — check it before touching a cluster.
 

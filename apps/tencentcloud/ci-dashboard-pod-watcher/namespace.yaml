@@ -1,0 +1,19 @@
+# `ee-cd` — the CI namespace of this cluster.
+#
+# It used to be created by the Tekton configs
+# (apps/tencentcloud/tekton/configs/0-namespace.yaml). Tekton is retired in this
+# cluster (docs/TEKTON_MIGRATION.md), so the namespace is owned here, next to
+# its remaining consumer.
+#
+# The prune annotation is retained deliberately: the Namespace was in the
+# `tekton-configs` Flux inventory, and the teardown prunes in the background —
+# it may run after this manifest has already been applied, and without the
+# annotation that would delete the namespace and cascade into the pod watcher.
+# Dropping it later is fine once the teardown has been verified; a deliberate
+# removal of this file can strip the annotation in the same change.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ee-cd
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
