@@ -5,7 +5,13 @@
 # the plugins call the ghproxy cache). Everything else — other namespaces,
 # cluster-wide scanners, anything that lands in the network — is dropped.
 #
-# Egress is deliberately not restricted here: its allow-list needs to cover
+# Kubelet health checks travel from the node, not from a pod, so they are not
+# subject to this policy on GKE Dataplane V2 — verified by recreating a probe-
+# carrying deployment after the policy was applied: the pod reached 1/1 with no
+# restarts. Allowing `kube-system` would not cover them (the probe source is the
+# node) and would only widen access.
+#
+# Egress lives in netpol-egress.yaml: its allow-list needs to cover
 # GitHub, GCS, the OpenAI API, the Jenkins installations, the build-cluster
 # apiservers and the gateway, and that list is being measured separately.
 apiVersion: networking.k8s.io/v1
