@@ -67,10 +67,10 @@ up as a reviewable diff instead of silently widening the blast radius.
 
 | Cluster | Allowlisted namespaces | Consuming namespaces | Namespaces without consumers | ExternalSecrets | Distinct GCP secrets |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| `gcp` | 20 | 20 | 0 | 66 | 48 |
+| `gcp` | 20 | 20 | 0 | 65 | 48 |
 | `tencentcloud` | 17 | 17 | 0 | 51 | 42 |
 | `prod2` | 6 | 6 | 0 | 14 | 26 |
-| **Total** | **43** | **43** | **0** | **131** | **84** |
+| **Total** | **43** | **43** | **0** | **130** | **84** |
 
 ### Consumers by namespace
 
@@ -79,7 +79,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | Namespace | Trust domain | ExternalSecrets | GCP secret names |
 | :--- | :--- | ---: | :--- |
 | `apps` | CORE | 3 | `gcp_ci_dashboard_kafka_password`, `gcp_kafka_cluster_ca`, `google-oauth2-client-ee-apps` |
-| `chatops-lark` | APP | 2 | `gcp_chatops_lark_json`, `github-bot-token` |
+| `chatops-lark` | APP | 1 | `gcp_chatops_lark_json` |
 | `cs` | APP | 2 | `gcp_cloudevents_kafka_password`, `gcp_cloudevents_lark_app_secret`, `gcp_cloudevents_test_case_run_dsn`, `gcp_kafka_cluster_ca` |
 | `dl` | APP | 3 | `gcp_dl_config_json`, `gcp_dl_delivery_policy_json`, `gcp_dl_delivery_tidb_json` |
 | `ee-cd` | CI | 8 | `ga_offline_pkg_s3_json`, `gcp_dockerconfig_json_ee-releaser`, `gcp_prow_github_app_webhook_hmac`, `gcp_sa_json_ee-releaser`, `gcp_tibuild_cloudevent_hmac`, `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `tidbx-delivery-github-issue` |
@@ -142,7 +142,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | CI | `ee-gcp-sm-ci` | `ee-cd`, `prow`, `prow-test-pods`, `tekton-pipelines` | 25 | 22 |
 | JENKINS | `ee-gcp-sm-jenkins` | `jenkins` | 12 | 7 |
 | JENKINS-AGENTS | `ee-gcp-sm-jenkins-agents` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
-| APP | `ee-gcp-sm-app` | `chatops-lark`, `cs`, `dl`, `kafka`, `tibuild` | 13 | 20 |
+| APP | `ee-gcp-sm-app` | `chatops-lark`, `cs`, `dl`, `kafka`, `tibuild` | 12 | 20 |
 
 `JENKINS-AGENTS` is served by an identity and store owned by the External Secrets work in `pingcap-qe/ee-infra`; this repository does not create that store. `JENKINS` is the controller namespace only.
 
@@ -216,7 +216,7 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gha__system__github_app_private_key` | `prod2` | `arc-runners` |
 | `github-bot-ssh-rsa-json` | `gcp` | `ee-cd`, `jenkins`, `prow-test-pods` |
 | `github-bot-ssh-rsa-json` | `tencentcloud` | `ee-cd`, `jenkins` |
-| `github-bot-token` | `gcp` | `chatops-lark`, `ee-cd`, `jenkins`, `prow`, `prow-test-pods`, `tibuild` |
+| `github-bot-token` | `gcp` | `ee-cd`, `jenkins`, `prow`, `prow-test-pods`, `tibuild` |
 | `github-bot-token` | `tencentcloud` | `ee-cd`, `jenkins`, `prow-test-pods`, `tibuild` |
 | `github-bot-token` | `prod2` | `tibuild` |
 | `github-bot-username` | `gcp` | `ee-cd`, `jenkins` |
