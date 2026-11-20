@@ -1,4 +1,17 @@
+# `ee-cd` outlives the Tekton configs: it is also the home of the
+# ci-dashboard-pod-watcher (apps/tencentcloud/ci-dashboard-pod-watcher), which
+# stays after Tekton is retired from this cluster.
+#
+# The prune annotation is what keeps that pod watcher alive during the
+# teardown: this Namespace is in the `tekton-configs` Flux inventory, so the
+# garbage collection triggered by removing the Tekton tree would otherwise
+# delete the Namespace and cascade into every workload in it. The annotation
+# travels with the manifest when it moves to ci-dashboard-pod-watcher, because
+# that prune runs in the background and may outlive the move. See
+# docs/TEKTON_MIGRATION.md ("tencentcloud -> gcp").
 apiVersion: v1
 kind: Namespace
 metadata:
   name: ee-cd
+  annotations:
+    kustomize.toolkit.fluxcd.io/prune: disabled
