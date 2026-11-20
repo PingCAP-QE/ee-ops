@@ -13,31 +13,27 @@ Repository-level GitHub Actions Runner Controller (ARC) scale set in the KSY
 | `release-1-controller.yaml` | ARC controller, chart 0.15.1, CRD upgrades enabled |
 | `release-2-runners-tiup.yaml` | the `arc-runner-set-tiup-release` scale set |
 | `external-secret-github-app.yaml` | GitHub App credentials from GCP Secret Manager |
-| `networkpolicy-egress.yaml` | outbound-only policy: DNS, public Internet, internal TiUP mirror |
 
 ## GitHub identity
 
-- App `214286` (`ti-chi-bot`), installation `36729905` on the `pingcap`
-  organization (`repository_selection: all`).
-- The private key is the shared `gha__system__github_app_private_key`; the
-  installation id lives in `arc__repo__pingcap__tiup__github_app_installation_id`.
+- A GitHub App installed on the `pingcap` organization; credentials are managed
+  in GCP Secret Manager and only the `arc-runners` namespace can read them
+  through the `ee-gcp-sm` ClusterSecretStore.
 - The scale set registers at `https://github.com/pingcap/tiup`, so the runner
   label is `arc-runner-set-tiup-release`.
 
-## KSY-specific workarounds
+## KSY-specific notes
 
-- **`github.com` is currently unreachable** (its Asian edge 20.205.243.x /
-  20.27.x is blackholed from KSY). Do not enable the workflow until the
-  cluster's DNS/routing to `github.com` is fixed; `actions/checkout` will time
-  out. Pinning US IPs via `hostAliases` was evaluated and intentionally not
-  used.
 - **The runner image has no `wget`.** `release-tiup` therefore uses `curl` to
   download the TiUP bootstrap tarball.
-- **Cold image pulls are slow** (~950 KiB/s, roughly 5–10 minutes). Pre-pull the
-  pinned image on healthy nodes before enabling the workflow; never run
-  concurrent `ctr pull` for the same image (containerd ingest lock).
-- **`10.2.15.75` cannot pull non-KCE images.** Runner pods are scheduled away
-  from it until the node is repaired.
+- **Cold image pulls are slow.** The pinned image is pre-pulled on the three
+  amd64 nodes; never run concurrent `ctr pull` for the same image (containerd
+  ingest lock).
+- **The runner pool is the three amd64 nodes.** The other four nodes are arm64;
+  `maxRunners: 4` can place two runners on one node.
+- **No egress isolation.** The cluster's Calico deployment ships only the CNI
+  plugin, so `NetworkPolicy` is not enforced. This is an accepted risk; the
+  approval requirement for outside-collaborator PR workflows is the gate.
 - **Public repository + self-hosted runner:** `pingcap/tiup` must require
   approval for workflows from all outside collaborators
   (`fork-pr-contributor-approval = all_outside_collaborators`). Do not enable
