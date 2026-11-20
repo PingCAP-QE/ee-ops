@@ -25,6 +25,7 @@ controller:
 
   # https://docs.cloudbees.com/docs/admin-resources/latest/jvm-troubleshooting/
   # Set min/max heap here if needed with:
+  # CVE-2026-114938 (Java4Shell) workaround; drop it with the JDK 25.0.5.1 bump.
   javaOpts: >-
     -XX:+UseContainerSupport -XX:InitialRAMPercentage=20.0
     -XX:MaxRAMPercentage=70.0 -XX:+UseG1GC -XX:+AlwaysPreTouch
@@ -34,6 +35,7 @@ controller:
     -Xlog:gc*=info,gc+heap=debug,gc+ref*=debug,gc+ergo*=trace,gc+age*=trace:file=/var/jenkins_home/logs/gc-%t.log:utctime,pid,level,tags:filecount=2,filesize=100M
     -Dio.jenkins.plugins.artifact_manager_jclouds.s3.S3BlobStoreConfig.deleteArtifacts=true
     -Dio.jenkins.plugins.artifact_manager_jclouds.s3.S3BlobStoreConfig.deleteStashes=true
+    -XX:-UseBASE64Intrinsics
 
   # Optionally specify additional init-containers
   customInitContainers:
