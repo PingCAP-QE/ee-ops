@@ -38,7 +38,10 @@ spec:
         memory: 256Mi
       limits:
         cpu: "500m"
-        memory: 512Mi
+        # 512Mi OOMKilled this pod 6 times in 16h while Jenkins pushed its
+        # `cdevents` bursts at /events (steady state is ~63Mi, so the spikes are
+        # burst buffers, not a leak). Keep the request and give the bursts room.
+        memory: 1Gi
     nodeSelector:
       kubernetes.io/arch: amd64
     image:
