@@ -1,4 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - https://raw.githubusercontent.com/kubernetes-sigs/prow/refs/heads/main/config/prow/cluster/prowjob-crd/prowjob_customresourcedefinition.yaml
+  # Pinned to the last commit touching this file on kubernetes-sigs/prow@main (2026-10-27).
+  # Bump deliberately: check the diff before changing the SHA.
+  - https://raw.githubusercontent.com/kubernetes-sigs/prow/654cd8d1c3d4917b095c69e3cd6aa66969d3d055/config/prow/cluster/prowjob-crd/prowjob_customresourcedefinition.yaml
