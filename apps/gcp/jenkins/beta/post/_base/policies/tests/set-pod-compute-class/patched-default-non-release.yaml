@@ -3,6 +3,8 @@ kind: Pod
 metadata:
   name: pod-non-release
   namespace: jenkins-pd
+  labels:
+    kubernetes.jenkins.io/controller: ""
   annotations:
     ci_refs: '{"org":"pingcap","repo":"tidb","base_ref":"master"}'
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"

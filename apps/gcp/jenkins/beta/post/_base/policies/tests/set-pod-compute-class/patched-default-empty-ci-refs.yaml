@@ -3,6 +3,8 @@ kind: Pod
 metadata:
   name: pod-empty-ci-refs
   namespace: jenkins-pd
+  labels:
+    kubernetes.jenkins.io/controller: ""
   annotations:
     ci_refs: ""
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
