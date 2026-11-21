@@ -6,4 +6,3 @@ resources:
   - release-1-controller.yaml
   - release-2-runners-tiup.yaml
   - external-secret-github-app.yaml
-  - networkpolicy-egress.yaml
