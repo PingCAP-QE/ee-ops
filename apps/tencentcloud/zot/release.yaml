@@ -15,6 +15,14 @@ spec:
   dependsOn:
     - name: redis
   interval: 1h
+  # The 0.1.122 install reported `StatefulSet/zot/zot status: 'Failed'` while the
+  # zot-0 pod was only still starting, and without install remediation the
+  # HelmRelease stayed `Stalled` from 2026-11-11 on — one transient rollout
+  # report froze the release for nine days even though the registry served
+  # traffic the whole time. Retry installs so a slow first rollout heals itself.
+  install:
+    remediation:
+      retries: 3
   upgrade:
     remediation:
       strategy: uninstall
