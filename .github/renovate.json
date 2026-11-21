@@ -46,6 +46,13 @@
       "enabled": false
     },
     {
+      "description": "Tencent Cloud cluster still runs Kubernetes 1.34, which Flux v2.10+ does not support; only allow Flux patch updates there until the cluster is upgraded",
+      "matchManagers": ["flux"],
+      "matchFileNames": ["clusters/tencentcloud/flux-system/**"],
+      "matchUpdateTypes": ["minor", "major"],
+      "enabled": false
+    },
+    {
       "description": "Open GCP ARC upgrade PRs during normal Renovate runs",
       "matchManagers": ["flux"],
       "matchFileNames": ["apps/gcp/acr-runners/**"],
