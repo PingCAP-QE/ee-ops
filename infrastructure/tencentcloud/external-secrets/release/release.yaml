@@ -14,13 +14,24 @@ spec:
         name: external-secrets
         namespace: flux-system
   values:
+    # The chart renders "<global.repository>:<image.tag>" for all three components
+    # (controller, webhook, cert-controller). Images come from the upstream
+    # `ghcr.io` and are pinned by digest via `tag` (valid OCI form
+    # `vX.Y.Z@sha256:...`). Update all three tags in the same commit as the
+    # chart `version` bump.
     global:
-      repository: ghcr.nju.edu.cn/external-secrets/external-secrets
+      repository: ghcr.io/external-secrets/external-secrets
+    image:
+      tag: v2.8.0@sha256:24c0dd3699e0988520afd2218612758cd97d1f702757b5b4fcf89adaa33ef679
     replicaCount: 2
     webhook:
       replicaCount: 2
+      image:
+        tag: v2.8.0@sha256:24c0dd3699e0988520afd2218612758cd97d1f702757b5b4fcf89adaa33ef679
     certController:
       replicaCount: 2
+      image:
+        tag: v2.8.0@sha256:24c0dd3699e0988520afd2218612758cd97d1f702757b5b4fcf89adaa33ef679
     serviceAccount:
       create: true
     crds:
