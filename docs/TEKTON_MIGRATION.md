@@ -56,15 +56,38 @@ teardown:
   `kustomize.toolkit.fluxcd.io/prune: disabled` so the `tekton-configs` prune
   cannot delete it (the annotation was applied in a separate, earlier
   revision — the prune reads the live object).
-- `apps/tencentcloud/tibuild/v2/`: the `tekton:` block (CloudEvent endpoint,
-  dashboard URLs, HMAC secret) is gone — that instance runs the image-copy
-  delivery workers, devbuilds are dispatched by gcp.
+- `apps/tencentcloud/tibuild/v2/`: the dashboard URL and the HMAC secret are
+  gone; only a placeholder `tekton.cloudevent_endpoint`
+  (`http://el-tibuild.ee-cd.invalid:8080`) remains, because tibuild-v2 refuses
+  to start with an empty endpoint ("http target option was empty string"). With
+  `api_url`/`view_url` unset the PipelineRun reconciler stays off, so nothing
+  polls the removed dashboard Service. That instance runs the image-copy
+  delivery workers; devbuilds are dispatched by gcp.
 - `apps/tencentcloud/cloudevents-server/`: the `tekton:` handler config and the
   `tekton_notify_lark_json` secret extraction are gone; the instance still
   handles the Jenkins `cdevents` test-case-run events.
 - `tekton-pipelines`/`tekton-operator` dropped from the tencentcloud Kyverno
   node-selector policy and from the `ee-gcp-sm` ClusterSecretStore namespace
   allow-list.
+
+Prune friction on TKE (both rules come from the preinstalled
+`baseline.gatekeeper.sh` policies, so they apply to any future namespace/CRD
+teardown here):
+
+- `block-namespace-deletion-rule` refuses to delete a namespace that still has
+  pods, and `block-crd-deletion-rule` refuses to delete a CRD that still has
+  custom resources. The prune runs both concurrently, so `tekton-setup` looped
+  on `Namespace/tekton-pipelines delete failed` / `CRD ... delete failed`.
+- The operator CRs also carried operator finalizers
+  (`tektonconfigs.operator.tekton.dev`, `tektoninstallersets.operator.tekton.dev`)
+  that only the operator can clear — and the operator Deployment is deleted
+  first. Manual order that unblocked it: delete the
+  `TektonInstallerSet`s, then `TektonConfig`/`TektonPipeline`/`TektonTrigger`/
+  `TektonChain`, strip their finalizers, then delete the operator-created
+  Deployments in `tekton-pipelines` (they are not in the Flux inventory), and
+  let the retry finish the CRDs/namespace. `manual-approval-gate` was already
+  gone from the inventory at that point, so the finalizer was cleared by hand
+  after its CRD was deleted.
 
 Manual follow-ups (not in GitOps):
 
