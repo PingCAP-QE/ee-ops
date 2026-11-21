@@ -15,6 +15,10 @@ spec:
         name: kyverno
         namespace: flux-system
   values:
+    # All Kyverno images are pulled from the upstream `ghcr.io` and pinned by digest.
+    # The chart renders `<registry>/<repository>:<tag>`, so the digest is carried in
+    # `tag` (valid OCI form `vX.Y.Z@sha256:...`). When bumping the chart `version`,
+    # update these tags/digests to the chart appVersion in the same commit.
     global:
       nodeSelector:
         compute-class: system
@@ -22,17 +26,20 @@ spec:
     admissionController:
       container:
         image:
-          registry: ghcr.nju.edu.cn
+          registry: ghcr.io
+          tag: v1.18.2@sha256:0a540e2ddf74d0d2d3d45f9ef248d7dbc96576accdbcc6a2dd7eaff9fea56504
       initContainer:
         image:
-          registry: ghcr.nju.edu.cn
+          registry: ghcr.io
+          tag: v1.18.2@sha256:cd8cb4a31d25b3992734fb8f24a90ef691c90ce49338c89bea96792160eacb98
       autoscaling:
         enabled: true
         minReplicas: 1
         maxReplicas: 3
     backgroundController:
       image:
-        registry: ghcr.nju.edu.cn
+        registry: ghcr.io
+        tag: v1.18.2@sha256:d62566ce41bd0d4a32bf2cf44b9ebfc02c36374f821f83070890287f62f68671
       autoscaling:
         enabled: true
         minReplicas: 1
@@ -46,23 +53,22 @@ spec:
               verbs: ["get", "list", "watch", "delete"]
     cleanupController:
       image:
-        registry: ghcr.nju.edu.cn
+        registry: ghcr.io
+        tag: v1.18.2@sha256:b0395d29ae332276e6910eb40418be9bc127c068d659f90aa1bcddd6be99ccb4
       autoscaling:
         enabled: true
         minReplicas: 1
         maxReplicas: 2
     reportsController:
       image:
-        registry: ghcr.nju.edu.cn
+        registry: ghcr.io
+        tag: v1.18.2@sha256:f09cf305170014e191b94e1c54f5be73163d8824eefad49349675c4efe43159a
       autoscaling:
         enabled: true
         minReplicas: 1
         maxReplicas: 2
-    policyReportsCleanup:
-      image:
-        registry: mirror.ccs.tencentyun.com
-        tag: latest
     crds:
       migration:
         image:
-          registry: ghcr.nju.edu.cn
+          registry: ghcr.io
+          tag: v1.18.2@sha256:7224ed05508c24419c3df98114c28ba682ad0a940dcdb7b9fdba0a4b6bf943cf
