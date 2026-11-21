@@ -63,6 +63,14 @@ spec:
       image:
         registry: ghcr.io
         tag: v1.18.2@sha256:f09cf305170014e191b94e1c54f5be73163d8824eefad49349675c4efe43159a
+      # Chart default is 128Mi, which the controller exceeds while building its
+      # informer cache on cold start (338 PolicyReports / ~1k pods here): every
+      # restart OOMKills before the cache syncs and the loop never converges.
+      # Requests stay at the chart defaults so scheduling and the CPU-based HPA
+      # are unchanged.
+      resources:
+        limits:
+          memory: 512Mi
       autoscaling:
         enabled: true
         minReplicas: 1
