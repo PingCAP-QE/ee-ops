@@ -15,15 +15,8 @@ resources:
   # Report PR-authored Pods that name this namespace's credentials
   - policies/restrict-prow-job-pod-credentials.yaml
 
-# Each rule can be enforced from here once its consumers are migrated, without
-# touching the policy file: rules 0/1/2 are the ServiceAccount, org-admin secret
-# and project secret tiers.
-#
-# patches:
-#   - target:
-#       kind: Policy
-#       name: restrict-prow-job-pod-credentials
-#     patch: |-
-#       - op: replace
-#         path: /spec/rules/1/validate/failureAction
-#         value: Enforce
+# `validationActions` is policy-scoped in the CEL policy API, so the old
+# per-rule `failureAction` override is gone. To enforce the org-admin tier
+# before the project tier, split the policy in two (ServiceAccount + org-admin
+# secrets, then project secrets) and put `validationActions: [Audit, Deny]` on
+# the one you want to block. The regression-suite expectations stay valid.

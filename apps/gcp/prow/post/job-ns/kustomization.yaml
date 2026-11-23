@@ -6,3 +6,9 @@ resources:
   - restrict-prow-job-pod-credentials.yaml
   - rbac.yaml
   - secrets
+
+# `validationActions` is policy-scoped in the CEL policy API, so the old
+# per-rule `failureAction` override is gone. To enforce the org-admin tier
+# before the project tier, split the policy in two (ServiceAccount + org-admin
+# secrets, then project secrets) and put `validationActions: [Audit, Deny]` on
+# the one you want to block. The regression-suite expectations stay valid.
