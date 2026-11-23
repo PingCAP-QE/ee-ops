@@ -291,6 +291,44 @@ spec:
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --label-prefix=needs-cherry-pick-
           - --skip-fork
+      # Unified cherry-pick plugin (config key `cherry-pick`). Runs next to the
+      # legacy deployments while the canary repositories are migrated.
+      cherry-pick:
+        replicaCount: 1
+        service:
+          type: ClusterIP
+        ports:
+          http: 8888
+        serviceAccount:
+          name: prow-hook
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            memory: 1Gi
+        image:
+          repository: ghcr.io/ti-community-infra/prow/cherrypicker
+          tag: v20261123-20637939d
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/app-private-key
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+          # The plugin reads its per-repository section from the shared file and
+          # pushes cherry-pick branches to the ti-chi-bot fork.
+          - --external-plugins-config=/etc/external_plugins_config/external_plugins_config.yaml
+          - --fork-owner=ti-chi-bot
+          - --on-conflict=hold
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       needs-rebase:
         replicaCount: 1
         image:
