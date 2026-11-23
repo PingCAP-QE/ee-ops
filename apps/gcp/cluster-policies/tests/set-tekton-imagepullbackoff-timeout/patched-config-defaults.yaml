@@ -9,4 +9,3 @@ kind: ConfigMap
 metadata:
   name: config-defaults
   namespace: tekton-pipelines
-
