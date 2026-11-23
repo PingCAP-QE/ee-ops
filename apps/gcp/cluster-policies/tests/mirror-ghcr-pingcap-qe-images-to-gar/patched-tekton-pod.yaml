@@ -24,5 +24,3 @@ spec:
     name: prepare
   - image: us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/ee-apps/github-token-broker-git-credential:v2026.10.25-6-g9218dd0
     name: fetch-broker-token
-
----
