@@ -39,3 +39,25 @@ spec:
   containers:
     - name: agent
       image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fallback-author
+  namespace: default
+  labels:
+    kubernetes.jenkins.io/controller: ""
+    prow.k8s.io/refs.org: pingcap
+    prow.k8s.io/refs.repo: tidb
+    prow.k8s.io/refs.base_ref: release-8_5
+    author: some_user_example_com
+    org: pingcap
+    repo: tidb
+    env: cicd
+  annotations:
+    ci_refs: '{"org":"PingCAP","repo":"TiDB","base_ref":"Release-8.5"}'
+    ci_trigger_user: 'Some.User@Example.com'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36

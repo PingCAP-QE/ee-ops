@@ -27,3 +27,20 @@ spec:
   containers:
     - name: agent
       image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fallback-author
+  namespace: default
+  labels:
+    kubernetes.jenkins.io/controller: ""
+  annotations:
+    # No `pulls`, so `author` falls back to `ci_trigger_user`; both the org/repo
+    # casing and the `.`/`@` characters exercise the sanitiser.
+    ci_refs: '{"org":"PingCAP","repo":"TiDB","base_ref":"Release-8.5"}'
+    ci_trigger_user: 'Some.User@Example.com'
+spec:
+  containers:
+    - name: agent
+      image: busybox:1.36

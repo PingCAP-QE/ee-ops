@@ -21,6 +21,11 @@ spec:
   # `[a-z0-9]([a-z0-9_-]*[a-z0-9])?` match to drop any leading/trailing `-`/`_`.
   #
   # The namespace comes from the per-component overlay, same as before.
+  #
+  # `ci_refs` is written by our own Jenkins pipeline. If it were ever malformed
+  # JSON, `json.unmarshal` makes the policy evaluation fail (CEL has no
+  # try/catch); with `failurePolicy: Ignore` the pod is still admitted and simply
+  # gets no labels, which is the same fail-open behaviour as the JMESPath policy.
   matchConstraints:
     objectSelector:
       matchExpressions:
@@ -64,12 +69,14 @@ spec:
       jsonPatch:
         expression: |
           [
+            // Prow-style refs: `<org>`, `<repo>`, `<base_ref>` of the CI run.
             JSONPatch{op: "add", path: "/metadata/labels/prow.k8s.io~1refs.org",
               value: (size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
             JSONPatch{op: "add", path: "/metadata/labels/prow.k8s.io~1refs.repo",
               value: (size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
             JSONPatch{op: "add", path: "/metadata/labels/prow.k8s.io~1refs.base_ref",
               value: (size(variables.sanitizedBaseRef) > 63 ? variables.sanitizedBaseRef.substring(0, 63) : variables.sanitizedBaseRef).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
+            // Short aliases used by dashboards and cost reports.
             JSONPatch{op: "add", path: "/metadata/labels/author",
               value: (size(variables.sanitizedAuthor) > 63 ? variables.sanitizedAuthor.substring(0, 63) : variables.sanitizedAuthor).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
             JSONPatch{op: "add", path: "/metadata/labels/org",

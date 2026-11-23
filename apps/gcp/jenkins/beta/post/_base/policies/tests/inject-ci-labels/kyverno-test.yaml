@@ -11,6 +11,7 @@ results:
     resources:
       - bot-author
       - label-length-boundary
+      - fallback-author
     kind: Pod
     result: pass
     patchedResources: patched.yaml
