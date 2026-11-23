@@ -1,0 +1,69 @@
+# The approval service is reachable only through the Gateway, and may only call
+# the services it needs. Services are ClusterIP, so without this policy any Pod
+# in the cluster could call the OIDC-protected pages or the in-cluster HTTP API
+# directly and bypass the Gateway's SecurityPolicy.
+#
+# Ingress: `infra` hosts the `eg-internal` Envoy data plane. Kubelet probes are
+# unaffected: GKE Dataplane V2 always admits probe traffic regardless of
+# NetworkPolicy (https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2).
+#
+# Egress:
+# - cluster DNS;
+# - `dl` namespace (dl-management:80) for share issuance/revocation;
+# - public HTTPS (Lark OpenAPI, Google JWKS) and the public TiDB SQL endpoint
+#   on 4000, still excluding the private ranges so lateral movement stays closed.
+#   If the shared TiDB endpoint is private, add its /32 or a dedicated
+#   namespaceSelector here; do not widen the private-range exception.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: dl-approval
+spec:
+  podSelector:
+    # Pinned to the future chart release: app.kubernetes.io/name is the chart
+    # name and instance is the Helm release name (`dl-approval`).
+    matchLabels:
+      app.kubernetes.io/name: delivery-approval
+      app.kubernetes.io/instance: dl-approval
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+      ports:
+        - protocol: TCP
+          port: 80
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+        - ipBlock:
+            cidr: 10.116.0.10/32
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: dl
+      ports:
+        - protocol: TCP
+          port: 80
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443
+        - protocol: TCP
+          port: 4000

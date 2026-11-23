@@ -1,0 +1,37 @@
+# Approval service prerequisites. Phase 0 only creates the namespace,
+# NetworkPolicy and ExternalSecrets, so this Kustomization is safe to reconcile
+# before the service image/chart exists. Later phases add the migration Job and
+# HelmRelease to the same path; keep `dependsOn` pointing at dl-delivery so the
+# management API and its NetworkPolicy are present first.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: dl-approval
+  namespace: flux-system
+spec:
+  dependsOn:
+    - name: dl-delivery
+  interval: 10m
+  retryInterval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/gcp/dl-approval
+  prune: true
+  timeout: 10m
+  healthChecks:
+    # Keep the prerequisites fail-closed: before the GSM keys/OAuth secret
+    # exist, these ExternalSecrets report SecretSynced=False and the
+    # Kustomization stays not-Ready instead of silently continuing.
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: dl-approval-oidc
+      namespace: dl-approval
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: dl-approval-tidb
+      namespace: dl-approval
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: dl-approval-config
+      namespace: dl-approval

@@ -18,6 +18,7 @@ spec:
               - "chatops-lark"
               - "cs"
               - "dl"
+              - "dl-approval"
               - "ee-cd"
               - "flux-system"
               - "github-token-broker"
