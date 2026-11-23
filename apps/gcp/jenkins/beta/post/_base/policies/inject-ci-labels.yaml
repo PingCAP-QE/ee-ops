@@ -1,86 +1,80 @@
-apiVersion: kyverno.io/v1
-kind: Policy
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
 metadata:
   name: inject-ci-labels
 spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
   failurePolicy: Ignore
-  rules:
-    - name: inject-labels-from-annotations
-      match:
-        resources:
-          kinds:
-            - Pod
-          selector:
-            matchExpressions:
-              - key: kubernetes.jenkins.io/controller
-                operator: Exists
-      context:
-        - name: parsed_refs
-          variable:
-            default: {}
-            jmesPath: "request.object.metadata.annotations.ci_refs | parse_json(@)"
-      preconditions:
-        all:
-          - key: "{{ request.object.metadata.annotations.ci_refs || '' }}"
-            operator: NotEquals
-            value: ""
-      mutate:
-        patchStrategicMerge:
-          metadata:
-            labels:
-              # compatible with prow style refs labels; trim after truncation so
-              # character 63 cannot leave a trailing '-' or '_'.
-              prow.k8s.io/refs.org: >-
-                {{
-                  not_null(parsed_refs.org, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '')
-                }}
-              prow.k8s.io/refs.repo: >-
-                {{
-                  not_null(parsed_refs.repo, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '')
-                }}
-              prow.k8s.io/refs.base_ref: >-
-                {{
-                  not_null(parsed_refs.base_ref, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '')
-                }}
-
-              author: >-
-                {{
-                  not_null(
-                    parsed_refs.pulls[0].author,
-                    request.object.metadata.annotations."ci_trigger_user",
-                    ''
-                  ) |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '')
-                }}
-              org: >-
-                {{
-                  not_null(parsed_refs.org, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '')
-                }}
-              repo: >-
-                {{
-                  not_null(parsed_refs.repo, '') |
-                  to_lower(@) |
-                  regex_replace_all('[^a-z0-9_-]', @, '_') |
-                  regex_replace_all('^(.{0,63}).*$', @, '$1') |
-                  regex_replace_all('^[-_]+|[-_]+$', @, '')
-                }}
-              env: cicd
+  # Copies the Prow-style refs from the `ci_refs` annotation (injected by the
+  # Jenkins pipeline) onto the agent pod as labels, plus author/org/repo/env.
+  #
+  # Label values must match `[a-z0-9_-]{0,63}` with alphanumeric boundaries.
+  # The kyverno.io/v1 Policy sanitised them with `regex_replace_all`, which has
+  # no CEL equivalent (see Kyverno's JMESPath->CEL guide), so the same four steps
+  # are expressed as: lowercase, replace every character outside
+  # `[a-z0-9_-]` with `_`, truncate to 63, then `find()` the first
+  # `[a-z0-9]([a-z0-9_-]*[a-z0-9])?` match to drop any leading/trailing `-`/`_`.
+  #
+  # The namespace comes from the per-component overlay, same as before.
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: kubernetes.jenkins.io/controller
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: has-ci-refs
+      expression: >-
+        has(object.metadata.annotations) &&
+        'ci_refs' in object.metadata.annotations &&
+        object.metadata.annotations['ci_refs'] != ''
+  variables:
+    - name: refs
+      expression: |
+        json.unmarshal(object.metadata.annotations['ci_refs'])
+    # `pulls[0].author` wins, then the `ci_trigger_user` annotation, then empty.
+    - name: author
+      expression: |
+        variables.refs.?pulls.orValue([]).size() > 0
+          ? string(variables.refs.pulls[0].?author.orValue(''))
+          : string(object.metadata.?annotations.orValue({})[?'ci_trigger_user'].orValue(''))
+    - name: sanitizedOrg
+      expression: |
+        string(variables.refs.?org.orValue('')).lowerAscii().split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+    - name: sanitizedRepo
+      expression: |
+        string(variables.refs.?repo.orValue('')).lowerAscii().split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+    - name: sanitizedBaseRef
+      expression: |
+        string(variables.refs.?base_ref.orValue('')).lowerAscii().split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+    - name: sanitizedAuthor
+      expression: |
+        variables.author.lowerAscii().split("").map(c, c.matches("[a-z0-9_-]") ? c : "_").join("")
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          [
+            JSONPatch{op: "add", path: "/metadata/labels/prow.k8s.io~1refs.org",
+              value: (size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
+            JSONPatch{op: "add", path: "/metadata/labels/prow.k8s.io~1refs.repo",
+              value: (size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
+            JSONPatch{op: "add", path: "/metadata/labels/prow.k8s.io~1refs.base_ref",
+              value: (size(variables.sanitizedBaseRef) > 63 ? variables.sanitizedBaseRef.substring(0, 63) : variables.sanitizedBaseRef).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
+            JSONPatch{op: "add", path: "/metadata/labels/author",
+              value: (size(variables.sanitizedAuthor) > 63 ? variables.sanitizedAuthor.substring(0, 63) : variables.sanitizedAuthor).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
+            JSONPatch{op: "add", path: "/metadata/labels/org",
+              value: (size(variables.sanitizedOrg) > 63 ? variables.sanitizedOrg.substring(0, 63) : variables.sanitizedOrg).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
+            JSONPatch{op: "add", path: "/metadata/labels/repo",
+              value: (size(variables.sanitizedRepo) > 63 ? variables.sanitizedRepo.substring(0, 63) : variables.sanitizedRepo).find("[a-z0-9]([a-z0-9_-]*[a-z0-9])?")},
+            JSONPatch{op: "add", path: "/metadata/labels/env", value: "cicd"}
+          ]

@@ -8,7 +8,6 @@ resources:
   - resources.yaml
 results:
   - policy: inject-ci-labels
-    rule: inject-labels-from-annotations
     resources:
       - bot-author
       - label-length-boundary

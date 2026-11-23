@@ -1,15 +1,20 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: pod-non-release
-  namespace: jenkins-pd
   annotations:
     ci_refs: '{"org":"pingcap","repo":"tidb","base_ref":"master"}'
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  labels:
+    kubernetes.jenkins.io/controller: ""
+  name: pod-non-release
+  namespace: jenkins-pd
 spec:
   containers:
-    - name: main
-      image: busybox:1.36
-      command: ["sh", "-c", "sleep 3600"]
+  - command:
+    - sh
+    - -c
+    - sleep 3600
+    image: busybox:1.36
+    name: main
   nodeSelector:
     cloud.google.com/compute-class: ci-worker
