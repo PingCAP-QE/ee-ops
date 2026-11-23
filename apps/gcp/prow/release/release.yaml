@@ -495,7 +495,7 @@ spec:
           name: prow-hook
         image:
           repository: ticommunityinfra/tichi-label-plugin
-          tag: v2026.10.26
+          tag: v2026.11.19
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
