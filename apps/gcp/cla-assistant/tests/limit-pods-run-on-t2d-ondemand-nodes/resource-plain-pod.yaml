@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cla-assistant-6b7c9d8f5-xyz12
+  namespace: cla
+spec:
+  containers:
+    - name: cla-assistant
+      image: ghcr.io/pingcap-qe/ee-apps/cla-assistant:test

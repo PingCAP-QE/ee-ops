@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bp-tikv-nextgen-linux-amd64-pod
+  namespace: ee-cd
+spec:
+  containers:
+    - name: step-build
+      image: ghcr.io/pingcap-qe/cd/utils/release:v2025.10.12-7-gfdd779c

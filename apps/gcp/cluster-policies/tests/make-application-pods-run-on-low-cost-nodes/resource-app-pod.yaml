@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ci-dashboard-7d9f8b6c4-abcde
+  namespace: apps
+spec:
+  containers:
+    - name: ci-dashboard
+      image: ghcr.io/pingcap-qe/ee-apps/ci-dashboard:test
+  nodeSelector:
+    kubernetes.io/arch: amd64

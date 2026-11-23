@@ -1,53 +1,48 @@
-apiVersion: kyverno.io/v1
-kind: Policy
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
 metadata:
   name: set-node-selector-tekton-taskrun-pods
 spec:
-  rules:
-    - name: add-compute-class-and-annotations
-      match:
-        resources:
-          kinds:
-            - Pod
-          selector:
-            matchExpressions:
-              - key: tekton.dev/taskRun
-                operator: Exists
-      mutate:
-        patchStrategicMerge:
-          metadata:
-            annotations:
-              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
-          spec:
-            nodeSelector:
-              cloud.google.com/compute-class: ci-worker
-
-    # Override compute class for retried Tekton TaskRun pods to ensure they
-    # run on on-demand CI workers instead of spot nodes.
-    - name: override-compute-class-for-retried-pods
-      match:
-        resources:
-          kinds:
-            - Pod
-          selector:
-            matchExpressions:
-              - key: tekton.dev/taskRun
-                operator: Exists
-      context:
-        - name: is_retried_pod
-          variable:
-            default: false
-            jmesPath: "regex_match('-retry[0-9]+$', request.object.metadata.name)"
-      preconditions:
-        all:
-          - key: "{{ is_retried_pod }}"
-            operator: Equals
-            value: true
-      mutate:
-        patchStrategicMerge:
-          metadata:
-            annotations:
-              cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
-          spec:
-            nodeSelector:
-              cloud.google.com/compute-class: ci-worker-ondemand
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  # Retried TaskRun pods (`-retry<N>` suffix) must land on on-demand CI workers
+  # instead of spot nodes. The kyverno.io/v1 Policy expressed this as two
+  # ordered rules, where the second one overrode the first; CEL computes the
+  # final compute class in a single expression instead, so the evaluation order
+  # of policies cannot change the outcome.
+  #
+  # The namespace comes from the `tekton-configs` Flux Kustomization
+  # (`targetNamespace: ee-cd`), same as the previous Policy.
+  matchConstraints:
+    objectSelector:
+      matchExpressions:
+        - key: tekton.dev/taskRun
+          operator: Exists
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  variables:
+    - name: isRetriedPod
+      expression: |
+        object.metadata.name.matches('-retry[0-9]+$')
+    - name: computeClass
+      expression: |
+        variables.isRetriedPod ? 'ci-worker-ondemand' : 'ci-worker'
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          [
+            (has(object.metadata.annotations) ?
+              JSONPatch{op: "add", path: "/metadata/annotations/cluster-autoscaler.kubernetes.io~1safe-to-evict", value: "false"} :
+              JSONPatch{op: "add", path: "/metadata/annotations", value: {"cluster-autoscaler.kubernetes.io/safe-to-evict": "false"}}),
+            (has(object.spec.nodeSelector) ?
+              JSONPatch{op: "add", path: "/spec/nodeSelector/cloud.google.com~1compute-class", value: variables.computeClass} :
+              JSONPatch{op: "add", path: "/spec/nodeSelector", value: {"cloud.google.com/compute-class": variables.computeClass}})
+          ]

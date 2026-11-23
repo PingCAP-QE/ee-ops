@@ -1,22 +1,33 @@
-apiVersion: kyverno.io/v1
-kind: Policy
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
 metadata:
   name: ci-dashboard-scheduling
   namespace: apps
 spec:
-  rules:
-    - name: migrate-app-to-compute-class
-      match:
-        resources:
-          kinds:
-            - Deployment
-          names:
-            - ci-dashboard
-      mutate:
-        patchStrategicMerge:
-          spec:
-            template:
-              spec:
-                affinity: null
-                nodeSelector:
-                  cloud.google.com/compute-class: ee-application
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  # Kept from the kyverno.io/v1 Policy: only the ci-dashboard Deployment, and
+  # the deprecated t2d/n2d/e2 + non-spot node affinity is dropped in favour of
+  # the ee-application compute class.
+  matchConstraints:
+    resourceRules:
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments"]
+  matchConditions:
+    - name: is-ci-dashboard
+      expression: object.metadata.name == 'ci-dashboard'
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          (has(object.spec.template.spec.affinity) ?
+            [JSONPatch{op: "remove", path: "/spec/template/spec/affinity"}] : []) +
+          (has(object.spec.template.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/template/spec/nodeSelector/cloud.google.com~1compute-class", value: "ee-application"}] :
+            [JSONPatch{op: "add", path: "/spec/template/spec/nodeSelector", value: {"cloud.google.com/compute-class": "ee-application"}}])
