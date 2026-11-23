@@ -10,6 +10,15 @@ spec:
       enabled: true
     mutateExisting:
       enabled: false
+  # kyverno/kyverno#16141 (regression, fixed in Kyverno 1.19): a mutating policy
+  # without any matchConditions is folded into the shared
+  # `mpol.validate.kyverno.svc-fail` webhook together with policies of the other
+  # scope, the generated webhook names collide, and the controller can never
+  # apply the webhook configuration again - mutations then silently stop.
+  # Keep one trivially-true condition until this cluster runs Kyverno >= 1.19.
+  matchConditions:
+    - name: always-true
+      expression: "true"
   matchConstraints:
     resourceRules:
       - apiGroups: [""]

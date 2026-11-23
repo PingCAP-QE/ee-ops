@@ -22,6 +22,15 @@ spec:
   # The namespace comes from the per-component overlay
   # (`apps/gcp/jenkins/beta/post/<component>/kustomization.yaml`), same as
   # before, so it is intentionally not set here.
+  # kyverno/kyverno#16141 (regression, fixed in Kyverno 1.19): a mutating policy
+  # without any matchConditions is folded into the shared
+  # `mpol.validate.kyverno.svc-fail` webhook together with policies of the other
+  # scope, the generated webhook names collide, and the controller can never
+  # apply the webhook configuration again - mutations then silently stop.
+  # Keep one trivially-true condition until this cluster runs Kyverno >= 1.19.
+  matchConditions:
+    - name: always-true
+      expression: "true"
   matchConstraints:
     objectSelector:
       matchExpressions:
