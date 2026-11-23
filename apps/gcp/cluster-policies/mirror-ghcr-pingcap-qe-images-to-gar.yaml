@@ -1,57 +1,75 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_mutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
 metadata:
   name: mirror-ghcr-pingcap-qe-images-to-gar
 spec:
-  admission: true
-  background: false
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
   # This is a pull optimisation, not a security control: never block pod
   # creation just because Kyverno is unavailable.
   failurePolicy: Ignore
-  rules:
-    # Our own builder images are multi-GB. Pulling them node-direct from ghcr.io
-    # on a fresh spot node takes ~2 minutes, which is exactly the kubelet CRI
-    # deadline, so any GitHub hiccup turns into
-    # "dial tcp <ip>:443: i/o timeout" -> ImagePullBackOff -> Tekton fails the
-    # whole release pipeline on the first attempt.
-    #
-    # `ghcr-remote` is an Artifact Registry REMOTE_REPOSITORY backed by
-    # https://ghcr.io, so the same reference resolves to byte-identical content
-    # (tags and digests are preserved) but is served from a Google-internal
-    # endpoint inside the same location: no internet egress, no cross-border
-    # flakiness, and much faster on a cold node.
-    #
-    # Only the `ghcr.io/pingcap-qe/` prefix is rewritten. Everything else is
-    # left byte-for-byte alone, so third-party images keep their original
-    # (DNS-verified, auth-controlled) source.
-    - name: rewrite-ghcr-pingcap-qe-containers
-      match:
-        any:
-          - resources:
-              kinds:
-                - Pod
-      exclude:
-        any:
-          - resources:
-              namespaces:
-                - kube-system
-                - kube-public
-                - kube-node-lease
-                - infra
-                - flux-system
-                - tekton-pipelines
-                - tekton-operator
-      mutate:
-        foreach:
-          - list: "request.object.spec.containers"
-            patchStrategicMerge:
-              spec:
-                containers:
-                  - (name): "{{ element.name }}"
-                    image: "{{ replace_all('{{ element.image }}', 'ghcr.io/pingcap-qe/', 'us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/') }}"
-          - list: "request.object.spec.initContainers"
-            patchStrategicMerge:
-              spec:
-                initContainers:
-                  - (name): "{{ element.name }}"
-                    image: "{{ replace_all('{{ element.image }}', 'ghcr.io/pingcap-qe/', 'us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/') }}"
+  # Our own builder images are multi-GB. Pulling them node-direct from ghcr.io
+  # on a fresh spot node takes ~2 minutes, which is exactly the kubelet CRI
+  # deadline, so any GitHub hiccup turns into
+  # "dial tcp <ip>:443: i/o timeout" -> ImagePullBackOff -> Tekton fails the
+  # whole release pipeline on the first attempt.
+  #
+  # `ghcr-remote` is an Artifact Registry REMOTE_REPOSITORY backed by
+  # https://ghcr.io, so the same reference resolves to byte-identical content
+  # (tags and digests are preserved) but is served from a Google-internal
+  # endpoint inside the same location: no internet egress, no cross-border
+  # flakiness, and much faster on a cold node.
+  #
+  # Only the `ghcr.io/pingcap-qe/` prefix is rewritten. Everything else is left
+  # byte-for-byte alone, so third-party images keep their original
+  # (DNS-verified, auth-controlled) source.
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: NotIn
+          values:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - infra
+            - flux-system
+            - tekton-pipelines
+            - tekton-operator
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  matchConditions:
+    - name: has-ghcr-pingcap-qe-image
+      expression: >-
+        object.spec.containers.exists(c, c.image.startsWith('ghcr.io/pingcap-qe/')) ||
+        object.spec.?initContainers.orValue([]).exists(c, c.image.startsWith('ghcr.io/pingcap-qe/'))
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.containers.map(c,
+            c.image.startsWith("ghcr.io/pingcap-qe/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/image",
+              value: c.image.replace("ghcr.io/pingcap-qe/", "us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/")
+            } : null
+          ).filter(p, p != null)
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          object.spec.?initContainers.orValue([]).map(c,
+            c.image.startsWith("ghcr.io/pingcap-qe/") ?
+            JSONPatch{
+              op: "replace",
+              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/image",
+              value: c.image.replace("ghcr.io/pingcap-qe/", "us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/")
+            } : null
+          ).filter(p, p != null)

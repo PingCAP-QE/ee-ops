@@ -9,7 +9,6 @@ resources:
   - resource-excluded-namespace.yaml
 results:
   - policy: mirror-ghcr-pingcap-qe-images-to-gar
-    rule: rewrite-ghcr-pingcap-qe-containers
     resources:
       - bp-tiflash-enterprise-linux-arm64-build-binaries-pod
     kind: Pod
@@ -17,7 +16,6 @@ results:
     patchedResources: patched-tekton-pod.yaml
 
   - policy: mirror-ghcr-pingcap-qe-images-to-gar
-    rule: rewrite-ghcr-pingcap-qe-containers
     resources:
       - tekton-pipelines-controller
     kind: Pod

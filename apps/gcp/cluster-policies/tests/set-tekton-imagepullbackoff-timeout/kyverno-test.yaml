@@ -9,7 +9,6 @@ resources:
   - resource-other-configmap.yaml
 results:
   - policy: set-tekton-imagepullbackoff-timeout
-    rule: inject-default-imagepullbackoff-timeout
     resources:
       - config-defaults
     kind: ConfigMap
@@ -17,7 +16,6 @@ results:
     patchedResources: patched-config-defaults.yaml
 
   - policy: set-tekton-imagepullbackoff-timeout
-    rule: inject-default-imagepullbackoff-timeout
     resources:
       - feature-flags
     kind: ConfigMap
