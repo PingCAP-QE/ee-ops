@@ -1,0 +1,24 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: mirror-ghcr-pingcap-qe-images-to-gar
+policies:
+  - ../../mirror-ghcr-pingcap-qe-images-to-gar.yaml
+resources:
+  - resource-tekton-pod.yaml
+  - resource-excluded-namespace.yaml
+results:
+  - policy: mirror-ghcr-pingcap-qe-images-to-gar
+    rule: rewrite-ghcr-pingcap-qe-containers
+    resources:
+      - bp-tiflash-enterprise-linux-arm64-build-binaries-pod
+    kind: Pod
+    result: pass
+    patchedResources: patched-tekton-pod.yaml
+
+  - policy: mirror-ghcr-pingcap-qe-images-to-gar
+    rule: rewrite-ghcr-pingcap-qe-containers
+    resources:
+      - tekton-pipelines-controller
+    kind: Pod
+    result: skip

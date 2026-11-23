@@ -1,0 +1,43 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: set-tekton-imagepullbackoff-timeout
+spec:
+  admission: true
+  background: false
+  failurePolicy: Ignore
+  rules:
+    # Tekton fails a TaskRun as soon as one of its step containers enters
+    # ImagePullBackOff, unless `default-imagepullbackoff-timeout` is set in the
+    # `config-defaults` ConfigMap. The upstream default is 0 (fail immediately),
+    # and it is still 0 in Pipelines v1.4/v1.5/main.
+    #
+    # We cannot set it the usual way:
+    #   - tektoncd/operator does not expose this field in
+    #     TektonConfig.spec.pipeline (checked up to v0.80.0 and main), and
+    #     `config-defaults` is owned by the operator's TektonInstallerSet, so a
+    #     one-off `kubectl patch` is overwritten whenever the installer set is
+    #     re-applied.
+    #
+    # Injecting the key at admission time makes it stick for every CREATE and
+    # UPDATE the operator performs on that ConfigMap, without upgrading or
+    # forking the operator.
+    #
+    # Effect: on a transient image pull failure Tekton now keeps the pod around
+    # for 5 minutes (Tekton controller watches this ConfigMap, no restart
+    # needed), which gives kubelet room for its own retries instead of turning a
+    # single 2-minute CRI deadline into a red release pipeline.
+    - name: inject-default-imagepullbackoff-timeout
+      match:
+        any:
+          - resources:
+              kinds:
+                - ConfigMap
+              namespaces:
+                - tekton-pipelines
+              names:
+                - config-defaults
+      mutate:
+        patchStrategicMerge:
+          data:
+            default-imagepullbackoff-timeout: "5m"

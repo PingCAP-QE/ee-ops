@@ -1,0 +1,12 @@
+apiVersion: v1
+data:
+  default-imagepullbackoff-timeout: 5m
+  default-service-account: default
+  default-task-run-workspace-binding: |
+    emptyDir: {}
+  default-timeout-minutes: "120"
+kind: ConfigMap
+metadata:
+  name: config-defaults
+  namespace: tekton-pipelines
+

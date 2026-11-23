@@ -1,0 +1,57 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: mirror-ghcr-pingcap-qe-images-to-gar
+spec:
+  admission: true
+  background: false
+  # This is a pull optimisation, not a security control: never block pod
+  # creation just because Kyverno is unavailable.
+  failurePolicy: Ignore
+  rules:
+    # Our own builder images are multi-GB. Pulling them node-direct from ghcr.io
+    # on a fresh spot node takes ~2 minutes, which is exactly the kubelet CRI
+    # deadline, so any GitHub hiccup turns into
+    # "dial tcp <ip>:443: i/o timeout" -> ImagePullBackOff -> Tekton fails the
+    # whole release pipeline on the first attempt.
+    #
+    # `ghcr-remote` is an Artifact Registry REMOTE_REPOSITORY backed by
+    # https://ghcr.io, so the same reference resolves to byte-identical content
+    # (tags and digests are preserved) but is served from a Google-internal
+    # endpoint inside the same location: no internet egress, no cross-border
+    # flakiness, and much faster on a cold node.
+    #
+    # Only the `ghcr.io/pingcap-qe/` prefix is rewritten. Everything else is
+    # left byte-for-byte alone, so third-party images keep their original
+    # (DNS-verified, auth-controlled) source.
+    - name: rewrite-ghcr-pingcap-qe-containers
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kube-public
+                - kube-node-lease
+                - infra
+                - flux-system
+                - tekton-pipelines
+                - tekton-operator
+      mutate:
+        foreach:
+          - list: "request.object.spec.containers"
+            patchStrategicMerge:
+              spec:
+                containers:
+                  - (name): "{{ element.name }}"
+                    image: "{{ replace_all('{{ element.image }}', 'ghcr.io/pingcap-qe/', 'us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/') }}"
+          - list: "request.object.spec.initContainers"
+            patchStrategicMerge:
+              spec:
+                initContainers:
+                  - (name): "{{ element.name }}"
+                    image: "{{ replace_all('{{ element.image }}', 'ghcr.io/pingcap-qe/', 'us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/') }}"
