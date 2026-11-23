@@ -1,0 +1,51 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
+metadata:
+  name: set-ci-worker-pod-defaults
+  # The test pods namespace. The owning Kustomization sets the effective namespace
+  # (`namespace: ${TEST_PODS_NAMESPACE}`, substituted by Flux) and overrides this
+  # value; it is kept here so the intent is readable in the source.
+  namespace: prow-test-pods
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  # Arm64 workloads go through their own compute class: on-demand Arm64 capacity
+  # is scarce in us-central1, so that class tries spot Arm64 first.
+  #
+  # The kyverno.io/v1 Policy used two ordered rules (arm64 first, everything else
+  # second); CEL derives the compute class from the pod's own scheduling hints in
+  # one expression, so the result no longer depends on rule ordering.
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  variables:
+    - name: archFromNodeSelector
+      expression: |
+        object.spec.?nodeSelector[?'kubernetes.io/arch'].orValue('')
+    - name: archFromAffinity
+      expression: |
+        object.spec.?affinity.?nodeAffinity.?requiredDuringSchedulingIgnoredDuringExecution.?nodeSelectorTerms.orValue([]).exists(term,
+          term.?matchExpressions.orValue([]).exists(expr,
+            expr.key == 'kubernetes.io/arch' && 'arm64' in expr.?values.orValue([])))
+    - name: computeClass
+      expression: |
+        (variables.archFromNodeSelector == 'arm64' || variables.archFromAffinity) ? 'ci-worker-arm64' : 'ci-worker-ondemand'
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          [
+            (has(object.metadata.annotations) ?
+              JSONPatch{op: "add", path: "/metadata/annotations/cluster-autoscaler.kubernetes.io~1safe-to-evict", value: "false"} :
+              JSONPatch{op: "add", path: "/metadata/annotations", value: {"cluster-autoscaler.kubernetes.io/safe-to-evict": "false"}}),
+            (has(object.spec.nodeSelector) ?
+              JSONPatch{op: "add", path: "/spec/nodeSelector/cloud.google.com~1compute-class", value: variables.computeClass} :
+              JSONPatch{op: "add", path: "/spec/nodeSelector", value: {"cloud.google.com/compute-class": variables.computeClass}})
+          ]

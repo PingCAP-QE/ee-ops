@@ -1,16 +1,25 @@
-apiVersion: kyverno.io/v1
-kind: Policy
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_namespacedmutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: NamespacedMutatingPolicy
 metadata:
   name: limit-pods-run-on-t2d-ondemand-nodes
+  namespace: cla
 spec:
-  rules:
-    - name: restrict-non-el-pods-to-c4-c4a
-      match:
-        resources:
-          kinds:
-            - Pod
-      mutate:
-        patchStrategicMerge:
-          spec:
-            nodeSelector:
-              cloud.google.com/compute-class: ee-application
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/nodeSelector/cloud.google.com~1compute-class", value: "ee-application"}] :
+            [JSONPatch{op: "add", path: "/spec/nodeSelector", value: {"cloud.google.com/compute-class": "ee-application"}}]

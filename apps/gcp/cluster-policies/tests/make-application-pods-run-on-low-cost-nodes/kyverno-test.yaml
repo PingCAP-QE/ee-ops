@@ -1,0 +1,21 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: make-application-pods-run-on-low-cost-nodes
+policies:
+  - ../../make-application-pods-run-on-low-cost-nodes.yaml
+resources:
+  - resource-app-pod.yaml
+  - resource-other-namespace.yaml
+results:
+  - policy: make-application-pods-run-on-low-cost-nodes
+    resources:
+      - ci-dashboard-7d9f8b6c4-abcde
+    kind: Pod
+    result: pass
+    patchedResources: patched-app-pod.yaml
+  - policy: make-application-pods-run-on-low-cost-nodes
+    resources:
+      - bp-tikv-nextgen-linux-amd64-pod
+    kind: Pod
+    result: skip

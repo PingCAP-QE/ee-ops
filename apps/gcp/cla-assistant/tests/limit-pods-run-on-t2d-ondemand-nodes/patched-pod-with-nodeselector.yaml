@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cla-assistant-worker-5f4d3c2b1-pqr89
+  namespace: cla
+spec:
+  containers:
+    - name: worker
+      image: ghcr.io/pingcap-qe/ee-apps/cla-assistant:test
+  nodeSelector:
+    cloud.google.com/compute-class: ee-application
+    kubernetes.io/arch: amd64

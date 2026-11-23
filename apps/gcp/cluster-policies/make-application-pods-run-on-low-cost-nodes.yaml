@@ -1,25 +1,36 @@
-apiVersion: kyverno.io/v1
-kind: ClusterPolicy
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_mutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
 metadata:
   name: make-application-pods-run-on-low-cost-nodes
 spec:
-  rules:
-    - name: set-compute-class
-      match:
-        resources:
-          kinds:
-            - Pod
-          namespaces:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  matchConstraints:
+    namespaceSelector:
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
             - apps
-            - prow
             - arc-systems
             - jenkins
             - kafka
             - kafka-operator
             - tekton-operator
             - tekton-pipelines
-      mutate:
-        patchStrategicMerge:
-          spec:
-            nodeSelector:
-              cloud.google.com/compute-class: ee-application
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  mutations:
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          has(object.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/nodeSelector/cloud.google.com~1compute-class", value: "ee-application"}] :
+            [JSONPatch{op: "add", path: "/spec/nodeSelector", value: {"cloud.google.com/compute-class": "ee-application"}}]

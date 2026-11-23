@@ -1,0 +1,22 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: limit-pods-run-on-t2d-ondemand-nodes
+policies:
+  - ../../policies.yaml
+resources:
+  - resource-plain-pod.yaml
+  - resource-pod-with-nodeselector.yaml
+results:
+  - policy: limit-pods-run-on-t2d-ondemand-nodes
+    resources:
+      - cla-assistant-6b7c9d8f5-xyz12
+    kind: Pod
+    result: pass
+    patchedResources: patched-plain-pod.yaml
+  - policy: limit-pods-run-on-t2d-ondemand-nodes
+    resources:
+      - cla-assistant-worker-5f4d3c2b1-pqr89
+    kind: Pod
+    result: pass
+    patchedResources: patched-pod-with-nodeselector.yaml

@@ -9,7 +9,7 @@ kind: Test
 metadata:
   name: restrict-prow-job-pod-credentials
 policies:
-  - ../../policies.yaml
+  - ../../restrict-prow-job-pod-credentials.yaml
 resources:
   - resource-presubmit-privileged-sa.yaml
   - resource-batch-org-secret-volume.yaml
