@@ -291,6 +291,34 @@ spec:
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
           - --label-prefix=needs-cherry-pick-
           - --skip-fork
+      cherry-pick:
+        replicaCount: 1
+        service:
+          type: ClusterIP
+        ports:
+          http: 8888
+        serviceAccount:
+          name: prow-hook
+        image:
+          repository: ghcr.io/ti-community-infra/prow/cherrypicker
+          tag: v20261123-20637939d
+        args:
+          - --dry-run=false
+          - --github-app-id=$(GITHUB_APP_ID)
+          - --github-app-private-key-path=/etc/github/app-private-key
+          - --github-endpoint=http://prow-ghproxy
+          - --github-graphql-endpoint=http://prow-ghproxy/graphql
+          - --external-plugins-config=/etc/external_plugins_config/external_plugins_config.yaml
+          - --fork-owner=ti-chi-bot
+          - --on-conflict=hold
+        volumes:
+          - name: external-plugins-config
+            configMap:
+              name: prow-external-plugins-config
+        volumeMounts:
+          - name: external-plugins-config
+            mountPath: /etc/external_plugins_config
+            readOnly: true
       needs-rebase:
         replicaCount: 1
         image:
