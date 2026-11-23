@@ -10,61 +10,30 @@ resources:
   - resource-non-release.yaml
   - resource-release.yaml
   - resource-retry.yaml
+  - resource-special-job.yaml
 results:
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
     resources:
       - pod-no-ci-refs
     kind: Pod
     result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
-    resources:
-      - pod-no-ci-refs
-    kind: Pod
-    result: skip
     patchedResources: patched-default.yaml
 
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
     resources:
       - pod-empty-ci-refs
     kind: Pod
     result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
-    resources:
-      - pod-empty-ci-refs
-    kind: Pod
-    result: skip
     patchedResources: patched-default-empty-ci-refs.yaml
 
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
     resources:
       - pod-non-release
     kind: Pod
     result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
-    resources:
-      - pod-non-release
-    kind: Pod
-    result: skip
     patchedResources: patched-default-non-release.yaml
 
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
-    resources:
-      - pod-release
-    kind: Pod
-    result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-for-hotfix-branches
     resources:
       - pod-release
     kind: Pod
@@ -72,16 +41,15 @@ results:
     patchedResources: patched-release.yaml
 
   - policy: set-pod-compute-class
-    rule: add-compute-class-and-annotations
-    resources:
-      - pod-retry
-    kind: Pod
-    result: pass
-
-  - policy: set-pod-compute-class
-    rule: override-compute-class-for-retried-pods
     resources:
       - pod-retry
     kind: Pod
     result: pass
     patchedResources: patched-retry.yaml
+
+  - policy: set-pod-compute-class
+    resources:
+      - pod-special-job
+    kind: Pod
+    result: pass
+    patchedResources: patched-special-job.yaml
