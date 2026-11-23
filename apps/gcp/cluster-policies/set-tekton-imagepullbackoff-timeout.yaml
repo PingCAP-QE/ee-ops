@@ -1,0 +1,55 @@
+#yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/kyverno/refs/heads/main/config/crds/crds/policies.kyverno.io_mutatingpolicies.yaml
+apiVersion: policies.kyverno.io/v1
+kind: MutatingPolicy
+metadata:
+  name: set-tekton-imagepullbackoff-timeout
+spec:
+  evaluation:
+    admission:
+      enabled: true
+    mutateExisting:
+      enabled: false
+  failurePolicy: Ignore
+  # Tekton fails a TaskRun as soon as one of its step containers enters
+  # ImagePullBackOff, unless `default-imagepullbackoff-timeout` is set in the
+  # `config-defaults` ConfigMap. The upstream default is 0 (fail immediately),
+  # and it is still 0 in Pipelines v1.4/v1.5/main.
+  #
+  # We cannot set it the usual way:
+  #   - tektoncd/operator does not expose this field in
+  #     TektonConfig.spec.pipeline (checked up to v0.80.0 and main), and
+  #     `config-defaults` is owned by the operator's TektonInstallerSet, so a
+  #     one-off `kubectl patch` is overwritten whenever the installer set is
+  #     re-applied.
+  #
+  # Injecting the key at admission time makes it stick for every CREATE and
+  # UPDATE the operator performs on that ConfigMap, without upgrading or
+  # forking the operator.
+  #
+  # Effect: on a transient image pull failure Tekton now keeps the pod around
+  # for 5 minutes (Tekton controller watches this ConfigMap, no restart
+  # needed), which gives kubelet room for its own retries instead of turning a
+  # single 2-minute CRI deadline into a red release pipeline.
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["configmaps"]
+  matchConditions:
+    - name: is-tekton-config-defaults
+      expression: >-
+        object.metadata.name == 'config-defaults' &&
+        object.metadata.namespace == 'tekton-pipelines'
+  mutations:
+    # `add` replaces the value when the key already exists, so this is
+    # idempotent. config-defaults always carries a `data` map, so patching the
+    # child key directly is safe (verified against the live ConfigMap).
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          [JSONPatch{
+            op: "add",
+            path: "/data/default-imagepullbackoff-timeout",
+            value: "5m"
+          }]

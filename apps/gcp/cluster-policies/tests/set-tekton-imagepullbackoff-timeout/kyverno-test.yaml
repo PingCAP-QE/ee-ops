@@ -1,0 +1,22 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: set-tekton-imagepullbackoff-timeout
+policies:
+  - ../../set-tekton-imagepullbackoff-timeout.yaml
+resources:
+  - resource-config-defaults.yaml
+  - resource-other-configmap.yaml
+results:
+  - policy: set-tekton-imagepullbackoff-timeout
+    resources:
+      - config-defaults
+    kind: ConfigMap
+    result: pass
+    patchedResources: patched-config-defaults.yaml
+
+  - policy: set-tekton-imagepullbackoff-timeout
+    resources:
+      - feature-flags
+    kind: ConfigMap
+    result: skip

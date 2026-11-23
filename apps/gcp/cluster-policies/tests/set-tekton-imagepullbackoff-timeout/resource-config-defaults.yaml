@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-defaults
+  namespace: tekton-pipelines
+data:
+  default-service-account: default
+  default-timeout-minutes: "120"
+  default-task-run-workspace-binding: |
+    emptyDir: {}

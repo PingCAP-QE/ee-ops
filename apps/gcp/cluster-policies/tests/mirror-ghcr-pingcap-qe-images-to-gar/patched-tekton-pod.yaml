@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bp-tiflash-enterprise-linux-arm64-build-binaries-pod
+  namespace: ee-cd
+spec:
+  containers:
+  - image: us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/ee-apps/github-token-broker-git-credential:v2026.10.25-6-g9218dd0
+    name: step-setup-git-auth
+  - image: us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/cd/builders/tiflash:v2025.8.10-2-gc9e3144-centos7
+    name: step-build
+  - image: us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/cd/utils/release:v2025.10.12-7-gfdd779c
+    name: step-publish
+  - image: us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/cd/utils/release:v2025.10.12-7-gfdd779c
+    name: step-already-mirrored
+  - image: docker.io/library/alpine:3.20
+    name: step-third-party
+  - image: ghcr.io/tektoncd/pipeline/sidecarlogresults-7501c6a20d741631510a448b48ab098f:v1.3.1@sha256:4e2567d980cf1768423f51d053fdaeb2656ab8a07fad769ce3311f8e20f1ecab
+    name: sidecar-log-results
+  initContainers:
+  - image: ghcr.io/tektoncd/pipeline/workingdirinit-0c558922ec6a1b739e550e349f2d5fc1:v1.3.1@sha256:1281a8218ba470fc5b98c055efeaef1201ec815c7c7c36786a3048ee88fcf389
+    name: working-dir-initializer
+  - image: ghcr.io/pingcap/pd:v8.5.0
+    name: prepare
+  - image: us-docker.pkg.dev/pingcap-testing-account/ghcr-remote/pingcap-qe/ee-apps/github-token-broker-git-credential:v2026.10.25-6-g9218dd0
+    name: fetch-broker-token
