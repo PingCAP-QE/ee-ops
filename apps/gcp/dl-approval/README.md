@@ -15,12 +15,12 @@ app).
 
 | Resource | Path |
 | --- | --- |
-| namespace `dl-approval` | `namespace.yaml` |
-| NetworkPolicy (ingress `infra` only; egress DNS/`dl`/public 443/4000) | `networkpolicy.yaml` |
-| `ExternalSecret/dl-approval-oidc` | `external-secrets/oidc.yaml` |
-| `ExternalSecret/dl-approval-tidb` | `external-secrets/tidb.yaml` |
-| `ExternalSecret/dl-approval-config` | `external-secrets/config.yaml` |
-| Flux Kustomization `dl-approval` | `clusters/gcp/04-dl-approval.yaml` |
+| namespace `dl-approval` | `prereq/namespace.yaml` |
+| NetworkPolicy (ingress `infra` only; egress DNS/`dl`/public 443/4000) | `prereq/networkpolicy.yaml` |
+| `ExternalSecret/dl-approval-oidc` | `prereq/external-secrets/oidc.yaml` |
+| `ExternalSecret/dl-approval-tidb` | `prereq/external-secrets/tidb.yaml` |
+| `ExternalSecret/dl-approval-config` | `prereq/external-secrets/config.yaml` |
+| Flux Kustomization `dl-approval` | `apps/gcp/dl-approval/flux.yaml` (applied by cluster-level `apps`) |
 
 `infrastructure/gcp/external-secrets/post/css-ee-gcp-sm.yaml` must allow the new
 namespace; it does. Re-run the scope inventory after changing ExternalSecrets:
@@ -179,7 +179,7 @@ the GSM key name and the `ee-gcp-sm` namespace allowlist first.
 
 ## Rollback
 
-- Remove `clusters/gcp/04-dl-approval.yaml` (or set it suspended) to stop
+- Suspend/remove Flux Kustomization `dl-approval` (or remove `dl-approval` from `apps/gcp/kustomization.yaml`) to stop
   reconciling the prerequisites; the namespace and Secrets are pruned according
   to Flux/prune policy.
 - Delete the GSM keys only after the namespace is gone. Keeping them is harmless
