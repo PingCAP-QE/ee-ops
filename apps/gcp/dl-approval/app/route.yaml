@@ -1,6 +1,17 @@
-# Browser route for the approval form. The existing `/dl` route still serves
-# the legacy anonymous download prefixes; this longer prefix wins for
-# /dl/grants and is rewritten to the application's root.
+# Browser route for the approval form. It attaches to Envoy Gateway
+# (eg-internal) so the route-level OIDC SecurityPolicy applies. The GKE gateway
+# forwards prow.tidb.net to eg-internal (see
+# infrastructure/gcp/gateways/config/route-gke-to-envoy.yaml), and Envoy picks
+# this more specific /dl/grants route over dl's /dl route.
+#
+# This relies on /dl being routed through eg-internal. If /dl is ever moved
+# back to a direct GKE route (as the temporary WeTech delivery change did),
+# add an explicit /dl/grants -> eg-internal rule to the GKE bridge; otherwise
+# the broader /dl prefix wins there and the approval form silently loses OIDC.
+#
+# Routing through eg-internal also makes the GKE NEG for this Service
+# unnecessary: GKE removes it and its health check shortly after the route
+# stops pointing at the GKE gateway, as it did for `dl`.
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -8,7 +19,7 @@ metadata:
 spec:
   parentRefs:
     - kind: Gateway
-      name: external-https
+      name: eg-internal
       namespace: infra
   hostnames:
     - prow.tidb.net
