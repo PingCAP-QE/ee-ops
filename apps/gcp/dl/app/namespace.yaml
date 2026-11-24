@@ -2,3 +2,7 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: dl
+  annotations:
+    # This namespace existed before the app-local Flux Kustomization split.
+    # Keep it on a future path move; deleting it would cascade the whole dl release.
+    kustomize.toolkit.fluxcd.io/prune: disabled
