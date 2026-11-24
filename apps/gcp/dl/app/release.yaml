@@ -23,8 +23,10 @@ spec:
     cleanupOnFail: true
     remediation:
       retries: 3
+  # The chart test probes /healthz and can stall on a keep-alive response;
+  # readiness/liveness probes already cover the service.
   test:
-    enable: true
+    enable: false
     ignoreFailures: false
   values:
     replicaCount: 1
