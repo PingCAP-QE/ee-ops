@@ -5,3 +5,4 @@ resources:
   - release.yaml
   - route.yaml
   - security-policy.yaml
+  - health-check-policy.yaml

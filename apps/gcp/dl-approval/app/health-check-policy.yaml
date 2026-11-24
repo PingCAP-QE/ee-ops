@@ -1,0 +1,22 @@
+# Backend health check for the GKE NEG behind this Service. The GKE default is
+# `GET /` on the serving port, but the approval service only answers `/livez`
+# and `/healthz` on its private probe port, so without this policy the endpoint
+# never turns healthy and the pod stays unready behind
+# cloud.google.com/load-balancer-neg-ready.
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: dl-approval
+spec:
+  default:
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: 8081
+        requestPath: /healthz
+        portSpecification: USE_FIXED_PORT
+    checkIntervalSec: 10
+  targetRef:
+    group: ""
+    kind: Service
+    name: dl-approval
