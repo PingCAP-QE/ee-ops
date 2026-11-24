@@ -88,18 +88,18 @@ spec:
         - name: github
           secret:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
         {{- if include "prow.persistent.needCredentials" . }}
         - name: persistent-credentials
           secret:
             secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
         {{- end }}
         {{- with .Values.crier.kubeconfigSecret }}
         - name: kubeconfig
           secret:
             secretName: {{ . }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
             optional: true
         {{- end }}
       {{- with .Values.nodeSelector }}

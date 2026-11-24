@@ -65,7 +65,7 @@ spec:
         - name: kubeconfig
           secret:
             secretName: {{ . }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
             optional: true
         {{- end }}
       {{- with .Values.nodeSelector }}

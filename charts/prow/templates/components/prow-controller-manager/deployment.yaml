@@ -71,7 +71,7 @@ spec:
         - name: github
           secret:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
         - name: prow-config
           configMap:
             name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
@@ -82,7 +82,7 @@ spec:
         - name: kubeconfig
           secret:
             secretName: {{ . }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
             optional: true
         {{- end }}
       {{- with .Values.nodeSelector }}
