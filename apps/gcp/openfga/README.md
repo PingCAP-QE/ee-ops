@@ -9,6 +9,18 @@ Prometheus from the private pod port.
 
 ## Database and bootstrap
 
+With the MySQL client and gcloud on PATH, run the following from this directory.
+Supply the TiDB primary SQL host and admin login. For a prefixed TiDB Cloud
+login add `--prefix PREFIX`. If the SQL endpoint requires a specific CA bundle,
+pass `--ca /path/to/ca.pem`. The helper prompts for the admin password, creates
+or reuses a dedicated GSM secret and verifies both generated logins over TLS.
+It performs the database and credential steps below. Rerun with the same
+arguments after a partial failure.
+
+```sh
+python3 bootstrap-tidb.py --host SQL_HOST --admin ADMIN_LOGIN
+```
+
 1. On the existing GCP TiDB cluster, provision a dedicated database named
    `ee_openfga` and separate migration and runtime accounts scoped to that database. The OpenFGA
    migration job needs schema DDL and the server needs DML. Configure TLS with
