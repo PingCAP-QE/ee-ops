@@ -10,7 +10,15 @@ spec:
     - group: gateway.networking.k8s.io
       kind: HTTPRoute
       name: dl-approval-grants
-  csrf: {}
+  # No Envoy CSRF filter. It compares the request Origin with the destination
+  # origin derived from this plain-HTTP listener (port 80), while the browser
+  # posts from https://prow.tidb.net (443), so every form submit is rejected
+  # with `Invalid origin` / `csrf_origin_mismatch`. `additionalOrigins` does not
+  # help: the policy renders them as a host-only matcher, which never matches
+  # the full origin string Envoy compares.
+  # The service enforces its own `approval_csrf` double-submit token instead
+  # (cookie + hidden form field, constant-time compare), so mutating requests
+  # are still protected against cross-site submission.
   oidc:
     provider:
       issuer: https://accounts.google.com
