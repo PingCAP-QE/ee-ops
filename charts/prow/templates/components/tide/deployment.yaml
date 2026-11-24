@@ -43,8 +43,13 @@ spec:
             - --github-app-private-key-path=/etc/github/app-private-key
             - --github-endpoint=http://{{ include "prow.fullname.ghproxy" . }}
             - --github-graphql-endpoint=http://{{ include "prow.fullname.ghproxy" . }}/graphql
-            - --history-uri={{ include "prow.persistent.baseUrl" . }}/tide/tide-history.json"
-            - --status-path={{ include "prow.persistent.baseUrl" . }}/status-reconciler/status-reconciler-status
+            - --history-uri={{ include "prow.persistent.baseUrl" . }}/tide/tide-history.json
+            # Tide keeps its incremental status-sync cursors here. It must not
+            # share the status-reconciler object: status-reconciler rewrites that
+            # path with its own state every few minutes, which zeroes tide's
+            # cursors on the next restart and leaves every org re-scanning from
+            # 1970 until the GitHub search query starts timing out (504).
+            - --status-path={{ include "prow.persistent.baseUrl" . }}/tide/tide-status.yaml
             {{- if include "prow.persistent.needCredentials" . }}
             - "--{{ .Values.persistent.type }}-credentials-file=/etc/persistent-credentials/{{ .Values.persistent.credentials.secretKey }}"
             {{- end }}
