@@ -1,0 +1,33 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: authzd
+spec:
+  podSelector:
+    matchLabels:
+      app: authzd
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: gmp-system
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: collector
+      ports:
+        - port: 9003
+          protocol: TCP
+---
+apiVersion: monitoring.googleapis.com/v1
+kind: PodMonitoring
+metadata:
+  name: authzd
+spec:
+  selector:
+    matchLabels:
+      app: authzd
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s

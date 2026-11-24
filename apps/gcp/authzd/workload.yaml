@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: authzd
+automountServiceAccountToken: false
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authzd
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: authzd
+  template:
+    metadata:
+      labels:
+        app: authzd
+    spec:
+      serviceAccountName: authzd
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: authzd
+          image: ghcr.io/pingcap-qe/ee-apps/authzd:v2026.11.22-18-g9dc1cce@sha256:286b6792aaa3f8821739f67c1e699551d409aa84f3ccdbffbd7fcc5a9590cd6a
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          ports:
+            - name: grpc
+              containerPort: 9002
+            - name: metrics
+              containerPort: 9003
+          env:
+            - name: AUTHZD_REGISTRY_PATH
+              value: /etc/authzd/registry.json
+            - name: AUTHZD_OPENFGA_URL
+              value: http://openfga-check:8080
+            - name: AUTHZD_PRIVATE_ADDR
+              value: ":9003"
+            - name: AUTHZD_OPENFGA_STORE_ID
+              valueFrom:
+                secretKeyRef:
+                  name: authzd-config
+                  key: AUTHZD_OPENFGA_STORE_ID
+            - name: AUTHZD_OPENFGA_MODEL_ID
+              valueFrom:
+                secretKeyRef:
+                  name: authzd-config
+                  key: AUTHZD_OPENFGA_MODEL_ID
+            - name: AUTHZD_OPENFGA_API_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: authzd-config
+                  key: AUTHZD_OPENFGA_API_TOKEN
+            - name: AUTHZD_CREDENTIAL_MODES
+              valueFrom:
+                secretKeyRef:
+                  name: authzd-config
+                  key: AUTHZD_CREDENTIAL_MODES
+          volumeMounts:
+            - name: registry
+              mountPath: /etc/authzd
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: metrics
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: metrics
+          resources:
+            requests:
+              memory: 32Mi
+              cpu: 25m
+            limits:
+              memory: 128Mi
+      volumes:
+        - name: registry
+          secret:
+            secretName: authzd-config
+            items:
+              - key: registry.json
+                path: registry.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authzd
+spec:
+  selector:
+    app: authzd
+  ports:
+    - name: grpc
+      port: 9002
+      targetPort: grpc
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: authzd
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: authzd
