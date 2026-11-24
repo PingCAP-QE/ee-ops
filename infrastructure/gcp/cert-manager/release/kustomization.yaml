@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# No `namespace:` here: the HelmReleases carry `metadata.namespace: cert-manager`
+# explicitly, which is the namespace the charts are installed into.
+resources:
+  - release.yaml
+  - trust-manager-release.yaml

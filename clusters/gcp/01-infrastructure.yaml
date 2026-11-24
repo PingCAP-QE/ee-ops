@@ -13,3 +13,16 @@ spec:
     name: flux-system
   path: ./infrastructure/gcp
   prune: true
+  timeout: 15m0s
+  # `apps` has one cert-manager custom resource of its own
+  # (`github-token-broker/tls.yaml`). Without this health check this stage goes
+  # Ready as soon as the child Kustomizations are *applied*, while the charts are
+  # still installing, so `apps` would dry-run its Certificate before the CRDs
+  # exist - the same deadlock this stage split fixes, just moved one level up.
+  # `cert-manager-post` is only Ready after the release stage installed the CRDs
+  # and it applied the CA and the issuers.
+  healthChecks:
+    - apiVersion: kustomize.toolkit.fluxcd.io/v1
+      kind: Kustomization
+      name: cert-manager-post
+      namespace: infra
