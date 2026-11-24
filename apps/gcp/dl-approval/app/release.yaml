@@ -60,7 +60,7 @@ spec:
         allowed_email_domains:
           - pingcap.com
         approver_emails:
-          - approver@pingcap.com
+          - wuhui.zuo@pingcap.com
         max_pending_per_requester: 5
         max_requests_per_day: 20
         default_ttl_seconds: 86400
