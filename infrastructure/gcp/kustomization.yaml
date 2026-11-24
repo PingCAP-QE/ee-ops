@@ -5,6 +5,7 @@ resources:
   - secret-generator
   - gateways
   - kyverno
+  - cert-manager
   - external-secrets
   - github-actions-secrets
   - operators

@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - namespace.yaml
   - kyverno
+  - cert-manager
   - external-secrets
   - node-pools
   - cleaners
