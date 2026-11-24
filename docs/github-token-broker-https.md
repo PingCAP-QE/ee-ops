@@ -114,10 +114,19 @@ Manager object is provisioned by hand:
 
 | Object | File | Purpose |
 | :--- | :--- | :--- |
-| `ClusterIssuer/internal-ca-selfsigned` | `infrastructure/gcp/cert-manager/cluster-issuers/issuers.yaml` | Bootstraps the CA certificate only |
-| `Certificate/internal-ca` (namespace `cert-manager`) | `infrastructure/gcp/cert-manager/internal-ca.yaml` | The cluster-internal CA: 10-year duration, key never rotated implicitly |
-| `ClusterIssuer/internal-ca` | `infrastructure/gcp/cert-manager/cluster-issuers/issuers.yaml` | Signs short-lived in-cluster service certificates |
+| `ClusterIssuer/internal-ca-selfsigned` | `infrastructure/gcp/cert-manager/post/cluster-issuers.yaml` | Bootstraps the CA certificate only |
+| `Certificate/internal-ca` (namespace `cert-manager`) | `infrastructure/gcp/cert-manager/post/internal-ca.yaml` | The cluster-internal CA: 10-year duration, key never rotated implicitly |
+| `ClusterIssuer/internal-ca` | `infrastructure/gcp/cert-manager/post/cluster-issuers.yaml` | Signs short-lived in-cluster service certificates |
 | `Certificate/github-token-broker-tls` | `apps/gcp/github-token-broker/tls.yaml` | The broker leaf: 90-day duration, renews 30 days before expiry, re-keys on renewal |
+
+Those objects are applied in two stages on purpose. The HelmReleases install
+cert-manager's CRDs; the CA, issuers and Bundle are custom resources of those
+CRDs. Flux server-side dry-runs a whole kustomization before applying anything, so
+the two stages live in separate nested Kustomizations: `cert-manager-release`
+(HelmReleases, with `healthChecks` so the stage is only Ready once the charts are)
+and `cert-manager-post` (`dependsOn` the release stage). Putting them in one
+kustomization deadlocks on `no matches for kind "Certificate" in version
+"cert-manager.io/v1"` and also blocks every app that waits for `infrastructure`.
 
 The leaf Secret name is fixed (`github-token-broker-tls`) because it is what the
 chart mounts through `server.tls.existingSecret`. Renewal therefore needs no
@@ -171,7 +180,7 @@ chart/image upgrade for that cluster is reviewed.
 Consumers need the CA certificate only, never the broker key, and they must not be
 able to read it from the broker namespace. Distribution is declarative:
 `Bundle/github-token-broker-ca` in
-`infrastructure/gcp/cert-manager/internal-ca.yaml` reads `ca.crt` from the
+`infrastructure/gcp/cert-manager/post/internal-ca.yaml` reads `ca.crt` from the
 `internal-ca` Secret in the trust namespace (`cert-manager`) and writes a ConfigMap
 named `github-token-broker-ca` with key `ca.crt` into the namespaces its
 `namespaceSelector` matches, currently only `arc-runners`.

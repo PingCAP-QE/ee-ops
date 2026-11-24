@@ -47,7 +47,7 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         self.assertEqual(spec['privateKey']['rotationPolicy'], 'Always')
 
     def test_internal_ca_and_bundle_are_declarative(self):
-        documents = load_all('infrastructure/gcp/cert-manager/internal-ca.yaml')
+        documents = load_all('infrastructure/gcp/cert-manager/post/internal-ca.yaml')
         ca = by_kind(documents, 'Certificate')
         self.assertTrue(ca['spec']['isCA'])
         self.assertEqual(ca['spec']['secretName'], 'internal-ca')
@@ -57,7 +57,7 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         self.assertEqual(ca['spec']['privateKey']['rotationPolicy'], 'Never')
 
         issuers = {issuer['metadata']['name']: issuer['spec']
-                   for issuer in load_all('infrastructure/gcp/cert-manager/cluster-issuers/issuers.yaml')}
+                   for issuer in load_all('infrastructure/gcp/cert-manager/post/cluster-issuers.yaml')}
         self.assertEqual(issuers['internal-ca-selfsigned'], {'selfSigned': {}})
         self.assertEqual(issuers['internal-ca'], {'ca': {'secretName': 'internal-ca'}})
 
@@ -72,7 +72,7 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         })
 
     def test_trust_manager_is_scoped_to_the_runner_bundle(self):
-        values = load('infrastructure/gcp/cert-manager/trust-manager-release.yaml')['spec']['values']
+        values = load('infrastructure/gcp/cert-manager/release/trust-manager-release.yaml')['spec']['values']
         self.assertEqual(values['app']['targetNamespaces'], ['arc-runners'])
         self.assertEqual(values['app']['trust']['namespace'], 'cert-manager')
         self.assertTrue(values['secretTargets']['enabled'])
@@ -81,8 +81,8 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         self.assertFalse(values['defaultPackage']['enabled'])
 
     def test_cert_manager_addons_are_pinned_and_ordered(self):
-        cert_manager = load('infrastructure/gcp/cert-manager/release.yaml')['spec']
-        trust_manager = load('infrastructure/gcp/cert-manager/trust-manager-release.yaml')['spec']
+        cert_manager = load('infrastructure/gcp/cert-manager/release/release.yaml')['spec']
+        trust_manager = load('infrastructure/gcp/cert-manager/release/trust-manager-release.yaml')['spec']
         for release in (cert_manager, trust_manager):
             self.assertEqual(release['chart']['spec']['sourceRef'], {
                 'kind': 'HelmRepository',
@@ -97,13 +97,13 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         self.assertTrue(cert_manager['values']['crds']['enabled'])
 
     def test_tencent_cloud_deploys_the_same_internal_ca(self):
-        release = load('infrastructure/tencentcloud/cert-manager/release.yaml')['spec']
+        release = load('infrastructure/tencentcloud/cert-manager/release/release.yaml')['spec']
         self.assertEqual(release['chart']['spec']['version'],
-                         load('infrastructure/gcp/cert-manager/release.yaml')['spec']['chart']['spec']['version'])
+                         load('infrastructure/gcp/cert-manager/release/release.yaml')['spec']['chart']['spec']['version'])
         self.assertEqual(release['chart']['spec']['sourceRef']['name'], 'jetstack')
         self.assertTrue(release['values']['crds']['enabled'])
 
-        ca = load('infrastructure/tencentcloud/cert-manager/internal-ca.yaml')
+        ca = load('infrastructure/tencentcloud/cert-manager/post/internal-ca.yaml')
         self.assertEqual(ca['kind'], 'Certificate')
         self.assertTrue(ca['spec']['isCA'])
         self.assertEqual(ca['spec']['secretName'], 'internal-ca')
@@ -111,7 +111,7 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         self.assertEqual(ca['spec']['privateKey']['rotationPolicy'], 'Never')
 
         issuers = {issuer['metadata']['name'] for issuer
-                   in load_all('infrastructure/tencentcloud/cert-manager/cluster-issuers/issuers.yaml')}
+                   in load_all('infrastructure/tencentcloud/cert-manager/post/cluster-issuers.yaml')}
         self.assertEqual(issuers, {'internal-ca', 'internal-ca-selfsigned'})
 
         # Same Secret name as the GCP cluster so one activation recipe covers both.
@@ -122,9 +122,43 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         self.assertEqual(leaf['issuerRef'], gcp_leaf['issuerRef'])
 
         # No consumer there yet, so no trust distributor is installed.
-        self.assertFalse((ROOT / 'infrastructure/tencentcloud/cert-manager/trust-manager-release.yaml').exists())
+        self.assertFalse((ROOT / 'infrastructure/tencentcloud/cert-manager/release/trust-manager-release.yaml').exists())
         resources = load('apps/tencentcloud/github-token-broker/kustomization.yaml')['resources']
         self.assertIn('tls.yaml', resources)
+
+    def test_helm_release_custom_resources_are_applied_after_the_crds(self):
+        """The CRs a chart owns must not share a kustomization with its HelmRelease.
+
+        kustomize-controller server-side dry-runs the whole set before applying
+        anything, so a Certificate in the same set as the HelmRelease that
+        installs cert-manager's CRDs deadlocks with
+        `no matches for kind "Certificate" in version "cert-manager.io/v1"`.
+        """
+        for cloud in ('gcp', 'tencentcloud'):
+            base = f'infrastructure/{cloud}/cert-manager'
+            parent = load(f'{base}/kustomization.yaml')
+            self.assertEqual(parent['resources'], ['namespace.yaml', 'release.yaml', 'post.yaml'])
+            # A kustomize namespace would rename Namespace/cert-manager and stamp
+            # cluster-scoped custom resources.
+            self.assertNotIn('namespace', parent)
+
+            release = load(f'{base}/release.yaml')
+            post = load(f'{base}/post.yaml')
+            self.assertEqual(release['kind'], 'Kustomization')
+            self.assertEqual(release['metadata']['name'], 'cert-manager-release')
+            self.assertEqual(post['spec']['dependsOn'], [{'name': 'cert-manager-release'}])
+            checked = {check['name'] for check in release['spec']['healthChecks']}
+            self.assertIn('cert-manager', checked)
+
+            release_kinds = set()
+            for name in load(f'{base}/release/kustomization.yaml')['resources']:
+                release_kinds |= {doc['kind'] for doc in load_all(f'{base}/release/{name}')}
+            self.assertEqual(release_kinds, {'HelmRelease'})
+
+            post_kinds = set()
+            for name in load(f'{base}/post/kustomization.yaml')['resources']:
+                post_kinds |= {doc['kind'] for doc in load_all(f'{base}/post/{name}')}
+            self.assertLessEqual(post_kinds, {'Certificate', 'ClusterIssuer', 'Bundle'})
 
     def test_arc_network_grants_only_https(self):
         policy = load('apps/gcp/github-token-broker/networkpolicy-arc-https.yaml')['spec']
@@ -156,7 +190,7 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
             'name': 'github-token-broker-ca', 'optional': True,
         })
         # The mounted ConfigMap must be the one the Bundle distributes.
-        bundle = by_kind(load_all('infrastructure/gcp/cert-manager/internal-ca.yaml'), 'Bundle')
+        bundle = by_kind(load_all('infrastructure/gcp/cert-manager/post/internal-ca.yaml'), 'Bundle')
         self.assertEqual(bundle['metadata']['name'], volume['configMap']['name'])
         self.assertEqual(
             bundle['spec']['target']['namespaceSelector']['matchLabels']['kubernetes.io/metadata.name'],

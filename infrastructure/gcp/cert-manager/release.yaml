@@ -1,33 +1,37 @@
-#yaml-language-server: $schema=https://github.com/fluxcd-community/flux2-schemas/raw/refs/heads/main/helmrelease-helm-v2beta1.json
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
+---
+# Two-stage rollout, the same shape as `infrastructure/*/external-secrets`.
+#
+# The HelmReleases install cert-manager's CRDs, while the CA, the issuers and the
+# Bundle are custom resources of those CRDs. Keeping both in one kustomization
+# deadlocks: kustomize-controller server-side dry-runs the whole set before
+# applying anything, so the Certificate fails with
+# `no matches for kind "Certificate" in version "cert-manager.io/v1"` and the
+# HelmRelease that would install the CRD is never reached.
+#
+# `release` applies the HelmReleases and waits for them through healthChecks,
+# `post` depends on that and only then applies the custom resources.
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
 metadata:
-  name: cert-manager
-  namespace: cert-manager
+  name: cert-manager-release # setup components
+  namespace: infra
 spec:
-  interval: 5m
-  chart:
-    spec:
-      chart: cert-manager
-      # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
-      version: v1.21.3
-      sourceRef:
-        kind: HelmRepository
-        name: jetstack
-        namespace: flux-system
-  install:
-    remediation:
-      retries: 3
-  upgrade:
-    remediation:
-      retries: 3
-  values:
-    # No issuer is installed by this chart: the cluster-internal CA lives in
-    # cluster-issuers/ and is only reachable through reviewed GitOps changes.
-    crds:
-      enabled: true
-    replicaCount: 2
-    webhook:
-      replicaCount: 2
-    cainjector:
-      replicaCount: 2
+  interval: 10m0s
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+    namespace: flux-system
+  path: ./infrastructure/gcp/cert-manager/release
+  prune: true
+  timeout: 15m0s
+  # Without these the parent goes Ready as soon as the HelmRelease objects are
+  # applied, and `cert-manager-post` could race the CRD/webhook installation.
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: cert-manager
+      namespace: cert-manager
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: trust-manager
+      namespace: cert-manager
