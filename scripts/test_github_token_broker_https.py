@@ -155,10 +155,26 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
                 release_kinds |= {doc['kind'] for doc in load_all(f'{base}/release/{name}')}
             self.assertEqual(release_kinds, {'HelmRelease'})
 
+            # `apps` owns a cert-manager CR too, so the infrastructure stage must
+            # not report Ready before cert-manager is actually installed.
+            root = load(f'clusters/{cloud}/01-infrastructure.yaml')['spec']
+            self.assertEqual(root['healthChecks'], [{
+                'apiVersion': 'kustomize.toolkit.fluxcd.io/v1',
+                'kind': 'Kustomization',
+                'name': 'cert-manager-post',
+                'namespace': 'infra',
+            }])
             post_kinds = set()
             for name in load(f'{base}/post/kustomization.yaml')['resources']:
                 post_kinds |= {doc['kind'] for doc in load_all(f'{base}/post/{name}')}
             self.assertLessEqual(post_kinds, {'Certificate', 'ClusterIssuer', 'Bundle'})
+
+    def test_root_kustomization_reconciles_the_stage_manifests(self):
+        """The health-check wiring above only works if these files come from Git."""
+        for cloud in ('gcp', 'tencentcloud'):
+            root = next(doc for doc in load_all(f'clusters/{cloud}/flux-system/gotk-sync.yaml')
+                        if doc['kind'] == 'Kustomization')
+            self.assertEqual(root['spec']['path'], f'./clusters/{cloud}')
 
     def test_arc_network_grants_only_https(self):
         policy = load('apps/gcp/github-token-broker/networkpolicy-arc-https.yaml')['spec']
