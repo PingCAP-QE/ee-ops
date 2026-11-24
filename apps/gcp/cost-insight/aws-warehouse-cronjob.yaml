@@ -42,7 +42,7 @@ spec:
           containers:
             - name: sync-aws-warehouse-summary
               # Shared application worker; pinned multi-platform release digest.
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:fd11e3b746524bd048f2ce90e181ba85ba0be61a25bd8a1c85f8c8b76a89cd77
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb@sha256:e17a3d9c468df8b1b88da195ce0722ce44986daa3a55da4648eb76bdb5b2d4ad
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:
