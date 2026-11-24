@@ -121,6 +121,7 @@ spec:
       volumes:
         - name: github
           secret:
+            defaultMode: 0400
             {{- with $root.Values.prow.github.secretName }}
             secretName: {{ . }}
             {{- else }}
@@ -128,6 +129,7 @@ spec:
             {{- end }}
         - name: webhook
           secret:
+            defaultMode: 0400
             {{- with $root.Values.prow.webhook.secretName }}
             secretName: {{ . }}
             {{- else }}
