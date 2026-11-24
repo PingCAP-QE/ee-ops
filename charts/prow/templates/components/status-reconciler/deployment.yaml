@@ -85,6 +85,7 @@ spec:
         - name: github
           secret:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+            defaultMode: 0400
         - name: prow-config
           configMap:
             name: {{ default (printf "%s-config" (include "prow.fullname" .)) .Values.prow.configs.prow.configMapName }}
@@ -98,11 +99,13 @@ spec:
         - name: persistent-credentials
           secret:
             secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
+            defaultMode: 0400
         {{- end }}
         {{- with .Values.statusReconciler.kubeconfigSecret }}
         - name: kubeconfig
           secret:
             secretName: {{ . }}
+            defaultMode: 0400
             optional: true
         {{- end }}
       {{- with .Values.nodeSelector }}

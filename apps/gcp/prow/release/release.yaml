@@ -226,6 +226,13 @@ spec:
             secretName: ${JENKINS_OPERATOR_1_AUTH_SEC_NAME}
             secretKeyJenkinsUser: ${JENKINS_OPERATOR_1_AUTH_SEC_KEY_USER}
             secretKeyJenkinsToken: ${JENKINS_OPERATOR_1_AUTH_SEC_KEY_TOKEN}
+    podSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
     thirdPlugins:
       chatgpt:
         service:

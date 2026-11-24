@@ -117,18 +117,22 @@ spec:
         - name: github
           secret:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" .)) .Values.prow.github.secretName }}
+            defaultMode: 0400
         - name: oauth-cookie
           secret:
             secretName: {{ default (printf "%s-oauth-cookie" (include "prow.fullname" .)) .Values.prow.oauth.cookie.secretName }}
+            defaultMode: 0400
         {{- if include "prow.persistent.needCredentials" . }}
         - name: persistent-credentials
           secret:
             secretName: {{ default (printf "%s-%s-credentials" (include "prow.fullname" .) .Values.persistent.type) .Values.persistent.credentials.secretName }}
+            defaultMode: 0400
         {{- end }}
         {{- with .Values.deck.kubeconfigSecret }}
         - name: kubeconfig
           secret:
             secretName: {{ . }}
+            defaultMode: 0400
             optional: true
       {{- end }}
       {{- with .Values.nodeSelector }}

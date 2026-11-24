@@ -60,7 +60,7 @@ spec:
         {{- with .Values.pipeline.kubeconfigSecret }}
         - name: kubeconfig
           secret:
-            defaultMode: 420
+            defaultMode: 0400
             # todo: setup secret.
             secretName: {{ . }}
         {{- end }}
