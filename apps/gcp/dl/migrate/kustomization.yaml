@@ -1,5 +1,5 @@
 # Delivery schema migration, deliberately split into its own Flux Kustomization
-# (see clusters/gcp/03-dl-delivery.yaml) so the Deployments in `dl-delivery` are
+# (see apps/gcp/dl/flux.yaml) so the Deployments in `dl-delivery` are
 # only applied after the Job succeeds.
 #
 # Re-running a migration: bump the name suffix (`-v2`, `-v3`, ...) and point it at
