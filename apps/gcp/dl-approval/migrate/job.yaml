@@ -1,0 +1,46 @@
+# One-shot delivery approval schema migration. The runtime role has no DDL;
+# Flux runs this Job to completion before the Deployment/HelmRelease.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dl-approval-migrate-v1
+  labels:
+    app.kubernetes.io/name: delivery-approval
+    app.kubernetes.io/component: migrate
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: delivery-approval
+        app.kubernetes.io/component: migrate
+    spec:
+      restartPolicy: Never
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65532
+        runAsGroup: 65532
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: ghcr.io/pingcap-qe/ee-apps/delivery-approval:v2026.11.22-11-g322b93b
+          # The migrate command reads only DL_APPROVAL_DATABASE_DSN; it does not
+          # need Lark/dl credentials.
+          env:
+            - name: DL_APPROVAL_DATABASE_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: dl-approval-tidb
+                  key: migrate_dsn
+          resources:
+            limits:
+              cpu: "500m"
+              memory: 256Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]

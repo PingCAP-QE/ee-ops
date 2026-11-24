@@ -1,0 +1,28 @@
+# Browser route for the approval form. The existing `/dl` route still serves
+# the legacy anonymous download prefixes; this longer prefix wins for
+# /dl/grants and is rewritten to the application's root.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: dl-approval-grants
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: external-https
+      namespace: infra
+  hostnames:
+    - prow.tidb.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /dl/grants
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /
+      backendRefs:
+        - name: dl-approval
+          port: 80

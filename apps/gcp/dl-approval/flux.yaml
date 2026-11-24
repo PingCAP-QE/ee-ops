@@ -1,9 +1,10 @@
-# App-specific Flux Kustomization, applied by the cluster-level `apps`
-# Kustomization (same pattern as apps/gcp/prow and apps/gcp/tekton).
+# App-specific Flux Kustomizations live under apps/gcp/<app>/ and are applied by
+# the cluster-level `apps` Kustomization, matching the existing prow/tekton
+# structure. Ordering: prereq -> migrate -> app.
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
 metadata:
-  name: dl-approval
+  name: dl-approval-prereq
 spec:
   dependsOn:
     - name: dl-delivery
@@ -27,4 +28,42 @@ spec:
     - apiVersion: external-secrets.io/v1
       kind: ExternalSecret
       name: dl-approval-config
+      namespace: dl-approval
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: dl-approval-migrate
+spec:
+  dependsOn:
+    - name: dl-approval-prereq
+  interval: 10m
+  retryInterval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/gcp/dl-approval/migrate
+  prune: true
+  wait: true
+  timeout: 10m
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: dl-approval
+spec:
+  dependsOn:
+    - name: dl-approval-migrate
+  interval: 10m
+  retryInterval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/gcp/dl-approval/app
+  prune: true
+  timeout: 10m
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: dl-approval
       namespace: dl-approval

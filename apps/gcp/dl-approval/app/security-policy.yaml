@@ -1,0 +1,31 @@
+# Google OIDC for the approval pages. The Gateway owns interactive login and
+# forwards the ID token; the service verifies the token and enforces all
+# authorization (domain, approver, ownership, state) in code.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: dl-approval-oidc
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: dl-approval-grants
+  csrf: {}
+  oidc:
+    provider:
+      issuer: https://accounts.google.com
+    clientIDRef:
+      name: dl-approval-oidc
+    clientSecret:
+      name: dl-approval-oidc
+    cookieNames:
+      accessToken: ee-apps-access-token
+      idToken: ee-apps-id-token
+    forwardIDToken:
+      header: X-Approval-Id-Token
+    redirectURL: https://prow.tidb.net/dl/grants/oauth2/callback
+    logoutPath: /dl/grants/logout
+    scopes:
+      - openid
+      - email
+      - profile

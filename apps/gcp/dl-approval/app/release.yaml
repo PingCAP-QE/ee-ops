@@ -1,0 +1,86 @@
+# Approval service. The chart and image are built by ee-apps; the image tag is
+# pinned here (no floating tags). Approval cards are delivered as per-approver
+# DMs (no group chat ID); delivery is enabled by the Lark/dl secrets.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dl-approval
+spec:
+  releaseName: dl-approval
+  chart:
+    spec:
+      chart: delivery-approval
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: false
+  values:
+    fullnameOverride: dl-approval
+    replicaCount: 1
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/delivery-approval
+      tag: v2026.11.22-14-gee06fbc
+    serviceAccount:
+      create: true
+    server:
+      env:
+        - name: DL_APPROVAL_DATABASE_DSN
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-tidb
+              key: runtime_dsn
+        - name: DL_APPROVAL_OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-oidc
+              key: client-id
+        - name: DL_APPROVAL_LARK_APP_ID
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-config
+              key: lark_app_id
+        - name: DL_APPROVAL_LARK_APP_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-config
+              key: lark_app_secret
+        - name: DL_APPROVAL_URL_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-config
+              key: url_encryption_key
+        - name: DL_APPROVAL_DL_ISSUER_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-config
+              key: dl_issuer_secret
+      config:
+        listen: ":8080"
+        health_address: ":8081"
+        public_url: https://prow.tidb.net/dl/grants
+        dl_base_url: http://dl-management.dl.svc.cluster.local
+        allowed_email_domains:
+          - pingcap.com
+        approver_emails:
+          - wuhui.zuo@pingcap.com
+        max_pending_per_requester: 5
+        max_requests_per_day: 20
+        default_ttl_seconds: 86400
+        max_ttl_seconds: 604800
+        lark_notification_chat_id: ""
+        lark_buzz: false
