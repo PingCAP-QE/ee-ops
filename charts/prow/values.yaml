@@ -16,6 +16,17 @@ podLabels: {}
 podSecurityContext: {}
 securityContext: {}
 
+### Mode of the mounted secret files (GitHub App private key, webhook HMAC).
+## The first-party components (hook, tide, deck, ...) run as uid 0, so `0400`
+## (256) is enough for them.
+secretFileMode: 256
+## Third-party plugin images are not built here and some of them run as non-root
+## (the ko-built distroless ones use uid=65532), which cannot read a `0400`
+## mount owned by root: they die with
+## `error reading /etc/webhook/hmac: open /etc/webhook/hmac: permission denied`.
+## Keep their mounts readable but still not writable: `0444` (292).
+thirdPluginsSecretFileMode: 292
+
 #### custom config, all should be replaced.
 prow:
   podsNamespace: default

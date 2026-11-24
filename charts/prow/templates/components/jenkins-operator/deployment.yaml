@@ -139,19 +139,19 @@ spec:
         - name: github
           secret:
             secretName: {{ default (printf "%s-github" (include "prow.fullname" $)) $.Values.prow.github.secretName }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
         {{- with $operator.auth.secretName }}
         - name: jenkins-auth
           secret:
             secretName: {{ . }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
             optional: true
         {{- end }}
         {{- with $operator.kubeconfigSecret }}
         - name: kubeconfig
           secret:
             secretName: {{ . }}
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
             optional: true
         {{- end }}
       {{- with $.Values.nodeSelector }}

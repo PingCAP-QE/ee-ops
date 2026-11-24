@@ -60,7 +60,7 @@ spec:
         {{- with .Values.pipeline.kubeconfigSecret }}
         - name: kubeconfig
           secret:
-            defaultMode: 0400
+            defaultMode: {{ $.Values.secretFileMode | default 256 }}
             # todo: setup secret.
             secretName: {{ . }}
         {{- end }}
