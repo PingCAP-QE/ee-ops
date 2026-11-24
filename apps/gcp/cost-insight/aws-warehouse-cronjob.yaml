@@ -41,8 +41,8 @@ spec:
           terminationGracePeriodSeconds: 60
           containers:
             - name: sync-aws-warehouse-summary
-              # Shared application worker; pinned multi-platform release digest.
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb@sha256:e17a3d9c468df8b1b88da195ce0722ce44986daa3a55da4648eb76bdb5b2d4ad
+              # Shared application worker; multi-platform release tag.
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:
