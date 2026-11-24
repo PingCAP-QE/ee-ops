@@ -5,4 +5,5 @@ resources:
   - namespace.yaml
   - external-secret-credentials.yaml
   - external-secret-policy.yaml
+  - tls.yaml
   - release.yaml

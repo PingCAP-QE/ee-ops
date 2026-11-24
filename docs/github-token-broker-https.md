@@ -2,11 +2,31 @@
 
 This is the deployment companion to the optional native HTTPS listener in
 `PingCAP-QE/ee-apps` (`github-token-broker` and its Helm chart) and the verified
-HTTPS client in `PingCAP-QE/gitinsight`. It is **not** a record of a completed
-production rollout. No commands in this document have been run against production.
+HTTPS client in `PingCAP-QE/gitinsight`. It is **not a record of a completed
+production rollout**: the listener is still disabled, and enabling it remains a
+separate reviewed change.
 
 For the separate public Google-JWT gateway route (Service port 80, not native
 HTTPS), see [External access to the GitHub token broker](github-token-broker-external.md).
+
+## What this TLS actually protects
+
+Native HTTPS protects one hop: the ARC runner pod to the broker pod inside the
+cluster. That is why the certificate carries an in-cluster DNS name
+(`github-token-broker.github-token-broker.svc.cluster.local`), why
+`apps/gcp/github-token-broker/networkpolicy-arc-https.yaml` grants target port
+8443 to the `arc-runners` namespace only, and why the client is handed a CA
+bundle instead of relying on system trust.
+
+It is server authentication only, not mutual TLS: callers prove identity with a
+projected ServiceAccount token, which the broker validates with TokenReview plus
+the caller policy. TLS adds confidentiality for credentials in flight; it does
+not authorize anyone.
+
+The public route described in
+[External access to the GitHub token broker](github-token-broker-external.md) is a
+different path. TLS there terminates at the GKE gateway, its upstream to the
+Service stays plaintext, and this certificate is not part of it.
 
 ## Scope and ordering
 
@@ -16,11 +36,15 @@ HTTPS), see [External access to the GitHub token broker](github-token-broker-ext
    change pins those releases with **`server.tls.enabled: false`**: upgrade and
    verify the existing HTTP service and new ARC runners first. The broker's
    existing HTTP 8080, authentication and permissions remain unchanged.
-2. Provision the leaf certificate/key and distribute the public CA as below.
-   This change also prepares the TLS Secret, HTTPS-only ARC NetworkPolicy and
-   runner mount. Missing TLS material must not block this HTTP-only stage.
+2. Certificate issuance and trust distribution are declarative and need no manual
+   provisioning: `infrastructure/gcp/cert-manager` installs cert-manager and
+   trust-manager, the cluster-internal CA signs
+   `apps/gcp/github-token-broker/tls.yaml`, and a trust-manager `Bundle` writes the
+   public CA into the `arc-runners` `github-token-broker-ca` ConfigMap. See
+   [Certificate issuance (automated)](#certificate-issuance-automated) and
+   [Public CA on ARC](#public-ca-on-arc).
 3. In a **separate reviewed activation change**, enable HTTPS using the template
-   below only after the certificate and runner trust are ready. The additional
+   below only after the certificate and runner trust are verified. The additional
    HTTPS listener uses 8443 and Service port 443. Do not merge the GitInsight
    HTTPS-only client merely because the HTTP-only upgrade succeeded.
 4. Confirm the approved ARC caller-policy entry below is loaded, check HTTPS
@@ -28,10 +52,10 @@ HTTPS), see [External access to the GitHub token broker](github-token-broker-ext
    merge/enable the GitInsight client and run one authorized crawl. Only after
    this succeeds is the deployed Helix finding ready for closure.
 
-Merging code is not permission to mutate production. Certificate provisioning,
-GitOps activation and the authorized workflow run require operator approval.
-The implementation owner should follow the rollout through rather than hand an
-untested URL change to the repository owner as a completed fix.
+Merging code is not permission to mutate production. GitOps activation and the
+authorized workflow run require operator approval. The implementation owner
+should follow the rollout through rather than hand an untested URL change to the
+repository owner as a completed fix.
 
 ## Published-artifact activation (operator only)
 
@@ -83,93 +107,102 @@ instead of its explicitly disabled HTTP-only stage. Run
 `python3 scripts/test_github_token_broker_https.py` to check the activation template
 against that NetworkPolicy. HTTP 8080 and existing probes remain enabled.
 
-## Certificate material
+## Certificate issuance (automated)
 
-Use the organisation's approved issuer. Its leaf certificate must include
-`github-token-broker.github-token-broker.svc.cluster.local` as a DNS SAN, have
-server-auth usage, be unexpired, and match its private key. `tls.crt` must contain
-the PEM leaf followed by required intermediates. The public CA bundle is not a
-credential, but is a trust anchor: obtain it through trusted deployment channels,
-not by downloading and trusting whatever the broker currently serves.
+Issuance is owned by cert-manager, so no leaf certificate, private key or Secret
+Manager object is provisioned by hand:
 
-The root/issuer private key must never enter Git, Kubernetes runner mounts, logs,
-or the broker TLS Secret. Protect the leaf key using the existing Secret Manager
-and External Secrets mechanism, not a plaintext file in the repository.
+| Object | File | Purpose |
+| :--- | :--- | :--- |
+| `ClusterIssuer/internal-ca-selfsigned` | `infrastructure/gcp/cert-manager/cluster-issuers/issuers.yaml` | Bootstraps the CA certificate only |
+| `Certificate/internal-ca` (namespace `cert-manager`) | `infrastructure/gcp/cert-manager/internal-ca.yaml` | The cluster-internal CA: 10-year duration, key never rotated implicitly |
+| `ClusterIssuer/internal-ca` | `infrastructure/gcp/cert-manager/cluster-issuers/issuers.yaml` | Signs short-lived in-cluster service certificates |
+| `Certificate/github-token-broker-tls` | `apps/gcp/github-token-broker/tls.yaml` | The broker leaf: 90-day duration, renews 30 days before expiry, re-keys on renewal |
 
-After approval, with pre-existing secure local files `CERT_FILE`, `KEY_FILE` and
-`CA_FILE`, an operator verifies the chain and key using the approved PKI procedure
-and checks the hostname, for example:
+The leaf Secret name is fixed (`github-token-broker-tls`) because it is what the
+chart mounts through `server.tls.existingSecret`. Renewal therefore needs no
+operator step: cert-manager updates the Secret, kubelet swaps the projected volume
+atomically, and the broker re-reads the pair on every handshake.
 
-```bash
-set -euo pipefail
-# Do not shell-trace these steps or print key contents.
-BROKER_HOST=github-token-broker.github-token-broker.svc.cluster.local
-umask 077
-check_dir=$(mktemp -d)
-trap 'rm -rf "$check_dir"' EXIT
-# Verify the leaf identity while supplying the full chain as intermediates.
-openssl x509 -in "$CERT_FILE" -out "$check_dir/leaf.pem"
-openssl verify -CAfile "$CA_FILE" -untrusted "$CERT_FILE" -purpose sslserver \
-  -verify_hostname "$BROKER_HOST" "$check_dir/leaf.pem"
-# Compare only public keys; these commands do not emit the private key.
-openssl x509 -in "$CERT_FILE" -noout -pubkey > "$check_dir/cert.pub"
-openssl pkey -in "$KEY_FILE" -pubout > "$check_dir/key.pub"
-cmp "$check_dir/cert.pub" "$check_dir/key.pub"
-```
+The earlier design pulled a prepared `github_token_broker_tls_json` object from
+Secret Manager through the `ee-gcp-sm` store. That path is gone: nothing lives in
+Secret Manager, so there is no certificate material to forget to provision, and a
+missing remote object can no longer leave an ExternalSecret permanently unsynced.
 
-Store a JSON object with `tls.crt` and `tls.key` in GCP Secret Manager secret
-`github_token_broker_tls_json` in `pingcap-testing-account`. The existing
-`ee-gcp-sm` store is already restricted to approved namespaces, including
-`github-token-broker`. `external-secret-tls.yaml` extracts the object into a
-`kubernetes.io/tls` Secret. Do not broaden that store to `arc-runners` just to
-read public CA material: that would grant access to unrelated project secrets.
-If the preparatory ExternalSecret is merged before its remote object exists, it
-will report a sync error and create no TLS Secret. Existing TLS-disabled pods
-continue running; this is not evidence that TLS is ready. Provision the remote
-object and confirm a successful sync before approving TLS activation.
+Accepted trade-offs to review alongside the CA change:
 
-## Public CA on ARC
+- The CA private key lives in the `cert-manager` namespace alongside the add-on.
+  It is not mounted into workloads, never enters Git, and is not readable from
+  `arc-runners`.
+- `ClusterIssuer/internal-ca` can sign any `Certificate` in the cluster, but every
+  such certificate still lands through a reviewed GitOps change. Keep the issuer
+  reserved for in-cluster service TLS.
+- The trust anchor only reaches consumers that a reviewed `Bundle` targets.
 
-The runner mounts public ConfigMap `github-token-broker-ca` in namespace
-`arc-runners` at `/etc/github-token-broker/ca` and reads its `ca.crt` key at
-`/etc/github-token-broker/ca/ca.crt`. It exports
-`GITINSIGHT_BROKER_CA_FILE` so the GitInsight helper can use the bundle without
-replacing trust for GitHub, Pixi or other tools. An explicit action `ca-file`
-input takes precedence.
-
-The bundle is environment-specific public data, seeded from the verified issuer
-bundle after operator approval (never include a private key). Set `CONTEXT` to the
-approved GCP kubeconfig context and `CA_FILE` to the verified local public bundle
-path before running:
+Verify the issued Secret:
 
 ```bash
 set -euo pipefail
 : "${CONTEXT:?Set CONTEXT to the approved GCP kubeconfig context}"
-: "${CA_FILE:?Set CA_FILE to the verified public CA bundle path}"
-test -f "$CA_FILE"
-test -r "$CA_FILE"
-if grep -q 'PRIVATE KEY' "$CA_FILE"; then
-  echo 'refusing a CA bundle containing a private key' >&2
-  exit 1
-fi
-kubectl --context "$CONTEXT" -n arc-runners create configmap github-token-broker-ca \
-  --from-file=ca.crt="$CA_FILE" --dry-run=client -o yaml | \
-  kubectl --context "$CONTEXT" apply -f -
+kubectl --context "$CONTEXT" -n github-token-broker get certificate github-token-broker-tls \
+  -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}{"\n"}'
+kubectl --context "$CONTEXT" -n github-token-broker get secret github-token-broker-tls \
+  -o jsonpath='{.type}{"\n"}'
 ```
 
-This public ConfigMap is operator-owned; it is not generated from the broker's
-private-key Secret and must be updated through the same trusted PKI change
-process. Record its certificate fingerprints and rotation owner in that change.
-No Secret Manager access or new RBAC permission is granted to runner pods.
+The first command must print `True` and the second `kubernetes.io/tls`.
 
-The ConfigMap mount is optional **only for staging compatibility**: runners must
-still start while the existing HTTP consumers operate, even if the ConfigMap or
-its `ca.crt` key is absent. The whole ConfigMap is mounted without a required-key
-projection; keep its contents public CA material only. The HTTPS client does not
-silently ignore a configured missing/invalid bundle and does not fall back to
-HTTP. The public bundle must be present at `ca.crt` before enabling it. Volume
-mounts are read-only, without `subPath`, so bundle updates can propagate to pods;
-explicitly verify the new bundle on active runners before completing a rotation.
+## TencentCloud cluster parity
+
+`infrastructure/tencentcloud/cert-manager` installs the same cert-manager release
+and the same cluster-internal CA, and
+`apps/tencentcloud/github-token-broker/tls.yaml` stages the same leaf Secret name,
+so activation there only needs that cluster's chart upgrade plus
+`server.tls.enabled: true`.
+
+That cluster has no in-cluster trust-bundle consumer yet, so trust-manager and a
+`Bundle` are intentionally not installed: add them together with the first
+consumer instead of pre-wiring an unused distributor. Its broker still runs Chart
+`0.1.0`, which has no HTTPS listener at all; do not enable TLS there before the
+chart/image upgrade for that cluster is reviewed.
+
+## Public CA on ARC
+
+Consumers need the CA certificate only, never the broker key, and they must not be
+able to read it from the broker namespace. Distribution is declarative:
+`Bundle/github-token-broker-ca` in
+`infrastructure/gcp/cert-manager/internal-ca.yaml` reads `ca.crt` from the
+`internal-ca` Secret in the trust namespace (`cert-manager`) and writes a ConfigMap
+named `github-token-broker-ca` with key `ca.crt` into the namespaces its
+`namespaceSelector` matches, currently only `arc-runners`.
+
+trust-manager is installed with `app.targetNamespaces: [arc-runners]` and
+`secretTargets.authorizedSecrets: [internal-ca]`, so it can write targets only
+there, and its Secret read access is limited to the trust namespace plus that
+target namespace. It distributes a public trust anchor, not a credential: never
+point a `Bundle` source at a Secret that holds a private key.
+
+The runner mounts that ConfigMap at `/etc/github-token-broker/ca` and exports
+`GITINSIGHT_BROKER_CA_FILE` so the GitInsight helper can use the bundle without
+replacing trust for GitHub, Pixi or other tools. An explicit action `ca-file`
+input takes precedence.
+
+The volume is `optional: true` **only for staging compatibility**: runners must
+still start while the existing HTTP consumers operate, even if the Bundle has not
+converged yet. The HTTPS client does not silently ignore a configured
+missing/invalid bundle and does not fall back to HTTP, so the bundle must be
+present at `ca.crt` before the client is enabled. Volume mounts are read-only,
+without `subPath`, so bundle updates propagate to pods; explicitly verify the new
+bundle on active runners before completing a rotation.
+
+Verify the distributed bundle and record its fingerprint:
+
+```bash
+set -euo pipefail
+: "${CONTEXT:?Set CONTEXT to the approved GCP kubeconfig context}"
+kubectl --context "$CONTEXT" -n arc-runners get configmap github-token-broker-ca \
+  -o jsonpath='{.data.ca\.crt}' | openssl x509 -noout -subject -fingerprint -sha256
+```
 
 ## ARC caller authorization (operator only)
 
@@ -254,32 +287,36 @@ arguments or copy token values into review comments.
 
 ## Rotation and rollback
 
-Rotate the leaf/key together via the existing Secret Manager secret and wait for
-External Secrets refresh and projected Secret volume propagation. The server
-reloads the certificate/key pair on each new TLS handshake; no pod restart is
-required for a valid pair. The ExternalSecret's refresh interval is **one hour**;
-plan rotations with that delay plus projected-volume propagation in mind. During
-an approved rotation window, an operator may request an earlier sync:
+Leaf rotation is automatic: cert-manager renews 30 days before expiry, re-keys the
+pair, the Secret change propagates through the projected volume, and the server
+reloads the certificate/key pair on each new TLS handshake. No pod restart is
+required for a valid pair, and no operator step is needed at renewal time.
+
+For an approved early or emergency re-issue:
 
 ```bash
 set -euo pipefail
 : "${CONTEXT:?Set CONTEXT to the approved GCP kubeconfig context}"
-kubectl --context "$CONTEXT" -n github-token-broker annotate externalsecret \
-  github-token-broker-tls force-sync="$(date +%s)" --overwrite
+cmctl renew --namespace github-token-broker github-token-broker-tls --context "$CONTEXT"
 ```
 
 Then verify the Secret update and every replica's new handshake rather than
-assuming the annotation itself completes rotation. A healthy old HTTP probe alone
-does not demonstrate HTTPS readiness. For a root change, distribute a temporary
-old+new **public** trust bundle before rotating the leaf, confirm all consumers,
-then retire the old root. Do not add an insecure verifier bypass.
+assuming the command itself completes rotation. A healthy old HTTP probe alone
+does not demonstrate HTTPS readiness.
+
+Rotating the **CA** is a different, coordinated change. Its key is not rotated
+implicitly (`rotationPolicy: Never`), so a CA change means re-keying: distribute
+an overlapping bundle that carries both the old and the new CA certificate,
+re-issue every leaf, confirm all consumers, and only then retire the old root.
+Update the `Bundle` source and the affected `Certificate` resources in the same
+reviewed change. Do not add an insecure verifier bypass.
 
 TLS activation is **broker-wide**: missing/malformed/mismatched certificate/key
 material or a failed HTTPS bind prevents the process from serving either
 listener. A bad activation can therefore interrupt every existing HTTP consumer
-and probe, not just GitInsight. Verify the pair before approving activation,
-observe the rollout and fresh HTTPS handshakes on **every replica**, and retain
-the pre-activation HelmRelease/chart/image revision for rollback.
+and probe, not just GitInsight. Observe the rollout and fresh HTTPS handshakes on
+**every** replica, and retain the pre-activation HelmRelease/chart/image revision
+for rollback.
 
 If activation fails, pause the affected crawl. An operator must revert the
 activation GitOps change to the reviewed pre-activation HelmRelease and verify
