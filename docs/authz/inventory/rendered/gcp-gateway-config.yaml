@@ -1,0 +1,159 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: internal
+  namespace: infra
+spec:
+  provider:
+    kubernetes:
+      envoyService:
+        name: eg-internal
+        type: ClusterIP
+    type: Kubernetes
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: HTTPRouteFilter
+metadata:
+  name: eg-internal-healthz-direct-response
+  namespace: infra
+spec:
+  directResponse:
+    body:
+      inline: ok
+      type: Inline
+    statusCode: 200
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: eg-internal
+spec:
+  gatewayClassName: envoy-gateway
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: internal
+  listeners:
+  - allowedRoutes:
+      kinds:
+      - group: gateway.networking.k8s.io
+        kind: HTTPRoute
+      namespaces:
+        from: All
+    name: wildcard-pingcap-net-http
+    port: 80
+    protocol: HTTP
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: external-https
+spec:
+  addresses:
+  - type: NamedAddress
+    value: gw-apps-ip
+  gatewayClassName: gke-l7-global-external-managed
+  listeners:
+  - allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+      namespaces:
+        from: All
+    hostname: '*.tidb.net'
+    name: wildcard-tidb-net-https
+    port: 443
+    protocol: HTTPS
+    tls:
+      certificateRefs:
+      - name: wildcard-tidb-net-cert
+      mode: Terminate
+  - allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+      namespaces:
+        from: All
+    hostname: '*.pingcap.net'
+    name: wildcard-pingcap-net-https
+    port: 443
+    protocol: HTTPS
+    tls:
+      certificateRefs:
+      - name: wildcard-pingcap-net-cert
+      mode: Terminate
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-gateway
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: eg-internal-healthz
+  namespace: infra
+spec:
+  parentRefs:
+  - name: eg-internal
+  rules:
+  - filters:
+    - extensionRef:
+        group: gateway.envoyproxy.io
+        kind: HTTPRouteFilter
+        name: eg-internal-healthz-direct-response
+      type: ExtensionRef
+    matches:
+    - path:
+        type: Exact
+        value: /eg-healthz
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: gke-to-envoy-route
+spec:
+  hostnames:
+  - prow.tidb.net
+  - prow.pingcap.net
+  parentRefs:
+  - name: external-https
+  rules:
+  - backendRefs:
+    - name: eg-internal
+      port: 80
+    matches:
+    - path:
+        type: PathPrefix
+        value: /
+---
+apiVersion: networking.gke.io/v1
+kind: GCPBackendPolicy
+metadata:
+  name: eg-internal-backend-timeout
+  namespace: infra
+spec:
+  default:
+    timeoutSec: 3600
+  targetRef:
+    group: ""
+    kind: Service
+    name: eg-internal
+---
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  name: eg-internal-health-check
+  namespace: infra
+spec:
+  default:
+    config:
+      httpHealthCheck:
+        portSpecification: USE_SERVING_PORT
+        requestPath: /eg-healthz
+      type: HTTP
+  targetRef:
+    group: ""
+    kind: Service
+    name: eg-internal

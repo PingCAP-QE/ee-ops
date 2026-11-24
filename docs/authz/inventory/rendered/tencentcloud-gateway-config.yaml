@@ -1,0 +1,208 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: envoy-infra-external-https
+  namespace: infra
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: envoy
+      gateway.envoyproxy.io/owning-gateway-name: external-https
+      gateway.envoyproxy.io/owning-gateway-namespace: infra
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: envoy-infra-internal-https
+  namespace: infra
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: envoy
+      gateway.envoyproxy.io/owning-gateway-name: internal-https
+      gateway.envoyproxy.io/owning-gateway-namespace: infra
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: ClientTrafficPolicy
+metadata:
+  name: internal-https
+  namespace: infra
+spec:
+  http2:
+    initialConnectionWindowSize: 16Mi
+    initialStreamWindowSize: 1Mi
+  targetRefs:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    name: internal-https
+  timeout:
+    http:
+      streamIdleTimeout: 10m
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: external-https-proxy
+  namespace: infra
+spec:
+  provider:
+    kubernetes:
+      envoyDeployment:
+        container:
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+        pod:
+          annotations:
+            karpenter.sh/do-not-disrupt: "true"
+          nodeSelector:
+            compute-class: system
+          priorityClassName: system-cluster-critical
+          topologySpreadConstraints:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: envoy
+                gateway.envoyproxy.io/owning-gateway-name: external-https
+            maxSkew: 1
+            topologyKey: topology.kubernetes.io/zone
+            whenUnsatisfiable: DoNotSchedule
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: envoy
+                gateway.envoyproxy.io/owning-gateway-name: external-https
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+        replicas: 2
+        strategy:
+          rollingUpdate:
+            maxSurge: 1
+            maxUnavailable: 0
+          type: RollingUpdate
+      envoyService:
+        annotations:
+          service.cloud.tencent.com/direct-access: "true"
+          service.cloud.tencent.com/pass-to-target: "true"
+          service.cloud.tencent.com/security-groups: ${security_group_id}
+    type: Kubernetes
+  shutdown:
+    drainTimeout: 60s
+    minDrainDuration: 45s
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: internal-https-proxy
+  namespace: infra
+spec:
+  provider:
+    kubernetes:
+      envoyDeployment:
+        container:
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 512Mi
+        pod:
+          annotations:
+            karpenter.sh/do-not-disrupt: "true"
+          nodeSelector:
+            compute-class: system
+          priorityClassName: system-cluster-critical
+          topologySpreadConstraints:
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: envoy
+                gateway.envoyproxy.io/owning-gateway-name: internal-https
+            maxSkew: 1
+            topologyKey: topology.kubernetes.io/zone
+            whenUnsatisfiable: DoNotSchedule
+          - labelSelector:
+              matchLabels:
+                app.kubernetes.io/name: envoy
+                gateway.envoyproxy.io/owning-gateway-name: internal-https
+            maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+        replicas: 2
+        strategy:
+          rollingUpdate:
+            maxSurge: 1
+            maxUnavailable: 0
+          type: RollingUpdate
+      envoyService:
+        annotations:
+          service.cloud.tencent.com/direct-access: "true"
+          service.cloud.tencent.com/pass-to-target: "true"
+          service.cloud.tencent.com/security-groups: ${security_group_id}
+          service.kubernetes.io/qcloud-loadbalancer-internal-subnetid: ${internal_lb_subnet_id}
+    type: Kubernetes
+  shutdown:
+    drainTimeout: 60s
+    minDrainDuration: 45s
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: external-https
+spec:
+  gatewayClassName: envoy-gateway
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: external-https-proxy
+  listeners:
+  - allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+      namespaces:
+        from: All
+    hostname: '*.pingcap.net'
+    name: wildcard-pingcap-net-https
+    port: 443
+    protocol: HTTPS
+    tls:
+      certificateRefs:
+      - name: wildcard-pingcap-net-cert
+      mode: Terminate
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: internal-https
+spec:
+  gatewayClassName: envoy-gateway
+  infrastructure:
+    parametersRef:
+      group: gateway.envoyproxy.io
+      kind: EnvoyProxy
+      name: internal-https-proxy
+  listeners:
+  - allowedRoutes:
+      kinds:
+      - kind: HTTPRoute
+      namespaces:
+        from: All
+    hostname: '*.pingcap.net'
+    name: wildcard-pingcap-net-https
+    port: 443
+    protocol: HTTPS
+    tls:
+      certificateRefs:
+      - name: wildcard-pingcap-net-cert
+      mode: Terminate
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy-gateway
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller

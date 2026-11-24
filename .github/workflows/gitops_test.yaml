@@ -24,6 +24,31 @@ jobs:
       - name: Verify browser route CSRF policies
         if: matrix.path == 'apps'
         run: bash scripts/check_gcp_route_csrf.sh
+      - name: Report authorization policy coverage baseline
+        if: matrix.path == 'apps'
+        run: |
+          set +e
+          bash scripts/check_authz_policy_coverage.sh
+          status=$?
+          set -e
+          if [ "$status" -gt 1 ]; then exit "$status"; fi
+          if [ "$status" -eq 1 ]; then
+            echo "::warning::Authorization route coverage has gaps; report-only during inventory phase."
+          fi
+      - name: Report authorization security-contract baseline
+        if: matrix.path == 'apps'
+        run: |
+          set +e
+          bash scripts/check_authz_security.sh
+          status=$?
+          set -e
+          if [ "$status" -gt 1 ]; then exit "$status"; fi
+          if [ "$status" -eq 1 ]; then
+            echo "::warning::Authorization security contracts are incomplete; report-only during inventory phase."
+          fi
+      - name: Self-test authorization inventory scripts
+        if: matrix.path == 'apps'
+        run: bash scripts/check_authz_inventory_test.sh
       - name: Verify Dashboard backend identity configuration
         if: matrix.path == 'apps'
         run: bash scripts/check_ci_dashboard_auth_config.sh

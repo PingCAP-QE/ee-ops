@@ -1,0 +1,14 @@
+cluster,namespace,route,hostnames,paths,security_policies,status
+"gcp","prow","prow","prow.tidb.net|prow.pingcap.net","/|/hook|/ti-community-owners|/tichi",0,gap
+"gcp","default","github-token-broker-external","prow.pingcap.net","/gh-broker/v1/token",1,mapped
+"gcp","tekton-pipelines","tekton","prow.tidb.net","/tekton",1,mapped
+"gcp","default","dl","prow.tidb.net","/dl",0,gap
+"gcp","default","dl-public","dl.pingcap.net","/d/",0,gap
+"gcp","jenkins","controller","${INGRESS_HOST}","${INGRESS_PATH}",0,gap
+"gcp","tibuild","tibuild-v2-machine","prow.tidb.net","/tibuild",1,mapped
+"gcp","tibuild","tibuild-v2-privileged","prow.tidb.net","/tibuild|/tibuild/api/v2/artifact|/tibuild/api/v2/hotfix|/tibuild/api/v2/publish|/tibuild/api/v2/tidbcloud",1,mapped
+"tencentcloud","zot","zot-internal","cr-qcloud.pingcap.net","/",0,gap
+"tencentcloud","jenkins","controller","${INGRESS_HOST}","${INGRESS_PATH}",0,gap
+"tencentcloud","jenkins","controller-staging","${INGRESS_HOST}","${INGRESS_PATH}-staging",0,gap
+"gcp","default","gke-to-envoy-route","prow.tidb.net|prow.pingcap.net","/",0,gap
+"gcp","infra","eg-internal-healthz","","/eg-healthz",0,gap
