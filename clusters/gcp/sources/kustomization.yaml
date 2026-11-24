@@ -10,5 +10,6 @@ resources:
   - helm-repo-ee-apps.yaml
   - helm-repo-ee-ops.yaml
   - helm-repo-external-secrets.yaml
+  - helm-repo-jetstack.yaml
   - helm-repo-kyverno.yaml
   - helm-repo-others.yaml

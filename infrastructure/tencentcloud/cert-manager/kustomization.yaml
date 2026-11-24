@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+# No `namespace:` here on purpose. This directory mixes cluster-scoped issuers
+# with namespaced objects, and a kustomize namespace transformer would stamp a
+# namespace onto the ClusterIssuer resources, which the API server rejects.
+# Every namespaced object therefore carries its namespace explicitly.
+resources:
+  - namespace.yaml
+  - release.yaml
+  - internal-ca.yaml
+  - cluster-issuers

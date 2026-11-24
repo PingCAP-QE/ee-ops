@@ -1,0 +1,47 @@
+---
+# The cluster-internal CA is a trust anchor, not a credential: its *certificate*
+# is distributed to consumers (see the Bundle below), while the private key stays
+# in this namespace and is never mounted into workloads or committed to Git.
+#
+# Rotation policy: the key is never rotated implicitly. Re-keying the CA changes
+# every consumer's trust anchor, so it is done as a reviewed change that first
+# distributes an overlapping bundle and only then re-issues the leaves.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: internal-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: pingcap-internal-services-ca
+  secretName: internal-ca
+  duration: 87600h
+  renewBefore: 8760h
+  privateKey:
+    algorithm: ECDSA
+    size: 384
+    rotationPolicy: Never
+  issuerRef:
+    name: internal-ca-selfsigned
+    kind: ClusterIssuer
+    group: cert-manager.io
+---
+# The only copy of the CA certificate that leaves this namespace. Consumers mount
+# the resulting ConfigMap; nothing is provisioned by hand, so a rotated CA reaches
+# the runners without an operator step.
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: github-token-broker-ca
+  namespace: cert-manager
+spec:
+  sources:
+    - secret:
+        name: internal-ca
+        key: ca.crt
+  target:
+    configMap:
+      key: ca.crt
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: arc-runners

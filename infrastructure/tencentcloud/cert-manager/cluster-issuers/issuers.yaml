@@ -1,0 +1,24 @@
+---
+# Bootstrap issuer for the cluster-internal CA only. It signs exactly one
+# Certificate (`internal-ca`); service certificates must use `internal-ca`.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: internal-ca-selfsigned
+spec:
+  selfSigned: {}
+---
+# Signs short-lived cluster-internal service certificates. The CA Secret is read
+# from cert-manager's cluster resource namespace, which is the namespace this
+# add-on is installed in.
+#
+# Anyone able to create a Certificate can request a certificate from this issuer,
+# so it is reserved for in-cluster service TLS; the trust anchor is only handed
+# to consumers through reviewed change.
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: internal-ca
+spec:
+  ca:
+    secretName: internal-ca

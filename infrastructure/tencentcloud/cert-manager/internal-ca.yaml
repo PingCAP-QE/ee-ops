@@ -1,0 +1,31 @@
+---
+# The cluster-internal CA is a trust anchor, not a credential: its *certificate*
+# is distributed to consumers that need it, while the private key stays in this
+# namespace and is never mounted into workloads or committed to Git.
+#
+# Rotation policy: the key is never rotated implicitly. Re-keying the CA changes
+# every consumer's trust anchor, so it is done as a reviewed change that first
+# distributes an overlapping bundle and only then re-issues the leaves.
+#
+# This cluster has no in-cluster trust-bundle consumer yet, so trust-manager and
+# a distributed Bundle are not installed here. Add them together with the first
+# consumer instead of pre-wiring an unused distributor.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: internal-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: pingcap-internal-services-ca
+  secretName: internal-ca
+  duration: 87600h
+  renewBefore: 8760h
+  privateKey:
+    algorithm: ECDSA
+    size: 384
+    rotationPolicy: Never
+  issuerRef:
+    name: internal-ca-selfsigned
+    kind: ClusterIssuer
+    group: cert-manager.io
