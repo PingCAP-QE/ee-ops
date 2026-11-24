@@ -1,0 +1,33 @@
+---
+# Native HTTPS listener certificate for the broker, issued by the
+# cluster-internal CA. The Secret name is the one the chart mounts
+# (`server.tls.existingSecret`), so the broker picks up renewals from the
+# projected volume without a restart: it re-reads the pair on every handshake.
+#
+# This replaces the former ExternalSecret that read a prepared object from Secret
+# Manager. Issuance and renewal are now fully declarative; nothing is provisioned
+# by hand.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: github-token-broker-tls
+spec:
+  secretName: github-token-broker-tls
+  commonName: github-token-broker.github-token-broker.svc.cluster.local
+  dnsNames:
+    # The name GitInsight verifies. Keep it first: it is the documented origin.
+    - github-token-broker.github-token-broker.svc.cluster.local
+    - github-token-broker.github-token-broker.svc
+    - github-token-broker
+  duration: 2160h
+  renewBefore: 720h
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    # The Secret is projected into the pod; kubelet swaps the projected volume
+    # atomically, so a renewed pair is always consistent when read.
+    rotationPolicy: Always
+  issuerRef:
+    name: internal-ca
+    kind: ClusterIssuer
+    group: cert-manager.io
