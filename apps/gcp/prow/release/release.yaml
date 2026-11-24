@@ -270,29 +270,8 @@ spec:
                     items:
                       - key: tasks.yaml
                         path: tasks.yaml
-      cherrypicker:
-        service:
-          type: ClusterIP
-        ports:
-          http: 8888
-        serviceAccount:
-          name: prow-hook
-        image:
-          repository: ghcr.io/ti-community-infra/prow/cherrypicker
-          tag: v20250805-57374e9b9
-        # Only organization members may request cherry picks: `--allow-all`
-        # skips the GitHub org membership check (upstream cherrypicker
-        # `server.go`: `if !s.allowAll { IsMember(org, user) }`).
-        args:
-          - --dry-run=false
-          - --github-app-id=$(GITHUB_APP_ID)
-          - --github-app-private-key-path=/etc/github/app-private-key
-          - --github-endpoint=http://prow-ghproxy
-          - --github-graphql-endpoint=http://prow-ghproxy/graphql
-          - --label-prefix=needs-cherry-pick-
-          - --skip-fork
-      # Unified cherry-pick plugin (config key `cherry-pick`). Runs next to the
-      # legacy deployments while the canary repositories are migrated.
+      # Unified cherry-pick plugin. The fork owner is configured per repository
+      # (fork_owner), so no deployment-wide flag is passed.
       cherry-pick:
         replicaCount: 1
         service:
@@ -319,7 +298,6 @@ spec:
           # The plugin reads its per-repository section from the shared file and
           # pushes cherry-pick branches to the ti-chi-bot fork.
           - --external-plugins-config=/etc/external_plugins_config/external_plugins_config.yaml
-          - --fork-owner=ti-chi-bot
           - --on-conflict=hold
         volumes:
           - name: external-plugins-config
@@ -419,29 +397,6 @@ spec:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
           - --github-app-private-key-path=/etc/github/app-private-key
-          - --github-endpoint=http://prow-ghproxy
-          - --github-graphql-endpoint=http://prow-ghproxy/graphql
-        volumes:
-          - name: external-plugins-config
-            configMap:
-              name: prow-external-plugins-config
-        volumeMounts:
-          - name: external-plugins-config
-            mountPath: /etc/external_plugins_config
-            readOnly: true
-      ti-community-cherrypicker:
-        service:
-          type: ClusterIP
-        ports:
-          http: 80
-        serviceAccount:
-          name: prow-hook
-        image:
-          repository: ticommunityinfra/tichi-cherrypicker-plugin
-          tag: v2026.11.19
-        args:
-          - --dry-run=false
-          - --github-token-path=/etc/github/token
           - --github-endpoint=http://prow-ghproxy
           - --github-graphql-endpoint=http://prow-ghproxy/graphql
         volumes:
