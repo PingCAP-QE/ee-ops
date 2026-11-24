@@ -4,3 +4,4 @@ resources:
   - dl-config.yaml
   - delivery-tidb.yaml
   - delivery-policy.yaml
+  - oidc.yaml
