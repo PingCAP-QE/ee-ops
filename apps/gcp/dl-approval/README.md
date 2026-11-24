@@ -44,20 +44,20 @@ scripts/eso-scope-inventory.sh --check   # what CI runs
 
 Run once with an admin identity against the shared TiDB primary SQL endpoint
 (the same cluster that backs `dl`; do **not** use a stale-read/replica endpoint).
-TiDB Cloud usernames must carry the cluster prefix; this cluster uses
-`4VXAzfBKKPKmZKh.` — update both the user names and the DSNs if the cluster changes:
+TiDB Cloud usernames must carry the cluster prefix. Use your own
+`<cluster-prefix>.<short-name>` values below; do not commit them to this file:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS delivery_approval
   CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 -- Migration identity: DDL on this database only.
-CREATE USER IF NOT EXISTS '4VXAzfBKKPKmZKh.dl_appr_migrate'@'%' IDENTIFIED BY '<random-1>';
-GRANT ALL PRIVILEGES ON delivery_approval.* TO '4VXAzfBKKPKmZKh.dl_appr_migrate'@'%';
+CREATE USER IF NOT EXISTS '<migrate-user>'@'%' IDENTIFIED BY '<random-1>';
+GRANT ALL PRIVILEGES ON delivery_approval.* TO '<migrate-user>'@'%';
 
 -- Runtime identity: no DDL, no DELETE; events are append-only.
-CREATE USER IF NOT EXISTS '4VXAzfBKKPKmZKh.dl_appr'@'%' IDENTIFIED BY '<random-2>';
-GRANT SELECT, INSERT, UPDATE ON delivery_approval.* TO '4VXAzfBKKPKmZKh.dl_appr'@'%';
+CREATE USER IF NOT EXISTS '<runtime-user>'@'%' IDENTIFIED BY '<random-2>';
+GRANT SELECT, INSERT, UPDATE ON delivery_approval.* TO '<runtime-user>'@'%';
 
 FLUSH PRIVILEGES;
 ```
@@ -74,8 +74,8 @@ of the repository and shell history where possible.
 
 ```json
 {
-  "migrate_dsn": "4VXAzfBKKPKmZKh.dl_appr_migrate:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true",
-  "runtime_dsn": "4VXAzfBKKPKmZKh.dl_appr:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true"
+  "migrate_dsn": "<migrate-user>:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true",
+  "runtime_dsn": "<runtime-user>:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true"
 }
 ```
 
