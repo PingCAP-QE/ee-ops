@@ -46,9 +46,8 @@ spec:
       tag: v2026.11.15-10-g1389545
     server:
       # prod2 only keeps the two TiUP publish workers. The API has no consumers:
-      # both do2.pingcap.net/tibuild and internal2-do.pingcap.net/tibuild have
-      # zero upstream requests, and all CI/ops clients use prow.tidb.net or the
-      # in-cluster gcp service.
+      # internal2-do.pingcap.net/tibuild has zero upstream requests, and all
+      # CI/ops clients use prow.tidb.net or the in-cluster gcp service.
       enabled: false
       debug: false
       config:
@@ -144,8 +143,7 @@ spec:
               readOnly: true
     httpRoute:
       # The internal2-do route is part of the API surface; it is removed with
-      # the server. The external do2 basicAuth route lives in its own manifests
-      # and is removed in the same change.
+      # the server. The external basic-auth route was removed with the API.
       enabled: false
       parentRefs:
         - kind: Gateway
