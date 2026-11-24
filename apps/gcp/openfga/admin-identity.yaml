@@ -1,0 +1,30 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicy
+metadata:
+  name: ee-authz-openfga-admin
+spec:
+  failurePolicy: Fail
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods"]
+  validations:
+    - expression: >-
+        !has(object.metadata.labels) || !('app' in object.metadata.labels) ||
+        object.metadata.labels['app'] != 'openfga-admin' ||
+        object.spec.serviceAccountName == 'openfga-admin'
+      message: OpenFGA administration pods must use the openfga-admin service account.
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingAdmissionPolicyBinding
+metadata:
+  name: ee-authz-openfga-admin
+spec:
+  policyName: ee-authz-openfga-admin
+  validationActions: [Deny]
+  matchResources:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: ee-authz

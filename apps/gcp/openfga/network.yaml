@@ -1,0 +1,43 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: private-by-default
+spec:
+  podSelector: {}
+  policyTypes: [Ingress]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: openfga-check
+spec:
+  podSelector:
+    matchLabels:
+      app: openfga-check
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: authzd
+      ports:
+        - port: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: openfga
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: openfga
+      app.kubernetes.io/instance: openfga
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: openfga-check
+        - podSelector:
+            matchLabels:
+              app: openfga-admin
+      ports:
+        - port: 8080

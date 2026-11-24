@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ee-authz
+resources:
+  - namespace.yaml
+  - admin-identity.yaml
+  - network.yaml
+  - check-proxy.yaml
+  - release.yaml
+  - external-secret.yaml
+configMapGenerator:
+  - name: openfga-check
+    files:
+      - default.conf=check.conf

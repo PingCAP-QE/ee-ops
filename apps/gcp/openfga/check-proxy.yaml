@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openfga-check
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: openfga-check
+  template:
+    metadata:
+      labels:
+        app: openfga-check
+    spec:
+      automountServiceAccountToken: false
+      containers:
+        - name: nginx
+          image: docker.io/nginxinc/nginx-unprivileged:stable-alpine@sha256:f5116ed4606f3eb015dd4a8e28cb9b351476dc0ad4bc6e9f93b19cec130cdf03
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/conf.d
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: openfga-check
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openfga-check
+spec:
+  selector:
+    app: openfga-check
+  ports:
+    - port: 8080
+      targetPort: 8080

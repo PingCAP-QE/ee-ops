@@ -67,10 +67,10 @@ up as a reviewable diff instead of silently widening the blast radius.
 
 | Cluster | Allowlisted namespaces | Consuming namespaces | Namespaces without consumers | ExternalSecrets | Distinct GCP secrets |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| `gcp` | 21 | 21 | 0 | 68 | 49 |
+| `gcp` | 22 | 22 | 0 | 70 | 51 |
 | `tencentcloud` | 16 | 16 | 0 | 42 | 36 |
 | `prod2` | 6 | 6 | 0 | 14 | 26 |
-| **Total** | **43** | **43** | **0** | **124** | **84** |
+| **Total** | **44** | **44** | **0** | **126** | **86** |
 
 ### Consumers by namespace
 
@@ -83,6 +83,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | `cs` | APP | 2 | `gcp_cloudevents_kafka_password`, `gcp_cloudevents_lark_app_secret`, `gcp_cloudevents_test_case_run_dsn`, `gcp_kafka_cluster_ca` |
 | `dl` | APP | 4 | `gcp_dl_config_json`, `gcp_dl_delivery_policy_json`, `gcp_dl_delivery_tidb_json`, `google-oauth2-client-ee-apps` |
 | `dl-approval` | APP | 3 | `gcp_dl_approval_config_json`, `gcp_dl_approval_tidb_json`, `google-oauth2-client-ee-apps` |
+| `ee-authz` | CORE | 2 | `ee-authzd-config`, `ee-openfga-backend` |
 | `ee-cd` | CI | 8 | `ga_offline_pkg_s3_json`, `gcp_dockerconfig_json_ee-releaser`, `gcp_prow_github_app_webhook_hmac`, `gcp_sa_json_ee-releaser`, `gcp_tibuild_cloudevent_hmac`, `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `tidbx-delivery-github-issue` |
 | `flux-system` | CORE | 1 | `tencentcloud_ci_terraform_creds` |
 | `github-token-broker` | CORE | 3 | `gha__system__github_app_private_key`, `github-token-broker-policy`, `github_token_broker_external_reader_token` |
@@ -138,7 +139,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 
 | Domain | Target store | Namespaces | ExternalSecrets | Distinct GCP secrets |
 | :--- | :--- | :--- | ---: | ---: |
-| CORE | `ee-gcp-sm` | `apps`, `flux-system`, `github-token-broker`, `infra` | 9 | 9 |
+| CORE | `ee-gcp-sm` | `apps`, `ee-authz`, `flux-system`, `github-token-broker`, `infra` | 11 | 11 |
 | CI | `ee-gcp-sm-ci` | `ee-cd`, `prow`, `prow-test-pods`, `tekton-pipelines` | 25 | 22 |
 | JENKINS | `ee-gcp-sm-jenkins` | `jenkins` | 12 | 7 |
 | JENKINS-AGENTS | `ee-gcp-sm-jenkins-agents` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
@@ -167,6 +168,8 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `arc__repo__pingcap__tiup__github_app_installation_id` | `prod2` | `arc-runners` |
 | `ci_registry_auth_dockerconfig_json` | `gcp` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` |
 | `ci_registry_auth_dockerconfig_json` | `tencentcloud` | `cache`, `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv`, `prow-test-pods` |
+| `ee-authzd-config` | `gcp` | `ee-authz` |
+| `ee-openfga-backend` | `gcp` | `ee-authz` |
 | `ga_offline_pkg_s3_json` | `gcp` | `ee-cd` |
 | `gcp_chatops_lark_json` | `gcp` | `chatops-lark` |
 | `gcp_ci_dashboard_kafka_password` | `gcp` | `apps`, `kafka` |
