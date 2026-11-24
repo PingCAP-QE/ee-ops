@@ -1,9 +1,12 @@
 # Delivery approval service (prerequisites)
 
-This directory holds the namespace, NetworkPolicy and ExternalSecrets for
-`delivery_approval_service_20261123`. The application image/chart, migration Job
-and HelmRelease are added in later phases; Phase 0 is safe to reconcile on its
-own (no Pods are created).
+This directory holds the approval service prerequisites (namespace,
+NetworkPolicy, ExternalSecrets), the one-shot schema migration and the
+HelmRelease/route/OIDC policy. Flux reconciles them in this order:
+
+```
+prereq -> migrate -> app (HelmRelease + HTTPRoute + SecurityPolicy)
+```
 
 The service is described in
 `conductor/projects/PingCAP-QE/ee-apps/tracks/delivery_approval_service_20261123/spec.md`
@@ -20,10 +23,17 @@ app).
 | `ExternalSecret/dl-approval-oidc` | `prereq/external-secrets/oidc.yaml` |
 | `ExternalSecret/dl-approval-tidb` | `prereq/external-secrets/tidb.yaml` |
 | `ExternalSecret/dl-approval-config` | `prereq/external-secrets/config.yaml` |
-| Flux Kustomization `dl-approval` | `apps/gcp/dl-approval/flux.yaml` (applied by cluster-level `apps`) |
+| migration Job | `migrate/job.yaml` |
+| HelmRelease + HTTPRoute + OIDC policy | `app/release.yaml`, `app/route.yaml`, `app/security-policy.yaml` |
+| Flux Kustomizations | `apps/gcp/dl-approval/flux.yaml` (applied by the cluster-level `apps` Kustomization) |
 
 `infrastructure/gcp/external-secrets/post/css-ee-gcp-sm.yaml` must allow the new
-namespace; it does. Re-run the scope inventory after changing ExternalSecrets:
+namespace; it does. These resources are GitOps-managed: merge the Phase 0/6 PR and
+let Flux reconcile `infrastructure` and `dl-approval` (or `dl-approval-prereq`
+after the Phase 6 split). Do not keep `kubectl apply` as the owner; a manual apply
+is only a pre-merge dry-run/bootstrap.
+
+Re-run the scope inventory after changing ExternalSecrets:
 
 ```bash
 scripts/eso-scope-inventory.sh --write   # updates docs/external-secrets-scope.md
@@ -33,19 +43,21 @@ scripts/eso-scope-inventory.sh --check   # what CI runs
 ## 1. TiDB database and roles
 
 Run once with an admin identity against the shared TiDB primary SQL endpoint
-(the same cluster that backs `dl`; do **not** use a stale-read/replica endpoint):
+(the same cluster that backs `dl`; do **not** use a stale-read/replica endpoint).
+TiDB Cloud usernames must carry the cluster prefix; this cluster uses
+`4VXAzfBKKPKmZKh.` — update both the user names and the DSNs if the cluster changes:
 
 ```sql
 CREATE DATABASE IF NOT EXISTS delivery_approval
   CHARACTER SET utf8mb4 COLLATE utf8mb4_bin;
 
 -- Migration identity: DDL on this database only.
-CREATE USER IF NOT EXISTS 'dl_approval_migrate'@'%' IDENTIFIED BY '<random-1>';
-GRANT ALL PRIVILEGES ON delivery_approval.* TO 'dl_approval_migrate'@'%';
+CREATE USER IF NOT EXISTS '4VXAzfBKKPKmZKh.dl_appr_migrate'@'%' IDENTIFIED BY '<random-1>';
+GRANT ALL PRIVILEGES ON delivery_approval.* TO '4VXAzfBKKPKmZKh.dl_appr_migrate'@'%';
 
 -- Runtime identity: no DDL, no DELETE; events are append-only.
-CREATE USER IF NOT EXISTS 'dl_approval'@'%' IDENTIFIED BY '<random-2>';
-GRANT SELECT, INSERT, UPDATE ON delivery_approval.* TO 'dl_approval'@'%';
+CREATE USER IF NOT EXISTS '4VXAzfBKKPKmZKh.dl_appr'@'%' IDENTIFIED BY '<random-2>';
+GRANT SELECT, INSERT, UPDATE ON delivery_approval.* TO '4VXAzfBKKPKmZKh.dl_appr'@'%';
 
 FLUSH PRIVILEGES;
 ```
@@ -62,8 +74,8 @@ of the repository and shell history where possible.
 
 ```json
 {
-  "migrate_dsn": "dl_approval_migrate:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true",
-  "runtime_dsn": "dl_approval:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true"
+  "migrate_dsn": "4VXAzfBKKPKmZKh.dl_appr_migrate:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true",
+  "runtime_dsn": "4VXAzfBKKPKmZKh.dl_appr:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true"
 }
 ```
 
@@ -114,7 +126,7 @@ Add (adjust `max_ttl_seconds` if the approval form should be shorter than 7d):
 
 ```yaml
   - id: delivery-approval
-    # printf '%s' "$DL_ISSUER_SECRET" | sha256sum
+    # printf '%s' "$DL_ISSUER_SECRET" | shasum -a 256
     token_sha256: "<64-hex-sha256-of-dl_issuer_secret>"
     repositories:
       - us-docker.pkg.dev/pingcap-testing-account/tidbx/
@@ -179,9 +191,9 @@ the GSM key name and the `ee-gcp-sm` namespace allowlist first.
 
 ## Rollback
 
-- Suspend/remove Flux Kustomization `dl-approval` (or remove `dl-approval` from `apps/gcp/kustomization.yaml`) to stop
-  reconciling the prerequisites; the namespace and Secrets are pruned according
-  to Flux/prune policy.
+- Suspend/remove `dl-approval-prereq`, `dl-approval-migrate` and `dl-approval`
+  (or remove `dl-approval` from `apps/gcp/kustomization.yaml`) to stop
+  reconciling; the namespace and Secrets are pruned according to Flux/prune policy.
 - Delete the GSM keys only after the namespace is gone. Keeping them is harmless
   and avoids losing the URL encryption key.
 - The dl policy change is additive; removing the `delivery-approval` issuer

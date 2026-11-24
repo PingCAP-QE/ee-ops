@@ -1,0 +1,69 @@
+# Approval service. The chart and image are built by ee-apps; the image tag is
+# pinned here (no floating tags). The Lark/delivery env values are intentionally
+# omitted until the Phase 0 Lark app/chat id and dl issuer secret exist, so this
+# release starts in approval-only mode; adding them enables delivery.
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: dl-approval
+spec:
+  releaseName: dl-approval
+  chart:
+    spec:
+      chart: delivery-approval
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: ee-apps
+        namespace: flux-system
+  interval: 5m
+  timeout: 10m
+  install:
+    remediation:
+      retries: 3
+  rollback:
+    cleanupOnFail: true
+    recreate: true
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  test:
+    enable: false
+  values:
+    fullnameOverride: dl-approval
+    replicaCount: 1
+    image:
+      repository: ghcr.io/pingcap-qe/ee-apps/delivery-approval
+      tag: v2026.11.22-11-g322b93b
+    serviceAccount:
+      create: true
+    server:
+      # Approval-only mode: DB + OIDC audience; delivery stays disabled until
+      # the Lark/dl secrets are added.
+      env:
+        - name: DL_APPROVAL_DATABASE_DSN
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-tidb
+              key: runtime_dsn
+        - name: DL_APPROVAL_OIDC_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: dl-approval-oidc
+              key: client-id
+      config:
+        listen: ":8080"
+        health_address: ":8081"
+        public_url: https://prow.tidb.net/dl/grants
+        dl_base_url: http://dl-management.dl.svc.cluster.local
+        allowed_email_domains:
+          - pingcap.com
+        approver_emails:
+          - approver@pingcap.com
+        max_pending_per_requester: 5
+        max_requests_per_day: 20
+        default_ttl_seconds: 86400
+        max_ttl_seconds: 604800
+        lark_notification_chat_id: ""
+        lark_buzz: true
