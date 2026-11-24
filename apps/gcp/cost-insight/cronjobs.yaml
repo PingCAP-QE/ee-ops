@@ -31,7 +31,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -272,8 +272,8 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-alibaba-billing-summary
-              # Official main release v2026.10.25-49-ge71fd92 (ee-apps #804).
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:fd11e3b746524bd048f2ce90e181ba85ba0be61a25bd8a1c85f8c8b76a89cd77
+              # Official main release v2026.11.22-13-g78f7ddb; release run 45337474960.
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -556,7 +556,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-gcp-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.10.25-9-g75cb4d7
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -640,7 +640,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-5-g33837a0@sha256:d710579b60c68186fa42f7b2bb34e3ff6d53214d698f32ee04eb50188513b63a
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -738,8 +738,8 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-f04-billing-summary
-              # v2026.11.8-2-g462f651; release run 42621120435 (amd64 + arm64).
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:e2b633b85f3dd814a0227ce2fe7fc70ed0b8b84339e7851f742562db1e36c92a
+              # v2026.11.22-13-g78f7ddb; release run 45337474960 (amd64 + arm64).
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:
@@ -809,7 +809,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-unmatched-resources
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-5-g33837a0@sha256:d710579b60c68186fa42f7b2bb34e3ff6d53214d698f32ee04eb50188513b63a
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command:
                 - /bin/sh
@@ -886,7 +886,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-tencent-billing-summary
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-4-gf7e02a2
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: Always
               command:
                 - /bin/sh

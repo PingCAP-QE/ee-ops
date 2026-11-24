@@ -37,8 +37,8 @@ spec:
           terminationGracePeriodSeconds: 60
           containers:
             - name: sync-azure-warehouse-summary
-              # v2026.11.8-1-g20e7d9e; release run 42588674762, attempt 2.
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs@sha256:d1df62338074852d0c8b828ee1835a4f69d6b22b5e6dda37f7a1feeebc7a4694
+              # v2026.11.22-13-g78f7ddb; release run 45337474960 (amd64 + arm64).
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:
