@@ -5,7 +5,7 @@
 # `download_issuers` is queryable, and the runtime identities are not allowed to
 # change the schema themselves.
 #
-# Ordering is enforced by Flux, not by kubectl: clusters/gcp/03-dl-delivery.yaml
+# Ordering is enforced by Flux, not by kubectl: apps/gcp/dl/flux.yaml
 # runs this Kustomization with `wait: true` and only then applies
 # `apps/gcp/dl/delivery`. No `ttlSecondsAfterFinished` here — pruning a finished
 # Job would make Flux recreate it on every reconcile.
