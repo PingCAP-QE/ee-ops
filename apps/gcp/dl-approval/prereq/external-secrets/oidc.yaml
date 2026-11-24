@@ -1,0 +1,23 @@
+# Google OAuth client for the approval form.
+#
+# Reuse the existing "internal" OAuth client that the other prow.tidb.net
+# browser routes use. The Google OAuth client must allow:
+#   https://prow.tidb.net/dl/grants/oauth2/callback
+#
+# The gateway SecurityPolicy reads both keys; the approval process mounts only
+# `client-id` (the token audience) and never the client secret.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-approval-oidc
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-approval-oidc
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: google-oauth2-client-ee-apps

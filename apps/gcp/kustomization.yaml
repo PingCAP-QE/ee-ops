@@ -12,6 +12,7 @@ resources:
   - cost-insight
   - chatops-lark
   - dl
+  - dl-approval
   - roster
   - tibuild
   - github-token-broker

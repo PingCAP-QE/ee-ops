@@ -1,0 +1,30 @@
+# App-specific Flux Kustomization, applied by the cluster-level `apps`
+# Kustomization (same pattern as apps/gcp/prow and apps/gcp/tekton).
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: dl-approval
+spec:
+  dependsOn:
+    - name: dl-delivery
+  interval: 10m
+  retryInterval: 2m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./apps/gcp/dl-approval/prereq
+  prune: true
+  timeout: 10m
+  healthChecks:
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: dl-approval-oidc
+      namespace: dl-approval
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: dl-approval-tidb
+      namespace: dl-approval
+    - apiVersion: external-secrets.io/v1
+      kind: ExternalSecret
+      name: dl-approval-config
+      namespace: dl-approval

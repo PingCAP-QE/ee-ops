@@ -1,0 +1,30 @@
+# Runtime configuration for the approval service.
+#
+# GSM key `gcp_dl_approval_config_json` is a JSON object with four keys:
+#   {
+#     "lark_app_id":        "<delivery-approval Lark app id>",
+#     "lark_app_secret":    "<delivery-approval Lark app secret>",
+#     "url_encryption_key": "<base64 of 32 random bytes; AES-256-GCM>",
+#     "dl_issuer_secret":   "<separate random issuer secret, >=32 bytes>"
+#   }
+#
+# The Lark app must be dedicated to this service (not the chatops bot app):
+# it needs send-message, app-urgent and contact-by-email permissions, and must
+# not subscribe to inbound events. `dl_issuer_secret` is also stored as a
+# SHA-256 hash in the dl delivery policy (`delivery-approval` issuer); the
+# plaintext lives only in this Secret.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-approval-config
+spec:
+  refreshInterval: 1m
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-approval-config
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: gcp_dl_approval_config_json

@@ -380,7 +380,7 @@ DOMAINS = OrderedDict([
     ("JENKINS", ["jenkins"]),
     ("JENKINS-AGENTS", ["jenkins-pd", "jenkins-ticdc", "jenkins-tidb",
                         "jenkins-tiflash", "jenkins-tiflow", "jenkins-tikv"]),
-    ("APP", ["cache", "chatops-lark", "cs", "dl", "kafka", "tibuild", "zot"]),
+    ("APP", ["cache", "chatops-lark", "cs", "dl", "dl-approval", "kafka", "tibuild", "zot"]),
 ])
 DOMAIN_OF = {ns: domain for domain, namespaces in DOMAINS.items() for ns in namespaces}
 # prod2 keeps a single store for every consumer.

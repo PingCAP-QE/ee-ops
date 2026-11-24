@@ -1,0 +1,26 @@
+# TiDB DSNs for the approval service.
+#
+# GSM key `gcp_dl_approval_tidb_json` is a JSON object with two keys:
+#   {
+#     "migrate_dsn":  "dl_approval_migrate:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true",
+#     "runtime_dsn":  "dl_approval:<pw>@tcp(<host>:4000)/delivery_approval?parseTime=true&loc=UTC&charset=utf8mb4&collation=utf8mb4_bin&tls=true"
+#   }
+#
+# The runtime Pod injects only `runtime_dsn`; the migration Job injects only
+# `migrate_dsn`. Both accounts must use the primary SQL endpoint, not a
+# stale-read or replica endpoint. See README.md for the grants.
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: dl-approval-tidb
+spec:
+  refreshInterval: 1m
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: dl-approval-tidb
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: gcp_dl_approval_tidb_json

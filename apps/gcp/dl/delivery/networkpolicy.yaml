@@ -3,8 +3,10 @@
 # management issuer API (and, later, the public redemption surface) directly.
 #
 # `infra` hosts the `eg-internal` Envoy data plane, which is the only intended
-# caller of port 80 for both releases. Kubelet probes are unaffected: GKE
-# Dataplane V2 always admits probe traffic regardless of NetworkPolicy.
+# caller of port 80 for both releases. `dl-approval` is the approval service:
+# it calls the management API in-cluster (no Gateway route) to issue/revoke
+# shares. Kubelet probes are unaffected: GKE Dataplane V2 always admits probe
+# traffic regardless of NetworkPolicy.
 # (https://cloud.google.com/kubernetes-engine/docs/how-to/dataplane-v2)
 #
 # Add a namespace only together with the reason its caller cannot use the
@@ -27,6 +29,9 @@ spec:
         - namespaceSelector:
             matchLabels:
               kubernetes.io/metadata.name: infra
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: dl-approval
       ports:
         - protocol: TCP
           port: 80
