@@ -95,6 +95,24 @@ plus one line in `scale-sets/kustomization.yaml`.
 - **No `NetworkPolicy`.** This cluster does not enforce one for these
   namespaces; the runner group membership is the access boundary instead.
 
+## Adopting it from a workflow
+
+The scale set is the base environment; wiring a repository's workflows to it is
+the repository maintainer's call. For a job that qualifies:
+
+```yaml
+runs-on: [arc-runner-set-pingcap-qe-private]
+```
+
+- The repository must be a member of the `tencentcloud-private-ci` runner group
+  (organization admin action, not a Git change).
+- The job must not need a Docker daemon (`services:`, `docker/*` with a daemon,
+  `docker/setup-buildx-action`), a C compiler, Python 3, `pip`, or `apt-get`
+  with root/sudo. Anything it does need must either be in the runner image or be
+  installed by an `actions/setup-*` action into the runner's tool cache.
+- Jobs that do not qualify yet keep their current label; see
+  [limitations](#limitations).
+
 ## Limitations
 
 The `test-infra` and `endless` workflows currently expect a runner that also
