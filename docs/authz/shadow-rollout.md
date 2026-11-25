@@ -41,6 +41,39 @@ manifests in `apps/gcp/tibuild/v2/`.
    every rerun decision during shadow reports `resource_not_found` and is
    recorded as a would-deny. That is expected; do not read it as a policy defect.
 
+### Filter order on the live listener
+
+Read from the Envoy config dump after the attachment:
+
+```text
+1. csrf
+2. ext_authz   (securitypolicy/tibuild/tibuild-v2-machine-jwt, disabled: true
+                at chain level, enabled per route)
+3. oauth2
+4. jwt_authn
+5. rbac
+6. local_ratelimit
+7. credential_injector (github-token-broker)
+8. router
+```
+
+Three consequences, all confirmed against this deployment:
+
+1. **`ext_authz` runs before authentication.** Requests that JWT or OIDC will
+   later reject still reach `authzd`, which is why the observe period records
+   `identity_invalid` rather than "no decision". Nothing is relaxed by this: a
+   later filter still rejects them, and `authzd` verifies tokens itself.
+2. **`forwardIDToken` cannot deliver a browser identity to `authzd`.** The OIDC
+   and JWT filters that attach the forwarded token run *after* `ext_authz`, so a
+   browser fragment would never see it. Browser mode therefore needs either
+   `authzd` validating the OIDC ID-token cookie itself, or the browser route
+   staying on OIDC without `extAuth` — the current state. Do not enable browser
+   `extAuth` on the assumption that the forwarded header arrives.
+3. **The GitHub token broker case works.** Its upstream credential replacement
+   (`credential_injector`, position 7) runs after `ext_authz`, so `authzd` sees
+   the caller's original `Authorization` header, which is what the broker
+   contract requires.
+
 ## 2. Preconditions before attaching `extAuth`
 
 | # | Precondition | Why |
@@ -122,16 +155,21 @@ Do not add `contextExtensions` for `upstream_path`: the registry matches the
 external path, which is what arrives at the filter before the URL rewrite.
 
 **Attach the machine and privileged routes first, not the browser route.** The
-deployed `AUTHZD_CREDENTIAL_MODES` contains only `machine`. A browser fragment
-would reach `authzd` with `identity_mode=browser`, hit
-`identity_mode_unconfigured`, and record a would-deny for every browser request —
-technically safe in observe, but it produces noise instead of evidence.
+deployed `AUTHZD_CREDENTIAL_MODES` contains only `machine`, and the filter order
+above shows the OIDC filter attaches `forwardIDToken` after `ext_authz`. A browser
+fragment would therefore record `identity_mode_unconfigured` for every browser
+request and never see a forwarded token. Browser reads keep their existing OIDC
+policy until `authzd` can validate the browser credential itself; see
+`docs/adr/0003-browser-identity-handoff.md` in `ee-apps`.
 
-Browser mode also needs the ID token forwarded to a dedicated header
-(`forwardIDToken`), a matching `browser` entry in `AUTHZD_CREDENTIAL_MODES`, and a
-verified filter order that delivers that header to `ext_authz`; see
-`docs/adr/0003-browser-identity-handoff.md` in `ee-apps`. Until then, browser
-reads keep their existing OIDC policy and no `extAuth` fragment.
+### Deployed registry drift
+
+The `registry.json` in the `ee-authzd-config` secret is **not** the committed
+sample: its three TiBuild rules carry `mode: off` (the sample says `observe`).
+Under `off` a rule returns allow without verifying identity or checking tuples,
+so those paths record `mode_off` and produce no observation signal. Flipping them
+to `observe` is a Secret Manager change, not a Git change; it is the next step
+before the observe period can measure rerun, create and get.
 
 ## 4. Synthetic test matrix for the observe period
 
@@ -146,19 +184,20 @@ Baseline captured on 2026-11-25 against `https://prow.tidb.net`, before any
 
 | Case | Request | Baseline | Expected decision once attached |
 | --- | --- | --- | --- |
-| unauth list | `GET /tibuild/api/v2/devbuilds` | 302 (OIDC redirect) | none: never reaches ext_authz |
-| malformed bearer | same, `Authorization: Bearer not-a-jwt` | 401 | none |
+| unauth list | `GET /tibuild/api/v2/devbuilds` | 302 (OIDC redirect) | none: browser route has no filter |
+| malformed bearer | same, `Authorization: Bearer not-a-jwt` | 401 | none on the browser route; `identity_invalid` once the machine rule matches |
 | unsupported scheme | same, `Authorization: Basic …` | 302 | none |
-| privileged publish | `POST /tibuild/api/v2/publish/images` | 401 | none |
-| rerun without token | `POST /tibuild/api/v2/devbuilds/000000/rerun` | 401 | none |
-| double slash | `GET //tibuild/api/v2/devbuilds` | 302 | `route_not_registered` if it reaches the filter |
-| dot segment | `GET /tibuild/api/v2/../api/v2/devbuilds` | 302 | `route_not_registered` |
-| unregistered path | `GET /tibuild/__authz_shadow_probe__` | 302 | `route_not_registered` |
+| privileged publish | `POST /tibuild/api/v2/publish/images` | 401 | `route_not_registered` (no publish rule yet) |
+| rerun without token | `POST /tibuild/api/v2/devbuilds/000000/rerun` | 401 | the rerun rule's mode decides: `mode_off` today, `identity_invalid` once it is `observe` |
+| double slash | `GET //tibuild/api/v2/devbuilds` | 302 | none: browser route |
+| dot segment | `GET /tibuild/api/v2/../api/v2/devbuilds` | 302 | none: browser route |
+| unregistered path | `GET /tibuild/__authz_shadow_probe__` | 302 | none: browser route |
 
 The probe fails on any 5xx, and on any 200 for a case the existing authn layer is
-supposed to reject. It fails closed for the right reason: a request the Gateway
-rejected never reaches `ext_authz`, so only cases that pass authn can produce a
-decision, which is why `--expect-decisions` requires `--id-token` or `--cookie`.
+supposed to reject. `--expect-decisions` still requires `--id-token` or
+`--cookie`: `ext_authz` runs before authentication, so rejected requests do
+produce decisions, but only an authenticated request exercises identity
+verification and the tuple checks that the observe period is meant to measure.
 
 Authenticated cases, run by an operator with a valid machine token and/or browser
 session:
