@@ -5,3 +5,4 @@ resources:
   - workload.yaml
   - external-secret.yaml
   - network.yaml
+  - reference-grant.yaml

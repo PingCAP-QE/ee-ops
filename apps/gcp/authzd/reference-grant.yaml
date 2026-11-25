@@ -1,0 +1,19 @@
+# Permits a SecurityPolicy in another namespace to use authzd as its ext_authz
+# backend. Envoy Gateway rejects a cross-namespace extAuth backendRef with
+# "not permitted by any ReferenceGrant" otherwise.
+#
+# Narrow on purpose: only security policies in `tibuild` (the pilot) may
+# reference Services here. Add a namespace entry when another service attaches
+# extAuth, and keep the grant scoped to Service.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: authzd-extauth
+spec:
+  from:
+    - group: gateway.envoyproxy.io
+      kind: SecurityPolicy
+      namespace: tibuild
+  to:
+    - group: ""
+      kind: Service

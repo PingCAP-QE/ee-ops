@@ -18,6 +18,21 @@ spec:
       ports:
         - port: 9003
           protocol: TCP
+    # Envoy Gateway dataplane for the eg-internal Gateway. The ext_authz gRPC
+    # check arrives from these pods; without this rule fail-closed denies every
+    # request once cluster NetworkPolicy enforcement is on. Inert until a route
+    # attaches extAuth.
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: infra
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/name: envoy
+              gateway.envoyproxy.io/owning-gateway-name: eg-internal
+      ports:
+        - port: 9002
+          protocol: TCP
 ---
 apiVersion: monitoring.googleapis.com/v1
 kind: PodMonitoring
