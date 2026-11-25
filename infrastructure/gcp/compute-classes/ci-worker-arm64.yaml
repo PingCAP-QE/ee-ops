@@ -10,33 +10,29 @@ spec:
     location:
       locationPolicy: ANY
       zoneTypes: [STANDARD]
+  # Arm64 Prow test pods (`prow-test-pods`, chosen by `set-ci-worker-pod-defaults`).
+  # No Spot: preempted pods fail their job the same way as a real failure, and the
+  # retry only exists for the jobs that declare one.
+  #
+  # This class used to be spot-first because on-demand Arm64 (c4a/n4a) capacity in
+  # us-central1 was frequently exhausted (`ZONE_RESOURCE_POOL_EXHAUSTED`, which
+  # leaves Arm64 pods pending until Prow's 5m pod-pending timeout aborts them).
+  # That trade-off is no longer worth it: over the 14 days before 2026-11-25 the
+  # zone-exhaustion events for Arm64 families were ~20 out of ~720, while Spot
+  # preempted Arm64 nodes repeatedly, so waiting for on-demand capacity is the
+  # cheaper failure mode.
+  #
+  # Family set stays at c4a/n4a: T2A cannot attach Hyperdisk and the wider
+  # Arm64 story is tracked with the x86 `ci-worker` family discussion.
   priorities:
-    # --------- spot Arm64 (preferred) -----------
-    # On-demand Arm64 (c4a/n4a) capacity in us-central1 is frequently exhausted
-    # (GCE returns 503 ZONE_RESOURCE_POOL_EXHAUSTED), which leaves Arm64 CI pods
-    # unscheduled. Spot Arm64 is usually available, so try it first here.
     - machineFamily: c4a # Arm64
       priorityScore: 100
-      spot: true
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: n4a # Arm64
-      priorityScore: 90
-      spot: true
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-
-    # --------- on-demand Arm64 fallback -----------
-    - machineFamily: c4a # Arm64
-      priorityScore: 50
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
     - machineFamily: n4a # Arm64
-      priorityScore: 40
+      priorityScore: 90
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
