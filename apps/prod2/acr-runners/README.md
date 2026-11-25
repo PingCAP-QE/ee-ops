@@ -1,26 +1,68 @@
-# ARC runner set for `pingcap/tiup` releases
+# ARC runner scale set for `pingcap/tiup` releases
 
-Repository-level GitHub Actions Runner Controller (ARC) scale set in the KSY
-(`prod2`) cluster. It serves only the `release` job of `pingcap/tiup`'s
-`release-tiup` workflow; `brew-upgrade` stays on GitHub-hosted runners.
+GitHub Actions Runner Controller (ARC) scale set in the KSY (`prod2`) cluster.
+It serves only the `release` job of `pingcap/tiup`'s `release-tiup` workflow;
+`brew-upgrade` stays on GitHub-hosted runners.
+
+The scale set that serves `PingCAP-QE/test-infra` and `PingCAP-QE/endless` lives
+in [`apps/tencentcloud/acr-runners`](../../tencentcloud/acr-runners/README.md).
 
 ## Layout
 
-| File | Purpose |
-| --- | --- |
-| `source.yaml` | OCI HelmRepository for the ARC charts |
-| `namespaces.yaml` | `arc-systems` (controller/listener) and `arc-runners` (runner pods), both PSA `restricted` |
-| `release-1-controller.yaml` | ARC controller, chart 0.15.1, CRD upgrades enabled |
-| `release-2-runners-tiup.yaml` | the `arc-runner-set-tiup-release` scale set |
-| `external-secret-github-app.yaml` | GitHub App credentials from GCP Secret Manager |
+```text
+apps/prod2/acr-runners/
+├── kustomization.yaml      # source.yaml, namespaces.yaml, controller/, scale-sets/
+├── source.yaml             # HelmRepository, shared by the controller and the scale set
+├── namespaces.yaml         # arc-systems (controller/listener) + arc-runners (runners)
+├── controller/             # ARC controller, chart 0.15.1, CRD upgrades enabled
+│   ├── kustomization.yaml
+│   └── release.yaml
+└── scale-sets/
+    ├── kustomization.yaml  # lists the scale sets
+    └── tiup/
+        ├── kustomization.yaml
+        ├── scale-set.yaml          # HelmRelease arc-runner-set-tiup-release
+        └── github-app-secret.yaml  # ExternalSecret for its GitHub App credentials
+```
+
+One directory per scale set keeps the HelmRelease and the ExternalSecret that
+must change together next to each other, so a new runner set is a new directory
+plus one line in `scale-sets/kustomization.yaml`. The old `release-1-`,
+`release-2-` prefixes are gone: everything is applied by a single Flux
+Kustomization, so a numeric prefix never enforced an order.
+
+## Dependencies
+
+Everything here is rendered by one Flux Kustomization, so ordering that matters
+is declared explicitly:
+
+1. `clusters/prod2/apps.yaml` `dependsOn` `infrastructure`, so the
+   external-secrets controller and the `ee-gcp-sm` ClusterSecretStore already
+   exist when this directory is applied.
+2. The GCP secrets (`gha__system__*`, `arc__repo__pingcap__tiup__*`) are created
+   out of band and must exist before the ExternalSecret can sync; a missing one
+   shows as an `ExternalSecret` that never becomes `SecretSynced`.
+3. The scale-set HelmRelease `dependsOn` the `arc` HelmRelease in `arc-systems`.
+   The chart renders an `AutoscalingRunnerSet`, so the ARC CRDs and the
+   `arc-gha-rs-controller` ServiceAccount have to be there first.
+4. The runner pods mount the Secret produced by the ExternalSecret. If the scale
+   set installs before that Secret exists, the pod sits in
+   `CreateContainerConfigError` for a few seconds and then starts; the Helm
+   release itself does not fail.
+5. `namespaces.yaml` stays at the top level: Flux applies `Namespace` objects
+   before other kinds in the same Kustomization.
 
 ## GitHub identity
 
-- A GitHub App installed on the `pingcap` organization; credentials are managed
-  in GCP Secret Manager and only the `arc-runners` namespace can read them
-  through the `ee-gcp-sm` ClusterSecretStore.
-- The scale set registers at `https://github.com/pingcap/tiup`, so the runner
-  label is `arc-runner-set-tiup-release`.
+- The scale set authenticates as the `ti-chi-bot` GitHub App (id `214286`).
+  Credentials are managed in GCP Secret Manager and only the `arc-runners`
+  namespace can read them through the `ee-gcp-sm` ClusterSecretStore.
+- The app is installed per account, so the installation ID is the `pingcap`
+  organization installation (`36729905`), read from
+  `arc__repo__pingcap__tiup__github_app_installation_id`.
+- It registers at repository scope at `https://github.com/pingcap/tiup`, so the
+  label is the HelmRelease name, `arc-runner-set-tiup-release`. Workflows select
+  it with `runs-on: [arc-runner-set-tiup-release]`.
 
 ## KSY-specific notes
 
@@ -54,20 +96,23 @@ kubectl --context ksy-pingcap-cicd -n arc-runners get pod   # empty when idle
 kubectl --context ksy-pingcap-cicd -n arc-runners get externalsecret
 ```
 
-The listener logs should show an `actions/scaleset` session. A runner pod must
-have no projected service-account token and must run as uid 1001.
+The `AutoscalingRunnerSet` must be `Running`. The listener logs should show an
+`actions/scaleset` session. A runner pod must have no projected service-account
+token and must run as uid 1001.
 
 ## Rollback
 
 1. In `pingcap/tiup`, change the `release` job back to `runs-on: ubuntu-22.04`.
 2. Remove `acr-runners` from `apps/prod2/kustomization.yaml` and merge; Flux
-   prunes the HelmReleases, the AutoscalingRunnerSet and the namespaces.
+   prunes the HelmRelease, the AutoscalingRunnerSet and the namespaces.
 3. Confirm the runner is deregistered in GitHub.
 
 ## Upgrades
 
-Renovate tracks both charts and the runner image. Keep `upgrade.crds:
-CreateReplace` on the controller. A cross-minor ARC upgrade deletes the old
+Renovate tracks both charts and the runner image in `apps/gcp/acr-runners`; the
+`prod2` copies are maintained by hand, so bump `controller/release.yaml`, the
+scale set and the image digest together. Keep `upgrade.crds: CreateReplace` on
+the controller. A cross-minor ARC upgrade deletes the old
 AutoscalingRunnerSet (the controller checks the `app.kubernetes.io/version`
 label), so after upgrading run:
 
