@@ -1,10 +1,14 @@
 # GitInsight broker HTTPS rollout
 
-This is the deployment companion to the optional native HTTPS listener in
+This is the deployment companion to the native HTTPS listener in
 `PingCAP-QE/ee-apps` (`github-token-broker` and its Helm chart) and the verified
-HTTPS client in `PingCAP-QE/gitinsight`. It is **not a record of a completed
-production rollout**: the listener is still disabled, and enabling it remains a
-separate reviewed change.
+HTTPS client in `PingCAP-QE/gitinsight`.
+
+The listener is **enabled on the GCP cluster** (`apps/gcp/github-token-broker`)
+and reachable from the `arc-runners` namespace only. That alone does not close
+the finding: the GitInsight client switch and one authorized HTTPS crawl are
+still separate steps, and the TencentCloud cluster still runs the HTTP-only
+chart.
 
 For the separate public Google-JWT gateway route (Service port 80, not native
 HTTPS), see [External access to the GitHub token broker](github-token-broker-external.md).
@@ -31,11 +35,13 @@ Service stays plaintext, and this certificate is not part of it.
 ## Scope and ordering
 
 1. The broker/chart implementation is merged in
-   [ee-apps PR 899](https://github.com/PingCAP-QE/ee-apps/pull/899), and its
-   Chart `0.2.0` and image `v2026.11.8-19-g04ea8c8` are published. This ee-ops
-   change pins those releases with **`server.tls.enabled: false`**: upgrade and
-   verify the existing HTTP service and new ARC runners first. The broker's
-   existing HTTP 8080, authentication and permissions remain unchanged.
+   [ee-apps PR 899](https://github.com/PingCAP-QE/ee-apps/pull/899), and Chart
+   `0.2.1` (which scopes the TLS port to `networkPolicy.tlsIngressNamespaces`)
+   and image `v2026.11.8-19-g04ea8c8` are published. This ee-ops change pins
+   those releases with `server.tls.enabled: true`
+   ([activated configuration](#activated-configuration)). The broker's existing
+   HTTP 8080, authentication and permissions remain unchanged, so the consumers
+   that have not migrated keep working.
 2. Certificate issuance and trust distribution are declarative and need no manual
    provisioning: `infrastructure/gcp/cert-manager` installs cert-manager and
    trust-manager, the cluster-internal CA signs
@@ -43,41 +49,39 @@ Service stays plaintext, and this certificate is not part of it.
    public CA into the `arc-runners` `github-token-broker-ca` ConfigMap. See
    [Certificate issuance (automated)](#certificate-issuance-automated) and
    [Public CA on ARC](#public-ca-on-arc).
-3. In a **separate reviewed activation change**, enable HTTPS using the template
-   below only after the certificate and runner trust are verified. The additional
-   HTTPS listener uses 8443 and Service port 443. Do not merge the GitInsight
-   HTTPS-only client merely because the HTTP-only upgrade succeeded.
-4. Confirm the approved ARC caller-policy entry below is loaded, check HTTPS
-   identity and Python availability from the actual ARC runner network, then
-   merge/enable the GitInsight client and run one authorized crawl. Only after
-   this succeeds is the deployed Helix finding ready for closure.
+3. An operator then verifies the **activated** listener from the actual ARC
+   runner network, on every replica, and confirms that wrong CA and wrong
+   hostname fail. See [Verifying the activated
+   listener](#verifying-the-activated-listener). Untested activation is not a
+   completed migration: the change is broker-wide, so observe it.
+4. Confirm the approved ARC caller-policy entry below, then merge/enable the
+   GitInsight client and run one authorized crawl. Only after this succeeds is
+   the deployed Helix finding ready for closure.
 
 Merging code is not permission to mutate production. GitOps activation and the
 authorized workflow run require operator approval. The implementation owner
 should follow the rollout through rather than hand an untested URL change to the
 repository owner as a completed fix.
 
-## Published-artifact activation (operator only)
+## Activated configuration
 
-The HTTP-only stage pins Chart `0.2.0` and image `v2026.11.8-19-g04ea8c8`,
-verified against the completed [chart release](https://github.com/PingCAP-QE/ee-apps/actions/runs/43348037974)
-and [image release](https://github.com/PingCAP-QE/ee-apps/actions/runs/43348037966).
-The image digest is
+The release pins Chart `0.2.1` and image `v2026.11.8-19-g04ea8c8`. The image was
+verified against the completed
+[image release](https://github.com/PingCAP-QE/ee-apps/actions/runs/43348037966);
+its digest is
 `sha256:7430bb2d479a78a0314307ba4331119133a1768ab53bc93b00171e34f2b493f5`.
-These published versions are used below; verify the selected artifacts again if
-updating either version in the later activation change.
+Chart `0.2.1` adds `networkPolicy.tlsIngressNamespaces`; `charts-release.yaml`
+publishes it on merge to `main`. Verify the selected artifacts again if updating
+either version.
 
-Merge these fields into the existing HelmRelease in
-`apps/gcp/github-token-broker/release.yaml`, preserving all other chart/source,
-image repository, authentication, policy and HTTP settings. This is a future
-activation template, not a complete replacement manifest or an instruction to
-activate the current release:
+`apps/gcp/github-token-broker/release.yaml` carries these fields on top of the
+unchanged chart source, authentication, policy and HTTP settings:
 
 ```yaml
 spec:
   chart:
     spec:
-      version: 0.2.0
+      version: 0.2.1
   values:
     image:
       tag: v2026.11.8-19-g04ea8c8
@@ -96,16 +100,25 @@ The chart maps these values to runtime `server.tls.enabled: true`,
 `server.tls.address: ":8443"`,
 `server.tls.cert_file: /etc/github-token-broker/tls/tls.crt` and
 `server.tls.key_file: /etc/github-token-broker/tls/tls.key`. It mounts the existing
-Secret read-only at `/etc/github-token-broker/tls` without `subPath`. Inspect the
-published chart's rendered output to confirm this wiring and Service 443 -> 8443
-before approval. Its `server.tls.port` must also equal the allowed port in
+Secret read-only at `/etc/github-token-broker/tls` without `subPath`, so a renewed
+pair is read on the next handshake without a restart, and it renders Service port
+443 -> `targetPort: https`. `server.address` stays `:8080` -- the chart refuses any
+other value -- and Service port 80, the probes and every existing HTTP consumer
+are untouched.
+
+`server.tls.port` must equal the allowed port in
 `apps/gcp/github-token-broker/networkpolicy-arc-https.yaml`; update both together
-if changing it. In the same activation change, update
-`test_resources_are_wired_without_premature_tls_activation` in
-`scripts/test_github_token_broker_https.py` to assert the enabled TLS configuration
-instead of its explicitly disabled HTTP-only stage. Run
-`python3 scripts/test_github_token_broker_https.py` to check the activation template
-against that NetworkPolicy. HTTP 8080 and existing probes remain enabled.
+if changing it. The chart keeps the TLS port out of
+`networkPolicy.ingressNamespaces` (chart `0.2.1`): that list admits the plaintext
+consumers on 8080 only, `networkPolicy.tlsIngressNamespaces` is left empty, and
+`arc-runners` is granted 8443 by its own policy. `scripts/test_github_token_broker_https.py`
+asserts the activated values, that `server.tls.existingSecret` is the Secret the
+internal CA issues (`tls.yaml`), that no namespace gets the TLS port through the
+chart's policy, and that the template above still matches the NetworkPolicy:
+
+```bash
+uv run --no-project --with pyyaml python3 -m unittest scripts/test_github_token_broker_https.py
+```
 
 ## Certificate issuance (automated)
 
@@ -196,13 +209,16 @@ The runner mounts that ConfigMap at `/etc/github-token-broker/ca` and exports
 replacing trust for GitHub, Pixi or other tools. An explicit action `ca-file`
 input takes precedence.
 
-The volume is `optional: true` **only for staging compatibility**: runners must
-still start while the existing HTTP consumers operate, even if the Bundle has not
-converged yet. The HTTPS client does not silently ignore a configured
-missing/invalid bundle and does not fall back to HTTP, so the bundle must be
-present at `ca.crt` before the client is enabled. Volume mounts are read-only,
-without `subPath`, so bundle updates propagate to pods; explicitly verify the new
-bundle on active runners before completing a rotation.
+The bundle is live in `arc-runners` (checked 2026-11-25: `CN=pingcap-internal-services-ca`,
+SHA256 `03:4F:23:AF:...:BF:1D:0D`), so the listener can be verified from a runner
+pod. The volume is still `optional: true` **only because the HTTPS client is not
+enabled yet**: runners must start while every consumer still uses HTTP, and an ARC
+runner set that never talks to the broker must not fail on a missing ConfigMap. The
+HTTPS client does not silently ignore a configured missing/invalid bundle and does
+not fall back to HTTP, so drop `optional` in the same reviewed change that enables
+the client. Volume mounts are read-only, without `subPath`, so bundle updates
+propagate to pods; explicitly verify the new bundle on active runners before
+completing a rotation.
 
 Verify the distributed bundle and record its fingerprint:
 
@@ -258,10 +274,13 @@ propagation and broker policy reload before the workflow run. Confirm the broker
 has loaded the approved rule. A missing or mismatched rule yields `403 forbidden`
 even with healthy TLS, trusted CA and a successful unauthenticated `/healthz`.
 
-## Validation and activation
+## Verifying the activated listener
 
-Before activating the consumer, use the authorized runner network and synthetic
-or no-auth health requests only:
+Run these checks from the authorized runner network, before switching the client,
+and repeat the handshake against **every** broker replica rather than one pod: a
+mismatched certificate/key pair or a failed HTTPS bind stops the process from
+serving either listener, so a single healthy pod proves nothing about the rest of
+the rollout.
 
 ```bash
 command -v python3
@@ -281,13 +300,15 @@ with urllib.request.urlopen(
 PY
 ```
 
-Also verify wrong-CA and wrong-hostname requests fail before any credential is
-sent. Inspect the rendered Service 443 -> 8443, the TLS-enabled Deployment and
-its certificate mount, plus effective NetworkPolicies. The standalone ARC rule
-allows 8443 only; it does not grant ARC access to legacy HTTP 8080. A successful
-`/healthz` does not verify caller authorization: the scoped ARC policy onboarding
-above is a separate prerequisite. Do not weaken TLS verification, TokenReview or
-authorization grants to work around a TLS failure.
+Also verify the two negative cases fail before any credential is sent: the same
+`/healthz` request with a different `cafile` (the GitHub bundle, or an empty file),
+and with the hostname replaced by another namespace. Inspect the rendered Service
+443 -> 8443, the TLS-enabled Deployment and its certificate mount, plus effective
+NetworkPolicies. The standalone ARC rule allows 8443 only; it does not grant ARC
+access to legacy HTTP 8080. A successful `/healthz` does not verify caller
+authorization: the scoped ARC policy onboarding above is a separate prerequisite.
+Do not weaken TLS verification, TokenReview or authorization grants to work around
+a TLS failure.
 
 Then run the explicitly authorized GitInsight workflow with normal policy
 checks, verify token outputs remain masked and the crawl succeeds, and attach
@@ -323,9 +344,19 @@ reviewed change. Do not add an insecure verifier bypass.
 TLS activation is **broker-wide**: missing/malformed/mismatched certificate/key
 material or a failed HTTPS bind prevents the process from serving either
 listener. A bad activation can therefore interrupt every existing HTTP consumer
-and probe, not just GitInsight. Observe the rollout and fresh HTTPS handshakes on
-**every** replica, and retain the pre-activation HelmRelease/chart/image revision
-for rollback.
+and probe, not just GitInsight. So:
+
+- Watch the broker for **5 minutes** after Flux reconciles: every replica `Ready`,
+  `/healthz` 200 on both listeners, no restart loop, one fresh handshake per
+  replica, and one request from each existing HTTP consumer path that shares this
+  broker.
+- Keep the pre-activation revision of
+  `apps/gcp/github-token-broker/release.yaml` (`server.tls.enabled: false`, no
+  `service.httpsPort`) as the rollback target. Revert the activation change and let
+  Flux reconcile; the chart then renders without the HTTPS listener, Service 443
+  and the TLS mount, exactly as before.
+- Do not roll back by deleting `Certificate/github-token-broker-tls` or its Secret:
+  they are inert while the listener is disabled and are needed for the retry.
 
 If activation fails, pause the affected crawl. An operator must revert the
 activation GitOps change to the reviewed pre-activation HelmRelease and verify
