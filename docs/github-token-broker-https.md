@@ -4,11 +4,12 @@ This is the deployment companion to the native HTTPS listener in
 `PingCAP-QE/ee-apps` (`github-token-broker` and its Helm chart) and the verified
 HTTPS client in `PingCAP-QE/gitinsight`.
 
-The listener is **enabled on the GCP cluster** (`apps/gcp/github-token-broker`)
-and reachable from the `arc-runners` namespace only. That alone does not close
-the finding: the GitInsight client switch and one authorized HTTPS crawl are
-still separate steps, and the TencentCloud cluster still runs the HTTP-only
-chart.
+The listener is **enabled on both clusters** (`apps/gcp/github-token-broker` and
+`apps/tencentcloud/github-token-broker`). On GCP the `arc-runners` namespace is
+the only client it was opened for; on TencentCloud no client uses it yet, so no
+namespace is granted the port. Either way that alone does not close the finding:
+the GitInsight client switch and one authorized HTTPS crawl are separate steps,
+and the TencentCloud consumers still call the plaintext listener.
 
 For the separate public Google-JWT gateway route (Service port 80, not native
 HTTPS), see [External access to the GitHub token broker](github-token-broker-external.md).
@@ -29,7 +30,7 @@ anetd daemon, so none of these policies filter traffic today. Measured
 which the policy does not grant. The control that actually keeps unauthorized
 callers out is the projected ServiceAccount token plus TokenReview and the
 caller policy — it always was. See
-[NetworkPolicy enforcement is off on this cluster](#networkpolicy-enforcement-is-off-on-this-cluster).
+[NetworkPolicy enforcement is off on both clusters](#networkpolicy-enforcement-is-off-on-both-clusters).
 
 It is server authentication only, not mutual TLS: callers prove identity with a
 projected ServiceAccount token, which the broker validates with TokenReview plus
@@ -45,12 +46,14 @@ Service stays plaintext, and this certificate is not part of it.
 
 1. The broker/chart implementation is merged in
    [ee-apps PR 899](https://github.com/PingCAP-QE/ee-apps/pull/899), and Chart
-   `0.2.1` (which scopes the TLS port to `networkPolicy.tlsIngressNamespaces`)
-   and image `v2026.11.8-19-g04ea8c8` are published. This ee-ops change pins
-   those releases with `server.tls.enabled: true`
-   ([activated configuration](#activated-configuration)). The broker's existing
-   HTTP 8080, authentication and permissions remain unchanged, so the consumers
-   that have not migrated keep working.
+   `0.2.2` (which keeps the TLS port out of `networkPolicy.ingressNamespaces`)
+   and image `v2026.11.8-19-g04ea8c8` are published. Both releases pin those
+   artifacts with `server.tls.enabled: true`
+   ([activated configuration](#activated-configuration)); TencentCloud runs the
+   same chart and image, and keeps HTTP-only consumers and no TLS client
+   ([TencentCloud cluster parity](#tencentcloud-cluster-parity)). The broker's
+   existing HTTP 8080, authentication and permissions remain unchanged, so the
+   consumers that have not migrated keep working.
 2. Certificate issuance and trust distribution are declarative and need no manual
    provisioning: `infrastructure/gcp/cert-manager` installs cert-manager and
    trust-manager, the cluster-internal CA signs
@@ -74,23 +77,25 @@ repository owner as a completed fix.
 
 ## Activated configuration
 
-The release pins Chart `0.2.1` and image `v2026.11.8-19-g04ea8c8`. The image was
+Both releases pin Chart `0.2.2` and image `v2026.11.8-19-g04ea8c8`. The image was
 verified against the completed
 [image release](https://github.com/PingCAP-QE/ee-apps/actions/runs/43348037966);
 its digest is
 `sha256:7430bb2d479a78a0314307ba4331119133a1768ab53bc93b00171e34f2b493f5`.
-Chart `0.2.1` adds `networkPolicy.tlsIngressNamespaces`; `charts-release.yaml`
-publishes it on merge to `main`. Verify the selected artifacts again if updating
-either version.
+`0.2.1` added `networkPolicy.tlsIngressNamespaces` (so enabling TLS does not
+hand the port to every HTTP consumer) and `0.2.2` made both namespace lists
+default to empty; `charts-release.yaml` publishes a version on merge to `main`.
+Verify the selected artifacts again if updating either one.
 
-`apps/gcp/github-token-broker/release.yaml` carries these fields on top of the
-unchanged chart source, authentication, policy and HTTP settings:
+`apps/gcp/github-token-broker/release.yaml` and
+`apps/tencentcloud/github-token-broker/release.yaml` carry these fields on top of
+their unchanged chart source, authentication, policy and HTTP settings:
 
 ```yaml
 spec:
   chart:
     spec:
-      version: 0.2.1
+      version: 0.2.2
   values:
     image:
       tag: v2026.11.8-19-g04ea8c8
@@ -187,15 +192,41 @@ The first command must print `True` and the second `kubernetes.io/tls`.
 
 `infrastructure/tencentcloud/cert-manager` installs the same cert-manager release
 and the same cluster-internal CA, and
-`apps/tencentcloud/github-token-broker/tls.yaml` stages the same leaf Secret name,
-so activation there only needs that cluster's chart upgrade plus
-`server.tls.enabled: true`.
+`apps/tencentcloud/github-token-broker/tls.yaml` issues the same leaf Secret name
+from it. That broker now runs the same chart (`0.2.2`), the same image, and the
+same activated listener (`server.tls.enabled: true`, port 8443, Service 443), so
+both clusters are one recipe.
 
-That cluster has no in-cluster trust-bundle consumer yet, so trust-manager and a
-`Bundle` are intentionally not installed: add them together with the first
-consumer instead of pre-wiring an unused distributor. Its broker still runs Chart
-`0.1.0`, which has no HTTPS listener at all; do not enable TLS there before the
-chart/image upgrade for that cluster is reviewed.
+**Nobody consumes it there yet.** Activation opened the listener but granted it
+to no namespace: `networkPolicy.tlsIngressNamespaces` stays empty and there is no
+dedicated port policy on that cluster, so no client is configured for HTTPS.
+The namespaces that still call the broker there (`ee-cd`, `tibuild`,
+`jenkins-tidb`) use the plaintext listener as before; their credentials stay in
+the clear until each one is migrated.
+
+### Who needs the CA on that cluster
+
+The cluster has no ARC and no trust-bundle consumer, so trust-manager and a
+`Bundle` are intentionally not installed and the CA exists only as
+`Secret/internal-ca` in the `cert-manager` namespace — not readable from the
+consumer namespaces, and useless to them without an explicit grant. When the
+first HTTPS client lands:
+
+1. Install trust-manager in that cluster with the same scoping as the GCP one
+   (`app.targetNamespaces` limited to the consumer namespace,
+   `secretTargets.authorizedSecrets: [internal-ca]`), and add a `Bundle` that
+   publishes `ca.crt` into that namespace only.
+2. Mount that ConfigMap into the client and point it at the broker's in-cluster
+   name (`github-token-broker.github-token-broker.svc.cluster.local` on Service
+   port 443). Do not fall back to plaintext or to system trust.
+3. Only then set `networkPolicy.tlsIngressNamespaces` to that namespace, so the
+   port is granted together with the trust it needs.
+4. Verify the handshake on every replica, as in
+   [Verifying the activated listener](#verifying-the-activated-listener), and
+   keep the client's HTTP calls until its HTTPS path is proven.
+
+Sizing that migration is separate work: the clients there are Tekton and Jenkins
+jobs, not a single helper, and each needs its own CA mount and URL change.
 
 ## Public CA on ARC
 
@@ -315,7 +346,7 @@ and with the hostname replaced by another namespace. Inspect the rendered Servic
 443 -> 8443, the TLS-enabled Deployment and its certificate mount, plus the
 NetworkPolicy objects. The ARC rule declares 8443 and does not declare 8080, but
 do not read that as isolation — see
-[NetworkPolicy enforcement is off on this cluster](#networkpolicy-enforcement-is-off-on-this-cluster).
+[NetworkPolicy enforcement is off on both clusters](#networkpolicy-enforcement-is-off-on-both-clusters).
 A successful `/healthz` does not verify caller authorization either: the scoped ARC
 policy onboarding above is a separate prerequisite. Do not weaken TLS verification,
 TokenReview or authorization grants to work around a TLS failure.
@@ -325,37 +356,41 @@ checks, verify token outputs remain masked and the crawl succeeds, and attach
 the run/commit evidence to Helix. Never use the real SA JWT in diagnostic curl
 arguments or copy token values into review comments.
 
-## NetworkPolicy enforcement is off on this cluster
+## NetworkPolicy enforcement is off on both clusters
 
-Every `NetworkPolicy` in this document is declarative on the GCP cluster, not
-enforced:
+Every `NetworkPolicy` in this document is declarative, not enforced:
 
-- `gcloud container clusters describe prow --zone us-central1-c` reports
-  `addonsConfig.networkPolicyConfig.disabled: true`.
-- No `calico-node` or `anetd` DaemonSet runs anywhere in the cluster.
-- Measured 2026-11-25 after activation: a pod in `arc-runners` reached the
-  broker's plaintext port 8080 with `200`, although
+- GCP: `gcloud container clusters describe prow --zone us-central1-c` reports
+  `addonsConfig.networkPolicyConfig.disabled: true`, and no `calico-node` or
+  `anetd` DaemonSet runs there. Measured 2026-11-25 after activation: a pod in
+  `arc-runners` reached the broker's plaintext port 8080 with `200`, although
   `NetworkPolicy/github-token-broker-arc-https` grants it only 8443 and the
   chart's own policy lists seven other namespaces for 8080.
+- TencentCloud: `DataPlaneV2` is off and only `tke-cni-agent` runs (no
+  calico/cilium DaemonSet). Measured 2026-11-25 during the chart upgrade: a pod
+  in `default` — a namespace the chart's policy does not list — reached 8080 with
+  `200`.
 
 So today:
 
-- Any pod in the cluster can reach both broker listeners. The policies describe
-  the intended topology and are ready for the day enforcement is switched on;
-  they are not the control that protects the credentials.
+- Any pod in either cluster can reach the broker's listeners. The policies
+  describe the intended topology and are ready for the day enforcement is
+  switched on; they are not the control that protects the credentials.
 - Caller authorization is the real boundary: a request without a valid projected
   ServiceAccount token for a policy entry gets `403` regardless of source
   address. Keep that policy narrow; do not treat network reachability as
   authorization.
-- Verifying "only ARC can reach 8443" is not possible on this cluster yet. The
+- Verifying "only ARC can reach 8443" is not possible on these clusters yet. The
   HTTPS migration evidence is the handshake itself (trusted CA, expected SAN,
-  every replica), not the source namespace.
+  every replica), not the source namespace. That is also why an activated
+  listener with `tlsIngressNamespaces` empty is not isolation — it is simply a
+  port nobody has a CA for yet.
 
 Turning enforcement on is a separate, cluster-wide change: it applies every
 existing policy at once, so workloads that rely on today's implicit allow-all
 start being denied. Audit and fix the whole estate, announce a maintenance
-window, then enable it (GKE Dataplane V2 or the `networkPolicy` add-on); do not
-flip it as part of a TLS rollout.
+window, then enable it (GKE Dataplane V2 or the `networkPolicy` add-on on GCP;
+the VPC-CNI policy path on TKE); do not flip it as part of a TLS rollout.
 
 ## Rotation and rollback
 

@@ -34,11 +34,19 @@ spec:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/github-token-broker versioning=semver
       tag: v2026.11.8-19-g04ea8c8
     server:
-      # This cluster has no HTTPS client yet, so it takes the TLS-capable chart
-      # and image over the existing HTTP listener first. Activating the listener
-      # is a separate reviewed change, as on the GCP cluster.
+      # Native HTTPS listener on the cluster-internal CA leaf. No client uses it
+      # yet: networkPolicy.tlsIngressNamespaces stays empty, so the chart grants
+      # 8443 to nobody until a consumer (and its CA) is added. HTTP 8080 and its
+      # probes are unchanged for the namespaces that still call it.
       tls:
-        enabled: false
+        enabled: true
+        port: 8443
+        existingSecret: github-token-broker-tls
+        certKey: tls.crt
+        keyKey: tls.key
+    service:
+      # Service 443 fronts the native TLS listener (targetPort: https).
+      httpsPort: 443
     github:
       appId: 214286
       credentialsSecret:
@@ -54,6 +62,10 @@ spec:
       seccompProfile:
         type: RuntimeDefault
     networkPolicy:
+      # Plaintext consumers of the HTTP listener (port 8080). The native TLS
+      # port is never added here: tlsIngressNamespaces stays empty, so no
+      # namespace reaches 8443 until one is added together with its CA.
+      tlsIngressNamespaces: []
       ingressNamespaces:
         - ee-cd
         - tibuild
