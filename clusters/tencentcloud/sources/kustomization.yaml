@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: flux-system
 resources:
+  - helm-repo-actions-runner-controller.yaml
   - helm-repo-bitnami-legacy.yaml
   - helm-repo-bitnami.yaml
   - helm-repo-ee-apps.yaml
