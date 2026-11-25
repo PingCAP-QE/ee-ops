@@ -78,6 +78,8 @@ spec:
           - pingcap.com
         approver_emails:
           - wuhui.zuo@pingcap.com
+          - lizhonglei@pingcap.com
+          - xiaozhou.zhu@pingcap.com
         max_pending_per_requester: 5
         max_requests_per_day: 20
         default_ttl_seconds: 86400
