@@ -1,9 +1,10 @@
 # TiBuild external authorization: shadow rollout plan
 
-Status: preparation only. No HTTPRoute has `extAuth` attached, and `authzd` has
-no Gateway attachment in either cluster. This document records the verified route
-graph, the preconditions that must hold before any route is attached, the test
-matrix for the observe period, and the rollback switches.
+Status: the machine and privileged routes carry `extAuth` in observe mode; the
+browser route does not. `authzd` is attached to one policy and returns allow for
+every request, so client-visible behaviour is unchanged while decisions are
+recorded. This document records the verified route graph, the attach shape, the
+test matrix for the observe period, and the rollback switches.
 
 Evidence below was read from the live GCP cluster on 2026-11-25 and from the
 manifests in `apps/gcp/tibuild/v2/`.
@@ -76,10 +77,14 @@ The Envoy dataplane pods run in namespace `infra` with
 `app.kubernetes.io/name=envoy` and
 `gateway.envoyproxy.io/owning-gateway-name=eg-internal`.
 
-## 3. Attach shape (not applied yet)
+## 3. Attach shape
 
-Browser policy (`tibuild-v2-oidc`), additive to the existing `csrf` and `oidc`
-fields:
+Applied to `tibuild-v2-machine-jwt`, which covers both the machine and privileged
+routes. The browser fragment below is **not** applied: the deployed credential
+modes contain only `machine`.
+
+Browser policy (`tibuild-v2-oidc`) — not applied yet, additive to the existing
+`csrf` and `oidc` fields:
 
 ```yaml
   extAuth:
