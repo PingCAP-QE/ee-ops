@@ -115,18 +115,50 @@ must be observed before browser mode is trusted; see
 
 ## 4. Synthetic test matrix for the observe period
 
-Every case must reach the backend unchanged, because observe only records:
+`scripts/check_authz_shadow_probe.sh` implements this matrix. It sends a fresh
+`X-Request-Id` per case, which `authzd` records as `correlation_id`, so every
+decision can be attributed to one case. Requests are chosen so nothing mutates
+state: unauthenticated probes are rejected before the backend, path variants are
+reads, and the authenticated mutation targets a build id that cannot exist.
 
-| Case | Request | Recorded decision |
+Baseline captured on 2026-11-25 against `https://prow.tidb.net`, before any
+`extAuth` attachment. These are the statuses the observe period must not change:
+
+| Case | Request | Baseline | Expected decision once attached |
+| --- | --- | --- | --- |
+| unauth list | `GET /tibuild/api/v2/devbuilds` | 302 (OIDC redirect) | none: never reaches ext_authz |
+| malformed bearer | same, `Authorization: Bearer not-a-jwt` | 401 | none |
+| unsupported scheme | same, `Authorization: Basic …` | 302 | none |
+| privileged publish | `POST /tibuild/api/v2/publish/images` | 401 | none |
+| rerun without token | `POST /tibuild/api/v2/devbuilds/000000/rerun` | 401 | none |
+| double slash | `GET //tibuild/api/v2/devbuilds` | 302 | `route_not_registered` if it reaches the filter |
+| dot segment | `GET /tibuild/api/v2/../api/v2/devbuilds` | 302 | `route_not_registered` |
+| unregistered path | `GET /tibuild/__authz_shadow_probe__` | 302 | `route_not_registered` |
+
+The probe fails on any 5xx, and on any 200 for a case the existing authn layer is
+supposed to reject. It fails closed for the right reason: a request the Gateway
+rejected never reaches `ext_authz`, so only cases that pass authn can produce a
+decision, which is why `--expect-decisions` requires `--id-token` or `--cookie`.
+
+Authenticated cases, run by an operator with a valid machine token and/or browser
+session:
+
+| Case | Request | Expected during observe |
 | --- | --- | --- |
-| Browser read | OIDC cookie, `GET /tibuild/api/v2/devbuilds` | `authorized` if the registry covers the path, otherwise `route_not_registered` |
-| Machine read | valid allowlisted Bearer, `GET /tibuild/api/v2/devbuilds` | `authorized` or `relationship_denied` once the read rule exists |
-| Machine mutation | valid allowlisted Bearer, `POST /tibuild/api/v2/devbuilds/{id}/rerun` | `resource_not_found` (ADR 0005) |
-| Privileged mutation | valid allowlisted Bearer, `POST /tibuild/api/v2/publish/images` | `route_not_registered` until a rule exists |
-| Expired / other-audience / malformed Bearer | same paths | `identity_invalid`; the request is still rejected by the Gateway JWT layer, not by authzd |
-| Path variants | `//tibuild/...`, `%2e%2e`, casing, trailing slash | decision recorded for the unmatched route; no 5xx |
-| In-cluster direct call | `POST v2-tibuild-v2.tibuild.svc/api/v2/devbuilds/{id}/rerun` | no decision at all; the existing application checks still run |
-| Unregistered path | `GET /tibuild/anything-else` | `route_not_registered` |
+| machine read | `GET /tibuild/api/v2/devbuilds` with an allowlisted ID token | `authorized` or `relationship_denied` once the rule exists |
+| machine mutation | `POST /tibuild/api/v2/devbuilds/__authz_shadow_probe__/rerun` with the same token | `resource_not_found` (ADR 0005); backend returns not-found |
+
+```sh
+scripts/check_authz_shadow_probe.sh                       # unauthenticated baseline
+scripts/check_authz_shadow_probe.sh --expect-decisions \
+  --id-token "$(gcloud auth print-identity-token --audiences=prow.tidb.net)" \
+  --project pingcap-testing-account
+```
+
+`--expect-decisions` reads Cloud Logging with the filter in the query template
+below; override it with `--log-filter` when the collector renames the stream.
+`scripts/check_authz_shadow_probe_test.sh` exercises the assertions against a
+local stub and runs in CI, so the probe's own logic cannot rot silently.
 
 ## 5. Divergence observation
 

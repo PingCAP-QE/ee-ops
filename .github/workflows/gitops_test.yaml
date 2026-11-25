@@ -61,6 +61,9 @@ jobs:
       - name: Self-test Jenkins route guard
         if: matrix.path == 'apps'
         run: bash scripts/check_jenkins_route_security_headers_test.sh
+      - name: Self-test authorization shadow probe
+        if: matrix.path == 'apps'
+        run: bash scripts/check_authz_shadow_probe_test.sh
       - name: Verify TiBuild image_sync registry allowlists
         if: matrix.path == 'apps'
         run: bash scripts/check_tibuild_image_sync_regex.sh
