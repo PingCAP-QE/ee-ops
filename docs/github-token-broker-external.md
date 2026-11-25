@@ -69,7 +69,17 @@ gcloud iam service-accounts keys create key.json \
 
 A key can only mint ID tokens with the audience above; it cannot call Google
 APIs. Use one key per client and delete the key to revoke that client
-(`gcloud iam service-accounts keys delete`).
+(`gcloud iam service-accounts keys delete`); deleting the key also means deleting
+its row in the register.
+
+**Every key minted this way must also be entered in the register**
+([`credential-rotation/sa-key-inventory.md`](credential-rotation/sa-key-inventory.md)):
+key id, service account, owner, creation date and maximum age.
+`scripts/check-sa-key-inventory.sh` runs in CI and fails when a client allowed by
+this policy has no key row, when a row has no owner or creation date, when the
+same key id is registered twice, or when a key is older than its declared maximum
+age. Handing out a key that is not in the register is the regression that guard
+exists to catch.
 
 To onboard another client, request a new service account through the platform
 infrastructure process, add the resulting email to the `broker-clients` claim
@@ -181,8 +191,12 @@ kubectl auth can-i --list \
    broker `external-reader` ServiceAccount; broker audit logs and rate limits
    cannot distinguish clients. The gateway can distinguish them by the JWT
    `email` claim, but that requires claim-based logging.
-3. **Long-lived keys.** Service account keys do not expire. Use one key per
-   client and rotate them; the ID tokens themselves are short-lived (one hour).
+3. **Long-lived keys.** Service account keys do not expire. Every key is recorded
+   in [`credential-rotation/sa-key-inventory.md`](credential-rotation/sa-key-inventory.md)
+   with an owner and a maximum age, and `scripts/check-sa-key-inventory.sh` fails
+   CI when a key is missing from the register, older than its maximum age, or
+   registered twice. Rotate per that row; the ID tokens themselves are
+   short-lived (one hour).
 4. **PAT fallback.** Keep `github.fallback.enabled=false`. If a PAT is
    configured, external callers could receive it for owners where the App is not
    installed.
