@@ -3,6 +3,5 @@ kind: Kustomization
 resources:
   - source.yaml
   - namespaces.yaml
-  - release-1-controller.yaml
-  - release-2-runners-tiup.yaml
-  - external-secret-github-app.yaml
+  - controller
+  - scale-sets

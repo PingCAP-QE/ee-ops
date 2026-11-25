@@ -1,0 +1,105 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: arc-runner-set-pingcap-qe-private
+  namespace: arc-runners
+spec:
+  chart:
+    spec:
+      chart: gha-runner-scale-set
+      version: 0.15.1
+      sourceRef:
+        kind: HelmRepository
+        name: actions-runner-controller-charts
+        namespace: flux-system
+  interval: 15m
+  timeout: 10m
+  # The chart creates an AutoscalingRunnerSet, so its CRD and the
+  # `arc-gha-rs-controller` ServiceAccount must exist first. One Flux
+  # Kustomization applies this directory, so order comes from here, not from a
+  # file-name prefix.
+  dependsOn:
+    - name: arc
+      namespace: arc-systems
+  values:
+    # The controller HelmRelease creates this ServiceAccount. Naming it
+    # explicitly avoids cross-chart discovery during a cold install.
+    controllerServiceAccount:
+      name: arc-gha-rs-controller
+      namespace: arc-systems
+    # Organization-level scale set: the label is available to the repositories
+    # in the `tencentcloud-private-ci` runner group (PingCAP-QE/test-infra and
+    # PingCAP-QE/endless), not to the whole organization. The scale set name is
+    # the runner label, so workflows select it with
+    # `runs-on: [arc-runner-set-pingcap-qe-private]`.
+    githubConfigUrl: https://github.com/PingCAP-QE
+    runnerGroup: tencentcloud-private-ci
+    githubConfigSecret: arc-runner-set-pingcap-qe-private-github-config
+    minRunners: 0
+    maxRunners: 4
+    listenerTemplate:
+      spec:
+        # The listener is long-running and talks to GitHub, never to the runner
+        # pods directly, so keep it on the application pool and let an idle
+        # `ci-worker` pool scale to zero.
+        nodeSelector:
+          compute-class: ee-application
+        securityContext:
+          runAsNonRoot: true
+          seccompProfile:
+            type: RuntimeDefault
+        containers:
+          - name: listener
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+    template:
+      spec:
+        # JIT registration is delivered through the listener; the runner does
+        # not need the Kubernetes API.
+        automountServiceAccountToken: false
+        # `ci-worker` is the Karpenter pool for CI nodes (compute-class label,
+        # capped at 64 vCPU per node). The virtual-kubelet `eklet` node carries
+        # a NoSchedule taint, so runners never land there.
+        nodeSelector:
+          compute-class: ci-worker
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+          runAsGroup: 1001
+          seccompProfile:
+            type: RuntimeDefault
+        topologySpreadConstraints:
+          - maxSkew: 1
+            topologyKey: kubernetes.io/hostname
+            whenUnsatisfiable: ScheduleAnyway
+            labelSelector:
+              matchLabels:
+                app.kubernetes.io/part-of: gha-runner-scale-set
+        containers:
+          - name: runner
+            # Same image as the prod2 scale sets: the upstream runner plus make,
+            # GNU tar, wget, xz and zip. It has no Docker daemon, no buildx and
+            # no gcc/python3/pip, and the container runs as a non-root user
+            # without sudo, so workflows that publish images or install
+            # packages need a different runner for now.
+            image: ghcr.io/pingcap-qe/ci/actions-runner:v2026.11.22-12-g998596a42@sha256:96cd795bef6ff6c9710999d81a579315362453f13c4d90a5dc35afa692e7aa93
+            imagePullPolicy: IfNotPresent
+            command: ["/home/runner/run.sh"]
+            securityContext:
+              allowPrivilegeEscalation: false
+              capabilities:
+                drop: ["ALL"]
+              seccompProfile:
+                type: RuntimeDefault
+            resources:
+              requests:
+                cpu: "2"
+                memory: 4Gi
+                ephemeral-storage: 10Gi
+              limits:
+                cpu: "6"
+                memory: 12Gi
+                ephemeral-storage: 30Gi

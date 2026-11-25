@@ -376,7 +376,7 @@ clusters = cluster_list.split()
 # migration, so adding a namespace has to be a deliberate decision.
 DOMAINS = OrderedDict([
     ("CORE", ["apps", "ee-authz", "flux-system", "github-token-broker", "infra"]),
-    ("CI", ["ee-cd", "prow", "prow-test-pods", "tekton-pipelines"]),
+    ("CI", ["arc-runners", "ee-cd", "prow", "prow-test-pods", "tekton-pipelines"]),
     ("JENKINS", ["jenkins"]),
     ("JENKINS-AGENTS", ["jenkins-pd", "jenkins-ticdc", "jenkins-tidb",
                         "jenkins-tiflash", "jenkins-tiflow", "jenkins-tikv"]),
@@ -546,7 +546,9 @@ for cluster in clusters:
             cluster, len(namespaces), len(distinct_keys(cluster))))
         write("")
         app_key = "gha__system__github_app_private_key"
-        key_holders = sorted(record["namespace"] for record in scoped_records(cluster) if app_key in record["keys"])
+        # One namespace can hold several ExternalSecrets that all pull the key;
+        # list the namespace once per cluster, not once per ExternalSecret.
+        key_holders = sorted({record["namespace"] for record in scoped_records(cluster) if app_key in record["keys"]})
         if key_holders:
             write("The same store keeps the organisation-wide GitHub App private key "
                   "(`%s`) readable from %s, so narrowing this store's GCP IAM does not "

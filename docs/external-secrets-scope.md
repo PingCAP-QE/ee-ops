@@ -68,9 +68,9 @@ up as a reviewable diff instead of silently widening the blast radius.
 | Cluster | Allowlisted namespaces | Consuming namespaces | Namespaces without consumers | ExternalSecrets | Distinct GCP secrets |
 | :--- | ---: | ---: | ---: | ---: | ---: |
 | `gcp` | 22 | 22 | 0 | 70 | 51 |
-| `tencentcloud` | 16 | 16 | 0 | 42 | 36 |
+| `tencentcloud` | 17 | 17 | 0 | 43 | 38 |
 | `prod2` | 6 | 6 | 0 | 14 | 26 |
-| **Total** | **44** | **44** | **0** | **126** | **86** |
+| **Total** | **45** | **45** | **0** | **127** | **87** |
 
 ### Consumers by namespace
 
@@ -105,6 +105,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 
 | Namespace | Trust domain | ExternalSecrets | GCP secret names |
 | :--- | :--- | ---: | :--- |
+| `arc-runners` | CI | 1 | `arc__org__pingcap-qe__github_app_installation_id`, `gha__system__github_app_id`, `gha__system__github_app_private_key` |
 | `cache` | APP | 3 | `ci_registry_auth_dockerconfig_json`, `tencentcloud_common_creds_json`, `tencentcloud_kellnr_admin_json` |
 | `cs` | APP | 2 | `tencentcloud_cloudevents_kafka_password`, `tencentcloud_kafka_cluster_ca`, `tencentcloud_test_case_run_dsn` |
 | `ee-cd` | CI | 1 | `tencentcloud_ci_dashboard_db_json` |
@@ -152,7 +153,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | Domain | Target store | Namespaces | ExternalSecrets | Distinct GCP secrets |
 | :--- | :--- | :--- | ---: | ---: |
 | CORE | `ee-gcp-sm` | `github-token-broker`, `infra` | 4 | 4 |
-| CI | `ee-gcp-sm-ci-app` | `ee-cd`, `prow-test-pods` | 8 | 8 |
+| CI | `ee-gcp-sm-ci-app` | `arc-runners`, `ee-cd`, `prow-test-pods` | 9 | 11 |
 | JENKINS | `ee-gcp-sm-ci-app` | `jenkins` | 11 | 8 |
 | JENKINS-AGENTS | `ee-gcp-sm-ci-app` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
 | APP | `ee-gcp-sm-ci-app` | `cache`, `cs`, `kafka`, `tibuild`, `zot` | 13 | 20 |
@@ -165,6 +166,7 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 
 | GCP secret | Cluster | Namespaces that can read it |
 | :--- | :--- | :--- |
+| `arc__org__pingcap-qe__github_app_installation_id` | `tencentcloud` | `arc-runners` |
 | `arc__repo__pingcap__tiup__github_app_installation_id` | `prod2` | `arc-runners` |
 | `ci_registry_auth_dockerconfig_json` | `gcp` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` |
 | `ci_registry_auth_dockerconfig_json` | `tencentcloud` | `cache`, `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv`, `prow-test-pods` |
@@ -212,9 +214,10 @@ The same store keeps the organisation-wide GitHub App private key (`gha__system_
 | `gcp_wildcard_pingcap_net_cert_json` | `prod2` | `infra` |
 | `gcp_wildcard_tidb_net_cert_json` | `gcp` | `infra` |
 | `gcp_wildcard_tidb_net_cert_json` | `tencentcloud` | `infra` |
+| `gha__system__github_app_id` | `tencentcloud` | `arc-runners` |
 | `gha__system__github_app_id` | `prod2` | `arc-runners` |
 | `gha__system__github_app_private_key` | `gcp` | `github-token-broker` |
-| `gha__system__github_app_private_key` | `tencentcloud` | `github-token-broker` |
+| `gha__system__github_app_private_key` | `tencentcloud` | `arc-runners`, `github-token-broker` |
 | `gha__system__github_app_private_key` | `prod2` | `arc-runners` |
 | `github-bot-ssh-rsa-json` | `gcp` | `ee-cd`, `jenkins`, `prow-test-pods` |
 | `github-bot-ssh-rsa-json` | `tencentcloud` | `jenkins` |
