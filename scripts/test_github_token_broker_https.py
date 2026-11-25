@@ -126,18 +126,25 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         resources = load('apps/tencentcloud/github-token-broker/kustomization.yaml')['resources']
         self.assertIn('tls.yaml', resources)
 
-    def test_tencent_cloud_stages_the_same_tls_capable_chart(self):
-        """One chart version on both clusters; each cluster activates separately."""
+    def test_both_clusters_run_the_same_activated_tls_capable_chart(self):
+        """One chart version, one image, and an activated listener on each."""
         gcp = load('apps/gcp/github-token-broker/release.yaml')['spec']
         tke = load('apps/tencentcloud/github-token-broker/release.yaml')['spec']
         for release in (gcp, tke):
             self.assertEqual(release['chart']['spec']['version'], '0.2.2')
             self.assertEqual(release['values']['image'], gcp['values']['image'])
-        self.assertIs(gcp['values']['server']['tls']['enabled'], True)
-        # No HTTPS client exists on that cluster yet, so it upgrades onto the
-        # TLS-capable chart over the existing HTTP listener and activates in its
-        # own reviewed change.
-        self.assertIs(tke['values']['server']['tls']['enabled'], False)
+            self.assertIs(release['values']['server']['tls']['enabled'], True)
+            self.assertEqual(release['values']['server']['tls']['port'], 8443)
+            self.assertEqual(release['values']['service'], {'httpsPort': 443})
+
+        # Activation opens no client access on the TencentCloud cluster: it has
+        # no HTTPS consumer yet and no CA distributor, so the chart's TLS
+        # allow-list stays empty and no dedicated policy grants 8443 there.
+        self.assertEqual(tke['values']['networkPolicy']['tlsIngressNamespaces'], [])
+        self.assertFalse((ROOT / 'apps/tencentcloud/github-token-broker/networkpolicy-arc-https.yaml').exists())
+        # The mounted Secret is the leaf that cluster's internal CA signs.
+        certificate = load('apps/tencentcloud/github-token-broker/tls.yaml')['spec']
+        self.assertEqual(tke['values']['server']['tls']['existingSecret'], certificate['secretName'])
 
     def test_helm_release_custom_resources_are_applied_after_the_crds(self):
         """The CRs a chart owns must not share a kustomization with its HelmRelease.
