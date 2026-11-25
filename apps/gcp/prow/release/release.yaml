@@ -135,6 +135,13 @@ spec:
         # the synchronous fast path for regular PRs and only falls back to the
         # asynchronous endpoint when GitHub rejects a stacked PR.
         - --merge-mode=auto
+        # Tide rewrites its whole action history object on every sync (1m30s).
+        # With the default 1000 records per pool the object grew to 25MB across
+        # 802 pools, so every sync uploaded 25MB (~24GB/day) and the flush added
+        # latency to the sync loop. 200 records per pool still covers what the
+        # deck history page shows for an active pool and takes the object down
+        # to ~10MB.
+        - --max-records-per-pool=200
       resources:
         requests:
           cpu: 1000m
