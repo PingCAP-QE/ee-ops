@@ -1,0 +1,20 @@
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: authz-filter-order-poc
+  namespace: infra
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        # ClusterIP only: the PoC allocates no load balancer and is reachable
+        # through a port-forward.
+        name: eg-authz-poc
+        type: ClusterIP
+  # Move external authorization after authentication so an OIDC/JWT filter can
+  # attach a forwarded identity first. Both filters run before RBAC and before
+  # the token broker's credential replacement.
+  filterOrder:
+    - name: envoy.filters.http.ext_authz
+      after: envoy.filters.http.jwt_authn

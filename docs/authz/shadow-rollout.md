@@ -224,6 +224,26 @@ below; override it with `--log-filter` when the collector renames the stream.
 `scripts/check_authz_shadow_probe_test.sh` exercises the assertions against a
 local stub and runs in CI, so the probe's own logic cannot rot silently.
 
+### If `filterOrder` moves `ext_authz` after authentication
+
+`EnvoyProxy.spec.filterOrder` can place `ext_authz` after `jwt_authn` and `oauth2`
+(see `infrastructure/gcp/poc-authz-filter-order/`). That reordering changes what
+the shadow period can observe, so the matrix above must be read conditionally:
+
+| Case | Before reordering | After reordering |
+| --- | --- | --- |
+| Request rejected by JWT/OIDC | decision recorded (`identity_invalid`) | **no decision**: `jwt_authn` answers first |
+| Request that passes authn | decision recorded | decision recorded, now with the authenticated headers already attached |
+| Malformed bearer | decision recorded | 401 from `jwt_authn`, no decision |
+
+Consequences for the exit criteria: `identity_invalid` disappears from the log,
+`would_deny` counts drop accordingly, and "no decision" stops being evidence of a
+missing filter. Any divergence count taken before and after the reordering is not
+comparable; record the filter order alongside the report.
+
+`filterOrder` is `EnvoyProxy`-scoped, so it applies to every route on the proxy,
+including the browser routes that carry no `extAuth` today.
+
 ## 5. Divergence observation
 
 `authzd` writes one structured JSON line per decision to stdout, so the log
