@@ -58,6 +58,20 @@ and the ReferenceGrant and NetworkPolicy render and validate with
 `Accepted`/`Programmed` conditions still need a real apply inside the rollout
 window.
 
+Isolation is verified with `scripts/check_authz_isolation.sh`, not by reading
+manifests: it runs a throwaway pod in `ee-authz` with no labels, so no policy
+selector matches it, and probes each Service listener.
+
+```sh
+scripts/check_authz_isolation.sh --mode open       # before enforcement: all reachable
+scripts/check_authz_isolation.sh --mode enforced   # after: none reachable
+```
+
+2026-11-25, `--mode open`: `openfga:8080`, `openfga-check:8080` and
+`authzd:9002` are all reachable from an unlabelled pod, which is the gap Phase 3
+is waiting on. `authzd:9003` is deliberately not probed: it is a pod port scraped
+by PodMonitoring, not a Service port.
+
 The Envoy dataplane pods run in namespace `infra` with
 `app.kubernetes.io/name=envoy` and
 `gateway.envoyproxy.io/owning-gateway-name=eg-internal`.
@@ -210,7 +224,8 @@ references `authzd`.
 2. TiBuild owner decision on `devbuild` ownership, or an accepted exception
    (ADR 0005).
 3. Verify the Envoy dataplane → `authzd:9002` path after GKE NetworkPolicy
-   enforcement is enabled.
+   enforcement is enabled: `check_authz_isolation.sh --mode enforced` proves the
+   gap closed from an unlabelled pod, but not that the allowed path still works.
 4. Browser identity handoff: confirm `forwardIDToken` reaches `ext_authz` and
    that a client-supplied copy of the header cannot.
 5. Agree the p95 latency budget for the added hop.
