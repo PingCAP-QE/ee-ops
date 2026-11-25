@@ -21,3 +21,7 @@ Chart.lock
 # IDEs
 .vscode
 .idea/
+
+# Python bytecode from the scripts/*.py checks
+__pycache__/
+*.pyc
