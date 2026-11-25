@@ -25,7 +25,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: authzd
-          image: ghcr.io/pingcap-qe/ee-apps/authzd:v2026.11.22-18-g9dc1cce@sha256:286b6792aaa3f8821739f67c1e699551d409aa84f3ccdbffbd7fcc5a9590cd6a
+          image: ghcr.io/pingcap-qe/ee-apps/authzd:v2026.11.22-31-g7cc82d8@sha256:eae98d4f949566c6bf33d86a99dcc5d4ccfeaace83bfbb64f30c03b4200160fb
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
@@ -43,6 +43,12 @@ spec:
               value: http://openfga-check:8080
             - name: AUTHZD_PRIVATE_ADDR
               value: ":9003"
+            # Observe-only until a route is attached and its decisions are
+            # reviewed. An unmatched route denies under the default enforce, so
+            # attaching extAuth first would 403 every path the registry does not
+            # list yet.
+            - name: AUTHZD_DECISION_MODE
+              value: observe
             - name: AUTHZD_OPENFGA_STORE_ID
               valueFrom:
                 secretKeyRef:
