@@ -45,7 +45,7 @@ manifests in `apps/gcp/tibuild/v2/`.
 
 | # | Precondition | Why |
 | --- | --- | --- |
-| 1 | `AUTHZD_DECISION_MODE=observe` on the deployment, from a released image | With the default `enforce`, any path the registry does not list is denied. Attaching first would 403 the unlisted routes. |
+| 1 | `AUTHZD_DECISION_MODE=observe` on the deployment, from a released image | With the default `enforce`, any path the registry does not list is denied. Attaching first would 403 the unlisted routes. Set in `apps/gcp/authzd/workload.yaml`; inert until a route is attached. |
 | 2 | NetworkPolicy ingress from the Envoy dataplane to `authzd:9002` | `apps/gcp/authzd/network.yaml` currently allows only the GMP collector on 9003. Once GKE NetworkPolicy enforcement is on, `failOpen: false` turns an unreachable authzd into a 403 outage. This change adds the rule; it is inert until a route is attached. |
 | 3 | ReferenceGrant in `ee-authz` for a `SecurityPolicy` in `tibuild` | The policies live in `tibuild` and the backend in `ee-authz`. Envoy Gateway rejects a cross-namespace extAuth backend reference that no ReferenceGrant permits (`not permitted by any ReferenceGrant`). This change adds the grant, scoped to `Service`; it is inert until a policy references it. |
 | 4 | Context extensions: `identity_mode` and `route_id` | `authzd` selects one verifier per credential mode and refuses to infer route identity from client headers. Both values are static per SecurityPolicy. |
@@ -121,11 +121,17 @@ Machine + privileged policy (`tibuild-v2-machine-jwt`), additive to `jwt` and
 Do not add `contextExtensions` for `upstream_path`: the registry matches the
 external path, which is what arrives at the filter before the URL rewrite.
 
+**Attach the machine and privileged routes first, not the browser route.** The
+deployed `AUTHZD_CREDENTIAL_MODES` contains only `machine`. A browser fragment
+would reach `authzd` with `identity_mode=browser`, hit
+`identity_mode_unconfigured`, and record a would-deny for every browser request —
+technically safe in observe, but it produces noise instead of evidence.
+
 Browser mode also needs the ID token forwarded to a dedicated header
-(`forwardIDToken`) and a matching `browser` entry in `AUTHZD_CREDENTIAL_MODES`.
-Whether the filter order delivers that header to `ext_authz` is unverified and
-must be observed before browser mode is trusted; see
-`docs/adr/0003-browser-identity-handoff.md` in `ee-apps`.
+(`forwardIDToken`), a matching `browser` entry in `AUTHZD_CREDENTIAL_MODES`, and a
+verified filter order that delivers that header to `ext_authz`; see
+`docs/adr/0003-browser-identity-handoff.md` in `ee-apps`. Until then, browser
+reads keep their existing OIDC policy and no `extAuth` fragment.
 
 ## 4. Synthetic test matrix for the observe period
 
