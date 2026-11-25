@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Offline assertions for the additive broker/ARC HTTPS rollout preparation."""
+"""Offline assertions for the broker/ARC native HTTPS listener and its activation."""
 
 import os
 from pathlib import Path
@@ -246,24 +246,40 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
                         self.assertIn(variable, result.stderr)
                         self.assertNotIn('unexpected-kubectl', result.stderr)
 
-    def test_http_stage_pins_published_tls_capable_release(self):
+    def test_release_pins_published_tls_capable_artifacts(self):
         release = load('apps/gcp/github-token-broker/release.yaml')['spec']
-        self.assertEqual(release['chart']['spec']['version'], '0.2.0')
+        self.assertEqual(release['chart']['spec']['version'], '0.2.1')
         self.assertEqual(release['values']['image'], {
             'repository': 'ghcr.io/pingcap-qe/ee-apps/github-token-broker',
             'tag': 'v2026.11.8-19-g04ea8c8',
         })
-        self.assertIs(release['values']['server']['tls']['enabled'], False)
 
-    def test_resources_are_wired_without_premature_tls_activation(self):
+    def test_native_https_is_activated_with_the_internal_ca_leaf(self):
         resources = load('apps/gcp/github-token-broker/kustomization.yaml')['resources']
         self.assertIn('tls.yaml', resources)
         self.assertNotIn('external-secret-tls.yaml', resources)
         self.assertIn('networkpolicy-arc-https.yaml', resources)
+
         values = load('apps/gcp/github-token-broker/release.yaml')['spec']['values']
-        self.assertNotIn('tls', values)
-        self.assertIs(values['server']['tls']['enabled'], False)
-        self.assertNotIn('arc-runners', values.get('networkPolicy', {}).get('ingressNamespaces', []))
+        tls = values['server']['tls']
+        self.assertIs(tls['enabled'], True)
+        self.assertEqual(tls['port'], 8443)
+        # The chart mounts server.tls.existingSecret, so it must name the
+        # certificate cert-manager signs for this host -- not a hand-made Secret.
+        certificate = load('apps/gcp/github-token-broker/tls.yaml')['spec']
+        self.assertEqual(tls['existingSecret'], certificate['secretName'])
+        self.assertEqual((tls['certKey'], tls['keyKey']), ('tls.crt', 'tls.key'))
+        # Service 443 fronts the listener; the legacy HTTP port keeps its default.
+        self.assertEqual(values['service'], {'httpsPort': 443})
+
+        # ARC reaches HTTPS through the dedicated policy, never through the
+        # networkPolicy lists. The chart would otherwise add the TLS port to
+        # every namespace it admits on 8080.
+        network_policy = values['networkPolicy']
+        self.assertEqual(network_policy['tlsIngressNamespaces'], [])
+        self.assertNotIn('arc-runners', network_policy['ingressNamespaces'])
+        policy = load('apps/gcp/github-token-broker/networkpolicy-arc-https.yaml')['spec']
+        self.assertEqual(policy['ingress'][0]['ports'], [{'protocol': 'TCP', 'port': tls['port']}])
 
     def test_no_manual_secret_manager_provisioning_remains(self):
         """The TLS leaf must not depend on a hand-created Secret Manager object."""
