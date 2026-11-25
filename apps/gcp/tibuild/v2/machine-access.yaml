@@ -90,6 +90,31 @@ spec:
             header: X-User-Email
           - claim: name
             header: X-User-Name
+  # External authorization, observation only. authzd verifies the same Bearer
+  # token independently and records what enforcement would decide; it returns
+  # allow for every request while AUTHZD_DECISION_MODE is observe, so nothing a
+  # client sees changes. The identity mode and route id are context extensions:
+  # authzd never infers either from client headers.
+  #
+  # This policy also targets tibuild-v2-privileged, deliberately: a POST with a
+  # Bearer token matches both that route's method rule and this route's header
+  # rule, and the tie breaks on creation time. Giving each route its own policy
+  # (and therefore its own route id) would turn that tie-break into an
+  # authorization difference. One policy, one route id, both routes.
+  extAuth:
+    failOpen: false
+    timeout: 1s
+    statusOnError: 503
+    contextExtensions:
+      - name: identity_mode
+        value: machine
+      - name: route_id
+        value: tibuild-v2-machine
+    grpc:
+      backendRefs:
+        - name: authzd
+          namespace: ee-authz
+          port: 9002
   # A valid Google ID token for the audience is not an authorization: any
   # Google identity (any project's service account, any Workspace user) can
   # mint one, because the audience value is not a secret. Only the callers
