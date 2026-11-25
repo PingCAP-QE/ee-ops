@@ -738,8 +738,8 @@ spec:
           restartPolicy: Never
           containers:
             - name: sync-aws-f04-billing-summary
-              # v2026.11.22-13-g78f7ddb; release run 45337474960 (amd64 + arm64).
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-13-g78f7ddb
+              # Release run 45576504719: checkpoint recovery (amd64 + arm64).
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-27-g19794a3
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:
@@ -770,6 +770,14 @@ spec:
                   valueFrom:
                     fieldRef:
                       fieldPath: metadata.name
+                - name: POD_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.namespace
+                - name: POD_UID
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.uid
               resources:
                 requests:
                   cpu: "500m"
