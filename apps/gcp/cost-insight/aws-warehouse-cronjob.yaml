@@ -42,7 +42,7 @@ spec:
           containers:
             - name: sync-aws-warehouse-summary
               # Release run 45576504719: checkpoint recovery (amd64 + arm64).
-              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-27-g19794a3@sha256:17960b89bbe6c855ccbc8d0f53db0d288e1d8539ce05c6f60e7ad9b171a9960b
+              image: ghcr.io/pingcap-qe/ee-apps/cost-insight-jobs:v2026.11.22-27-g19794a3
               imagePullPolicy: IfNotPresent
               command: [cost-insight]
               args:
