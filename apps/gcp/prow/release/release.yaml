@@ -285,8 +285,7 @@ spec:
           type: ClusterIP
         ports:
           http: 8888
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         resources:
           requests:
             cpu: 100m
@@ -371,8 +370,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-autoresponder-plugin
           tag: v2.4.5
@@ -395,8 +393,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-blunderbuss-plugin
           tag: v2.4.5
@@ -419,8 +416,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-contribution-plugin
           tag: v2.4.5
@@ -443,8 +439,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-format-checker-plugin
           tag: v2.4.5
@@ -467,8 +462,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-issue-triage-plugin
           tag: v2026.8.11
@@ -491,8 +485,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-label-plugin
           tag: v2026.11.19
@@ -515,8 +508,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-label-blocker-plugin
           tag: v2.4.5
@@ -546,8 +538,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-lgtm-plugin
           tag: v2.4.5
@@ -570,8 +561,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-merge-plugin
           tag: v2.4.5
@@ -594,8 +584,7 @@ spec:
           type: ClusterIP
         ports:
           http: 80
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-owners-plugin
           tag: v2.4.5
@@ -618,8 +607,7 @@ spec:
           type: ClusterIP
         ports:
           http: 8888
-        serviceAccount:
-          name: prow-hook
+        serviceAccountName: prow-hook
         image:
           repository: ticommunityinfra/tichi-tars-plugin
           tag: v2.4.5
