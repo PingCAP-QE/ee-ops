@@ -1,13 +1,13 @@
-# ARC runner scale set for `PingCAP-QE/test-infra` and `PingCAP-QE/endless`
+# ARC runner scale set for `PingCAP-QE/test-infra`, `PingCAP-QE/endless` and `PingCAP-QE/test-plan`
 
 GitHub Actions Runner Controller (ARC) scale set in the `tencentcloud` cluster.
-It replaces the `arc-runner-set` runners these two repositories currently use
-from the `tiworkload-migration` group, once the runner image can carry their
-tooling (see [limitations](#limitations)).
+It replaces the `arc-runner-set` runners these repositories currently use from
+the `tiworkload-migration` group, once the runner image can carry their tooling
+(see [limitations](#limitations)).
 
 The scale set registers at organization scope because one scale set can only
-register at a single `githubConfigUrl`, and it serves two repositories. The
-runner group `tencentcloud-private-ci` is what limits it to those two.
+register at a single `githubConfigUrl`, and it serves several repositories. The
+runner group `tencentcloud-private-ci` is what limits it to them.
 
 The KSY (`prod2`) cluster has its own ARC deployment for `pingcap/tiup`; see
 [`apps/prod2/acr-runners`](../../prod2/acr-runners/README.md).
@@ -68,10 +68,11 @@ plus one line in `scale-sets/kustomization.yaml`.
   `arc__org__pingcap-qe__github_app_installation_id`.
 - Registration is `https://github.com/PingCAP-QE` with
   `runnerGroup: tencentcloud-private-ci` (group id `6`, `visibility: selected`,
-  `allows_public_repositories: false`), whose members are `PingCAP-QE/test-infra`
-  and `PingCAP-QE/endless`. **That group is GitHub state, not Git state**: adding
-  a repository is an organization-admin action, and a repository outside the
-  group cannot use the label at all.
+  `allows_public_repositories: false`). Its members are the source of truth for
+  who may use the label; today: `PingCAP-QE/test-infra`, `PingCAP-QE/endless`
+  and `PingCAP-QE/test-plan`. **That group is GitHub state, not Git state**:
+  adding a repository is an organization-admin action, and a repository outside
+  the group cannot use the label at all.
 - The label is the HelmRelease name, so workflows select it with
   `runs-on: [arc-runner-set-pingcap-qe-private]`.
 
@@ -113,6 +114,11 @@ runs-on: [arc-runner-set-pingcap-qe-private]
 - Jobs that do not qualify yet keep their current label; see
   [limitations](#limitations).
 
+`PingCAP-QE/test-plan` is the first candidate that needs no image work: its
+`pipeline-check` and `pipeline-syncer` jobs only use `bash`, `git`, `curl`,
+`sha256sum` and `actions/setup-go`, all of which the runner has. Check that
+`tcms.pingcap.net` is reachable from this cluster before switching them.
+
 ## Limitations
 
 The `test-infra` and `endless` workflows currently expect a runner that also
@@ -134,6 +140,8 @@ at `docker`:
   `lightning-specialized-ci` (image publishing through buildx)
 - `PingCAP-QE/endless`: `pr-check` and `integration-ci` (buildx with a buildkit
   image, so also a Docker daemon)
+- `PingCAP-QE/test-plan`: none of its jobs need any of this, so nothing is
+  blocked there.
 
 Closing the gap needs two changes outside this directory: a runner image with
 the toolchain (and Docker/buildx) in `PingCAP-QE/ci`, and a `privileged`
