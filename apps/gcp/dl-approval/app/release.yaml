@@ -34,7 +34,7 @@ spec:
     replicaCount: 1
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/delivery-approval
-      tag: v2026.11.22-19-g6b146c0
+      tag: v2026.11.22-23-gffe28c0
     serviceAccount:
       create: true
     server:

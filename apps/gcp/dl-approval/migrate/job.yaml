@@ -1,11 +1,12 @@
 # One-shot delivery approval schema migration. The runtime role has no DDL;
 # Flux runs this Job to completion before the Deployment/HelmRelease. It uses
 # the same image as the Deployment with -mode=migrate, so a release needs one
-# image tag only.
+# image tag only. A Job pod template is immutable, so every schema change needs
+# a new Job name; this release adds the approval_cards table.
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: dl-approval-migrate-v2
+  name: dl-approval-migrate-v3
   labels:
     app.kubernetes.io/name: delivery-approval
     app.kubernetes.io/component: migrate
@@ -28,7 +29,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: migrate
-          image: ghcr.io/pingcap-qe/ee-apps/delivery-approval:v2026.11.22-16-g57238ff
+          image: ghcr.io/pingcap-qe/ee-apps/delivery-approval:v2026.11.22-23-gffe28c0
           args: ["-mode=migrate"]
           # The migrate mode reads only DL_APPROVAL_DATABASE_DSN; it does not
           # need the approval config or Lark/dl credentials.
