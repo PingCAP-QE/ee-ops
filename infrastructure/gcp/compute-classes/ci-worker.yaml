@@ -10,101 +10,71 @@ spec:
     location:
       locationPolicy: ANY
       zoneTypes: [STANDARD]
+  # Tekton build pods (`ee-cd`) only. No Spot: a preemption kills a build that has
+  # already spent tens of minutes and silently discards its logs (the Pod is gone
+  # with the node), which showed up as random `exit 255` on otherwise healthy
+  # commits - see journals/2026-11-23 and journals/2026-11-25 in the ops vault.
+  # The trade-off is that on-demand capacity for these families is sometimes
+  # exhausted (`ZONE_RESOURCE_POOL_EXHAUSTED`), so the family list below is the
+  # widest one that is still usable; see the note on the family set.
+  #
+  # Why the family set stops at 3rd/4th gen: Tekton build pods mount the
+  # `source` workspace from the `hyperdisk-rwo` StorageClass, and these machine
+  # families cannot attach Hyperdisk at all (GCE rejects it: "hyperdisk-balanced
+  # disk type cannot be used by n2d-standard-2 machine type", C2/T2D do not
+  # support Hyperdisk Balanced either). Adding n2/n2d/e2/t2d here would only make
+  # autoscaling create nodes the build pods can never attach their volume to.
   priorities:
-    # --------- spot types -----------
+    # --------- x86-64 on-demand -----------
     - machineFamily: c4d
       priorityScore: 100
-      spot: true
+      spot: false
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
     - machineFamily: c4
-      priorityScore: 90
-      spot: true
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: c4a # Arm64
-      priorityScore: 85
-      spot: true
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: n4a # Arm64
-      priorityScore: 75
-      spot: true
+      priorityScore: 95
+      spot: false
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
     - machineFamily: n4d
-      priorityScore: 70
-      spot: true
+      priorityScore: 90
+      spot: false
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
     - machineFamily: n4
-      priorityScore: 65
-      spot: true
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: c3
-      priorityScore: 60
-      spot: true
+      priorityScore: 85
+      spot: false
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
     - machineFamily: c3d
-      priorityScore: 55
-      spot: true
+      priorityScore: 80
+      spot: false
+      storage:
+        bootDiskType: hyperdisk-balanced
+        bootDiskSize: 100
+    - machineFamily: c3
+      priorityScore: 75
+      spot: false
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
 
-    # --------- on-demand types -----------
-    - machineFamily: c4d
-      priorityScore: 50
-      spot: false
-      storage:
-        bootDiskType: hyperdisk-balanced
-    - machineFamily: c4
-      priorityScore: 40
-      spot: false
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
+    # --------- Arm64 on-demand -----------
+    # Arm64 Tekton pods also land here (the tekton Kyverno policy only splits
+    # retried vs normal pods, not arches), so the Arm64 families stay in this
+    # class.
     - machineFamily: c4a # Arm64
-      priorityScore: 40
+      priorityScore: 70
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
         bootDiskSize: 100
     - machineFamily: n4a # Arm64
-      priorityScore: 35
-      spot: false
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: n4d
-      priorityScore: 30
-      spot: false
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: n4
-      priorityScore: 28
-      spot: false
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: c3
-      priorityScore: 25
-      spot: false
-      storage:
-        bootDiskType: hyperdisk-balanced
-        bootDiskSize: 100
-    - machineFamily: c3d
-      priorityScore: 20
+      priorityScore: 65
       spot: false
       storage:
         bootDiskType: hyperdisk-balanced
