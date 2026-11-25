@@ -1,6 +1,6 @@
 # Egress for the Prow control plane.
 #
-# Everything the components talk to resolves to a public address (measured from
+# External dependencies of the components resolve to public addresses (measured from
 # inside the namespace, 2026-11-20):
 #
 #   api.github.com        140.82.112.6
@@ -10,7 +10,7 @@
 #   TKE apiserver         62.234.200.108:443
 #   KCE apiserver         120.92.208.140:6443
 #
-# so the rule is: the internet, minus the three private ranges. That keeps the
+# so the external egress rule allows the internet minus the private ranges. That keeps the
 # pod network out of reach for a component that never needs it, while leaving
 # GitHub, GCS, the OpenAI API, both Jenkins installations and both build-cluster
 # apiservers reachable.
@@ -27,6 +27,16 @@ spec:
     # hook -> external plugins, plugins/deck/tide -> ghproxy. Same trust domain.
     - to:
         - podSelector: {}
+    # In-cluster API clients use kubernetes.default.svc. Cover both sides of
+    # Service DNAT. Recheck these /32s after a control-plane endpoint change.
+    - to:
+        - ipBlock:
+            cidr: 10.116.0.1/32
+        - ipBlock:
+            cidr: 10.128.0.37/32
+      ports:
+        - protocol: TCP
+          port: 443
     # Cluster DNS. The ClusterIP is listed next to the namespace selector because
     # implementations differ on whether the policy sees the service address or
     # the backend pod address.
