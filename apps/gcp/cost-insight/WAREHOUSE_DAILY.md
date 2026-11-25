@@ -1,5 +1,44 @@
 # AWS / Azure warehouse daily jobs
 
+## Current scheduling policy — 2026-11-25
+
+The following formal import schedules use `Asia/Shanghai` (Beijing time), not UTC:
+
+| CronJob suffix | Daily time | Scope |
+| --- | --- | --- |
+| `sync-aws-billing-summary` | 12:40 | AWS split account `946646677266` only |
+| `sync-aws-warehouse-summary` | 15:10 | Four ordinary AWS accounts listed below |
+| `sync-azure-warehouse-summary` | 16:10 | Azure `aaa5414d-7537-4e24-99bd-a7a841221810` |
+| `sync-aws-f04-billing-summary` | 23:30 | AWS F04 `380838443567` |
+
+Keep these daily jobs enabled independently of historical rebuild success or
+failure. Rebuild coordinators must yield to formal imports: reserve a quiet
+window before each relevant daily start, including the maximum child runtime,
+and do not start another batch while a conflicting formal job is active. Do not
+use `suspend: true` or a Flux reconciliation hold on a formal CronJob to serialize
+an ad hoc rebuild. This does not permit concurrent writes to the same source/day.
+
+The retired `cost-insight-sync-azure-billing-summary` (12:30, legacy source) is
+removed from GitOps, not retained as a suspended alternative. Azure's only daily
+billing route is the 16:10 warehouse job. Keep existing cost facts and checkpoint
+state; retiring the scheduler is not a data deletion or lock reset.
+
+For old live migration holds, compare the desired and live command, explicit
+accounts, Workload Identity and env before removing
+`kustomize.toolkit.fluxcd.io/reconcile: disabled`; reconciliation can replace
+manually patched template fields. The split AWS command must remain explicitly
+scoped to `946646677266`, never expand to ordinary CUR accounts.
+
+After the retirement change is merged and reconciled, confirm the old Azure
+CronJob is absent. An existing reconciliation-disable annotation can prevent
+pruning. If it remains, verify no old worker is active, then delete only
+`cost-insight-sync-azure-billing-summary` with orphan propagation so historical
+Jobs/logs remain. Do not delete the warehouse CronJob, cost tables or shared KSA.
+Do not delete it before the GitOps definition is removed, or it may be recreated.
+
+The migration notes below are historical rollout evidence; their old-source
+holds do not override this current daily-versus-rebuild scheduling policy.
+
 ## Application image, not mounted workers
 
 Both CronJobs use `cost-insight sync-warehouse-billing-summary` from the application
