@@ -17,10 +17,19 @@ HTTPS), see [External access to the GitHub token broker](github-token-broker-ext
 
 Native HTTPS protects one hop: the ARC runner pod to the broker pod inside the
 cluster. That is why the certificate carries an in-cluster DNS name
-(`github-token-broker.github-token-broker.svc.cluster.local`), why
-`apps/gcp/github-token-broker/networkpolicy-arc-https.yaml` grants target port
-8443 to the `arc-runners` namespace only, and why the client is handed a CA
-bundle instead of relying on system trust.
+(`github-token-broker.github-token-broker.svc.cluster.local`), why the client is
+handed a CA bundle instead of relying on system trust, and why
+`apps/gcp/github-token-broker/networkpolicy-arc-https.yaml` **declares** target
+port 8443 for the `arc-runners` namespace only.
+
+Read that NetworkPolicy as intent, not as an enforced boundary: the GCP cluster
+runs with `addonsConfig.networkPolicyConfig.disabled: true` and no Calico or
+anetd daemon, so none of these policies filter traffic today. Measured
+2026-11-25: a pod in `arc-runners` reached the broker's plaintext 8080 as well,
+which the policy does not grant. The control that actually keeps unauthorized
+callers out is the projected ServiceAccount token plus TokenReview and the
+caller policy — it always was. See
+[NetworkPolicy enforcement is off on this cluster](#networkpolicy-enforcement-is-off-on-this-cluster).
 
 It is server authentication only, not mutual TLS: callers prove identity with a
 projected ServiceAccount token, which the broker validates with TokenReview plus
@@ -303,17 +312,50 @@ PY
 Also verify the two negative cases fail before any credential is sent: the same
 `/healthz` request with a different `cafile` (the GitHub bundle, or an empty file),
 and with the hostname replaced by another namespace. Inspect the rendered Service
-443 -> 8443, the TLS-enabled Deployment and its certificate mount, plus effective
-NetworkPolicies. The standalone ARC rule allows 8443 only; it does not grant ARC
-access to legacy HTTP 8080. A successful `/healthz` does not verify caller
-authorization: the scoped ARC policy onboarding above is a separate prerequisite.
-Do not weaken TLS verification, TokenReview or authorization grants to work around
-a TLS failure.
+443 -> 8443, the TLS-enabled Deployment and its certificate mount, plus the
+NetworkPolicy objects. The ARC rule declares 8443 and does not declare 8080, but
+do not read that as isolation — see
+[NetworkPolicy enforcement is off on this cluster](#networkpolicy-enforcement-is-off-on-this-cluster).
+A successful `/healthz` does not verify caller authorization either: the scoped ARC
+policy onboarding above is a separate prerequisite. Do not weaken TLS verification,
+TokenReview or authorization grants to work around a TLS failure.
 
 Then run the explicitly authorized GitInsight workflow with normal policy
 checks, verify token outputs remain masked and the crawl succeeds, and attach
 the run/commit evidence to Helix. Never use the real SA JWT in diagnostic curl
 arguments or copy token values into review comments.
+
+## NetworkPolicy enforcement is off on this cluster
+
+Every `NetworkPolicy` in this document is declarative on the GCP cluster, not
+enforced:
+
+- `gcloud container clusters describe prow --zone us-central1-c` reports
+  `addonsConfig.networkPolicyConfig.disabled: true`.
+- No `calico-node` or `anetd` DaemonSet runs anywhere in the cluster.
+- Measured 2026-11-25 after activation: a pod in `arc-runners` reached the
+  broker's plaintext port 8080 with `200`, although
+  `NetworkPolicy/github-token-broker-arc-https` grants it only 8443 and the
+  chart's own policy lists seven other namespaces for 8080.
+
+So today:
+
+- Any pod in the cluster can reach both broker listeners. The policies describe
+  the intended topology and are ready for the day enforcement is switched on;
+  they are not the control that protects the credentials.
+- Caller authorization is the real boundary: a request without a valid projected
+  ServiceAccount token for a policy entry gets `403` regardless of source
+  address. Keep that policy narrow; do not treat network reachability as
+  authorization.
+- Verifying "only ARC can reach 8443" is not possible on this cluster yet. The
+  HTTPS migration evidence is the handshake itself (trusted CA, expected SAN,
+  every replica), not the source namespace.
+
+Turning enforcement on is a separate, cluster-wide change: it applies every
+existing policy at once, so workloads that rely on today's implicit allow-all
+start being denied. Audit and fix the whole estate, announce a maintenance
+window, then enable it (GKE Dataplane V2 or the `networkPolicy` add-on); do not
+flip it as part of a TLS rollout.
 
 ## Rotation and rollback
 
