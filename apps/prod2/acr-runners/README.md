@@ -24,10 +24,15 @@ Repository-level GitHub Actions Runner Controller (ARC) scale set in the KSY
 
 ## KSY-specific notes
 
-- **The runner image has no `wget`.** `release-tiup` therefore uses `curl` to
-  download the TiUP bootstrap tarball.
-- **Cold image pulls are slow.** The pinned image is pre-pulled on the three
-  amd64 nodes; never run concurrent `ctr pull` for the same image (containerd
+- **Runner image is `ghcr.io/pingcap-qe/ci/actions-runner`.** It extends the
+  same upstream `2.338.2` runner with make, GNU tar, wget, xz and zip (see
+  `PingCAP-QE/ci` `dockerfiles/ci/actions-runner`), so `release-tiup` no longer
+  has to work around a missing `wget`. It is a public GHCR package, so the
+  scale set needs no `imagePullSecrets`.
+- **Cold image pulls are slow.** Only the previous upstream image is pre-pulled
+  on the three amd64 nodes. The new image reuses all ten of its base layers, so
+  the first pull only fetches the extra ~1 MB tools layer; if you pre-pull it
+  explicitly, never run concurrent `ctr pull` for the same image (containerd
   ingest lock).
 - **The runner pool is the three amd64 nodes.** The other four nodes are arm64;
   `maxRunners: 4` can place two runners on one node.

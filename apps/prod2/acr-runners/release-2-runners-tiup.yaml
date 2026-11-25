@@ -73,8 +73,10 @@ spec:
                 app.kubernetes.io/part-of: gha-runner-scale-set
         containers:
           - name: runner
-            # Pin tag and digest so Renovate reviews upgrades explicitly.
-            image: ghcr.io/actions/actions-runner:2.338.2@sha256:759a1d94a15b05941aba5196974ff43fe15b4cbba29b694b35cbc32a1166b232
+            # `pingcap-qe/ci/actions-runner` adds make, GNU tar, wget, xz and
+            # zip to the same 2.338.2 upstream runner, which the TiUP release
+            # build needs. Pin tag and digest so upgrades are reviewed.
+            image: ghcr.io/pingcap-qe/ci/actions-runner:v2026.11.22-12-g998596a42@sha256:96cd795bef6ff6c9710999d81a579315362453f13c4d90a5dc35afa692e7aa93
             imagePullPolicy: IfNotPresent
             command: ["/home/runner/run.sh"]
             securityContext:
