@@ -432,6 +432,33 @@ fi
 assert_contains "prod2 reports the remaining GitHub App key exposure" "${rendered_prod2}" \
   'readable from `arc-runners`, so narrowing this store'
 
+# A second ExternalSecret in the same namespace must not repeat the namespace in
+# that sentence.
+cat >>"${prod2}/apps/prod2/es.yaml" <<'YAML'
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: github-app-second
+  namespace: arc-runners
+spec:
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  data:
+    - secretKey: key
+      remoteRef:
+        key: gha__system__github_app_private_key
+YAML
+if ! rendered_prod2_two=$(bash "${inventory}" --repo "${prod2}" 2>"${workdir}/prod2-two.err"); then
+  fail "render should succeed with two ExternalSecrets in one namespace (stderr: $(cat "${workdir}/prod2-two.err"))"
+fi
+if [[ "${rendered_prod2_two}" == *'readable from `arc-runners`, `arc-runners`'* ]]; then
+  fail "the GitHub App key sentence repeats a namespace that holds two ExternalSecrets"
+else
+  pass "the GitHub App key sentence lists a namespace once"
+fi
+
 # Drift guard: --write records the block, --check accepts it, and any stale copy
 # is rejected.
 bash "${inventory}" --repo "${fixture}" --write >/dev/null 2>&1
