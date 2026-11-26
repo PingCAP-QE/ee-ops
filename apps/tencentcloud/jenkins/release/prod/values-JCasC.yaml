@@ -271,6 +271,11 @@ controller:
                     value: "http://github-token-broker.github-token-broker.svc"
                   - key: "GIT_BROKER_ORGS"
                     value: "tidbcloud,pingcap-inc"
+                  # PingCAP-QE is not migrated as an organization: only this one
+                  # private repository is, so the exclusive PAT consumer left on
+                  # the git-cdn path switches to an App installation token.
+                  - key: "GIT_BROKER_REPOS"
+                    value: "PingCAP-QE/tidb-test"
                   # Route GitHub HTTPS and SSH-style URLs through the in-cluster Git CDN.
                   # Git uses the HTTP credential only when the CDN returns 401.
                   # Keep the count synchronized with every KEY_n/VALUE_n pair below.
