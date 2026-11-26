@@ -43,7 +43,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-v2 versioning=semver
-      tag: v2026.11.15-10-g1389545
+      tag: v2026.11.22-44-g7fd698b
     server:
       # prod2 only keeps the two TiUP publish workers. The API has no consumers:
       # internal2-do.pingcap.net/tibuild has zero upstream requests, and all
@@ -84,7 +84,7 @@ spec:
       replicaCount: 1
       image:
         # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/exp-tibuild-worker versioning=semver
-        tag: v2026.11.15-10-g1389545
+        tag: v2026.11.22-44-g7fd698b
       resources:
         # TiUP packages can be several hundred MB (ctl is ~574 MB). The worker
         # streams the OCI layer to disk, but tiup still reads the whole
