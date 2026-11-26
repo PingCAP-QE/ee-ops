@@ -258,8 +258,11 @@ controller:
                   # The CDN is reached over TLS through the internal gateway:
                   # plaintext there would put the HTTP credential and the fetched
                   # private repository data on the pod network in the clear.
+                  # The host carries the cluster (`-qcloud`; a GCP instance
+                  # would use `-gcp`): each cluster terminates this name on its
+                  # own internal gateway address.
                   - key: "GIT_CDN_URL"
-                    value: "https://git-cdn.pingcap.net"
+                    value: "https://git-cdn-qcloud.pingcap.net"
                   # Mint GitHub App installation tokens from the in-cluster
                   # token broker for the listed organizations instead of using
                   # the ti-chi-bot SSH key/PAT (SAML-enforcing organizations).
@@ -281,15 +284,15 @@ controller:
                   - key: "GIT_CONFIG_COUNT"
                     value: "3"
                   - key: "GIT_CONFIG_KEY_0"
-                    value: "url.https://git-cdn.pingcap.net/.insteadOf"
+                    value: "url.https://git-cdn-qcloud.pingcap.net/.insteadOf"
                   - key: "GIT_CONFIG_VALUE_0"
                     value: "https://github.com/"
                   - key: "GIT_CONFIG_KEY_1"
-                    value: "url.https://git-cdn.pingcap.net/.insteadOf"
+                    value: "url.https://git-cdn-qcloud.pingcap.net/.insteadOf"
                   - key: "GIT_CONFIG_VALUE_1"
                     value: "git@github.com:"
                   - key: "GIT_CONFIG_KEY_2"
-                    value: "url.https://git-cdn.pingcap.net/.insteadOf"
+                    value: "url.https://git-cdn-qcloud.pingcap.net/.insteadOf"
                   - key: "GIT_CONFIG_VALUE_2"
                     value: "ssh://git@github.com/"
                   - key: "BAZELISK_BASE_URL"
