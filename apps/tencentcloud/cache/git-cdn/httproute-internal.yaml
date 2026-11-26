@@ -3,6 +3,14 @@
 # (`GIT_CDN_URL` / the `url.*.insteadOf` entries of the controller) so the HTTP
 # credential they attach travels over TLS only.
 #
+# The host name carries the cluster: `-qcloud` here, `-gcp` if the GCP cluster
+# ever exposes the same cache. Both clusters run a `*.pingcap.net` internal
+# gateway on a different address, so one cluster-agnostic name would silently
+# point half the fleet at the wrong cluster.
+#
+# `git-cdn.pingcap.net` is kept as a second host name until every build that
+# started before the rename has drained; drop it (and its DNS record) after.
+#
 # `request: 0s` disables the route timeout: a `git-upload-pack` for a large
 # repository legitimately takes minutes.
 apiVersion: gateway.networking.k8s.io/v1
@@ -16,7 +24,8 @@ spec:
       name: internal-https
       namespace: infra
   hostnames:
-    - git-cdn.pingcap.net
+    - git-cdn-qcloud.pingcap.net
+    - git-cdn.pingcap.net # transition only, see above
   rules:
     - matches:
         - path:
