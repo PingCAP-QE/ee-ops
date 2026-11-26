@@ -14,7 +14,8 @@ flowchart LR
     A[Git URL and credential IDs]
     G[GCP Jenkins agent]
     T[Tencent Cloud Jenkins agent]
-    C[git-cdn ClusterIP Service\nHTTP only: git-cdn.cache.svc:8000]
+    W[internal-https Gateway\ngit-cdn.pingcap.net]
+    C[git-cdn pods\nTLS sidecar 8443 -> app 8000]
     H[GitHub]
 
     P --> L
@@ -24,7 +25,8 @@ flowchart LR
     A --> G
     A --> T
     G -->|direct SSH/HTTPS| H
-    T -->|HTTPS/SSH URL rewrite| C
+    T -->|HTTPS URL rewrite| W
+    W -->|TLS, internal-ca leaf| C
     C -->|anonymous public request| H
     C -->|BasicAuth after 401| H
 ```
@@ -34,19 +36,49 @@ Provider from the existing `github-bot-username` and `github-bot-token`
 secrets. JCasC only supplies the global credential IDs and feature flags; it
 does not contain a second copy of the GitHub credential.
 
+## Transport encryption
+
+The credential being forwarded to GitHub is a long-lived organization PAT, so
+the hop that carries it must be encrypted end to end:
+
+| Hop | Transport |
+| --- | --- |
+| Jenkins agent → `internal-https` gateway | TLS, `*.pingcap.net` wildcard certificate |
+| gateway → git-cdn pod | TLS, re-encrypted by Envoy Gateway (`BackendTLSPolicy`), verified against the cluster-internal CA |
+| git-cdn pod: TLS sidecar → git-cdn app | plaintext, but on the pod loopback only |
+| git-cdn → GitHub | TLS (`GITSERVER_UPSTREAM=https://github.com/`) |
+
+The pieces live in `apps/tencentcloud/cache/git-cdn/`:
+
+- `certificate.yaml` — `internal-ca`-issued certificate for
+  `git-cdn.cache.svc`, mounted into the `tls` sidecar;
+- `tls-proxy-config.yaml` + the HelmRelease `postRenderers` — nginx sidecar that
+  terminates TLS on 8443 and proxies to the app on `127.0.0.1:8000`, plus the
+  Service port it listens on;
+- `httproute-internal.yaml` — `git-cdn.pingcap.net` on the `infra/internal-https`
+  Gateway;
+- `backendtlspolicy.yaml` — tells Envoy Gateway to verify and re-encrypt to the
+  pod instead of downgrading the second hop to cleartext.
+
+The CA certificate that the gateway verifies against is published by
+trust-manager (`infrastructure/tencentcloud/cert-manager/post/internal-ca-bundle.yaml`)
+as the `cache/internal-ca` ConfigMap. The CA key never leaves `cert-manager`.
+
 ## Authentication flow
 
 ```mermaid
 sequenceDiagram
     participant Job as Jenkins checkout
     participant Git as Git client
-    participant CDN as git-cdn
+    participant GW as internal-https gateway
+    participant CDN as git-cdn (TLS sidecar + app)
     participant GH as GitHub
     participant AP as Jenkins GIT_ASKPASS
 
     Job->>Git: fetch git@github.com:org/repo.git
-    Git->>Git: insteadOf -> http://git-cdn.cache.svc:8000/org/repo.git
-    Git->>CDN: anonymous HTTP request
+    Git->>Git: insteadOf -> https://git-cdn.pingcap.net/org/repo.git
+    Git->>GW: anonymous TLS request
+    GW->>CDN: TLS request (backed by `cache/internal-ca`)
     CDN->>GH: request without Authorization
     alt public repository
         GH-->>CDN: 200 + Git data
@@ -56,7 +88,8 @@ sequenceDiagram
         CDN-->>Git: 401
         Git->>AP: request username/password
         AP-->>Git: Jenkins github-bot-https credential
-        Git->>CDN: HTTP BasicAuth retry
+        Git->>GW: TLS BasicAuth retry
+        GW->>CDN: TLS BasicAuth retry
         CDN->>GH: forward BasicAuth
         GH-->>CDN: 200 + Git data
         CDN-->>Git: 200 + Git data
@@ -65,21 +98,26 @@ sequenceDiagram
 
 Git does not query repository visibility before the request. It first tries
 without credentials and invokes `GIT_ASKPASS` only when the HTTP server asks
-for credentials. This keeps the PAT out of public repository requests.
+for credentials. This keeps the PAT out of public repository requests, and the
+retry that does carry it is TLS-only.
 
 ## URL behavior
 
-Tencent staging configures the following Git rewrite rules:
+Tencent Cloud (prod and staging) configures the following Git rewrite rules:
 
 ```text
-https://github.com/       -> http://git-cdn.cache.svc:8000/
-git@github.com:            -> http://git-cdn.cache.svc:8000/
-ssh://git@github.com/      -> http://git-cdn.cache.svc:8000/
+https://github.com/       -> https://git-cdn.pingcap.net/
+git@github.com:            -> https://git-cdn.pingcap.net/
+ssh://git@github.com/      -> https://git-cdn.pingcap.net/
 ```
 
-GCP and Tencent prod do not configure these rules. Their existing direct Git
-transport behavior is unchanged, while the same credential IDs are available
-for the shared CI library.
+`GIT_CDN_URL` must match the rewrite target; the shared library uses it for the
+explicit rewrites in `component.checkout*`, while the `url.*.insteadOf` entries
+above cover the shell `git` invocations inside the pipelines.
+
+GCP does not configure these rules (`GIT_CDN_ENABLED=false`). Its existing
+direct Git transport behavior is unchanged, while the same credential IDs are
+available for the shared CI library.
 
 The original `refs/pull/<number>/head` and `refs/pull/<number>/merge` refspecs
 are unchanged. URL rewriting affects the transport only.
@@ -98,6 +136,11 @@ The shared library reads `GIT_SSH_CREDENTIALS_ID` and
 `GIT_HTTP_CREDENTIALS_ID` from the Jenkins environment. These values are
 credential IDs, not secret values.
 
+SAML-enforcing organizations (`tidbcloud`, `pingcap-inc`) do not use this path:
+`GIT_BROKER_ENABLED` mints a GitHub App installation token instead, and the
+repository list that may be minted is the broker policy's business, not this
+document's.
+
 ## Cache and security requirements
 
 The CDN must return 401 for an unauthenticated private repository request.
@@ -107,9 +150,12 @@ An authenticated private request must not make private Git data available to
 later unauthenticated requests from the cache. This must be tested explicitly
 before enabling the rewrite for private repositories.
 
-The CDN endpoint is intentionally an in-cluster HTTP Service. It is not
-exposed by an Ingress or HTTPRoute. NetworkPolicy should restrict access to
-Jenkins agents if the cluster policy model permits it.
+The endpoint is internal-only: the `internal-https` Gateway address
+(`10.0.6.5`) is not reachable from outside the corporate network, and no
+external Gateway route points at git-cdn. Adding a NetworkPolicy that admits
+only the Jenkins agent namespaces plus `envoy-gateway-system` is still open —
+today the plaintext port 8000 remains reachable in-cluster for consumers that
+have not migrated.
 
 ## Rollout and rollback
 
@@ -123,5 +169,7 @@ The rollout order is:
 3. Validate a TiFlash job with recursive submodules in GCP and Tencent Cloud.
 
 Rollback is performed by setting `GIT_CDN_ENABLED=false` and removing the
-three Tencent staging rewrite entries. Jenkins then returns to direct
-SSH/HTTPS behavior without changing the CI pipeline files.
+three Tencent rewrite entries. Jenkins then returns to direct SSH/HTTPS
+behavior without changing the CI pipeline files. A `GIT_CDN_URL` /
+`insteadOf` pair that points back at `http://git-cdn.cache.svc:8000` restores
+the previous plaintext transport as long as the 8000 listener is still there.
