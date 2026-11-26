@@ -1,0 +1,30 @@
+---
+# Internal entry point for git-cdn. Jenkins agents rewrite GitHub URLs here
+# (`GIT_CDN_URL` / the `url.*.insteadOf` entries of the controller) so the HTTP
+# credential they attach travels over TLS only.
+#
+# `request: 0s` disables the route timeout: a `git-upload-pack` for a large
+# repository legitimately takes minutes.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: git-cdn-internal
+  namespace: cache
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: internal-https
+      namespace: infra
+  hostnames:
+    - git-cdn.pingcap.net
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: git-cdn
+          port: 8443
+          weight: 1
+      timeouts:
+        request: 0s

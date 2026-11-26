@@ -1,0 +1,26 @@
+---
+# The gateway re-encrypts to the git-cdn pod instead of downgrading the second
+# hop to plaintext: Envoy verifies the pod certificate against the
+# cluster-internal CA, which trust-manager publishes as `cache/internal-ca`
+# (see infrastructure/tencentcloud/cert-manager/post/internal-ca-bundle.yaml).
+#
+# Only the TLS port is covered; the plaintext 8000 port stays out of the
+# gateway (no HTTPRoute references it) and is left for the consumers that have
+# not migrated yet.
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: git-cdn
+  namespace: cache
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: git-cdn
+      sectionName: https
+  validation:
+    hostname: git-cdn.cache.svc
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: internal-ca

@@ -7,6 +7,13 @@ metadata:
 spec:
   dependsOn:
     - name: cert-manager-release
+  # The Bundle CRD only exists once trust-manager is installed, so wait for its
+  # HelmRelease instead of failing until the CRD shows up.
+  healthChecks:
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: trust-manager
+      namespace: cert-manager
   interval: 10m0s
   sourceRef:
     kind: GitRepository
