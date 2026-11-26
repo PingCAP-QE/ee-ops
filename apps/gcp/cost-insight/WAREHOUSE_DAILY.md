@@ -29,12 +29,31 @@ accounts, Workload Identity and env before removing
 manually patched template fields. The split AWS command must remain explicitly
 scoped to `946646677266`, never expand to ordinary CUR accounts.
 
-After the retirement change is merged and reconciled, confirm the old Azure
-CronJob is absent. An existing reconciliation-disable annotation can prevent
-pruning. If it remains, verify no old worker is active, then delete only
-`cost-insight-sync-azure-billing-summary` with orphan propagation so historical
-Jobs/logs remain. Do not delete the warehouse CronJob, cost tables or shared KSA.
-Do not delete it before the GitOps definition is removed, or it may be recreated.
+### Retired CronJob cleanup
+
+- `cost-insight-sync-gcs-cache-last-seen` and
+  `cost-insight-cleanup-gcs-cache-delete-cas`: retired Bazel cache maintenance
+  ([#2504](https://github.com/PingCAP-QE/ee-ops/pull/2504)), not cost imports.
+  The Bazel-cache freshness check was removed in
+  [#2505](https://github.com/PingCAP-QE/ee-ops/pull/2505); the daily Dashboard
+  freshness CronJob remains active. Before merging the manifest removal,
+  export any needed historical logs: Flux pruning can garbage-collect the
+  owned Jobs. After reconciliation, confirm both CronJobs are gone. Keep cache
+  storage and indexes out of this cleanup.
+- `cost-insight-sync-azure-billing-summary`: already removed from GitOps in
+  [#2904](https://github.com/PingCAP-QE/ee-ops/pull/2904). The live object can
+  remain because of its old `reconcile: disabled` annotation.
+- `ci-rs-aws-lineage-supervisor`: a live-only, temporary supervisor for the
+  June–August 2026 AWS lineage rebuild and its two one-off workers, not the
+  daily `ci-rs-resource-serving-native-refresh`.
+
+After merge and reconciliation, look up each live-only CronJob by exact name
+in GKE Prow, namespace `apps`. If present, confirm it is suspended, absent
+from Flux inventory, and has no active child Jobs or Pods; stop if any check
+fails. Archive the live CronJob YAML, then delete only that CronJob using
+`kubectl delete cronjob … --cascade=orphan` to retain historical Jobs and logs.
+Leave `cost-insight-sync-azure-warehouse-summary` (16:10 Beijing time), the
+native refresh, cost tables, checkpoints, and shared service accounts intact.
 
 The migration notes below are historical rollout evidence; their old-source
 holds do not override this current daily-versus-rebuild scheduling policy.
