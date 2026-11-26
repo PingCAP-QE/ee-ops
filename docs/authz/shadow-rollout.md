@@ -199,10 +199,15 @@ Baseline captured on 2026-11-25 against `https://prow.tidb.net`, before any
 | unregistered path | `GET /tibuild/__authz_shadow_probe__` | 302 | none: browser route |
 
 The probe fails on any 5xx, and on any 200 for a case the existing authn layer is
-supposed to reject. `--expect-decisions` still requires `--id-token` or
-`--cookie`: `ext_authz` runs before authentication, so rejected requests do
-produce decisions, but only an authenticated request exercises identity
-verification and the tuple checks that the observe period is meant to measure.
+supposed to reject. `--expect-decisions` requires `--id-token` or `--cookie`,
+because a request the Gateway rejects never reaches `ext_authz` and therefore has
+no decision to find.
+
+**Attribution does not use a client-supplied request id.** Envoy regenerates
+`x-request-id` (`preserve_external_request_id` defaults to false), so the value in
+`authzd`'s `correlation_id` is Envoy's, not the probe's. `--expect-decisions`
+asserts on a time window, with `--expect-principal` to narrow it; per-case
+attribution needs a unique capability or resource id instead.
 
 Authenticated cases, run by an operator with a valid machine token and/or browser
 session:
