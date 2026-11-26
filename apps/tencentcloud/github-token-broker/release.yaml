@@ -34,10 +34,9 @@ spec:
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/github-token-broker versioning=semver
       tag: v2026.11.22-39-g53753c8
     server:
-      # Native HTTPS listener on the cluster-internal CA leaf. The Jenkins agents
-      # are its first client: their namespace gets the CA from the trust-manager
-      # Bundle and is the only entry in networkPolicy.tlsIngressNamespaces. HTTP
-      # 8080 and its probes are unchanged for the namespaces still calling it.
+      # Native HTTPS listener on the cluster-internal CA leaf, enabled for parity
+      # with the GCP cluster. No client uses it yet: the consumers here still call
+      # the plaintext listener, and no namespace is granted 8443.
       tls:
         enabled: true
         port: 8443
@@ -70,10 +69,10 @@ spec:
         type: RuntimeDefault
     networkPolicy:
       # Plaintext consumers of the HTTP listener (port 8080). The chart keeps the
-      # TLS port out of this list; a namespace reaches 8443 only through
-      # tlsIngressNamespaces, added together with the CA it needs.
-      tlsIngressNamespaces:
-        - jenkins-tidb
+      # TLS port out of this list, and nobody is granted it: the listener is
+      # enabled for parity but this cluster has no HTTPS client yet. Add a
+      # namespace here together with the CA distribution it needs.
+      tlsIngressNamespaces: []
       ingressNamespaces:
         - ee-cd
         - tibuild

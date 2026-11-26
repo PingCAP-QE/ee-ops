@@ -197,12 +197,21 @@ from it. That broker now runs the same chart (`0.2.2`), the same image, and the
 same activated listener (`server.tls.enabled: true`, port 8443, Service 443), so
 both clusters are one recipe.
 
-**Nobody consumes it there yet.** Activation opened the listener but granted it
-to no namespace: `networkPolicy.tlsIngressNamespaces` stays empty and there is no
-dedicated port policy on that cluster, so no client is configured for HTTPS.
-The namespaces that still call the broker there (`ee-cd`, `tibuild`,
-`jenkins-tidb`) use the plaintext listener as before; their credentials stay in
-the clear until each one is migrated.
+**Nobody consumes it there yet, and moving the consumers is deliberately on
+hold.** Activation opened the listener but granted it to no namespace:
+`networkPolicy.tlsIngressNamespaces` stays empty and there is no dedicated port
+policy, so no client is configured for HTTPS. The namespaces that still call the
+broker there (`ee-cd`, `tibuild`, `jenkins-tidb`) keep using the plaintext
+listener.
+
+The reason is cost, not risk tolerance: the only live client there is Jenkins,
+whose build pods are created by the shared library that ~370 Jenkinsfiles go
+through, so giving them a CA file means adding a mount to that one shared point
+plus trust distribution on a cluster whose NetworkPolicy does not enforce
+either. That is a standing amount of CI surface for a single cluster, while the
+finding the TLS work addresses is the ARC runner hop, which the GCP cluster
+covers. Revisit when a TencentCloud client actually needs it — the procedure
+below is kept for that case.
 
 ### Who needs the CA on that cluster
 
