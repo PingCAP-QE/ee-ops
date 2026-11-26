@@ -29,8 +29,8 @@ spec:
       name: arc-gha-rs-controller
       namespace: arc-systems
     # Organization-level scale set: the label is available to the repositories
-    # in the `tencentcloud-private-ci` runner group (PingCAP-QE/test-infra and
-    # PingCAP-QE/endless), not to the whole organization. The scale set name is
+    # in the `tencentcloud-private-ci` runner group (see the README for the
+    # current members), not to the whole organization. The scale set name is
     # the runner label, so workflows select it with
     # `runs-on: [arc-runner-set-pingcap-qe-private]`.
     githubConfigUrl: https://github.com/PingCAP-QE
