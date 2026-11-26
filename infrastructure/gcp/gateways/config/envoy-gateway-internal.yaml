@@ -19,6 +19,23 @@ metadata:
   name: internal
   namespace: infra
 spec:
+  # External authorization must run after the authentication filters, so an OIDC
+  # or JWT filter can attach a verified identity first: the OAuth2 forwardIDToken
+  # header exists only if ext_authz runs after that filter. Verified on an
+  # isolated Gateway with the same controller version; the resulting chain is
+  # csrf -> oauth2 -> jwt_authn -> ext_authz -> rbac -> local_ratelimit ->
+  # credential_injector -> router.
+  #
+  # Envoy regenerates x-request-id, and a request the authentication filters
+  # reject no longer reaches ext_authz (so it produces no decision). Both are
+  # recorded in docs/authz/shadow-rollout.md; shadow counts taken before this
+  # change are not comparable with counts taken after it.
+  #
+  # filterOrder is EnvoyProxy-scoped, so it applies to every route on this
+  # Gateway, including routes without extAuth.
+  filterOrder:
+    - name: envoy.filters.http.ext_authz
+      after: envoy.filters.http.jwt_authn
   provider:
     type: Kubernetes
     kubernetes:
