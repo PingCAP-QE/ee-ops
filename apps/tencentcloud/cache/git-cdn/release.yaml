@@ -13,7 +13,12 @@ spec:
         name: ee-ops
         namespace: flux-system
   interval: 5m
-  timeout: 5m
+  # The two replicas are forced onto different nodes and the PVCs pin them to
+  # the node that owns each CBS volume, so a rollout waits for Karpenter to
+  # provision a node. Five minutes was not enough on 2026-11-26: the upgrade
+  # timed out and helm rolled it back, undoing the pod change while the
+  # certificate, route and policy stayed behind.
+  timeout: 15m
   install:
     remediation:
       retries: 3
