@@ -5,7 +5,6 @@ resources:
   - git-repo-prometheus-operator.yaml
   - helm-repo-bitnami.yaml
   - helm-repo-ingress-nginx.yaml
-  - helm-repo-nfs-server-provisioner.yaml
   - helm-repo-rook.yaml
   - helm-repo-others.yaml
   - helm-repo-kyverno.yaml
