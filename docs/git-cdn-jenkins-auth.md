@@ -14,7 +14,7 @@ flowchart LR
     A[Git URL and credential IDs]
     G[GCP Jenkins agent]
     T[Tencent Cloud Jenkins agent]
-    W[internal-https Gateway\ngit-cdn.pingcap.net]
+    W[internal-https Gateway\ngit-cdn-qcloud.pingcap.net]
     C[git-cdn pods\nTLS sidecar 8443 -> app 8000]
     H[GitHub]
 
@@ -55,8 +55,8 @@ The pieces live in `apps/tencentcloud/cache/git-cdn/`:
 - `tls-proxy-config.yaml` + the HelmRelease `postRenderers` — nginx sidecar that
   terminates TLS on 8443 and proxies to the app on `127.0.0.1:8000`, plus the
   Service port it listens on;
-- `httproute-internal.yaml` — `git-cdn.pingcap.net` on the `infra/internal-https`
-  Gateway;
+- `httproute-internal.yaml` — `git-cdn-qcloud.pingcap.net` on the
+  `infra/internal-https` Gateway;
 - `backendtlspolicy.yaml` — tells Envoy Gateway to verify and re-encrypt to the
   pod instead of downgrading the second hop to cleartext.
 
@@ -76,7 +76,7 @@ sequenceDiagram
     participant AP as Jenkins GIT_ASKPASS
 
     Job->>Git: fetch git@github.com:org/repo.git
-    Git->>Git: insteadOf -> https://git-cdn.pingcap.net/org/repo.git
+    Git->>Git: insteadOf -> https://git-cdn-qcloud.pingcap.net/org/repo.git
     Git->>GW: anonymous TLS request
     GW->>CDN: TLS request (backed by `cache/internal-ca`)
     CDN->>GH: request without Authorization
@@ -106,10 +106,16 @@ retry that does carry it is TLS-only.
 Tencent Cloud (prod and staging) configures the following Git rewrite rules:
 
 ```text
-https://github.com/       -> https://git-cdn.pingcap.net/
-git@github.com:            -> https://git-cdn.pingcap.net/
-ssh://git@github.com/      -> https://git-cdn.pingcap.net/
+https://github.com/       -> https://git-cdn-qcloud.pingcap.net/
+git@github.com:            -> https://git-cdn-qcloud.pingcap.net/
+ssh://git@github.com/      -> https://git-cdn-qcloud.pingcap.net/
 ```
+
+The host name carries the cluster. Both clusters run a `*.pingcap.net` internal
+gateway, on a different address each, so a cluster-agnostic name would resolve
+to one cluster and silently redirect the other cluster's agents across the
+network. Tencent Cloud therefore uses `-qcloud`; a GCP instance would use
+`-gcp` (GCP has `GIT_CDN_ENABLED=false` today).
 
 `GIT_CDN_URL` must match the rewrite target; the shared library uses it for the
 explicit rewrites in `component.checkout*`, while the `url.*.insteadOf` entries
