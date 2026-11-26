@@ -7,10 +7,10 @@
 # every consumer's trust anchor, so it is done as a reviewed change that first
 # distributes an overlapping bundle and only then re-issues the leaves.
 #
-# The Jenkins agents are the first HTTPS consumer on this cluster, so the trust
-# anchor is distributed to their namespace only. A second consumer means adding
-# its namespace here and to trust-manager's targetNamespaces in the same change;
-# the anchor is never pushed to a namespace that has no client yet.
+# No consumer here needs a distributed trust bundle yet: the broker's TLS
+# listener is enabled but nothing on this cluster verifies it (the Jenkins agents
+# still call the plaintext listener). Install trust-manager and a Bundle together
+# with the first client that needs one, instead of pre-wiring a distributor.
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
@@ -30,24 +30,3 @@ spec:
     name: internal-ca-selfsigned
     kind: ClusterIssuer
     group: cert-manager.io
----
-# Public trust material for the consumers that must verify the broker's leaf.
-# The Bundle reads the CA certificate from the trust namespace and writes a
-# ConfigMap the Jenkins agents mount; the CA private key never leaves
-# `cert-manager`.
-apiVersion: trust.cert-manager.io/v1alpha1
-kind: Bundle
-metadata:
-  name: github-token-broker-ca
-  namespace: cert-manager
-spec:
-  sources:
-    - secret:
-        name: internal-ca
-        key: ca.crt
-  target:
-    configMap:
-      key: ca.crt
-    namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: jenkins-tidb

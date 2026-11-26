@@ -121,25 +121,13 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         self.assertEqual(leaf['dnsNames'], gcp_leaf['dnsNames'])
         self.assertEqual(leaf['issuerRef'], gcp_leaf['issuerRef'])
 
-        # The Jenkins agents are the first HTTPS consumer on that cluster, so the
-        # distributor is installed there but scoped to their namespace only.
-        trust_manager = load('infrastructure/tencentcloud/cert-manager/release/trust-manager-release.yaml')['spec']
-        self.assertEqual(trust_manager['values']['app']['targetNamespaces'], ['jenkins-tidb'])
-        self.assertEqual(trust_manager['values']['app']['trust']['namespace'], 'cert-manager')
-        self.assertEqual(trust_manager['values']['secretTargets']['authorizedSecrets'], ['internal-ca'])
-        self.assertEqual(trust_manager['chart']['spec']['version'],
-                         load('infrastructure/gcp/cert-manager/release/trust-manager-release.yaml')['spec']['chart']['spec']['version'])
-        bundle = by_kind(load_all('infrastructure/tencentcloud/cert-manager/post/internal-ca.yaml'), 'Bundle')
-        self.assertEqual(bundle['metadata']['name'], 'github-token-broker-ca')
-        self.assertEqual(bundle['metadata']['namespace'], 'cert-manager')
-        self.assertEqual(bundle['spec']['sources'], [{'secret': {'name': 'internal-ca', 'key': 'ca.crt'}}])
-        self.assertEqual(bundle['spec']['target'], {
-            'configMap': {'key': 'ca.crt'},
-            'namespaceSelector': {'matchLabels': {'kubernetes.io/metadata.name': 'jenkins-tidb'}},
-        })
-        # The Bundle lives in the post stage: its CRD comes from the release stage.
-        self.assertIn('trust-manager-release.yaml',
-                      load('infrastructure/tencentcloud/cert-manager/release/kustomization.yaml')['resources'])
+        # No client on that cluster verifies the broker yet, so no trust
+        # distributor is installed: adding an unused one is what the runbook
+        # warns against.
+        self.assertFalse((ROOT / 'infrastructure/tencentcloud/cert-manager/release/trust-manager-release.yaml').exists())
+        self.assertEqual(
+            [doc['kind'] for doc in load_all('infrastructure/tencentcloud/cert-manager/post/internal-ca.yaml')],
+            ['Certificate'])
 
         resources = load('apps/tencentcloud/github-token-broker/kustomization.yaml')['resources']
         self.assertIn('tls.yaml', resources)
@@ -158,9 +146,9 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
             # repository set, so the lifetime floor has to stay explicit.
             self.assertEqual(release['values']['cache'], {'minRemaining': '15m'})
 
-        # Only the Jenkins agents reach the TLS listener; the plaintext list stays
-        # what it was, and there is no dedicated 8443 policy on that cluster.
-        self.assertEqual(tke['values']['networkPolicy']['tlsIngressNamespaces'], ['jenkins-tidb'])
+        # The listener is activated for parity, but nobody on that cluster is
+        # granted it and there is no dedicated 8443 policy.
+        self.assertEqual(tke['values']['networkPolicy']['tlsIngressNamespaces'], [])
         self.assertEqual(tke['values']['networkPolicy']['ingressNamespaces'],
                          ['ee-cd', 'tibuild', 'jenkins-tidb'])
         self.assertFalse((ROOT / 'apps/tencentcloud/github-token-broker/networkpolicy-arc-https.yaml').exists())
@@ -190,9 +178,13 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
             self.assertEqual(release['metadata']['name'], 'cert-manager-release')
             self.assertEqual(post['spec']['dependsOn'], [{'name': 'cert-manager-release'}])
             checked = {check['name'] for check in release['spec']['healthChecks']}
-            # The post stage applies Certificate, ClusterIssuer and Bundle CRs,
-            # so both charts' CRDs must be ready before it runs.
-            self.assertEqual(checked, {'cert-manager', 'trust-manager'})
+            if cloud == 'gcp':
+                # The GCP post stage applies a Bundle, so trust-manager's CRDs
+                # must be ready before it runs.
+                self.assertEqual(checked, {'cert-manager', 'trust-manager'})
+            else:
+                # No Bundle there, so only cert-manager has to be ready.
+                self.assertEqual(checked, {'cert-manager'})
 
             release_kinds = set()
             for name in load(f'{base}/release/kustomization.yaml')['resources']:
