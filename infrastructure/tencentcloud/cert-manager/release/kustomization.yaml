@@ -4,3 +4,4 @@ kind: Kustomization
 # explicitly, which is the namespace the chart is installed into.
 resources:
   - release.yaml
+  - trust-manager-release.yaml
