@@ -1,0 +1,104 @@
+# Phase B, mode 1: browser identity handoff through the isolated PoC Gateway.
+#
+# Resources live in `tibuild` because that namespace is already allowed by the
+# ee-gcp-sm ClusterSecretStore and the canary backend is the TiBuild Service in
+# the same namespace, so no ReferenceGrant is needed.
+#
+# The browser reaches this only through `kubectl -n infra port-forward
+# svc/eg-authz-poc 18443:443`, which is why the OAuth redirect URI is
+# https://localhost:18443/...
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: authz-canary-oidc
+  namespace: tibuild
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: ee-gcp-sm
+    kind: ClusterSecretStore
+  target:
+    name: authz-canary-oidc
+    creationPolicy: Owner
+  dataFrom:
+    - extract:
+        key: google-oauth2-client-authzd-canary
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: authz-canary
+  namespace: tibuild
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: eg-authz-poc
+      namespace: infra
+  # No hostnames: the request arrives with Host: localhost:18080 through the
+  # port-forward, and this route must match it.
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /authz-canary
+      filters:
+        # Land on a real TiBuild endpoint so "reached the backend" is
+        # distinguishable from an Envoy routing error.
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api/v2/devbuilds/capabilities
+      backendRefs:
+        - name: v2-tibuild-v2
+          port: 80
+---
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: authz-canary-oidc
+  namespace: tibuild
+spec:
+  targetRefs:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      name: authz-canary
+  csrf: {}
+  oidc:
+    provider:
+      issuer: https://accounts.google.com
+    clientIDRef:
+      name: authz-canary-oidc
+    clientSecret:
+      name: authz-canary-oidc
+    # Distinct cookie names: same host as the production OIDC policies once a
+    # canary path is used on the shared Gateway.
+    cookieNames:
+      accessToken: authz-canary-access-token
+      idToken: authz-canary-id-token
+    # Must be prefixed with the protected route's path or the callback never
+    # matches the route. HTTPS because Envoy marks OIDC cookies Secure and
+    # WebKit browsers drop Secure cookies over plain http://localhost.
+    redirectURL: https://localhost:18443/authz-canary/oauth2/callback
+    scopes:
+      - openid
+      - email
+      - profile
+    # The field CI Dashboard already uses in production. Whether this header is
+    # present at ext_authz time is exactly what Phase B measures.
+    forwardIDToken:
+      header: X-Authzd-ID-Token
+  extAuth:
+    failOpen: false
+    timeout: 1s
+    statusOnError: 503
+    contextExtensions:
+      - name: identity_mode
+        value: browser
+      - name: route_id
+        value: authz-canary
+    grpc:
+      backendRefs:
+        - name: authzd
+          namespace: ee-authz
+          port: 9002

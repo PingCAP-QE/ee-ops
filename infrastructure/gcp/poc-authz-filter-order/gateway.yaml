@@ -20,3 +20,21 @@ spec:
             kind: HTTPRoute
         namespaces:
           from: All
+    # HTTPS listener for the Phase B browser test. Envoy marks OIDC cookies
+    # `Secure` unconditionally, and WebKit browsers drop them over plain
+    # http://localhost, so the callback cannot validate its nonce without TLS.
+    # Self-signed, localhost-only, exists only on this isolated Gateway.
+    - name: https
+      protocol: HTTPS
+      port: 443
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: authz-poc-localhost-tls
+      allowedRoutes:
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+        namespaces:
+          from: All
