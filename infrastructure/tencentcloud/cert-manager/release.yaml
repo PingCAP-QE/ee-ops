@@ -17,8 +17,15 @@ spec:
   path: ./infrastructure/tencentcloud/cert-manager/release
   prune: true
   timeout: 15m0s
+  # Without these the parent goes Ready as soon as the HelmRelease objects are
+  # applied, and `cert-manager-post` could race the CRD/webhook installation of
+  # either chart (the Bundle is a trust-manager CRD).
   healthChecks:
     - apiVersion: helm.toolkit.fluxcd.io/v2
       kind: HelmRelease
       name: cert-manager
+      namespace: cert-manager
+    - apiVersion: helm.toolkit.fluxcd.io/v2
+      kind: HelmRelease
+      name: trust-manager
       namespace: cert-manager
