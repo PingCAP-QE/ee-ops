@@ -301,7 +301,7 @@ spec:
             memory: 1Gi
         image:
           repository: ghcr.io/ti-community-infra/prow/cherrypicker
-          tag: v20261125-ac3cd35ca
+          tag: v20261126-ea60e1aff
         args:
           - --dry-run=false
           - --github-app-id=$(GITHUB_APP_ID)
