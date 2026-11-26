@@ -44,36 +44,51 @@ manifests in `apps/gcp/tibuild/v2/`.
 
 ### Filter order on the live listener
 
-Read from the Envoy config dump after the attachment:
+`EnvoyProxy.spec.filterOrder` puts external authorization **after** authentication.
+Read from the admin `config_dump` on `eg-internal` after the promotion
+(2026-11-26); the data plane applied it through xDS without a restart:
 
 ```text
 1. csrf
-2. ext_authz   (securitypolicy/tibuild/tibuild-v2-machine-jwt, disabled: true
-                at chain level, enabled per route)
-3. oauth2
-4. jwt_authn
+2. oauth2
+3. jwt_authn
+4. ext_authz   (securitypolicy/tibuild/tibuild-v2-machine-jwt, per-route enabled)
 5. rbac
 6. local_ratelimit
 7. credential_injector (github-token-broker)
 8. router
 ```
 
-Three consequences, all confirmed against this deployment:
+Three consequences, confirmed against this deployment:
 
-1. **`ext_authz` runs before authentication.** Requests that JWT or OIDC will
-   later reject still reach `authzd`, which is why the observe period records
-   `identity_invalid` rather than "no decision". Nothing is relaxed by this: a
-   later filter still rejects them, and `authzd` verifies tokens itself.
-2. **`forwardIDToken` cannot deliver a browser identity to `authzd`.** The OIDC
-   and JWT filters that attach the forwarded token run *after* `ext_authz`, so a
-   browser fragment would never see it. Browser mode therefore needs either
-   `authzd` validating the OIDC ID-token cookie itself, or the browser route
-   staying on OIDC without `extAuth` — the current state. Do not enable browser
-   `extAuth` on the assumption that the forwarded header arrives.
-3. **The GitHub token broker case works.** Its upstream credential replacement
-   (`credential_injector`, position 7) runs after `ext_authz`, so `authzd` sees
-   the caller's original `Authorization` header, which is what the broker
-   contract requires.
+1. **A request the authentication filters reject never reaches `authzd`.** It is
+   answered by `jwt_authn` or the OIDC redirect and leaves no decision, so the
+   baseline contains no `identity_invalid` for ordinary unauthenticated traffic.
+   From here `identity_invalid` means the identity handoff itself failed.
+2. **`forwardIDToken` reaches `ext_authz`.** Verified on an isolated Gateway with
+   the same controller version and re-verified through the chain above: a browser
+   session produced a decision whose principal came from the forwarded ID token,
+   verified independently against Google JWKS, and a valid foreign token supplied
+   by the client was overwritten. Browser `extAuth` is still off until the read
+   contract and membership source exist (see `ee-apps`
+   `docs/authz/browser-read-authorization.md`).
+3. **The GitHub token broker case still works.** `credential_injector` (position
+   7) runs after `ext_authz`, so `authzd` sees the caller's original
+   `Authorization` header.
+
+Before the promotion the order was `csrf → ext_authz → oauth2 → jwt_authn → rbac`,
+and the two behaviours above were inverted. Shadow counts taken before and after
+are therefore not comparable.
+
+#### Post-promotion verification (2026-11-26)
+
+| Check | Result |
+| --- | --- |
+| Client-visible probe, 8 cases | 8/8, statuses identical to the pre-promotion baseline (302/401, no 5xx) |
+| Malformed bearer, `GET /tibuild/api/v2/devbuilds` | 401 from `jwt_authn`, **no** decision recorded |
+| Per-route `ext_authz` enablement | machine rule, four privileged prefixes and four mutation methods ON; browser GET/HEAD/OPTIONS off |
+| Decisions for authenticated machine traffic | still recorded, `relationship_denied` with the caller's workload principal |
+| Broker ordering | `credential_injector` still after `ext_authz` |
 
 ## 2. Preconditions before attaching `extAuth`
 
@@ -190,19 +205,24 @@ Baseline captured on 2026-11-25 against `https://prow.tidb.net`, before any
 | Case | Request | Baseline | Expected decision once attached |
 | --- | --- | --- | --- |
 | unauth list | `GET /tibuild/api/v2/devbuilds` | 302 (OIDC redirect) | none: browser route has no filter |
-| malformed bearer | same, `Authorization: Bearer not-a-jwt` | 401 | none on the browser route; `identity_invalid` once the machine rule matches |
+| malformed bearer | same, `Authorization: Bearer not-a-jwt` | 401 | none: rejected by `jwt_authn` before `ext_authz` |
 | unsupported scheme | same, `Authorization: Basic …` | 302 | none |
-| privileged publish | `POST /tibuild/api/v2/publish/images` | 401 | `route_not_registered` (no publish rule yet) |
-| rerun without token | `POST /tibuild/api/v2/devbuilds/000000/rerun` | 401 | the rerun rule's mode decides: `mode_off` today, `identity_invalid` once it is `observe` |
+| privileged publish | `POST /tibuild/api/v2/publish/images` | 401 | none: rejected by `jwt_authn` |
+| rerun without token | `POST /tibuild/api/v2/devbuilds/000000/rerun` | 401 | none: rejected by `jwt_authn` |
 | double slash | `GET //tibuild/api/v2/devbuilds` | 302 | none: browser route |
 | dot segment | `GET /tibuild/api/v2/../api/v2/devbuilds` | 302 | none: browser route |
 | unregistered path | `GET /tibuild/__authz_shadow_probe__` | 302 | none: browser route |
 
 The probe fails on any 5xx, and on any 200 for a case the existing authn layer is
-supposed to reject. `--expect-decisions` still requires `--id-token` or
-`--cookie`: `ext_authz` runs before authentication, so rejected requests do
-produce decisions, but only an authenticated request exercises identity
-verification and the tuple checks that the observe period is meant to measure.
+supposed to reject. `--expect-decisions` requires `--id-token` or `--cookie`,
+because a request the Gateway rejects never reaches `ext_authz` and therefore has
+no decision to find.
+
+**Attribution does not use a client-supplied request id.** Envoy regenerates
+`x-request-id` (`preserve_external_request_id` defaults to false), so the value in
+`authzd`'s `correlation_id` is Envoy's, not the probe's. `--expect-decisions`
+asserts on a time window, with `--expect-principal` to narrow it; per-case
+attribution needs a unique capability or resource id instead.
 
 Authenticated cases, run by an operator with a valid machine token and/or browser
 session:
