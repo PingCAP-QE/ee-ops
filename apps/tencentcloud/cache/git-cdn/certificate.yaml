@@ -1,0 +1,35 @@
+---
+# Service certificate for the git-cdn TLS listener. It is served by the `tls`
+# sidecar inside the git-cdn pods and verified by Envoy Gateway through the
+# BackendTLSPolicy in backendtlspolicy.yaml, so the two hops
+# (agent -> gateway, gateway -> pod) are both encrypted and the Jenkins HTTP
+# credential never crosses the pod network in cleartext.
+#
+# A renewed pair is projected into the pod atomically by kubelet, but nginx only
+# reads it at start (same limitation as the token broker): the replacement is
+# picked up on the next pod restart, which happens well inside the 30-day
+# renewBefore window because the StatefulSet is rolled by every chart bump.
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: git-cdn-tls
+  namespace: cache
+spec:
+  secretName: git-cdn-tls
+  commonName: git-cdn.cache.svc.cluster.local
+  dnsNames:
+    - git-cdn.cache.svc.cluster.local
+    - git-cdn.cache.svc
+    - git-cdn
+  duration: 2160h
+  renewBefore: 720h
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+    # Projected volumes are swapped atomically, so the sidecar never reads a
+    # half-written pair.
+    rotationPolicy: Always
+  issuerRef:
+    name: internal-ca
+    kind: ClusterIssuer
+    group: cert-manager.io

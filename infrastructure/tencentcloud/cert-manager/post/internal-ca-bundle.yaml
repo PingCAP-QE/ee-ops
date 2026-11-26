@@ -1,0 +1,24 @@
+---
+# Publishes the cluster-internal CA certificate to the namespaces that have to
+# verify an internal service certificate. The CA *key* never leaves
+# `cert-manager`; only the public certificate is copied.
+#
+# First consumer: `cache/internal-ca`, read by the git-cdn BackendTLSPolicy so
+# Envoy Gateway can verify the git-cdn pod certificate
+# (apps/tencentcloud/cache/git-cdn/).
+apiVersion: trust.cert-manager.io/v1alpha1
+kind: Bundle
+metadata:
+  name: internal-ca
+spec:
+  sources:
+    - secret:
+        name: internal-ca
+        key: tls.crt
+  target:
+    # ConfigMap `internal-ca` with key `ca.crt` in every selected namespace.
+    configMap:
+      key: ca.crt
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: cache

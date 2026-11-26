@@ -102,3 +102,88 @@ spec:
       WORKING_DIRECTORY: /data
       PACK_CACHE_MULTI: true
       PACK_CACHE_DEPTH: true
+
+  # Serve TLS from inside the pods. The chart has no TLS option and the app can
+  # only listen on plain HTTP, so a sidecar terminates TLS and proxies to the
+  # loopback listener; that keeps the plaintext hop inside the pod. The gateway
+  # then re-encrypts to this port (see backendtlspolicy.yaml) instead of
+  # downgrading the second hop to cleartext.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: StatefulSet
+              name: git-cdn
+            patch: |
+              apiVersion: apps/v1
+              kind: StatefulSet
+              metadata:
+                name: git-cdn
+              spec:
+                template:
+                  metadata:
+                    annotations:
+                      # Keep `kubectl logs/exec` pointing at git-cdn itself now
+                      # that the pod has a second container.
+                      kubectl.kubernetes.io/default-container: git-cdn
+                  spec:
+                    containers:
+                      - name: tls
+                        # renovate: datasource=docker depName=nginx
+                        image: docker.io/library/nginx:1.27-alpine
+                        command: ["/usr/sbin/nginx"]
+                        args:
+                          - -c
+                          - /etc/nginx/nginx.conf
+                          - -g
+                          - daemon off;
+                        ports:
+                          - name: https
+                            containerPort: 8443
+                            protocol: TCP
+                        volumeMounts:
+                          - name: tls
+                            mountPath: /etc/git-cdn-tls
+                            readOnly: true
+                          - name: tls-proxy-config
+                            mountPath: /etc/nginx/nginx.conf
+                            subPath: nginx.conf
+                            readOnly: true
+                        readinessProbe:
+                          tcpSocket:
+                            port: https
+                          initialDelaySeconds: 5
+                          periodSeconds: 10
+                        livenessProbe:
+                          tcpSocket:
+                            port: https
+                          initialDelaySeconds: 30
+                          periodSeconds: 20
+                        resources:
+                          requests:
+                            cpu: 100m
+                            memory: 64Mi
+                          limits:
+                            cpu: "1"
+                            memory: 256Mi
+                    volumes:
+                      - name: tls
+                        secret:
+                          secretName: git-cdn-tls
+                      - name: tls-proxy-config
+                        configMap:
+                          name: git-cdn-tls-proxy
+          - target:
+              kind: Service
+              name: git-cdn
+            patch: |
+              apiVersion: v1
+              kind: Service
+              metadata:
+                name: git-cdn
+              spec:
+                ports:
+                  - name: https
+                    port: 8443
+                    targetPort: https
+                    protocol: TCP
