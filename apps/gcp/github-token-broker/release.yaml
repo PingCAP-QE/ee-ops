@@ -7,7 +7,7 @@ spec:
   chart:
     spec:
       chart: github-token-broker
-      version: 0.2.2
+      version: 0.2.3
       sourceRef:
         kind: HelmRepository
         name: ee-apps
@@ -32,7 +32,7 @@ spec:
     image:
       repository: ghcr.io/pingcap-qe/ee-apps/github-token-broker
       # renovate: datasource=docker depName=ghcr.io/pingcap-qe/ee-apps/github-token-broker versioning=semver
-      tag: v2026.11.8-19-g04ea8c8
+      tag: v2026.11.22-39-g53753c8
     server:
       tls:
         # Native HTTPS listener. It serves the leaf cert-manager issues in
@@ -56,6 +56,13 @@ spec:
     policy:
       existingSecret: github-token-broker-policy
       key: policy.yaml
+    cache:
+      # Never hand a caller a cached installation token with less than this
+      # left. Entries are shared by everyone asking for the same repository set
+      # and permissions, so the token a slow job receives can be the one another
+      # caller minted minutes ago; the broker re-mints instead of serving one
+      # that would expire mid-job.
+      minRemaining: 15m
     podSecurityContext:
       runAsNonRoot: true
       runAsUser: 65532

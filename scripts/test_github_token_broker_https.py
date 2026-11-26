@@ -131,11 +131,14 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
         gcp = load('apps/gcp/github-token-broker/release.yaml')['spec']
         tke = load('apps/tencentcloud/github-token-broker/release.yaml')['spec']
         for release in (gcp, tke):
-            self.assertEqual(release['chart']['spec']['version'], '0.2.2')
+            self.assertEqual(release['chart']['spec']['version'], '0.2.3')
             self.assertEqual(release['values']['image'], gcp['values']['image'])
             self.assertIs(release['values']['server']['tls']['enabled'], True)
             self.assertEqual(release['values']['server']['tls']['port'], 8443)
             self.assertEqual(release['values']['service'], {'httpsPort': 443})
+            # Cache entries are shared by every caller asking for the same
+            # repository set, so the lifetime floor has to stay explicit.
+            self.assertEqual(release['values']['cache'], {'minRemaining': '15m'})
 
         # Activation opens no client access on the TencentCloud cluster: it has
         # no HTTPS consumer yet and no CA distributor, so the chart's TLS
@@ -268,10 +271,10 @@ class BrokerHTTPSRolloutTest(unittest.TestCase):
 
     def test_release_pins_published_tls_capable_artifacts(self):
         release = load('apps/gcp/github-token-broker/release.yaml')['spec']
-        self.assertEqual(release['chart']['spec']['version'], '0.2.2')
+        self.assertEqual(release['chart']['spec']['version'], '0.2.3')
         self.assertEqual(release['values']['image'], {
             'repository': 'ghcr.io/pingcap-qe/ee-apps/github-token-broker',
-            'tag': 'v2026.11.8-19-g04ea8c8',
+            'tag': 'v2026.11.22-39-g53753c8',
         })
 
     def test_native_https_is_activated_with_the_internal_ca_leaf(self):
