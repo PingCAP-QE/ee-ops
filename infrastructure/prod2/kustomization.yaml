@@ -4,7 +4,6 @@ resources:
   - ../_base
   - namespace.yaml
   - openebs
-  - nfs-pvc-provisioner
   - gateways # replaced nginx ingress controller
   - secret-generator
   - external-secrets
