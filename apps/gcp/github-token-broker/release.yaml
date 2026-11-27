@@ -70,23 +70,14 @@ spec:
       seccompProfile:
         type: RuntimeDefault
     networkPolicy:
-      # Plaintext consumers of the HTTP listener (port 8080). The native TLS
-      # port is never added here: `tlsIngressNamespaces` stays empty, so the
-      # chart's own policy grants 8443 to nobody and the only TLS grant is the
-      # dedicated `github-token-broker-arc-https` policy (arc-runners).
+      # The plaintext listener has no consumers left: Jenkins, `ci-dashboard`
+      # (`apps`), `tibuild`, `chatops-lark` and the GCP Tekton instance (`ee-cd`)
+      # all call the broker through the `infra/eg-internal` gateway over TLS, and
+      # the Service no longer publishes the port (see postRenderers). The native
+      # TLS port is granted by `networkpolicy-gateway-https.yaml` and
+      # `networkpolicy-arc-https.yaml`, not from here.
       tlsIngressNamespaces: []
-      ingressNamespaces:
-        # Active on THIS cluster: the GCP Tekton instance mints here what the
-        # retired TencentCloud/prod2 ones used to (50 mints in 24h, caller
-        # `ee-cd/github-bot`). It is the last plaintext consumer and moves only
-        # once Tekton's own broker configuration is pointed at the gateway.
-        - ee-cd
-        # Migrated to the gateway in ee-ops#2947 (ci-dashboard `apps`, `tibuild`,
-        # `chatops-lark`); the grants stay until the rollout is verified, then go
-        # together with the plaintext Service port.
-        - tibuild
-        - chatops-lark
-        - apps
+      ingressNamespaces: []
         # Not here, on purpose:
         #   `infra`                  -- the Envoy data plane reaches the TLS
         #                               listener (networkpolicy-gateway-https.yaml)
@@ -142,3 +133,22 @@ spec:
       minAvailable: 1
     serviceMonitor:
       enabled: false
+
+  # The app keeps its plaintext listener on 8080 for the kubelet probes, but no
+  # Service port publishes it: the only reachable endpoint is the TLS one the
+  # gateway re-encrypts to. The chart always renders `port: 80`, so the rendered
+  # Service is rewritten here rather than upstream.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Service
+              name: github-token-broker
+            patch: |
+              - op: replace
+                path: /spec/ports
+                value:
+                  - name: https
+                    port: 443
+                    targetPort: https
+                    protocol: TCP
