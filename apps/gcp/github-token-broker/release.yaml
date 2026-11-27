@@ -76,22 +76,21 @@ spec:
       # dedicated `github-token-broker-arc-https` policy (arc-runners).
       tlsIngressNamespaces: []
       ingressNamespaces:
+        # Still on the plaintext listener. `ee-cd` has no Tekton traffic left
+        # (see docs/TEKTON_MIGRATION.md); `chatops-lark` and `apps` are not
+        # migrated yet; `tibuild` carries its own `github.broker_url`.
         - ee-cd
         - tibuild
         - chatops-lark
         - apps
-        # `infra` (the Envoy data plane) is not here: the public /gh-broker
-        # route is retired and the remaining callers are all in-cluster.
-        # Jenkins agent namespaces on this cluster (the `master: "1"`
-        # controller). `pingcap-inc` enforces SAML SSO, so `prow.checkoutRefs`
-        # mints App installation tokens here instead of using the `ti-chi-bot`
-        # SSH key. The jobs set `K8S_NAMESPACE` explicitly, so their pods land
-        # in these namespaces rather than the controller-wide `jenkins-agents`
-        # default:
-        #   jenkins-tidb   -> pingcap-inc/tidb, pingcap-inc/enterprise-extensions
-        #   jenkins-tiflow -> pingcap-inc/{ticdc,tiflow,tiflash-scripts}
-        - jenkins-tidb
-        - jenkins-tiflow
+        # Not here, on purpose:
+        #   `infra`                  -- the Envoy data plane reaches the TLS
+        #                               listener (networkpolicy-gateway-https.yaml)
+        #   `jenkins-tidb`,
+        #   `jenkins-tiflow`         -- they call the broker through the gateway
+        #                               now (`github-token-broker-gcp.pingcap.net`,
+        #                               ee-ops#2941), so nothing should reach the
+        #                               plaintext port from those namespaces.
       egress:
         # DNS.
         - to:
