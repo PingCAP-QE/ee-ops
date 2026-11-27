@@ -22,7 +22,7 @@ When a change spans both repos (e.g. new Jenkins global variable + pipelines usi
 clusters/         # FluxCD bootstrap: flux-system, sources, Kustomization layers per cluster
 infrastructure/   # Base infra per cluster: external-secrets, gateways, kyverno, node-pools, operators, storage-classes, nginx...
 apps/             # Application deployments per cluster (jenkins, tekton, prow, tibuild, zot, kafka...)
-charts/           # Reusable Helm charts: ats, bazel-remote, buildbarn, cla-assistant, git-cdn, greenhouse, mcp-tool, paperclip, prow
+charts/           # Reusable Helm charts: bazel-remote, buildbarn, cla-assistant, git-cdn, greenhouse, mcp-tool, paperclip, prow
 scripts/          # validation + ops scripts
 docs/             # TEKTON_MIGRATION.md, kyverno-policy-testing.md, gar-controlled-delivery/, github-actions-secrets/
 ```
