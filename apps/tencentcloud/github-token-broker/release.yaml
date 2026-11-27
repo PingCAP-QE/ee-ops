@@ -68,16 +68,12 @@ spec:
       seccompProfile:
         type: RuntimeDefault
     networkPolicy:
-      # Plaintext consumers of the HTTP listener (port 8080). The chart keeps the
-      # TLS port out of this list, and nobody is granted it: the listener is
-      # enabled for parity but this cluster has no HTTPS client yet. Add a
-      # namespace here together with the CA distribution it needs.
+      # The plaintext listener has no consumers left: Jenkins (the only caller
+      # in the 24h mint log) goes through the gateway, `ee-cd` has no Tekton any
+      # more, and `tibuild` minted nothing. The Service no longer publishes the
+      # port either (see postRenderers), so nothing may be granted to it.
       tlsIngressNamespaces: []
-      ingressNamespaces:
-        - ee-cd
-        - tibuild
-        # Jenkins agents run the SAML-organization jobs (jenkins-tidb).
-        - jenkins-tidb
+      ingressNamespaces: []
       egress:
         # DNS.
         - to:
@@ -122,3 +118,22 @@ spec:
       minAvailable: 1
     serviceMonitor:
       enabled: false
+
+  # The app keeps its plaintext listener on 8080 for the kubelet probes, but no
+  # Service port publishes it: the only reachable endpoint is the TLS one the
+  # gateway re-encrypts to. The chart always renders `port: 80`, so the rendered
+  # Service is rewritten here rather than upstream.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Service
+              name: github-token-broker
+            patch: |
+              - op: replace
+                path: /spec/ports
+                value:
+                  - name: https
+                    port: 443
+                    targetPort: https
+                    protocol: TCP

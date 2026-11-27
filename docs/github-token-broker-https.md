@@ -208,10 +208,14 @@ shared library passes no `--cacert` at all.
 
 The gateway address is an internal CLB (`10.0.6.5`, RFC1918), so the endpoint is
 reachable from the VPC and from nothing outside it — verified by timing out from
-a corporate laptop against another route on the same gateway. The plaintext
-listener is still up for the namespaces that have not moved (`ee-cd`, `tibuild`);
-the 24h mint log shows only `jenkins-tidb` and `jenkins-tiflash` actually call
-the broker, so retiring that listener is a follow-up after a quiet day.
+a corporate laptop against another route on the same gateway.
+
+The plaintext Service port is gone: the 24h mint log had only `jenkins-tidb` and
+`jenkins-tiflash` calling the broker, `ee-cd` has no Tekton any more and
+`tibuild` minted nothing, so `networkPolicy.ingressNamespaces` is empty and the
+rendered Service publishes `https:443` only. The app still listens on `:8080`
+inside the pod for its own probes, which are container-port probes and need no
+Service port.
 
 ### Who needs the CA on that cluster
 
