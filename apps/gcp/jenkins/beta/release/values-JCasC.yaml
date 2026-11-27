@@ -274,8 +274,13 @@ controller:
                   # the SSH/PAT path.
                   - key: "GIT_BROKER_ENABLED"
                     value: "true"
+                  # Through the in-cluster gateway, over TLS: the plaintext
+                  # Service URL put the caller's SA token and the minted App
+                  # token on the pod network in clear text. The gateway presents
+                  # the public *.pingcap.net certificate and re-encrypts to the
+                  # broker's TLS listener.
                   - key: "GIT_BROKER_URL"
-                    value: "http://github-token-broker.github-token-broker.svc"
+                    value: "https://github-token-broker-gcp.pingcap.net"
                   - key: "GIT_BROKER_ORGS"
                     value: "pingcap-inc"
                   - key: "_JENKINS_OCI_ARTIFACT_HOST_HUB"
