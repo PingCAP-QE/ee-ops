@@ -7,3 +7,6 @@ resources:
   - external-secret-policy.yaml
   - tls.yaml
   - release.yaml
+  - httproute.yaml
+  - backendtlspolicy.yaml
+  - networkpolicy-gateway-https.yaml
