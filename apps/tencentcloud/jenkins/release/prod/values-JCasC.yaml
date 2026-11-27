@@ -258,8 +258,12 @@ controller:
                   # Resolve transport credentials from the shared Jenkins credential IDs.
                   - key: "GIT_SSH_CREDENTIALS_ID"
                     value: "github-sre-bot-ssh"
-                  - key: "GIT_HTTP_CREDENTIALS_ID"
-                    value: "github-bot-https"
+                  # No HTTP credential: every private repository that reaches
+                  # the cache authenticates with a broker-minted App token, and
+                  # the PAT this used to hand to git-cdn is gone (ee-ops#2925).
+                  # Leaving the id unset makes withGitCdnAskPass run without a
+                  # credential helper, so a checkout that still needs one fails
+                  # instead of silently sending a long-lived token.
                   - key: "GIT_CDN_ENABLED"
                     value: "true"
                   # The CDN is reached over TLS through the internal gateway:

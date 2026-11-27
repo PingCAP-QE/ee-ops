@@ -178,17 +178,35 @@ spec:
                       - name: tls-proxy-config
                         configMap:
                           name: git-cdn-tls-proxy
+          # Replace the rendered `http:8000` port entirely: the app keeps
+          # listening on 8000 inside the pod (the sidecar proxies to it over
+          # loopback), but nothing outside the pod may reach it any more, so the
+          # plaintext listener has no Service port and no consumer.
           - target:
               kind: Service
               name: git-cdn
             patch: |
-              apiVersion: v1
-              kind: Service
-              metadata:
-                name: git-cdn
-              spec:
-                ports:
+              - op: replace
+                path: /spec/ports
+                value:
                   - name: https
                     port: 8443
                     targetPort: https
                     protocol: TCP
+          # The chart's helm-test hook wgets the plaintext port; point it at the
+          # TLS endpoint so `helm test` keeps gating the release.
+          - target:
+              kind: Pod
+              name: git-cdn-test-connection
+            patch: |
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                name: git-cdn-test-connection
+              spec:
+                containers:
+                  - name: wget
+                    args:
+                      - --no-check-certificate
+                      - -qO-
+                      - https://git-cdn.cache.svc:8443/
