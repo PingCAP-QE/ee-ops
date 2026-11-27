@@ -43,12 +43,13 @@ spec:
               value: http://openfga-check:8080
             - name: AUTHZD_PRIVATE_ADDR
               value: ":9003"
-            # Enforcing since 2026-11-27: the registry covers all 22 TiBuild
-            # machine operations, every allowlisted caller holds the capabilities
-            # it needs, and the observation window showed authorized decisions
-            # only. Roll back by setting this to observe - one value, no state.
+            # Rolled back to observe on 2026-11-27: enforcing surfaced a datastore
+            # problem in OpenFGA (intermittent "sql error: invalid connection" on
+            # Check), which fail-closed turned into 503s for real TiBuild callers.
+            # Return to enforce only after the connection pool is tuned and a
+            # window shows no dependency errors.
             - name: AUTHZD_DECISION_MODE
-              value: enforce
+              value: observe
             - name: AUTHZD_OPENFGA_STORE_ID
               valueFrom:
                 secretKeyRef:
