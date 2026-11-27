@@ -13,11 +13,25 @@ metadata:
     iam.gke.io/gcp-service-account: terraform-plan-reader@pingcap-testing-account.iam.gserviceaccount.com
 ---
 # `pull-verify-k8s-pod-yaml` in PingCAP-QE/ci resolves every image a changed
-# Pod template references with `crane`. Images in the private `internal`
-# Artifact Registry repository are unreadable without a Google identity, which
-# is why that repository still grants `allUsers` a reader. This ServiceAccount
-# gives the presubmit the project-wide `gar-reader` identity (bound in
-# PingCAP-QE/ee-infra) so the anonymous reader can be dropped.
+# Pod template references with `crane`, and images in the private `internal`
+# Artifact Registry repository need a Google identity to read.
+#
+# That presubmit now runs as `pod-yaml-reader`, whose GCP identity reads exactly
+# the four repositories those templates use (`internal`, `dockerhub-remote`,
+# `hub`, `ghcr-remote`; bound in PingCAP-QE/ee-infra). It replaced the
+# `gar-reader` identity here, which also reads every other repository in the
+# project because the Azure ACR pull-through cache consumes it with a
+# `us-docker.pkg.dev/pingcap-testing-account/*` source rule.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: pod-yaml-reader
+  annotations:
+    iam.gke.io/gcp-service-account: pod-yaml-reader@pingcap-testing-account.iam.gserviceaccount.com
+---
+# Kept until the `pull-verify-k8s-pod-yaml` presubmit switches to
+# `pod-yaml-reader`; its Workload Identity binding is removed right after that
+# switch lands.
 apiVersion: v1
 kind: ServiceAccount
 metadata:

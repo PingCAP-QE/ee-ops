@@ -1,0 +1,25 @@
+# The pod-YAML gate itself is PR-authored and runs as a Workload-Identity
+# ServiceAccount: `pod-yaml-reader` can mint GCP tokens for the GCP identity that
+# reads the four Artifact Registry repositories that gate resolves images from.
+# It is a registered grant, not an oversight, so the policy has to name it.
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prow-presubmit-pod-yaml-reader
+  namespace: prow-test-pods
+  labels:
+    created-by-prow: "true"
+    prow.k8s.io/type: presubmit
+    prow.k8s.io/job: pull-verify-k8s-pod-yaml
+    prow.k8s.io/refs.org: PingCAP-QE
+    prow.k8s.io/refs.repo: ci
+    prow.k8s.io/refs.pull: "5632"
+spec:
+  serviceAccountName: pod-yaml-reader
+  containers:
+    - name: main
+      image: alpine:3.24
+      args:
+        - sh
+        - -ce
+        - bash .ci/run-policy-gate.sh pod-yaml

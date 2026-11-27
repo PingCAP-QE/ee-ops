@@ -15,6 +15,7 @@ policies:
   - ../../restrict-prow-job-pod-credentials.yaml
 resources:
   - resource-presubmit-privileged-sa.yaml
+  - resource-presubmit-pod-yaml-reader.yaml
   - resource-batch-org-secret-volume.yaml
   - resource-presubmit-org-secret-env.yaml
   - resource-presubmit-projected-ssh-key.yaml
@@ -69,3 +70,12 @@ results:
       - plain-pod-privileged
     kind: Pod
     result: skip
+
+  # 7. The pod-YAML gate's own ServiceAccount is a registered Workload-Identity
+  #    grant, so a PR-authored Pod naming it is reported like any other
+  #    privileged identity. Losing this case means the identity left the list.
+  - policy: restrict-prow-job-pod-credentials
+    resources:
+      - prow-presubmit-pod-yaml-reader
+    kind: Pod
+    result: fail
