@@ -1,18 +1,14 @@
 #!/usr/bin/env bash
-# Initial policy-contract guard. Every statically declared non-Prod2 HTTPRoute
-# must be attached to a SecurityPolicy or listed in the reviewed exception file.
+# Policy-contract guard. Every statically declared non-Prod2 HTTPRoute must be
+# attached to a SecurityPolicy. There is no exception register: an unprotected route
+# is a failure.
 set -euo pipefail
 repo_root=${AUTHZ_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
 yq_bin=${YQ_BIN:-yq}
 coverage="$repo_root/scripts/check_authz_policy_coverage.sh"
-exceptions="$repo_root/docs/authz/inventory/route-exceptions.csv"
 tmp=$(mktemp)
 trap 'rm -f "$tmp"' EXIT
 
-if [[ ! -f "$exceptions" ]]; then
-  echo "FAIL: missing explicit route exception register: $exceptions" >&2
-  exit 2
-fi
 for tool in "$yq_bin" jq; do
   if ! command -v "$tool" >/dev/null 2>&1; then
     echo "FAIL: required tool '$tool' is not installed" >&2
@@ -63,5 +59,5 @@ if "$coverage" >"$tmp" 2>&1; then
 fi
 
 cat "$tmp"
-echo "FAIL: route-policy gaps remain; exceptions must be reviewed and enumerated before this guard can pass" >&2
+echo "FAIL: route-policy gaps remain; attach a SecurityPolicy to each route" >&2
 exit 1
