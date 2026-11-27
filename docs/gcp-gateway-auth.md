@@ -49,7 +49,6 @@ separately.
 | `tibuild/api` in-cluster (`v2-tibuild-v2.tibuild.svc`) | NetworkPolicy | Ingress only from `infra` (Gateway), `tibuild`, `chatops-lark`, `ee-portal`; no other Pod can bypass the Gateway |
 | `prow.tidb.net/dashboard/` | OIDC + CSRF | CI Dashboard |
 | `prow.tidb.net/tekton` | OIDC + CSRF | Tekton Dashboard |
-| `prow.pingcap.net/gh-broker/v1/token` | JWT + allowlist | GitHub token broker |
 | `prow.tidb.net/dl` | Public allowlist | Public artifact downloads; target allowlist in `dl` |
 | `prow.tidb.net/jenkins` | Public allowlist | Community read-only Jenkins |
 | `cla.pingcap.net/` | Public app auth | CLA signature flow |

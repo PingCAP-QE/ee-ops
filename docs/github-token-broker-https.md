@@ -37,16 +37,12 @@ projected ServiceAccount token, which the broker validates with TokenReview plus
 the caller policy. TLS adds confidentiality for credentials in flight; it does
 not authorize anyone.
 
-The public route described in
-[External access to the GitHub token broker](github-token-broker-external.md) is a
-different path: callers present a Google ID token, Envoy verifies it and replaces
-the `Authorization` header with a dedicated read-only ServiceAccount token. Since
-2026-11-27 it also re-encrypts to this same certificate — the route's backend is
-Service port 443 with a `BackendTLSPolicy`
-(`apps/gcp/github-token-broker/backendtlspolicy.yaml`) instead of plaintext
-port 80 — so the minted App token no longer crosses the pod network in the clear.
-The CA for that verification reaches the `github-token-broker` namespace through
-the `github-token-broker-ca` Bundle, the same one the runners mount.
+The public route that used to live at `prow.pingcap.net/gh-broker` is retired
+(see [External access to the GitHub token broker](github-token-broker-external.md)):
+it had no traffic and its client identity had no usable key. Inside the cluster
+the broker is reached either directly on the plaintext Service port (Jenkins
+namespaces on GCP) or through a gateway that re-encrypts to this same
+certificate, as the TencentCloud instance does.
 
 ## Scope and ordering
 

@@ -21,7 +21,7 @@ Both clusters serve `securitypolicies.gateway.envoyproxy.io/v1alpha1`,
 extAuth backend is configured or operational.
 
 GCP currently has five SecurityPolicies, each with controller condition
-`Accepted=True`: `ci-dashboard-oidc`, `github-token-broker-jwt`,
+`Accepted=True`: `ci-dashboard-oidc`,
 `tekton-dashboard-oidc`, `tibuild-v2-machine-jwt`, and `tibuild-v2-oidc`.
 TencentCloud currently has no SecurityPolicy resources. The recorded Gateway
 route objects report `Accepted=True` and `ResolvedRefs=True`; route attachment

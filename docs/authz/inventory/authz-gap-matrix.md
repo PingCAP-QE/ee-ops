@@ -24,7 +24,6 @@ attachment and policy status from rendered/live objects before rollout.
 | Cluster | Namespace / route | Host and path | Baseline | Existing evidence to verify |
 | --- | --- | --- | --- | --- |
 | GCP | prow/prow | prow.tidb.net, prow.pingcap.net `/`, `/hook`, `/ti-community-owners`, `/tichi` | gap | Gateway forwarding plus Prow webhook and UI authentication; rendered route/policy attachment required |
-| GCP | default/github-token-broker-external | prow.pingcap.net `/gh-broker/v1/token` | mapped | SecurityPolicy JWT and external caller contract; broker retains TokenReview and repo/permission checks |
 | GCP | tekton-pipelines/tekton | prow.tidb.net `/tekton` | mapped | Dashboard SecurityPolicy; application RBAC remains required |
 | GCP | default/dl | prow.tidb.net `/dl` | gap | Internal DL route; verify auth and app capability checks |
 | GCP | default/dl-public | dl.pingcap.net `/d/` | gap | Anonymous capability URL by design; expiry/revocation/quota remain in DL |
