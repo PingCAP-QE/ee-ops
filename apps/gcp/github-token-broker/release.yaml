@@ -76,10 +76,10 @@ spec:
       # dedicated `github-token-broker-arc-https` policy (arc-runners).
       tlsIngressNamespaces: []
       ingressNamespaces:
-        # Still on the plaintext listener. `ee-cd` has no Tekton traffic left
-        # (see docs/TEKTON_MIGRATION.md); `chatops-lark` and `apps` are not
-        # migrated yet; `tibuild` carries its own `github.broker_url`.
-        - ee-cd
+        # `ee-cd` has no Tekton traffic left (docs/TEKTON_MIGRATION.md), so its
+        # grant is dropped here. The other three move to the gateway in the same
+        # change; their grants stay until the rollout is verified, then go with
+        # the plaintext Service port.
         - tibuild
         - chatops-lark
         - apps

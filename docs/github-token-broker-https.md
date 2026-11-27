@@ -49,8 +49,11 @@ token and the minted App token never cross the pod network in clear text and no
 CA has to be mounted into any agent image. `eg-internal` is a ClusterIP data
 plane, so that name is reachable from pods only.
 
-The plaintext Service port stays for the non-Jenkins callers (`ee-cd`,
-`tibuild`, `chatops-lark`, `apps`); migrating them is a separate change.
+The remaining callers move with it: `ci-dashboard` (`apps` namespace) and
+`tibuild` carry the gateway URL in their own configuration, and `chatops-lark`
+reads it from its Secret Manager config. `ee-cd` has no Tekton traffic left, so
+its plaintext grant is gone. Once those are verified, the plaintext Service port
+itself can be retired the way TencentCloud did it.
 
 ## Scope and ordering
 
