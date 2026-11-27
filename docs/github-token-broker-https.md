@@ -39,10 +39,18 @@ not authorize anyone.
 
 The public route that used to live at `prow.pingcap.net/gh-broker` is retired
 (see [External access to the GitHub token broker](github-token-broker-external.md)):
-it had no traffic and its client identity had no usable key. Inside the cluster
-the broker is reached either directly on the plaintext Service port (Jenkins
-namespaces on GCP) or through a gateway that re-encrypts to this same
-certificate, as the TencentCloud instance does.
+it had no traffic and its client identity had no usable key.
+
+In-cluster clients reach the broker through the `infra/eg-internal` Gateway on
+`https://github-token-broker-gcp.pingcap.net`, the same shape as TencentCloud:
+the Gateway terminates the agent's TLS with the public `*.pingcap.net` wildcard
+and a `BackendTLSPolicy` re-encrypts to this same certificate, so the caller's SA
+token and the minted App token never cross the pod network in clear text and no
+CA has to be mounted into any agent image. `eg-internal` is a ClusterIP data
+plane, so that name is reachable from pods only.
+
+The plaintext Service port stays for the non-Jenkins callers (`ee-cd`,
+`tibuild`, `chatops-lark`, `apps`); migrating them is a separate change.
 
 ## Scope and ordering
 

@@ -68,3 +68,23 @@ spec:
             kind: HTTPRoute
         namespaces:
           from: All
+    # In-cluster HTTPS for callers that carry a credential. The data plane is a
+    # ClusterIP service (see the EnvoyProxy above), so this listener is reachable
+    # from pods only -- never from the internet. The certificate is the public
+    # `*.pingcap.net` wildcard, so callers verify it with the roots their images
+    # already ship; a route that needs a cluster-internal backend certificate
+    # re-encrypts on top with a BackendTLSPolicy.
+    - name: wildcard-pingcap-net-https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.pingcap.net"
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-pingcap-net-cert
+      allowedRoutes:
+        kinds:
+          - group: gateway.networking.k8s.io
+            kind: HTTPRoute
+        namespaces:
+          from: All
