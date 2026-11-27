@@ -1,0 +1,25 @@
+---
+# Re-encrypt the last hop. Terminating TLS at the gateway would leave the
+# caller's Kubernetes SA token (the broker's whole identity model) in the request
+# and the minted GitHub App installation token in the response on the pod network
+# in clear text.
+#
+# Envoy verifies the broker certificate against the cluster-internal CA that
+# trust-manager publishes as `github-token-broker/github-token-broker-ca` (the
+# same Bundle the runners mount).
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: github-token-broker-gateway
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: github-token-broker
+      sectionName: https
+  validation:
+    hostname: github-token-broker.github-token-broker.svc
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: github-token-broker-ca

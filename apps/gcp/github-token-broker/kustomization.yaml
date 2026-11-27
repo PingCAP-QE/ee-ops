@@ -6,5 +6,8 @@ resources:
   - external-secret-credentials.yaml
   - external-secret-policy.yaml
   - tls.yaml
+  - httproute-gateway.yaml
+  - backendtlspolicy.yaml
+  - networkpolicy-gateway-https.yaml
   - networkpolicy-arc-https.yaml
   - release.yaml

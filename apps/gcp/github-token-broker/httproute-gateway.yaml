@@ -1,0 +1,31 @@
+---
+# In-cluster entry for the broker over TLS, for the GKE Jenkins agents
+# (`jenkins-tidb`, `jenkins-tiflow`). It replaces their plaintext Service call so
+# the caller's SA token and the minted App token are encrypted on every hop.
+#
+# Only the exact token path with POST is routed: the broker serves `/metrics`,
+# `/healthz` and `/readyz` without authentication on the same port.
+#
+# The host name carries the cluster (`-gcp`), because the TencentCloud instance
+# uses `-qcloud` on its own internal gateway.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: github-token-broker-gateway
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: eg-internal
+      namespace: infra
+  hostnames:
+    - github-token-broker-gcp.pingcap.net
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /v1/token
+          method: POST
+      backendRefs:
+        - name: github-token-broker
+          port: 443
+          weight: 1
