@@ -9,7 +9,7 @@ This directory contains repository design notes, migration guides, and operation
 - `gar-controlled-delivery/README.md`: controlled private-delivery design and related implementation documents
 - `github-actions-secrets/README.md`: GitHub Actions secrets central management design
 - `git-cdn-jenkins-auth.md`: Jenkins Git CDN URL rewriting and public/private repository authentication
-- `github-token-broker-external.md`: public JWT entry for the GitHub token broker, key issuance, residual risks and rollback
+- `github-token-broker-external.md`: the retired public JWT entry for the GitHub token broker — why it was removed and how to restore it
 - `zot-personal-namespaces.md`: `personal/**` namespaces on `cr.pingcap.net` (tencentcloud zot): how user lists are wired, why authorization must be users-based rather than groups-based, and the add-user / debug runbook
 - `external-secrets-scope.md`: generated inventory of the namespaces and GCP secrets reachable through `ClusterSecretStore/ee-gcp-sm`, plus the trust-domain split planned to narrow it
 

@@ -1,199 +1,54 @@
-# External access to the GitHub token broker
+# External access to the GitHub token broker (retired)
 
-The cluster-internal `github-token-broker` is also reachable from the public
-internet at:
+The broker used to be reachable from the public internet at:
 
 ```text
 POST https://prow.pingcap.net/gh-broker/v1/token
 ```
 
-This document describes the deployment-only design: the broker image, chart and
-code are unchanged.
+**It is retired as of 2026-11-27.** The route never carried traffic: the broker
+mint log has no `external-reader` entries, no code in PingCAP-QE references the
+URL, and the `gh-broker-client-macos@pingcap-testing-account` service account the
+design depended on has no user-managed key, so the documented `key.json` client
+flow could not have authenticated at all.
 
-## Topology
+The macOS build fleet does not need it: the `MacBuild` agent runs the checkout on
+the Mac with a `source.gitSecretRef` Secret it reads through the Kubernetes API,
+and the planned replacement is for the in-cluster operator to mint broker tokens
+and materialise them into a per-build Secret. Nothing on the Mac talks to the
+broker directly.
 
-```text
-client
-  Authorization: Bearer <Google ID token>
-    -> GKE external HTTPS (TLS terminated)
-    -> eg-internal Envoy
-         HTTPRoute: exact /gh-broker/v1/token, POST
-         URLRewrite: /v1/token
-         SecurityPolicy: JWT (issuer, audience) + claim authorization
-         HTTPRouteFilter: replace Authorization with the broker SA token
-    -> Service github-token-broker:80
-    -> broker: TokenReview + policy (unchanged)
-```
+## What was removed
 
-Only the token path is routed. `/metrics`, `/healthz` and `/readyz` stay
-cluster-internal.
+| Object | Purpose |
+| --- | --- |
+| `HTTPRoute/github-token-broker-external` | exact `POST /gh-broker/v1/token`, URLRewrite to `/v1/token` |
+| `SecurityPolicy/github-token-broker-jwt` | Google ID token (issuer, audience, per-client allowlist) |
+| `HTTPRouteFilter/github-token-broker-upstream-credential` | replaced `Authorization` with the injected SA token |
+| `BackendTrafficPolicy/github-token-broker-external-limit` | 300 req/min coarse limit |
+| `ServiceAccount/external-reader` + its token Secret + PushSecret | the identity injected into the upstream request |
+| `ExternalSecret/github-token-broker-upstream` | read that token back with the `Bearer ` prefix |
+| `BackendTLSPolicy/github-token-broker-external` + `NetworkPolicy/…-gateway-https` | re-encryption and the `infra` grant added for it |
+| broker policy rule `github-token-broker/external-reader` | authorization for the injected identity |
 
-## Authentication model
+The broker itself is unchanged: it still serves `/v1/token` on its TLS listener
+inside the cluster, and the runners keep their own HTTPS hop
+(`GITINSIGHT_BROKER_CA_FILE`).
 
-External callers present a **Google ID token** with:
+## Restoring it
 
-```text
-iss = https://accounts.google.com
-aud = https://prow.pingcap.net/gh-broker
-email = gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com
-```
+If an out-of-cluster client ever needs the broker, restore the pieces above from
+git history (`git log -- apps/gcp/github-token-broker/`), and in the same change:
 
-The gateway validates the signature, issuer and audience, then the
-`authorization` policy allows only the service account emails listed one by one
-(machine clients; add the next client next to the existing entry).
+1. re-add the `external-reader` rule to `github-token-broker-policy` (GCP Secret
+   Manager, managed outside this repository);
+2. issue a user-managed key for the client service account, or replace the
+   Google ID token flow with an identity the client can actually obtain — a
+   physical Mac has no metadata server, so a key file is a long-lived credential
+   on the machine and should be weighed against the operator-mints alternative;
+3. keep the `BackendTLSPolicy`: the upstream of that route must never fall back
+   to plaintext port 80, because the response carries a freshly minted App token.
 
-There is deliberately no domain-wide `hd = pingcap.com` rule: it would let any
-employee identity — or any compromised employee token — mint GitHub App
-installation tokens for the whole organisation.
-
-The caller's token never reaches the broker. A `HTTPRouteFilter` overwrites the
-`Authorization` header with the token of a dedicated `external-reader`
-ServiceAccount, which has **no RoleBindings or ClusterRoleBindings**. The broker
-performs the normal `TokenReview` and policy check.
-
-### Client service accounts
-
-Client service accounts are managed outside this repository by the platform
-infrastructure process. The macOS worker identity is
-`gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com`; do not
-create or delete service accounts with `gcloud`.
-
-The service accounts have no GCP IAM roles. Create a JSON key per client
-installation and hand it over out of band:
-
-```bash
-gcloud iam service-accounts keys create key.json \
-  --iam-account=gh-broker-client-macos@pingcap-testing-account.iam.gserviceaccount.com \
-  --project=pingcap-testing-account
-```
-
-A key can only mint ID tokens with the audience above; it cannot call Google
-APIs. Use one key per client and delete the key to revoke that client
-(`gcloud iam service-accounts keys delete`).
-
-To onboard another client, request a new service account through the platform
-infrastructure process, add the resulting email to the `broker-clients` claim
-values in `apps/gcp/github-token-broker/security-policy.yaml`, and issue a key.
-
-### Minting a token
-
-gcloud (activate the key in an isolated config directory):
-
-```bash
-export CLOUDSDK_CONFIG=$(mktemp -d)
-gcloud auth activate-service-account --key-file=key.json
-gcloud auth print-identity-token --audiences=https://prow.pingcap.net/gh-broker
-```
-
-Python:
-
-```python
-from google.auth.transport.requests import Request
-from google.oauth2 import service_account
-
-creds = service_account.IDTokenCredentials.from_service_account_file(
-    "key.json", target_audience="https://prow.pingcap.net/gh-broker"
-)
-creds.refresh(Request())
-print(creds.token)
-```
-
-Go:
-
-```go
-creds, err := idtoken.CredentialsFromJSON(ctx, keyJSON,
-    "https://prow.pingcap.net/gh-broker")
-tok, err := creds.TokenSource.Token()
-```
-
-Node:
-
-```js
-const auth = new GoogleAuth({keyFile: "key.json"});
-const client = await auth.getIdTokenClient("https://prow.pingcap.net/gh-broker");
-const headers = await client.getRequestHeaders();
-```
-
-## Broker identity
-
-```text
-Secret/external-reader-token (ServiceAccount token)
-  -> PushSecret -> GCP Secret Manager
-  -> ExternalSecret (template "Bearer {{ .token }}")
-  -> Secret/github-token-broker-upstream (key: credential)
-  -> HTTPRouteFilter/credentialInjection
-```
-
-Both directions refresh hourly. The broker never receives the caller's token,
-and the caller never receives the broker's ServiceAccount token.
-
-## Authorization
-
-The allowlist lives in the GCP Secret Manager secret
-`github-token-broker-policy` (not in this repository). A minimal rule:
-
-```yaml
-  - caller:
-      namespace: github-token-broker
-      service_account: external-reader
-    allow:
-      - owner: example-org
-        repositories: ["example-repo"]
-        max_permissions:
-          contents: read
-```
-
-The broker reloads the policy within seconds; no restart is needed. Keep the
-external rule read-only: there is no additional code-level ceiling in the
-deployment-only design.
-
-## Verification
-
-```bash
-# 401 without a token
-curl -sS -o /dev/null -w '%{http_code}\n' -X POST \
-  https://prow.pingcap.net/gh-broker/v1/token \
-  -H 'Content-Type: application/json' \
-  -d '{"repo":"example-org/example-repo","repositories":["example-repo"]}'
-
-# 200 with a valid ID token (do not echo the token)
-curl -sS -o /dev/null -w '%{http_code}\n' -X POST \
-  https://prow.pingcap.net/gh-broker/v1/token \
-  -H "Authorization: Bearer ${ID_TOKEN}" \
-  -H 'Content-Type: application/json' \
-  -d '{"repo":"example-org/example-repo","repositories":["example-repo"],"permissions":{"contents":"read"}}'
-
-# The broker ServiceAccount must not have RBAC permissions
-kubectl auth can-i --list \
-  --as=system:serviceaccount:github-token-broker:external-reader
-```
-
-## Residual risks
-
-1. **Installation-wide token.** When a request omits `repositories` and asks for
-   no write permission, the broker mints a token for the whole installation.
-   The gateway cannot inspect or rewrite the JSON body. External callers can
-   therefore obtain read access to every repository the GitHub App is installed
-   on, not only the allowlist. Detect it by alerting on broker log entries for
-   `external-reader` with `"repositories":[]`. A code guard or a dedicated
-   GitHub App would close this gap.
-2. **Shared broker identity.** Every external caller is mapped to the same
-   broker `external-reader` ServiceAccount; broker audit logs and rate limits
-   cannot distinguish clients. The gateway can distinguish them by the JWT
-   `email` claim, but that requires claim-based logging.
-3. **Long-lived keys.** Service account keys do not expire. Use one key per
-   client and rotate them; the ID tokens themselves are short-lived (one hour).
-4. **PAT fallback.** Keep `github.fallback.enabled=false`. If a PAT is
-   configured, external callers could receive it for owners where the App is not
-   installed.
-
-## Rollback
-
-- Remove the `github-token-broker-external` HTTPRoute: the public endpoint
-  returns 404 and the broker stays available in-cluster.
-- Remove the `broker-clients` authorization rule (or delete the service account
-  key): external requests fail with 403/401.
-- Remove the `external-reader` policy rule to revoke authorization
-  independently of the gateway.
-
-None of these steps affects in-cluster callers.
+Prefer the in-cluster alternative first: the `mac-builder-operator` can mint
+per-build tokens with its own ServiceAccount and hand them to the Mac through the
+`gitSecretRef` Secret it already reads.
