@@ -43,12 +43,12 @@ spec:
               value: http://openfga-check:8080
             - name: AUTHZD_PRIVATE_ADDR
               value: ":9003"
-            # Observe-only until a route is attached and its decisions are
-            # reviewed. An unmatched route denies under the default enforce, so
-            # attaching extAuth first would 403 every path the registry does not
-            # list yet.
+            # Enforcing since 2026-11-27: the registry covers all 22 TiBuild
+            # machine operations, every allowlisted caller holds the capabilities
+            # it needs, and the observation window showed authorized decisions
+            # only. Roll back by setting this to observe - one value, no state.
             - name: AUTHZD_DECISION_MODE
-              value: observe
+              value: enforce
             - name: AUTHZD_OPENFGA_STORE_ID
               valueFrom:
                 secretKeyRef:
