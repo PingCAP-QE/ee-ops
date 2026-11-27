@@ -39,8 +39,14 @@ not authorize anyone.
 
 The public route described in
 [External access to the GitHub token broker](github-token-broker-external.md) is a
-different path. TLS there terminates at the GKE gateway, its upstream to the
-Service stays plaintext, and this certificate is not part of it.
+different path: callers present a Google ID token, Envoy verifies it and replaces
+the `Authorization` header with a dedicated read-only ServiceAccount token. Since
+2026-11-27 it also re-encrypts to this same certificate — the route's backend is
+Service port 443 with a `BackendTLSPolicy`
+(`apps/gcp/github-token-broker/backendtlspolicy.yaml`) instead of plaintext
+port 80 — so the minted App token no longer crosses the pod network in the clear.
+The CA for that verification reaches the `github-token-broker` namespace through
+the `github-token-broker-ca` Bundle, the same one the runners mount.
 
 ## Scope and ordering
 

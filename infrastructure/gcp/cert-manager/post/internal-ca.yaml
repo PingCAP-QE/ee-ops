@@ -43,5 +43,12 @@ spec:
     configMap:
       key: ca.crt
     namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: arc-runners
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            # The runners' GitInsight client mounts the bundle.
+            - arc-runners
+            # The broker's own BackendTLSPolicy verifies the pod certificate
+            # with it, so the public /gh-broker route can be re-encrypted.
+            - github-token-broker

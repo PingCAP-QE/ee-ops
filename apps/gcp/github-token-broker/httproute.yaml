@@ -29,5 +29,8 @@ spec:
             kind: HTTPRouteFilter
             name: github-token-broker-upstream-credential
       backendRefs:
+        # The TLS listener, re-encrypted by the BackendTLSPolicy in
+        # backendtlspolicy.yaml. Port 80 would terminate TLS at the gateway and
+        # hand the minted App token to the pod network in clear text.
         - name: github-token-broker
-          port: 80
+          port: 443
