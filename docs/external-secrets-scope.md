@@ -68,9 +68,9 @@ up as a reviewable diff instead of silently widening the blast radius.
 | Cluster | Allowlisted namespaces | Consuming namespaces | Namespaces without consumers | ExternalSecrets | Distinct GCP secrets |
 | :--- | ---: | ---: | ---: | ---: | ---: |
 | `gcp` | 22 | 22 | 0 | 70 | 51 |
-| `tencentcloud` | 17 | 17 | 0 | 43 | 38 |
+| `tencentcloud` | 17 | 17 | 0 | 42 | 38 |
 | `prod2` | 6 | 6 | 0 | 14 | 26 |
-| **Total** | **45** | **45** | **0** | **127** | **87** |
+| **Total** | **45** | **45** | **0** | **126** | **87** |
 
 ### Consumers by namespace
 
@@ -111,7 +111,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | `ee-cd` | CI | 1 | `tencentcloud_ci_dashboard_db_json` |
 | `github-token-broker` | CORE | 2 | `gha__system__github_app_private_key`, `github-token-broker-policy` |
 | `infra` | CORE | 2 | `gcp_wildcard_pingcap_net_cert_json`, `gcp_wildcard_tidb_net_cert_json` |
-| `jenkins` | JENKINS | 11 | `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `google-oauth2-client-jenkins`, `tencentcloud_common_creds_json`, `tencentcloud_jenkins_artifact_s3_json`, `tencentcloud_jenkins_cache_s3_json`, `tencentcloud_jenkins_codecov_tokens_json` |
+| `jenkins` | JENKINS | 10 | `github-bot-ssh-rsa-json`, `github-bot-token`, `github-bot-username`, `google-oauth2-client-jenkins`, `tencentcloud_common_creds_json`, `tencentcloud_jenkins_artifact_s3_json`, `tencentcloud_jenkins_cache_s3_json`, `tencentcloud_jenkins_codecov_tokens_json` |
 | `jenkins-pd` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
 | `jenkins-ticdc` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
 | `jenkins-tidb` | JENKINS-AGENTS | 1 | `ci_registry_auth_dockerconfig_json` |
@@ -154,7 +154,7 @@ up as a reviewable diff instead of silently widening the blast radius.
 | :--- | :--- | :--- | ---: | ---: |
 | CORE | `ee-gcp-sm` | `github-token-broker`, `infra` | 4 | 4 |
 | CI | `ee-gcp-sm-ci-app` | `arc-runners`, `ee-cd`, `prow-test-pods` | 9 | 11 |
-| JENKINS | `ee-gcp-sm-ci-app` | `jenkins` | 11 | 8 |
+| JENKINS | `ee-gcp-sm-ci-app` | `jenkins` | 10 | 8 |
 | JENKINS-AGENTS | `ee-gcp-sm-ci-app` | `jenkins-pd`, `jenkins-ticdc`, `jenkins-tidb`, `jenkins-tiflash`, `jenkins-tiflow`, `jenkins-tikv` | 6 | 1 |
 | APP | `ee-gcp-sm-ci-app` | `cache`, `cs`, `kafka`, `tibuild`, `zot` | 13 | 20 |
 
