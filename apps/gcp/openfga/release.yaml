@@ -64,3 +64,12 @@ spec:
                               secretKeyRef:
                                 name: openfga-backend
                                 key: runtime_uri
+                          # Check failures surfaced as "sql error: invalid connection":
+                          # the pool held a connection the server had already closed.
+                          # Recycle well inside any idle timeout instead of trusting it.
+                          - name: OPENFGA_DATASTORE_CONN_MAX_LIFETIME
+                            value: 1m
+                          - name: OPENFGA_DATASTORE_CONN_MAX_IDLE_TIME
+                            value: 30s
+                          - name: OPENFGA_DATASTORE_MAX_IDLE_CONNS
+                            value: "2"
