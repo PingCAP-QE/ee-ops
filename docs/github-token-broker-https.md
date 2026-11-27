@@ -49,11 +49,13 @@ token and the minted App token never cross the pod network in clear text and no
 CA has to be mounted into any agent image. `eg-internal` is a ClusterIP data
 plane, so that name is reachable from pods only.
 
-The remaining callers move with it: `ci-dashboard` (`apps` namespace) and
-`tibuild` carry the gateway URL in their own configuration, and `chatops-lark`
-reads it from its Secret Manager config. `ee-cd` has no Tekton traffic left, so
-its plaintext grant is gone. Once those are verified, the plaintext Service port
-itself can be retired the way TencentCloud did it.
+The remaining callers moved too: `ci-dashboard` (`apps` namespace) and `tibuild`
+carry the gateway URL in their own configuration, `chatops-lark` reads it from its
+Secret Manager config, and the GCP Tekton instance (`ee-cd`) receives it from its
+trigger bindings (`gcp-*-build-params`), so no task or pipeline hardcodes an
+endpoint. With that, the plaintext Service port is retired here as well: the app
+still listens on `127.0.0.1:8080` for its own probes, but the Service publishes
+`https:443` only and `networkPolicy.ingressNamespaces` is empty.
 
 ## Scope and ordering
 
