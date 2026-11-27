@@ -197,45 +197,42 @@ from it. That broker now runs the same chart (`0.2.2`), the same image, and the
 same activated listener (`server.tls.enabled: true`, port 8443, Service 443), so
 both clusters are one recipe.
 
-**Nobody consumes it there yet, and moving the consumers is deliberately on
-hold.** Activation opened the listener but granted it to no namespace:
-`networkPolicy.tlsIngressNamespaces` stays empty and there is no dedicated port
-policy, so no client is configured for HTTPS. The namespaces that still call the
-broker there (`ee-cd`, `tibuild`, `jenkins-tidb`) keep using the plaintext
-listener.
+**Jenkins is the first HTTPS client there, and it needs no CA.** The listener is
+published on the cluster's own internal gateway
+(`github-token-broker-qcloud.pingcap.net`, `apps/tencentcloud/github-token-broker/httproute.yaml`),
+which presents the public `*.pingcap.net` certificate and re-encrypts to the
+pod's TLS listener through a `BackendTLSPolicy`; the agents therefore verify the
+public certificate with the roots their images already ship, and no trust
+material is mounted anywhere. `GIT_BROKER_URL` points at that name, and the
+shared library passes no `--cacert` at all.
 
-The reason is cost, not risk tolerance: the only live client there is Jenkins,
-whose build pods are created by the shared library that ~370 Jenkinsfiles go
-through, so giving them a CA file means adding a mount to that one shared point
-plus trust distribution on a cluster whose NetworkPolicy does not enforce
-either. That is a standing amount of CI surface for a single cluster, while the
-finding the TLS work addresses is the ARC runner hop, which the GCP cluster
-covers. Revisit when a TencentCloud client actually needs it — the procedure
-below is kept for that case.
+The gateway address is an internal CLB (`10.0.6.5`, RFC1918), so the endpoint is
+reachable from the VPC and from nothing outside it — verified by timing out from
+a corporate laptop against another route on the same gateway. The plaintext
+listener is still up for the namespaces that have not moved (`ee-cd`, `tibuild`);
+the 24h mint log shows only `jenkins-tidb` and `jenkins-tiflash` actually call
+the broker, so retiring that listener is a follow-up after a quiet day.
 
 ### Who needs the CA on that cluster
 
-The cluster has no ARC and no trust-bundle consumer, so trust-manager and a
-`Bundle` are intentionally not installed and the CA exists only as
-`Secret/internal-ca` in the `cert-manager` namespace — not readable from the
-consumer namespaces, and useless to them without an explicit grant. When the
-first HTTPS client lands:
+trust-manager **is** installed there now, but only to publish the internal CA to
+the two namespaces whose gateways verify a pod certificate
+(`cache`, `github-token-broker`) — it is not a trust bundle for broker clients.
+A client that wants to talk to the broker's in-cluster name
+(`github-token-broker.github-token-broker.svc:443`) directly is a different
+story and needs its own trust distribution:
 
-1. Install trust-manager in that cluster with the same scoping as the GCP one
-   (`app.targetNamespaces` limited to the consumer namespace,
-   `secretTargets.authorizedSecrets: [internal-ca]`), and add a `Bundle` that
-   publishes `ca.crt` into that namespace only.
-2. Mount that ConfigMap into the client and point it at the broker's in-cluster
-   name (`github-token-broker.github-token-broker.svc.cluster.local` on Service
-   port 443). Do not fall back to plaintext or to system trust.
-3. Only then set `networkPolicy.tlsIngressNamespaces` to that namespace, so the
-   port is granted together with the trust it needs.
+1. Extend the `Bundle`'s namespace selector to that client's namespace, and add
+   the namespace to `app.targetNamespaces` of the trust-manager release.
+2. Mount the resulting ConfigMap into the client and pass it to whatever HTTP
+   client it uses. The shared Jenkins library deliberately has no CA option any
+   more, so such a client has to bring its own (the GCP ARC runner does this
+   with `GITINSIGHT_BROKER_CA_FILE`).
+3. Grant that namespace on port 8443 with a NetworkPolicy next to the route it
+   serves.
 4. Verify the handshake on every replica, as in
    [Verifying the activated listener](#verifying-the-activated-listener), and
    keep the client's HTTP calls until its HTTPS path is proven.
-
-Sizing that migration is separate work: the clients there are Tekton and Jenkins
-jobs, not a single helper, and each needs its own CA mount and URL change.
 
 ## Public CA on ARC
 

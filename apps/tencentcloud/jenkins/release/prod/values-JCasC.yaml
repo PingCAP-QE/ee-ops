@@ -286,8 +286,6 @@ controller:
                   # roots -- no internal CA is mounted into the agent images.
                   - key: "GIT_BROKER_URL"
                     value: "https://github-token-broker-qcloud.pingcap.net"
-                  - key: "GIT_BROKER_CA_FILE"
-                    value: "system"
                   - key: "GIT_BROKER_ORGS"
                     value: "tidbcloud,pingcap-inc"
                   # PingCAP-QE is not migrated as an organization: only this one
