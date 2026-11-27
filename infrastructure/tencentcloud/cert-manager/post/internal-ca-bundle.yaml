@@ -3,9 +3,10 @@
 # verify an internal service certificate. The CA *key* never leaves
 # `cert-manager`; only the public certificate is copied.
 #
-# First consumer: `cache/internal-ca`, read by the git-cdn BackendTLSPolicy so
-# Envoy Gateway can verify the git-cdn pod certificate
-# (apps/tencentcloud/cache/git-cdn/).
+# Consumers: `cache/internal-ca` for the git-cdn BackendTLSPolicy and
+# `github-token-broker/internal-ca` for the token broker's, so Envoy Gateway can
+# verify the pod certificate of each (apps/tencentcloud/cache/git-cdn/ and
+# apps/tencentcloud/github-token-broker/).
 apiVersion: trust.cert-manager.io/v1alpha1
 kind: Bundle
 metadata:
@@ -20,5 +21,9 @@ spec:
     configMap:
       key: ca.crt
     namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: cache
+      matchExpressions:
+        - key: kubernetes.io/metadata.name
+          operator: In
+          values:
+            - cache
+            - github-token-broker

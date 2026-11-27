@@ -1,0 +1,32 @@
+---
+# In-cluster entry for the token broker, over TLS.
+#
+# Only the exact token path with POST is routed: the broker serves `/metrics`,
+# `/healthz` and `/readyz` without authentication on the same port, and the
+# gateway address is reachable from the whole VPC, so a prefix match would hand
+# the per-repository mint counters to anyone in the VPC.
+#
+# The host name carries the cluster (`-qcloud`; a GCP instance would use
+# `-gcp`): each cluster terminates `*.pingcap.net` on its own internal gateway
+# address.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: github-token-broker
+spec:
+  parentRefs:
+    - kind: Gateway
+      name: internal-https
+      namespace: infra
+  hostnames:
+    - github-token-broker-qcloud.pingcap.net
+  rules:
+    - matches:
+        - path:
+            type: Exact
+            value: /v1/token
+          method: POST
+      backendRefs:
+        - name: github-token-broker
+          port: 443
+          weight: 1

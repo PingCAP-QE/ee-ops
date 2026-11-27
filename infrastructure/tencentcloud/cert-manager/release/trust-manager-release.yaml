@@ -41,7 +41,9 @@ spec:
     app:
       trust:
         namespace: cert-manager
-      # Consumers that verify the internal CA: the git-cdn gateway backend
-      # (BackendTLSPolicy) today. Widen this only together with a Bundle.
+      # Consumers that verify the internal CA: the git-cdn and token-broker
+      # gateway backends (BackendTLSPolicy). Widen this only together with a
+      # Bundle.
       targetNamespaces:
         - cache
+        - github-token-broker
