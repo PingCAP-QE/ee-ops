@@ -189,8 +189,12 @@ spec:
                   value: INFO
                 - name: CI_DASHBOARD_BATCH_SIZE
                   value: "200"
+                # Through the in-cluster gateway: the plaintext Service port is
+                # being retired, and this path carries the caller's SA token and
+                # the minted App token. The gateway presents the public
+                # *.pingcap.net certificate, so no CA setting is needed.
                 - name: CI_DASHBOARD_GITHUB_BROKER_URL
-                  value: http://github-token-broker.github-token-broker.svc
+                  value: https://github-token-broker-gcp.pingcap.net
               resources:
                 requests:
                   cpu: "500m"
