@@ -76,10 +76,14 @@ spec:
       # dedicated `github-token-broker-arc-https` policy (arc-runners).
       tlsIngressNamespaces: []
       ingressNamespaces:
-        # `ee-cd` has no Tekton traffic left (docs/TEKTON_MIGRATION.md), so its
-        # grant is dropped here. The other three move to the gateway in the same
-        # change; their grants stay until the rollout is verified, then go with
-        # the plaintext Service port.
+        # Active on THIS cluster: the GCP Tekton instance mints here what the
+        # retired TencentCloud/prod2 ones used to (50 mints in 24h, caller
+        # `ee-cd/github-bot`). It is the last plaintext consumer and moves only
+        # once Tekton's own broker configuration is pointed at the gateway.
+        - ee-cd
+        # Migrated to the gateway in ee-ops#2947 (ci-dashboard `apps`, `tibuild`,
+        # `chatops-lark`); the grants stay until the rollout is verified, then go
+        # together with the plaintext Service port.
         - tibuild
         - chatops-lark
         - apps
