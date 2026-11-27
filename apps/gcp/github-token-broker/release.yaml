@@ -80,8 +80,9 @@ spec:
         - tibuild
         - chatops-lark
         - apps
-        # Envoy data plane that fronts the public /gh-broker route.
-        - infra
+        # `infra` (the Envoy data plane) is NOT here: the public route now
+        # reaches the TLS listener, so its grant lives in
+        # networkpolicy-gateway-https.yaml on port 8443 instead.
         # Jenkins agent namespaces on this cluster (the `master: "1"`
         # controller). `pingcap-inc` enforces SAML SSO, so `prow.checkoutRefs`
         # mints App installation tokens here instead of using the `ti-chi-bot`

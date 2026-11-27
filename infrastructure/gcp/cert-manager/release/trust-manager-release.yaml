@@ -41,6 +41,9 @@ spec:
     app:
       trust:
         namespace: cert-manager
-      # Keep trust-manager from writing targets outside the runner namespace.
+      # Keep trust-manager from writing targets outside the namespaces that
+      # actually verify the CA: the runners' GitInsight client and the broker's
+      # own gateway backend (BackendTLSPolicy re-encryption).
       targetNamespaces:
         - arc-runners
+        - github-token-broker

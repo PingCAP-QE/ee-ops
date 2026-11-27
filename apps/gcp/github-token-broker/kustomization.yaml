@@ -11,6 +11,8 @@ resources:
   - external-secret-upstream.yaml
   - httproute-filter.yaml
   - httproute.yaml
+  - backendtlspolicy.yaml
+  - networkpolicy-gateway-https.yaml
   - security-policy.yaml
   - backend-traffic-policy.yaml
   - release.yaml
