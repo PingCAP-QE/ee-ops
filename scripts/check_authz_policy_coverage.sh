@@ -57,14 +57,12 @@ while IFS= read -r route; do
       '[.[] | select(.namespace == $ns) | .refs[]? | select(.kind == "HTTPRoute" and .name == $name)] | length' \
       "$tmp/policies.json")
     cluster=${source#apps/}; cluster=${cluster#infrastructure/}; cluster=${cluster#clusters/}; cluster=${cluster%%/*}
-    status=gap
     if (( policies > 0 )); then
       status=mapped
-    elif awk -F, -v c="$cluster" -v n="$ns" -v r="$name" \
-      'NR > 1 && $1 == c && $2 == n && $3 == r && $4 != "" && $5 != "" && $6 == "approved" { found=1 } END { exit !found }' \
-      "$repo_root/docs/authz/inventory/route-exceptions.csv"; then
-      status=exception
     else
+      # No exception register: an unmapped route is always a gap. A deliberate
+      # exception would be a change to this script, not a data row.
+      status=gap
       ((gaps+=1))
     fi
     printf '"%s","%s","%s","%s","%s",%s,%s\n' \
